@@ -1,0 +1,7 @@
+{
+    "parent":"block/cube_all",
+    "textures": {
+        "all": "yurtmod:blocks/tepee_wall_0",
+		"particle": "yurtmod:blocks/tepee_wall_0"
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "parent": "block/crop",
+    "textures": {
+        "crop": "yurtmod:blocks/yurt_frame_1"
+    }
+}

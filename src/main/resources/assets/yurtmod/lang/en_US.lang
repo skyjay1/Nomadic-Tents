@@ -1,0 +1,33 @@
+itemGroup.yurtMain=Nomadic Tents
+
+tile.yurt_wall_outer.name=Yurt Outer Wall
+tile.yurt_wall_inner.name=Yurt Inner Wall
+tile.yurt_frame_wall.name=Yurt Frame Block (Wall)
+tile.yurt_frame_roof.name=Yurt Frame Block (Roof)
+tile.tepee_frame_wall.name=Tepee Frame Block (Wall)
+tile.yurt_door_0.name=Yurt Door (Red)
+tile.yurt_door_1.name=Yurt Door (Blue)
+tile.yurt_door_2.name=Yurt Door (Green)
+tile.tepee_door_0.name=Tepee Door (Red)
+tile.tepee_door_1.name=Tepee Door (Blue)
+tile.tepee_door_2.name=Tepee Door (Green)
+tile.tepee_wall_0.name=Tepee Wall (Blank)
+tile.tepee_wall.name=Tepee Wall
+tile.yurt_roof.name=Yurt Roof
+tile.yurt_roof_sloped.name=Yurt Roof Piece
+tile.yurt_floor.name=Dirt (Indestructible)
+tile.yurtmod_barrier.name=Barrier
+
+item.yurt_small.name=Small Yurt
+item.yurt_medium.name=Medium Yurt
+item.yurt_large.name=Large Yurt
+item.tepee_small.name=Small Tepee
+item.tepee_medium.name=Medium Tepee
+item.tepee_large.name=Large Tepee
+item.mallet.name=Tent Mallet
+item.super_mallet.name=Super Tent Mallet
+item.tent_canvas.name=Tent Canvas
+item.yurt_wall_piece.name=Yurt Wall Section
+item.tepee_wall_piece.name=Tepee Wall Section
+
+tooltip.extra_dimensional_space=Extra-dimensional space!

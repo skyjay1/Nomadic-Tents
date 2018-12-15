@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "down": "yurtmod:blocks/yurt_wall_inner_upper",
+        "up": "yurtmod:blocks/yurt_roof_upper",
+        "north": "yurtmod:blocks/yurt_wall_lower",
+        "south": "yurtmod:blocks/yurt_wall_lower",
+        "west": "yurtmod:blocks/yurt_wall_lower",
+        "east": "yurtmod:blocks/yurt_wall_lower",
+        "particle": "yurtmod:blocks/yurt_wall_lower"
+    }
+}

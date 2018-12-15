@@ -1,0 +1,6 @@
+{
+	"variants": {
+		"half=upper": { "model": "yurtmod:tepee_door_upper_2"},
+		"half=lower": { "model": "yurtmod:tepee_door_lower_2"}
+	}
+}

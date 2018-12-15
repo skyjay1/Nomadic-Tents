@@ -1,0 +1,20 @@
+{
+    "variants": {
+        "texture=0": { "model":"yurtmod:tepee_wall_0" },
+        "texture=1": { "model":"yurtmod:tepee_wall_1" },
+		"texture=2": { "model":"yurtmod:tepee_wall_2" },
+		"texture=3": { "model":"yurtmod:tepee_wall_3" },
+		"texture=4": { "model":"yurtmod:tepee_wall_4" },
+		"texture=5": { "model":"yurtmod:tepee_wall_5" },
+		"texture=6": { "model":"yurtmod:tepee_wall_6" },
+		"texture=7": { "model":"yurtmod:tepee_wall_7" },
+		"texture=8": { "model":"yurtmod:tepee_wall_8" },
+		"texture=9": { "model":"yurtmod:tepee_wall_9" },
+		"texture=10": { "model":"yurtmod:tepee_wall_10" },
+		"texture=11": { "model":"yurtmod:tepee_wall_11" },
+		"texture=12": { "model":"yurtmod:tepee_wall_12" },
+		"texture=13": { "model":"yurtmod:tepee_wall_13" },
+		"texture=14": { "model":"yurtmod:tepee_wall_14" },
+		"texture=15": { "model":"yurtmod:tepee_wall_15" }
+    }
+}
