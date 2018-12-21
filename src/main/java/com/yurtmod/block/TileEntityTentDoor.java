@@ -71,6 +71,14 @@ public class TileEntityTentDoor extends TileEntity
 		nbt.setInteger(S_PREV_DIM, this.getPrevDimension());
 		return nbt;
 	}
+	
+	/** Calculates what chunk offset x, z to give a door or item **/
+	public static int[] getChunkOffsetsFromXZ(int actualX, int actualZ)
+	{
+		int offsetX = actualX / (TentDimension.MAX_SQ_WIDTH);
+		int offsetZ = actualZ / (TentDimension.MAX_SQ_WIDTH);
+		return new int[] {offsetX, offsetZ};
+	}
 
 	public void setStructureType(StructureType type) 
 	{
@@ -126,9 +134,9 @@ public class TileEntityTentDoor extends TileEntity
 
 	public BlockPos getXYZFromOffsets()
 	{
-		int x = this.offsetX * (StructureHelper.MAX_SQ_WIDTH);
-		int y = StructureHelper.FLOOR_Y + 1;
-		int z = this.offsetZ * (StructureHelper.MAX_SQ_WIDTH);
+		int x = this.offsetX * (TentDimension.MAX_SQ_WIDTH);
+		int y = TentDimension.FLOOR_Y + 1;
+		int z = this.offsetZ * (TentDimension.MAX_SQ_WIDTH);
 		return new BlockPos(x,y,z);
 	}
 

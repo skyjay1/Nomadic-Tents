@@ -50,22 +50,7 @@ public class TentTeleporter extends Teleporter
 				entityZ = this.tentCorner.getZ() + this.structure.getDoorPosition() + 0.5D;
 				yaw = -90F;
 				// try to build a tent in that location (tent should check if it already exists)
-				switch(this.structure)
-				{
-				case YURT_LARGE: case YURT_MEDIUM: case YURT_SMALL:
-					new StructureYurt(this.structure).generateInTentDimension(prevDimID, worldServer, tentCorner.getX(), tentCorner.getZ(), prevX, prevY, prevZ);
-					break;
-				case TEPEE_LARGE: case TEPEE_MEDIUM: case TEPEE_SMALL:
-					new StructureTepee(this.structure).generateInTentDimension(prevDimID, worldServer, tentCorner.getX(), tentCorner.getZ(), prevX, prevY, prevZ);
-					break;
-				case BEDOUIN_LARGE: case BEDOUIN_MEDIUM: case BEDOUIN_SMALL:
-					new StructureBedouin(this.structure).generateInTentDimension(prevDimID, worldServer, tentCorner.getX(), tentCorner.getZ(), prevX, prevY, prevZ);
-					break;
-				default:
-					StructureHelper.generatePlatform(worldServer, tentCorner, 8);
-					System.out.println("Error: unhandled structure type resulted in empty platform");
-					break;
-				}
+				this.structure.getNewStructure().generateInTentDimension(prevDimID, worldServer, tentCorner.getX(), tentCorner.getZ(), prevX, prevY, prevZ);
 			}
 			else
 			{	

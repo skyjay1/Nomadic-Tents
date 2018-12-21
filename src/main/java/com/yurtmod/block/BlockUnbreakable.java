@@ -16,7 +16,7 @@ public class BlockUnbreakable extends BlockEmptyDrops
 		super(material);
 		this.setBlockUnbreakable();
 		this.disableStats();
-		this.setResistance(6000000.0F);
+		this.setResistance(6000001.0F);
 		this.setCreativeTab(NomadicTents.tab);
 		this.setSoundType(SoundType.WOOD);
 	}

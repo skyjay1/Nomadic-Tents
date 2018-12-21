@@ -1,0 +1,6 @@
+{
+	"variants": {
+		"half=upper": { "model": "yurtmod:bed_door_upper_2"},
+		"half=lower": { "model": "yurtmod:bed_door_lower_2"}
+	}
+}

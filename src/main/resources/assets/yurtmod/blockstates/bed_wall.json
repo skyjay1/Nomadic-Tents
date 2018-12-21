@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "above_similar=true,beside_similar=false": { "model": "yurtmod:bed_wall_upper"},
+		"above_similar=false,beside_similar=false": { "model": "yurtmod:bed_wall_lower"},
+		"above_similar=true,beside_similar=true": { "model": "yurtmod:bed_wall_upper2"},
+		"above_similar=false,beside_similar=true": { "model": "yurtmod:bed_wall_lower2"}
+    }
+}

@@ -5,6 +5,7 @@ import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.item.ItemMallet;
+import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureHelper;
 import com.yurtmod.structure.StructureType;
 
@@ -12,6 +13,7 @@ import net.minecraft.block.BlockDoor;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,20 +21,30 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvider, ITepeeBlock, IYurtBlock, IBedouinBlock
 {
-	public final int DECONSTRUCT_DAMAGE = 5;
+	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
+	public static final int DECONSTRUCT_DAMAGE = 5;
+	private static final double aabbDis = 0.25D;
+	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
+	public static final AxisAlignedBB AABB_Z = new AxisAlignedBB(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
+	public final boolean isCube;
 
-	public BlockTentDoor()
+	public BlockTentDoor(boolean isFull)
 	{
 		super(Material.WOOD);
-		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER));
-		//TODO add .withProperty(Facing [north-south or east-west] ) in order to change AABB to not be full block
+		this.isCube = isFull;
+		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER).withProperty(AXIS, EnumFacing.Axis.X));
 	}
 
 	@Override
@@ -48,20 +60,21 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	{
 		if(!worldIn.isRemote)
 		{
-			int meta = this.getMetaFromState(state);
-			BlockPos base = meta % 4 == 0 ? pos : pos.down(1);
+			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.UPPER) ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			if(te != null && te instanceof TileEntityTentDoor)
 			{
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
-				StructureType struct = teyd.getStructureType();
-				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? StructureHelper.STRUCTURE_DIR : StructureHelper.isValidStructure(worldIn, struct, base);
+				StructureType type = teyd.getStructureType();
+				StructureBase struct = type.getNewStructure();
+				// make sure there is a valid tent before doing anything
+				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR : struct.getValidFacing(worldIn, base);
 				if(dir == null) return false;
 				// deconstruct the tent if the player uses a tentHammer on the door (and in overworld and with fully built tent)
 				if(player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet && !TentDimension.isTentDimension(worldIn))
 				{
 					// prepare a tent item to drop
-					ItemStack toDrop = struct.getDropStack(teyd.getOffsetX(), teyd.getOffsetZ());
+					ItemStack toDrop = type.getDropStack(teyd.getOffsetX(), teyd.getOffsetZ());
 					if(toDrop != null)
 					{
 						// drop the tent item and damage the tool
@@ -69,7 +82,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// remove the yurt structure
-						StructureHelper.deleteSmallStructure(worldIn, teyd.getStructureType(), base, dir);
+						struct.remove(worldIn, base, dir, StructureType.Size.SMALL);
 						// damage the item
 						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player);
 
@@ -86,9 +99,9 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
 	{
-		if(state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER)
+		if(state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER))
 		{
-			worldIn.setBlockState(pos.up(), this.getDefaultState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER), 3);
+			worldIn.setBlockState(pos.up(), this.getDefaultState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER).withProperty(AXIS, state.getValue(AXIS)), 3);
 		}
 	}
 /*
@@ -98,6 +111,38 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 		return this.getDefaultState();
 	}
 */
+	@Override
+	 public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+		if(this.isCube)
+		{
+			state = state.getActualState(source, pos);
+	        EnumFacing.Axis axis = (EnumFacing.Axis)state.getValue(AXIS);
+	        if(axis.equals(EnumFacing.Axis.X)) return AABB_X;
+	        else return AABB_Z;
+		}
+		else return FULL_BLOCK_AABB;
+    }
+	
+	@Override
+	 public boolean isOpaqueCube(IBlockState state)
+    {
+        return this.isCube;
+    }
+	
+	@Override
+	public boolean isFullCube(IBlockState state)
+    {
+        return this.isCube;
+    }
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer()
+    {
+        return this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
+    }
+	 
 	@Override
 	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state)
 	{
@@ -122,16 +167,20 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
 	public IBlockState getStateFromMeta(int meta) 
 	{
-		return getDefaultState().withProperty(BlockDoor.HALF, meta % 4 == 0 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER);
+		return getDefaultState().withProperty(BlockDoor.HALF, meta % 2 == 0 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER).withProperty(AXIS, meta > 1 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) 
 	{
 		int meta = 0;
-		if(state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER)
+		if(state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.UPPER))
 		{
 			meta += 1;
+		}
+		if(state.getValue(AXIS).equals(EnumFacing.Axis.Z))
+		{
+			meta += 2;
 		}
 		return meta;
 	}

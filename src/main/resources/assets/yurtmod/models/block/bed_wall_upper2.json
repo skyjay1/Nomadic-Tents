@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+		"north": "yurtmod:blocks/bed_wall_upper2",
+		"south": "yurtmod:blocks/bed_wall_upper2",
+		"east": "yurtmod:blocks/bed_wall_upper",
+		"west": "yurtmod:blocks/bed_wall_upper",
+		"up": "yurtmod:blocks/bed_roof_top",
+		"down": "yurtmod:blocks/bed_roof_bottom",
+		"particle": "yurtmod:blocks/bed_wall_upper2"
+    }
+}

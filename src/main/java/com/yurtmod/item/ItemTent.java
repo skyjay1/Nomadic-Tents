@@ -7,8 +7,10 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Config;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
+import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureHelper;
 import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -40,6 +42,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemTent extends Item 
 {
+	/** Tent ItemStack NBTs should have this value for x and z offsets **/
+	public static final int ERROR_TAG = Short.MIN_VALUE;
 	public static final String OFFSET_X = "TentOffsetX";
 	public static final String OFFSET_Z = "TentOffsetZ";
 
@@ -72,10 +76,10 @@ public class ItemTent extends Item
 		}
 		if(!stack.getTagCompound().hasKey(OFFSET_X))
 		{
-			stack.getTagCompound().setInteger(OFFSET_X, StructureHelper.ERROR_TAG);
+			stack.getTagCompound().setInteger(OFFSET_X, ERROR_TAG);
 		}
 		if(!stack.getTagCompound().hasKey(OFFSET_Z)) {
-			stack.getTagCompound().setInteger(OFFSET_Z, StructureHelper.ERROR_TAG);
+			stack.getTagCompound().setInteger(OFFSET_Z, ERROR_TAG);
 		}
 	}
 
@@ -128,10 +132,11 @@ public class ItemTent extends Item
 				else if(hitTop)
 				{
 					StructureType type = StructureType.get(meta);
-					if(StructureHelper.canSpawnStructureHere(worldIn, type, hitPos, d))
+					StructureBase struct = type.getNewStructure();
+					if(struct.canSpawn(worldIn, hitPos, player.getHorizontalFacing(), StructureType.Size.SMALL))
 					{
 						Block door = StructureType.get(meta).getDoorBlock();
-						if(StructureHelper.generateSmallStructureOverworld(worldIn, type, hitPos, d))
+						if(struct.generateFrameStructure(worldIn, hitPos, player.getHorizontalFacing(), Size.SMALL))
 						{
 							// lower door:
 							TileEntity te = worldIn.getTileEntity(hitPos);
@@ -167,7 +172,7 @@ public class ItemTent extends Item
 	{
 		for(StructureType type : StructureType.values())
 		{
-			ItemStack tent = type.getDropStack(StructureHelper.ERROR_TAG, StructureHelper.ERROR_TAG);
+			ItemStack tent = type.getDropStack(ERROR_TAG, ERROR_TAG);
 			subItems.add(tent);
 		}
 	}
@@ -197,7 +202,7 @@ public class ItemTent extends Item
 	{
 		if(stack.getTagCompound() != null) 
 		{
-			return stack.getTagCompound().getInteger(OFFSET_X) == StructureHelper.ERROR_TAG && stack.getTagCompound().getInteger(OFFSET_Z) == StructureHelper.ERROR_TAG;
+			return stack.getTagCompound().getInteger(OFFSET_X) == ERROR_TAG && stack.getTagCompound().getInteger(OFFSET_Z) == ERROR_TAG;
 		}
 		return true;
 	}

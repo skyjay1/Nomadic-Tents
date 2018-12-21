@@ -86,15 +86,15 @@ public class Content
 		BEDOUIN_WALL = new BlockBedouinWall();
 		BEDOUIN_ROOF = new BlockBedouinRoof();
 		// doors
-		YURT_DOOR_SMALL = new BlockTentDoor();
-		YURT_DOOR_MEDIUM = new BlockTentDoor();
-		YURT_DOOR_LARGE = new BlockTentDoor();
-		TEPEE_DOOR_SMALL = new BlockTentDoor();
-		TEPEE_DOOR_MEDIUM = new BlockTentDoor();
-		TEPEE_DOOR_LARGE = new BlockTentDoor();
-		BEDOUIN_DOOR_SMALL = new BlockTentDoor();
-		BEDOUIN_DOOR_MEDIUM = new BlockTentDoor();
-		BEDOUIN_DOOR_LARGE = new BlockTentDoor();
+		YURT_DOOR_SMALL = new BlockTentDoor(false);
+		YURT_DOOR_MEDIUM = new BlockTentDoor(false);
+		YURT_DOOR_LARGE = new BlockTentDoor(false);
+		TEPEE_DOOR_SMALL = new BlockTentDoor(true);
+		TEPEE_DOOR_MEDIUM = new BlockTentDoor(true);
+		TEPEE_DOOR_LARGE = new BlockTentDoor(true);
+		BEDOUIN_DOOR_SMALL = new BlockTentDoor(false);
+		BEDOUIN_DOOR_MEDIUM = new BlockTentDoor(false);
+		BEDOUIN_DOOR_LARGE = new BlockTentDoor(false);
 		// frame blocks
 		FRAME_YURT_WALL = new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER);
 		FRAME_YURT_ROOF = new BlockTentFrame(BlockToBecome.YURT_ROOF);

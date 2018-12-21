@@ -20,7 +20,6 @@ public class BlockBarrier extends BlockUnbreakable implements IYurtBlock, ITepee
 	public BlockBarrier() 
 	{
 		super(Material.BARRIER);
-		this.setResistance(6000001.0F);
 		this.disableStats();
 		this.translucent = true;
 	}
