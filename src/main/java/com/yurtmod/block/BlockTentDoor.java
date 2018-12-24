@@ -4,9 +4,9 @@ import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.init.Config;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.structure.StructureBase;
-import com.yurtmod.structure.StructureHelper;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.BlockDoor;
@@ -16,7 +16,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -35,7 +35,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 {
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
 	public static final int DECONSTRUCT_DAMAGE = 5;
-	private static final double aabbDis = 0.25D;
+	private static final double aabbDis = 0.375D;
 	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
 	public static final AxisAlignedBB AABB_Z = new AxisAlignedBB(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
 	public final boolean isCube;
@@ -60,7 +60,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	{
 		if(!worldIn.isRemote)
 		{
-			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.UPPER) ? pos : pos.down(1);
+			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			if(te != null && te instanceof TileEntityTentDoor)
 			{
@@ -91,10 +91,41 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 				}
 				else return ((TileEntityTentDoor)te).onPlayerActivate(player);
 			}
-			else System.out.println("Error! Failed to retrieve TileEntityTentDoor at " + pos);
+			else System.out.println("[BlockTentDoor] Error! Failed to retrieve TileEntityTentDoor at " + pos);
 		}
 		return false;
 	}
+	
+	@Override
+	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn)
+	{
+		this.onEntityCollidedWithBlock(worldIn, pos, worldIn.getBlockState(pos), entityIn);
+	}
+	
+	 /**
+     * Called When an Entity Collided with the Block
+     */
+	@Override
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
+    {
+		 if(!worldIn.isRemote)
+		 {
+			 BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
+			 TileEntity te = worldIn.getTileEntity(base);
+			 if(te != null && te instanceof TileEntityTentDoor)
+			 {
+				 TileEntityTentDoor teyd = (TileEntityTentDoor) te;
+				 StructureType type = teyd.getStructureType();
+				 StructureBase struct = type.getNewStructure();
+				 // make sure there is a valid tent before doing anything
+				 EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR : struct.getValidFacing(worldIn, base);
+				 if(dir != null)
+				 {
+					 ((TileEntityTentDoor)te).onEntityCollide(entityIn, dir);
+				 }
+			 }
+		 }
+	 }
 
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
@@ -112,16 +143,18 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	}
 */
 	@Override
-	 public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
     {
 		if(this.isCube)
 		{
-			state = state.getActualState(source, pos);
-	        EnumFacing.Axis axis = (EnumFacing.Axis)state.getValue(AXIS);
+			return FULL_BLOCK_AABB;
+		}
+		else 
+		{
+			EnumFacing.Axis axis = (EnumFacing.Axis)state.getValue(AXIS);
 	        if(axis.equals(EnumFacing.Axis.X)) return AABB_X;
 	        else return AABB_Z;
 		}
-		else return FULL_BLOCK_AABB;
     }
 	
 	@Override
@@ -161,7 +194,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
 	protected BlockStateContainer createBlockState() 
 	{
-		return new BlockStateContainer(this, new IProperty[] {BlockDoor.HALF});
+		return new BlockStateContainer(this, new IProperty[] {BlockDoor.HALF, AXIS});
 	}
 
 	@Override
@@ -184,10 +217,18 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 		}
 		return meta;
 	}
+	
+	@Override
+	public boolean hasTileEntity(IBlockState state) 
+	{
+		return true;
+	}
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) 
 	{
-		return new TileEntityTentDoor();
+		TileEntityTentDoor ret = new TileEntityTentDoor();
+		ret.setWorld(worldIn);
+		return ret;
 	}
 }

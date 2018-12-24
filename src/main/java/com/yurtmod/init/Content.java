@@ -89,9 +89,9 @@ public class Content
 		YURT_DOOR_SMALL = new BlockTentDoor(false);
 		YURT_DOOR_MEDIUM = new BlockTentDoor(false);
 		YURT_DOOR_LARGE = new BlockTentDoor(false);
-		TEPEE_DOOR_SMALL = new BlockTentDoor(true);
-		TEPEE_DOOR_MEDIUM = new BlockTentDoor(true);
-		TEPEE_DOOR_LARGE = new BlockTentDoor(true);
+		TEPEE_DOOR_SMALL = new BlockTentDoor(false);
+		TEPEE_DOOR_MEDIUM = new BlockTentDoor(false);
+		TEPEE_DOOR_LARGE = new BlockTentDoor(false);
 		BEDOUIN_DOOR_SMALL = new BlockTentDoor(false);
 		BEDOUIN_DOOR_MEDIUM = new BlockTentDoor(false);
 		BEDOUIN_DOOR_LARGE = new BlockTentDoor(false);
@@ -124,7 +124,7 @@ public class Content
 	private static void registerBlocks() 
 	{
 		register(TENT_BARRIER, "tentmod_barrier");
-		register(SUPER_DIRT, "indestructible_dirt", "super_dirt");
+		register(SUPER_DIRT, "super_dirt");
 		register(YURT_WALL_OUTER, "yurt_wall_outer");
 		register(YURT_WALL_INNER, "yurt_wall_inner");
 		register(YURT_ROOF, "yurt_roof");
@@ -132,21 +132,21 @@ public class Content
 		register(BEDOUIN_WALL, "bed_wall");
 		register(BEDOUIN_ROOF, "bed_roof");
 		// doors
-		register(YURT_DOOR_SMALL, "yurt_door_0");
-		register(YURT_DOOR_MEDIUM, "yurt_door_1");
-		register(YURT_DOOR_LARGE, "yurt_door_2");
-		register(TEPEE_DOOR_SMALL, "tepee_door_0");
-		register(TEPEE_DOOR_MEDIUM, "tepee_door_1");
-		register(TEPEE_DOOR_LARGE, "tepee_door_2");
-		register(BEDOUIN_DOOR_SMALL, "bed_door_0");
-		register(BEDOUIN_DOOR_MEDIUM, "bed_door_1");
-		register(BEDOUIN_DOOR_LARGE, "bed_door_2");
+		register(YURT_DOOR_SMALL, null, "yurt_door_0");
+		register(YURT_DOOR_MEDIUM, null, "yurt_door_1");
+		register(YURT_DOOR_LARGE, null, "yurt_door_2");
+		register(TEPEE_DOOR_SMALL, null, "tepee_door_0");
+		register(TEPEE_DOOR_MEDIUM, null, "tepee_door_1");
+		register(TEPEE_DOOR_LARGE, null, "tepee_door_2");
+		register(BEDOUIN_DOOR_SMALL, null, "bed_door_0");
+		register(BEDOUIN_DOOR_MEDIUM, null, "bed_door_1");
+		register(BEDOUIN_DOOR_LARGE, null, "bed_door_2");
 		// frame blocks
-		register(FRAME_YURT_WALL, "frame_yurt_wall");
-		register(FRAME_YURT_ROOF, "frame_yurt_roof");
-		register(FRAME_TEPEE_WALL, "frame_tepee_wall");
-		register(FRAME_BEDOUIN_WALL, "frame_bed_wall");
-		register(FRAME_BEDOUIN_ROOF, "frame_bed_roof");
+		register(FRAME_YURT_WALL, null, "frame_yurt_wall");
+		register(FRAME_YURT_ROOF, null, "frame_yurt_roof");
+		register(FRAME_TEPEE_WALL, null, "frame_tepee_wall");
+		register(FRAME_BEDOUIN_WALL, null, "frame_bed_wall");
+		register(FRAME_BEDOUIN_ROOF, null, "frame_bed_roof");
 	}
 
 	private static void registerItems() 
@@ -164,38 +164,28 @@ public class Content
 	{
 		GameRegistry.registerTileEntity(te, NomadicTents.MODID + "." + name);	
 	}
-	
-	private static void register(Item item, String name, String unlocal)
+	/** Register the Item with the given name **/
+	private static void register(Item item, String name)
 	{
-		item.setUnlocalizedName(unlocal).setRegistryName(NomadicTents.MODID, name);
+		item.setUnlocalizedName(name).setRegistryName(NomadicTents.MODID, name);
 		GameRegistry.register(item);
 	}
 	
-	private static void register(Block block, ItemBlock ib, String name, String unlocal)
-	{
-		block.setUnlocalizedName(unlocal).setRegistryName(NomadicTents.MODID, name);
-		ib.setUnlocalizedName(unlocal).setRegistryName(NomadicTents.MODID, name);
-		GameRegistry.register(block);
-		GameRegistry.register(ib);
-	}
-	
-	private static void register(Item item, String name)
-	{
-		register(item, name, name);
-	}
-	
+	/** Register the Block with the given ItemBlock and name **/
 	private static void register(Block block, ItemBlock ib, String name)
 	{
-		register(block, ib, name, name);
+		block.setUnlocalizedName(name).setRegistryName(NomadicTents.MODID, name);
+		GameRegistry.register(block);
+		if(ib != null)
+		{
+			ib.setUnlocalizedName(name).setRegistryName(NomadicTents.MODID, name);
+			GameRegistry.register(ib);
+		}
 	}
 	
-	private static void register(Block block, String name, String unlocal)
-	{
-		register(block, new ItemBlock(block), name, unlocal);
-	}	
-	
+	/** Register the Block with an auto-generated ItemBlock and the given name **/
 	private static void register(Block block, String name)
 	{
-		register(block, name, name);
+		register(block, new ItemBlock(block), name);
 	}	
 }

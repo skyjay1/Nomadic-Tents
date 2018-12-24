@@ -1,13 +1,10 @@
 package com.yurtmod.dimension;
 
-import com.yurtmod.structure.StructureBedouin;
-import com.yurtmod.structure.StructureHelper;
-import com.yurtmod.structure.StructureTepee;
 import com.yurtmod.structure.StructureType;
-import com.yurtmod.structure.StructureYurt;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
@@ -18,13 +15,13 @@ public class TentTeleporter extends Teleporter
 	private BlockPos tentCorner;
 	private double prevX, prevY, prevZ;
 	private int prevDimID;
-	private WorldServer worldServer;
+	private WorldServer worldServerTo;
 
 	public TentTeleporter(int dimensionFrom, WorldServer worldTo, BlockPos corner, double oldX, double oldY, double oldZ, StructureType type)
 	{
 		super(worldTo);
 		this.prevDimID = dimensionFrom;
-		this.worldServer = worldTo;
+		this.worldServerTo = worldTo;
 		this.tentCorner = corner;
 		this.prevX = oldX;
 		this.prevY = oldY;
@@ -43,19 +40,21 @@ public class TentTeleporter extends Teleporter
 			float yaw;
 			entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 
-			if(TentDimension.isTentDimension(worldServer))
+			if(TentDimension.isTentDimension(worldServerTo))
 			{	
 				entityX = this.tentCorner.getX() + 1.5D;
 				entityY = this.tentCorner.getY() + 0.01D;
 				entityZ = this.tentCorner.getZ() + this.structure.getDoorPosition() + 0.5D;
 				yaw = -90F;
 				// try to build a tent in that location (tent should check if it already exists)
-				this.structure.getNewStructure().generateInTentDimension(prevDimID, worldServer, tentCorner.getX(), tentCorner.getZ(), prevX, prevY, prevZ);
+				this.structure.getNewStructure().generateInTentDimension(prevDimID, worldServerTo, tentCorner.getX(), tentCorner.getZ(), prevX, prevY, prevZ);
+				// also synchronize the time between Tent and Overworld dimensions
+				worldServerTo.getWorldInfo().setWorldTime(entity.getServer().worldServerForDimension(0).getWorldTime());
 			}
 			else
 			{	
 				entityX = this.prevX;
-				entityY = this.prevY + 0.5D;
+				entityY = this.prevY + 0.25D;
 				entityZ = this.prevZ;
 				yaw = entity.rotationYaw;
 			}
@@ -69,6 +68,7 @@ public class TentTeleporter extends Teleporter
 		return true;
 	}
 	
+	@Override
 	public String toString()
 	{
 		String out = "\n[TentTeleporter]\n" +
@@ -78,7 +78,7 @@ public class TentTeleporter extends Teleporter
 			"prevY=" + this.prevY + "\n" +
 			"prevZ=" + this.prevZ + "\n" +
 			"prevDimID=" + this.prevDimID + "\n" +
-			"nextDimID=" + this.worldServer.provider.getDimension() + "\n"; 
+			"nextDimID=" + this.worldServerTo.provider.getDimension() + "\n"; 
 		return out;
 	}
 }

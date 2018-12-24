@@ -67,6 +67,8 @@ public class BlockBedouinWall extends BlockUnbreakable implements IBedouinBlock
 		return above + beside;
 	}
 	
+	
+	
 	private void updateState(World worldIn, BlockPos myPos)
 	{
 		boolean above = worldIn.getBlockState(myPos.down(1)).getBlock() == this 

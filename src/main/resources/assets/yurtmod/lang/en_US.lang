@@ -58,3 +58,4 @@ item.bedouin_large.name=Large Bedouin
 tooltip.extra_dimensional_space=Extra-dimensional space!
 chat.no_structure_ln1=This tent item does not have valid coordinates!
 chat.no_structure_ln2=Craft the tent item in a crafting table and try again.
+chat.no_teleport=Teleporting is not allowed inside your tent.

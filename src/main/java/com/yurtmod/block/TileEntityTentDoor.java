@@ -2,16 +2,21 @@ package com.yurtmod.block;
 
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.structure.StructureHelper;
+import com.yurtmod.init.Config;
 import com.yurtmod.structure.StructureType;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldServer;
 
 public class TileEntityTentDoor extends TileEntity
 {
@@ -72,12 +77,16 @@ public class TileEntityTentDoor extends TileEntity
 		return nbt;
 	}
 	
-	/** Calculates what chunk offset x, z to give a door or item **/
-	public static int[] getChunkOffsetsFromXZ(int actualX, int actualZ)
+	/** Calculates what chunk offset x to give a door or item **/
+	public static int getChunkOffsetX(int actualX)
 	{
-		int offsetX = actualX / (TentDimension.MAX_SQ_WIDTH);
-		int offsetZ = actualZ / (TentDimension.MAX_SQ_WIDTH);
-		return new int[] {offsetX, offsetZ};
+		return actualX / (TentDimension.MAX_SQ_WIDTH);
+	}
+	
+	/** Calculates what chunk offset x to give a door or item **/
+	public static int getChunkOffsetZ(int actualZ)
+	{
+		return actualZ / (TentDimension.MAX_SQ_WIDTH);
 	}
 
 	public void setStructureType(StructureType type) 
@@ -139,9 +148,98 @@ public class TileEntityTentDoor extends TileEntity
 		int z = this.offsetZ * (TentDimension.MAX_SQ_WIDTH);
 		return new BlockPos(x,y,z);
 	}
+	
+	public boolean teleport(Entity entity)
+	{
+		// make sure the server exists
+		MinecraftServer mcServer = entity.getServer();
+		if(null == mcServer) return false;
+		// everything is ok, so continue with the code
+        entity.setPortal(pos);
+		if(entity.timeUntilPortal > 0)
+		{
+			entity.timeUntilPortal = 10;
+		}
+		else
+		{
+			// where the corresponding structure is in Tent dimension
+			BlockPos corners = getXYZFromOffsets();
+			// dimension to/from info for Teleporter object and math
+			int dimTo = TentDimension.isTentDimension(entity.getEntityWorld()) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
+			int dimFrom = entity.getEntityWorld().provider.getDimension();
+			WorldServer oldServer = mcServer.worldServerForDimension(dimFrom);
+			WorldServer newServer = mcServer.worldServerForDimension(dimTo);
+			
+			// make the teleporter
+			TentTeleporter tel = new TentTeleporter(
+					dimFrom, newServer, corners, this.prevX, this.prevY, this.prevZ, this.structure);
+			entity.timeUntilPortal = 10;
+			if(entity instanceof EntityPlayerMP)
+			{
+				// transfer player to dimension
+				mcServer.getPlayerList().transferPlayerToDimension((EntityPlayerMP)entity, dimTo, tel);
+			}
+			else
+			{
+				// transfer non-player entity to dimension
+				// TODO find out why it doesn't spawn the entity in the tent dimension after removing the overworld one
+				// mcServer.getPlayerList().transferEntityToWorld(entity, this.getPrevDimension(), oldServer, newServer, tel);
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Attempts to teleport the entity and use
+	 * its XYZ to update TileEntity fields.
+	 * @param entity the Entity that collided with the tent door block
+	 * @param tentDir the EnumFacing direction for which the tent was valid
+	 * @return whether the teleport was successful
+	 */
+	public boolean onEntityCollide(Entity entity, EnumFacing tentDir)
+	{
+		if(canTeleportEntity(entity) && Config.ALLOW_COLLIDE)
+		{
+			// remember the entity coordinates from the overworld
+			if(!TentDimension.isTentDimension(entity.getEntityWorld()))
+			{
+				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
+				double posX = respawn.getX() + 0.5D;
+				double posY = respawn.getY() + 0.01D;
+				double posZ = respawn.getZ() + 0.5D;
+				this.setOverworldXYZ(posX, posY, posZ);
+			}
+			// attempt teleport AFTER setting OverworldXYZ
+			return this.teleport(entity);
+		}
+		else return false;
+	}
 
+	/**
+	 * Attempts to teleport the entity and use
+	 * its XYZ to update TileEntity fields.
+	 * @param player the player who clicked on the tent door
+	 * @return whether the teleport was successful
+	 */
 	public boolean onPlayerActivate(EntityPlayer player)
 	{
+		if(canTeleportEntity(player))
+		{
+			// remember the entity coordinates from the overworld
+			if(!TentDimension.isTentDimension(player.getEntityWorld()))
+			{
+				double posX = player.posX;
+				double posY = player.posY;
+				double posZ = player.posZ;
+				this.setOverworldXYZ(posX, posY, posZ);
+			}
+			// attempt teleport AFTER setting OverworldXYZ
+			return this.teleport(player);
+		}
+		else return false;
+		
+		/*
 		if (!player.isRiding() && !player.isBeingRidden() && player instanceof EntityPlayerMP)
         {
             player.setPortal(pos);
@@ -185,5 +283,15 @@ public class TileEntityTentDoor extends TileEntity
 		}
 
 		return false;
+		*/
+	}
+	
+	/** TODO allow non-player entities to be teleported **/
+	public static boolean canTeleportEntity(Entity entity)
+	{
+		boolean ridingFlag = entity.isRiding() || entity.isBeingRidden();
+		boolean isInvalidClass = entity instanceof EntityEnderman;
+		//return isAlone && !isInvalidClass && entity.isNonBoss();
+		return !ridingFlag && entity instanceof EntityPlayer;
 	}
 }

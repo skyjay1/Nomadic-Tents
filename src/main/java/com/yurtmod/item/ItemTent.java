@@ -8,7 +8,6 @@ import com.yurtmod.init.Config;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
-import com.yurtmod.structure.StructureHelper;
 import com.yurtmod.structure.StructureType;
 import com.yurtmod.structure.StructureType.Size;
 
@@ -78,20 +77,24 @@ public class ItemTent extends Item
 		{
 			stack.getTagCompound().setInteger(OFFSET_X, ERROR_TAG);
 		}
-		if(!stack.getTagCompound().hasKey(OFFSET_Z)) {
+		if(!stack.getTagCompound().hasKey(OFFSET_Z)) 
+		{
 			stack.getTagCompound().setInteger(OFFSET_Z, ERROR_TAG);
 		}
 	}
 
 	@Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
+    public EnumActionResult onItemUseFirst(final EntityPlayer player, final World worldIn, final BlockPos pos, final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand)
 	{
 		if(!TentDimension.isTentDimension(worldIn))
 		{
-			RayTraceResult rtr = this.rayTrace(worldIn, player, true);
+			BlockPos hitPos = pos;
+			Block hitBlock = worldIn.getBlockState(pos).getBlock();
 			ItemStack stack = player.getHeldItem(hand);
+			EnumFacing hitSide = side;
+			//System.out.println("\nhitPos=" + hitPos.toString() + "\nhitBlock=" + hitBlock.getRegistryName() + "\nhitSide=" + side.toString());
 
-			if (rtr == null || stack == null || stack.isEmpty())
+			if (hitBlock == null || stack == null || stack.isEmpty())
 			{
 				return EnumActionResult.FAIL;
 			}
@@ -108,45 +111,46 @@ public class ItemTent extends Item
 				if(Config.ALLOW_REFUND)
 				{
 					dropComponents(worldIn, player, stack);
-					stack.setCount(stack.getCount()-1);;
+					stack.setCount(stack.getCount()-1);
 				}
 				return EnumActionResult.FAIL;
 			}
-			else if(rtr.typeOfHit == RayTraceResult.Type.BLOCK)
+			else
 			{
-				EnumFacing d = player.getHorizontalFacing();
-				BlockPos hitPos = rtr.getBlockPos().up(1);
-				boolean hitTop = rtr.sideHit == EnumFacing.UP;
-				Block clicked = worldIn.getBlockState(hitPos).getBlock();
-				int meta = stack.getItemDamage();
-				if(clicked == Blocks.SNOW_LAYER || worldIn.getBlockState(hitPos).getMaterial() == Material.PLANTS)
+				// offset the BlockPos to build on if it's snow or plants
+				if(StructureBase.REPLACE_BLOCK_PRED.test(worldIn.getBlockState(hitPos)))
 				{
-					hitTop = true;
 					hitPos = hitPos.down(1);
+					hitSide = EnumFacing.UP;
 				}
-
-				if(!player.canPlayerEdit(hitPos, hitTop ? EnumFacing.UP : rtr.sideHit, stack))
+				else hitPos = hitPos.up(1);
+				// if you can't edit these blocks, return FAIL
+				if(!player.canPlayerEdit(hitPos, hitSide, stack))
 				{
 					return EnumActionResult.FAIL;
 				}
-				else if(hitTop)
+				else if(hitSide.equals(EnumFacing.UP))
 				{
-					StructureType type = StructureType.get(meta);
-					StructureBase struct = type.getNewStructure();
-					if(struct.canSpawn(worldIn, hitPos, player.getHorizontalFacing(), StructureType.Size.SMALL))
+					final int meta = stack.getItemDamage();
+					final EnumFacing playerFacing = player.getHorizontalFacing();
+					final StructureType type = StructureType.get(meta);
+					final StructureBase struct = type.getNewStructure();
+					// make sure the tent can be built here
+					// overworld version will always be Size.SMALL 
+					if(struct.canSpawn(worldIn, hitPos, playerFacing, StructureType.Size.SMALL))
 					{
-						Block door = StructureType.get(meta).getDoorBlock();
-						if(struct.generateFrameStructure(worldIn, hitPos, player.getHorizontalFacing(), Size.SMALL))
+						// build the frames
+						if(struct.generateFrameStructure(worldIn, hitPos, playerFacing, Size.SMALL))
 						{
-							// lower door:
-							TileEntity te = worldIn.getTileEntity(hitPos);
+							// update the TileEntity information
+							final TileEntity te = worldIn.getTileEntity(hitPos);
 							if(te != null && te instanceof TileEntityTentDoor)
 							{
 								type.applyToTileEntity(player, stack, (TileEntityTentDoor)te);
 							}
-							else System.out.println("Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
+							else System.out.println("[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
 							// remove tent from inventory
-							stack.setCount(stack.getCount()-1);;
+							stack.setCount(stack.getCount()-1);
 						}
 					}
 				}
@@ -198,7 +202,7 @@ public class ItemTent extends Item
 		par3List.add(color + I18n.format("tooltip.extra_dimensional_space"));
 	}
 
-	public boolean hasInvalidCoords(ItemStack stack)
+	public static boolean hasInvalidCoords(ItemStack stack)
 	{
 		if(stack.getTagCompound() != null) 
 		{
@@ -208,7 +212,7 @@ public class ItemTent extends Item
 	}
 
 	/** Finds out what was used to make the ItemStack and 'refunds' the player by uncrafting it **/
-	public void dropComponents(World world, EntityPlayer player, ItemStack stack)
+	public static void dropComponents(World world, EntityPlayer player, ItemStack stack)
 	{
 		List<IRecipe> list = CraftingManager.getInstance().getRecipeList();
 		for(IRecipe r : list)

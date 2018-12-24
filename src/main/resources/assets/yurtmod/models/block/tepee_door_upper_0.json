@@ -1,12 +1,6 @@
 {
-    "parent": "block/cube",
+    "parent": "yurtmod:block/door_nonfull",
     "textures": {
-		"north": "yurtmod:blocks/tepee_door_upper_0",
-		"south": "yurtmod:blocks/tepee_door_upper_0",
-		"east": "yurtmod:blocks/tepee_door_upper_0",
-		"west": "yurtmod:blocks/tepee_door_upper_0",
-		"up": "yurtmod:blocks/tepee_wall_0",
-		"down": "yurtmod:blocks/tepee_wall_0",
-		"particle": "yurtmod:blocks/tepee_door_upper_0"
+        "t": "yurtmod:blocks/tepee_door_upper_0"
     }
 }

@@ -4,14 +4,11 @@ import java.util.function.Predicate;
 
 import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -108,8 +105,7 @@ public class StructureBedouin extends StructureBase
 	{
 		boolean flag = generateMedium(worldIn, doorBase, StructureHelper.STRUCTURE_DIR, Content.BEDOUIN_DOOR_MEDIUM, Content.BEDOUIN_WALL, Content.BEDOUIN_ROOF);
 		StructureHelper.refinePlatform(worldIn, doorBase, StructureHelper.bedWallsMed);
-		BlockPos pos = StructureHelper.getPosFromDoor(doorBase.down(1), 3, 0, StructureHelper.STRUCTURE_DIR);
-		StructureHelper.buildFire(worldIn, Blocks.GLOWSTONE.getDefaultState(), Blocks.AIR.getDefaultState(), pos); 
+		 
 		return flag;
 	}
 
@@ -219,7 +215,7 @@ public class StructureBedouin extends StructureBase
 			Block wallBlock, Block roofBlock) 
 	{
 		final Blueprints bp;
-		boolean tentDim = worldIn.provider.getDimension() == TentDimension.DIMENSION_ID;
+		boolean tentDim = TentDimension.isTentDimension(worldIn);
 		switch(size)
 		{
 		case LARGE:
@@ -231,9 +227,9 @@ public class StructureBedouin extends StructureBase
 			// add dimension-only features
 			if(tentDim)
 			{
-				generatePlatform(worldIn, doorBase.north(this.getType().getDoorPosition()), size.getSquareWidth());
-				BlockPos pos = getPosFromDoor(doorBase.down(1), 4, 0, TentDimension.STRUCTURE_DIR);
-				buildFire(worldIn, Blocks.GLOWSTONE.getDefaultState(), Blocks.AIR.getDefaultState(), pos); 
+				// place a fire to light up the place (since there's no window or skylight)
+				BlockPos pos = getPosFromDoor(doorBase, 4, 0, 0, TentDimension.STRUCTURE_DIR);
+				worldIn.setBlockState(pos, Blocks.FIRE.getDefaultState(), 3);
 			}
 			return true;
 		case MEDIUM:
@@ -245,9 +241,9 @@ public class StructureBedouin extends StructureBase
 			// add dimension-only features
 			if(tentDim)
 			{
-				generatePlatform(worldIn, doorBase.north(this.getType().getDoorPosition()), size.getSquareWidth());
-				BlockPos pos = getPosFromDoor(doorBase.down(1), 3, 0, TentDimension.STRUCTURE_DIR);
-				buildFire(worldIn, Blocks.GLOWSTONE.getDefaultState(), Blocks.AIR.getDefaultState(), pos); 
+				// place a fire to light up the place (since there's no window or skylight)
+				BlockPos pos = getPosFromDoor(doorBase, 3, 0, 0, TentDimension.STRUCTURE_DIR);
+				worldIn.setBlockState(pos, Blocks.FIRE.getDefaultState(), 3);
 			}
 			return true;
 		case SMALL:
@@ -259,10 +255,9 @@ public class StructureBedouin extends StructureBase
 			// add dimension-only features
 			if(tentDim)
 			{
-				generatePlatform(worldIn, doorBase.north(this.getType().getDoorPosition()), size.getSquareWidth());
-				BlockPos pos = getPosFromDoor(doorBase.down(1), 2, 0, TentDimension.STRUCTURE_DIR);
-				buildFire(worldIn, Blocks.GLOWSTONE.getDefaultState(), Blocks.AIR.getDefaultState(), pos); 
-				
+				// place a torch (too small for fire)
+				BlockPos pos = getPosFromDoor(doorBase, 2, 0, 0, TentDimension.STRUCTURE_DIR);
+				worldIn.setBlockState(pos, Blocks.TORCH.getDefaultState(), 3);				
 			}
 			return true;
 		}
@@ -279,9 +274,9 @@ public class StructureBedouin extends StructureBase
 				size.equals(StructureType.Size.LARGE) ? BP_LARGE : null;
 		
 		// check wall and roof arrays
-		if(!validateArray(worldIn, doorBase, bp.getWallCoords(), facing, canReplaceBlockPred)) 
+		if(!validateArray(worldIn, doorBase, bp.getWallCoords(), facing, REPLACE_BLOCK_PRED)) 
 			return false;
-		if(!validateArray(worldIn, doorBase, bp.getRoofCoords(), facing, canReplaceBlockPred)) 
+		if(!validateArray(worldIn, doorBase, bp.getRoofCoords(), facing, REPLACE_BLOCK_PRED)) 
 			return false;
 		// passes all checks, so return true
 		return true;
@@ -343,7 +338,7 @@ public class StructureBedouin extends StructureBase
 				{1,1,-3},{2,1,-3},{3,1,-3},{4,1,-3},{5,1,-3} });
 			bp.addRoofCoords(new int[][] {
 				// layer 1
-				{0,2,-1},{0,2,0},{0,2,2},{1,2,2},{2,2,2},{3,2,2},{4,2,2},{5,2,2},
+				{0,2,-1},{0,2,0},{0,2,1},{1,2,2},{2,2,2},{3,2,2},{4,2,2},{5,2,2},
 				{6,2,-1},{6,2,0},{6,2,1},{1,2,-2},{2,2,-2},{3,2,-2},{4,2,-2},{5,2,-2},
 				// layer 2
 				{0,3,0},{1,3,1},{2,3,1},{3,3,1},{4,3,1},{5,3,1},
