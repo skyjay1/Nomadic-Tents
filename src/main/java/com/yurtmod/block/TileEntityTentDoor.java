@@ -6,11 +6,9 @@ import com.yurtmod.init.Config;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -173,8 +171,8 @@ public class TileEntityTentDoor extends TileEntity
 			BlockPos corners = getXYZFromOffsets();
 			// dimension to/from info for Teleporter object and math
 			MinecraftServer mcServer = entity.getServer();
-			WorldServer oldServer = mcServer.worldServerForDimension(dimFrom);
-			WorldServer newServer = mcServer.worldServerForDimension(dimTo);
+			WorldServer oldServer = mcServer.getWorld(dimFrom);
+			WorldServer newServer = mcServer.getWorld(dimTo);
 			// make the teleporter
 			TentTeleporter tel = new TentTeleporter(
 					dimFrom, newServer, corners, this.prevX, this.prevY, this.prevZ, this.structure);
@@ -192,6 +190,7 @@ public class TileEntityTentDoor extends TileEntity
 			else
 			{
 				// transfer non-player entity to dimension
+				// TODO not working correctly
 				mcServer.getPlayerList().transferEntityToWorld(entity, dimFrom, oldServer, newServer, tel);
 			}
 			return true;

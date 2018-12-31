@@ -10,7 +10,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -22,8 +21,8 @@ public class NomadicTents
 {
 	public static final String MODID = "yurtmod";
 	public static final String NAME = "Nomadic Tents";
-	public static final String VERSION = "8.02";
-	public static final String MCVERSION = "1.11.2";
+	public static final String VERSION = "9.01";
+	public static final String MCVERSION = "1.12.2";
 	
 	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID + ".proxies.CommonProxy")
 	public static CommonProxy proxy;
@@ -44,13 +43,11 @@ public class NomadicTents
 		Config.mainRegistry(new Configuration(new File(path)));
 		Content.mainRegistry();
 		TentDimension.mainRegistry();
-		proxy.preInitRenders();
 	}
 	
 	@EventHandler
     public void init(FMLInitializationEvent event)
     {    
-		Crafting.mainRegistry();
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
     }
 }

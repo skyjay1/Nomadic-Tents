@@ -10,14 +10,36 @@ import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@Mod.EventBusSubscriber
 public class ClientProxy extends CommonProxy 
 {
-	@Override
-	public void preInitRenders() 
+	
+	@SubscribeEvent
+	public static void onRenderEvent(ModelRegistryEvent event)
 	{
-		registerVariantRenders();
+		// register variant renders
+		int len = StructureType.values().length;
+		ResourceLocation[] RLTentItem = new ResourceLocation[len];
+		ResourceLocation[] RLTepeeWall = new ResourceLocation[BlockTepeeWall.NUM_TEXTURES];
+		for(int i = 0; i < len; i++)
+		{
+			String modelName = NomadicTents.MODID + ":" + StructureType.getName(i);
+			RLTentItem[i] = new ResourceLocation(modelName);
+			register(Content.ITEM_TENT, modelName, i);
+		}
+		for(int j = 0; j < BlockTepeeWall.NUM_TEXTURES; j++)
+		{
+			String modelName = Content.IB_TEPEE_WALL.getRegistryName() + "_" + j;
+			RLTepeeWall[j] = new ResourceLocation(modelName);
+			register(Content.IB_TEPEE_WALL, modelName, j);
+		}
+		ModelBakery.registerItemVariants(Content.ITEM_TENT, RLTentItem);
+		ModelBakery.registerItemVariants(Content.IB_TEPEE_WALL, RLTepeeWall);
 
 		// register items		
 		register(Content.ITEM_TENT_CANVAS);
@@ -55,28 +77,7 @@ public class ClientProxy extends CommonProxy
 		register(Content.FRAME_BEDOUIN_ROOF, progress);
 	}
 
-	private void registerVariantRenders()
-	{
-		int len = StructureType.values().length;
-		ResourceLocation[] RLTentItem = new ResourceLocation[len];
-		ResourceLocation[] RLTepeeWall = new ResourceLocation[BlockTepeeWall.NUM_TEXTURES];
-		for(int i = 0; i < len; i++)
-		{
-			String modelName = NomadicTents.MODID + ":" + StructureType.getName(i);
-			RLTentItem[i] = new ResourceLocation(modelName);
-			register(Content.ITEM_TENT, modelName, i);
-		}
-		for(int j = 0; j < BlockTepeeWall.NUM_TEXTURES; j++)
-		{
-			String modelName = Content.IB_TEPEE_WALL.getRegistryName() + "_" + j;
-			RLTepeeWall[j] = new ResourceLocation(modelName);
-			register(Content.IB_TEPEE_WALL, modelName, j);
-		}
-		ModelBakery.registerItemVariants(Content.ITEM_TENT, RLTentItem);
-		ModelBakery.registerItemVariants(Content.IB_TEPEE_WALL, RLTepeeWall);
-	}
-
-	private void register(Item i, String name, int... meta)
+	private static void register(Item i, String name, int... meta)
 	{
 		if(meta.length < 1) meta = new int[] {0};
 		for(int m : meta)
@@ -85,12 +86,12 @@ public class ClientProxy extends CommonProxy
 		}
 	}
 
-	private void register(Item i, int... meta)
+	private static void register(Item i, int... meta)
 	{
 		register(i, i.getRegistryName().toString(), meta);
 	}
 
-	private void register(Block b, int... meta)
+	private static void register(Block b, int... meta)
 	{
 		Item i = Item.getItemFromBlock(b);
 		if(i != null)

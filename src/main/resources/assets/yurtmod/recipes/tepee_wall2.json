@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "FSF",
+   "FSF"],
+  "key": {
+    "F": {
+        "item": "minecraft:leather"
+      },
+	"S": {
+		"item": "minecraft:stick"
+	  }
+  },
+  "result": {
+    "item": "yurtmod:tepee_wall_piece",
+    "count": 1
+  }
+}

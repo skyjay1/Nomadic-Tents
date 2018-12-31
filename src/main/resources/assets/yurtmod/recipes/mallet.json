@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   " IS",
+   " CI",
+   "S  "],
+  "key": {
+    "I": {
+        "item": "minecraft:iron_ingot"
+      },
+	"S": {
+		"item": "minecraft:stick"
+	  },
+	"C": {
+		"item": "yurtmod:tent_canvas"
+	  }
+  },
+  "result": {
+    "item": "yurtmod:mallet",
+    "count": 1
+  }
+}

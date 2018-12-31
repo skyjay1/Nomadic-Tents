@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   " F ",
+   "FTF",
+   "FFF"],
+  "key": {
+    "F": {
+        "item": "yurtmod:bed_wall_piece"
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 7
+    }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	"data": 8,
+    "count": 1
+  }
+}

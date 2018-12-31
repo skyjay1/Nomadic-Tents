@@ -3,6 +3,7 @@ package com.yurtmod.block;
 import javax.annotation.Nullable;
 
 import com.yurtmod.block.Categories.IFrameBlock;
+import com.yurtmod.init.Config;
 import com.yurtmod.init.Content;
 import com.yurtmod.item.ItemMallet;
 
@@ -175,6 +176,9 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock
 
 	public boolean onSuperMalletUsed(World worldIn, BlockPos pos, IBlockState state, ItemStack mallet, EntityPlayer player)
 	{
+		if(Config.SUPER_MALLET_CREATIVE_ONLY && !player.isCreative()) 
+			return false;
+		
 		this.becomeReal(worldIn, pos, mallet, player);
 		for(int i = -1; i < 2; i++)
 		{

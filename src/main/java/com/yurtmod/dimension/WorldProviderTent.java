@@ -3,14 +3,13 @@ package com.yurtmod.dimension;
 import com.yurtmod.init.Config;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.biome.BiomeProviderSingle;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 
 public class WorldProviderTent extends WorldProvider
 {	
@@ -24,7 +23,6 @@ public class WorldProviderTent extends WorldProvider
 		this.setDimension(TentDimension.DIMENSION_ID);
 		this.setAllowedSpawnTypes(false, false);
 		this.hasSkyLight = true;
-		this.hasNoSky = false;
     }
     
 	@Override
@@ -63,12 +61,6 @@ public class WorldProviderTent extends WorldProvider
 	public boolean isSurfaceWorld()
 	{
 		return true;
-	}
-
-	@Override
-	public String getWelcomeMessage()
-	{
-		return "Entering your Tent";
 	}
 
 	@Override

@@ -28,9 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class CommonProxy
-{
-	public void preInitRenders() {}
-	
+{	
 	@SubscribeEvent
 	public static void registerBlocks(final RegistryEvent.Register<Block> event) 
 	{

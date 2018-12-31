@@ -1,20 +1,16 @@
 package com.yurtmod.block;
 
-import java.util.List;
-import java.util.Random;
-
 import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.init.Config;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.BlockDoor;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.BlockDoor.EnumDoorHalf;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;

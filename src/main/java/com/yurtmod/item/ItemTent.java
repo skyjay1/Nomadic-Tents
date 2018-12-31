@@ -2,6 +2,8 @@ package com.yurtmod.item;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Config;
@@ -12,13 +14,12 @@ import com.yurtmod.structure.StructureType;
 import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -31,7 +32,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentBase;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -107,11 +107,12 @@ public class ItemTent extends Item
 					player.sendMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_structure_ln2")));
 					player.sendMessage(lines);
 				}
-				if(Config.ALLOW_REFUND)
-				{
-					dropComponents(worldIn, player, stack);
-					stack.setCount(stack.getCount()-1);
-				}
+				//if(Config.ALLOW_REFUND)
+				//{
+					// TODO
+					//dropComponents(worldIn, player, stack);
+					//stack.setCount(stack.getCount()-1);
+				//}
 				return EnumActionResult.FAIL;
 			}
 			else
@@ -171,12 +172,12 @@ public class ItemTent extends Item
 	}
 
 	@Override
-    public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems)
-	{
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
+    {
 		for(StructureType type : StructureType.values())
 		{
 			ItemStack tent = type.getDropStack(ERROR_TAG, ERROR_TAG);
-			subItems.add(tent);
+			items.add(tent);
 		}
 	}
 
@@ -195,10 +196,10 @@ public class ItemTent extends Item
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer player, List par3List, boolean par4)
-	{
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+    {
 		TextFormatting color = StructureType.get(stack.getItemDamage()).getTooltipColor();
-		par3List.add(color + I18n.format("tooltip.extra_dimensional_space"));
+		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
 	}
 
 	public static boolean hasInvalidCoords(ItemStack stack)
@@ -210,7 +211,8 @@ public class ItemTent extends Item
 		return true;
 	}
 
-	/** Finds out what was used to make the ItemStack and 'refunds' the player by uncrafting it **/
+	// TODO
+	/** Finds out what was used to make the ItemStack and 'refunds' the player by uncrafting it
 	public static void dropComponents(World world, EntityPlayer player, ItemStack stack)
 	{
 		List<IRecipe> list = CraftingManager.getInstance().getRecipeList();
@@ -240,6 +242,7 @@ public class ItemTent extends Item
 			}
 		}
 	}
+	*/
 
 	public void adjustSaveData(ItemStack stack, World world, EntityPlayer player)
 	{

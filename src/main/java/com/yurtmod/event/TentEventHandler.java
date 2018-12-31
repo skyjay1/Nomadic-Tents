@@ -6,7 +6,6 @@ import com.yurtmod.init.Config;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.BlockBed;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -29,8 +28,8 @@ public class TentEventHandler
 		if(!event.getEntityPlayer().getEntityWorld().isRemote)
 		{
 			MinecraftServer server = event.getEntityPlayer().getServer();
-			WorldServer overworld = server.worldServerForDimension(0);
-			WorldServer tentDim = server.worldServerForDimension(TentDimension.DIMENSION_ID);
+			WorldServer overworld = server.getWorld(0);
+			WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
 			if(Config.ALLOW_SLEEP_TENT_DIM && TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld()))
 			{
 				handleSleepIn(overworld, event.shouldSetSpawn());
@@ -88,8 +87,8 @@ public class TentEventHandler
 					// let's do something about that
 
 					MinecraftServer mcServer = playerMP.getServer();
-					WorldServer oldServer = mcServer.worldServerForDimension(TENTDIM);
-					WorldServer newServer = mcServer.worldServerForDimension(RESPAWN);
+					WorldServer oldServer = mcServer.getWorld(TENTDIM);
+					WorldServer newServer = mcServer.getWorld(RESPAWN);
 					
 					BlockPos respawnPos = playerMP.getBedLocation(RESPAWN);
 					if(respawnPos != null && (newServer.getBlockState(bedPos).getBlock() instanceof BlockBed))
