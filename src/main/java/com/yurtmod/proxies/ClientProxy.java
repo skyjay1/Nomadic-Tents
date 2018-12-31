@@ -96,6 +96,6 @@ public class ClientProxy extends CommonProxy
 		if(i != null)
 		{
 			register(i, meta);
-		} else System.out.println("Tried to register render for a null ItemBlock. Skipping.");
+		} else System.out.println("[NomadicTents.ClientProxy] Tried to register render for a null ItemBlock. Skipping.");
 	}
 }

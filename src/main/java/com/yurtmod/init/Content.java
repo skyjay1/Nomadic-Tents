@@ -1,5 +1,7 @@
 package com.yurtmod.init;
 
+import javax.annotation.Nullable;
+
 import com.yurtmod.block.BlockBarrier;
 import com.yurtmod.block.BlockBedouinRoof;
 import com.yurtmod.block.BlockBedouinWall;
@@ -27,53 +29,82 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class Content 
 {
 	// begin blocks
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tentmod_barrier")
 	public static Block TENT_BARRIER;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":super_dirt")
 	public static Block SUPER_DIRT;
 
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_roof")
 	public static Block YURT_ROOF;		
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_wall_outer")
 	public static Block YURT_WALL_OUTER;		
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_wall_inner")
 	public static Block YURT_WALL_INNER;	
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_wall")
 	public static Block TEPEE_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_wall")
 	public static Block BEDOUIN_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_roof")
 	public static Block BEDOUIN_ROOF;
 
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_door_0")
 	public static Block YURT_DOOR_SMALL;	
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_door_1")
 	public static Block YURT_DOOR_MEDIUM;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_door_2")
 	public static Block YURT_DOOR_LARGE;		
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_door_0")
 	public static Block TEPEE_DOOR_SMALL; 	
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_door_1")
 	public static Block TEPEE_DOOR_MEDIUM;		
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_door_2")
 	public static Block TEPEE_DOOR_LARGE;	
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_door_0")
 	public static Block BEDOUIN_DOOR_SMALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_door_1")
 	public static Block BEDOUIN_DOOR_MEDIUM;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_door_2")
 	public static Block BEDOUIN_DOOR_LARGE;
 
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_yurt_wall")
 	public static Block FRAME_YURT_WALL;		
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_yurt_roof")
 	public static Block FRAME_YURT_ROOF;		
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_tepee_wall")
 	public static Block FRAME_TEPEE_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_bed_wall")
 	public static Block FRAME_BEDOUIN_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_bed_roof")
 	public static Block FRAME_BEDOUIN_ROOF;
 	
+	// Items and ItemBlocks
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_wall")
 	public static ItemBlock IB_TEPEE_WALL;
 
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent")
 	public static Item ITEM_TENT;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":mallet")
 	public static Item ITEM_MALLET;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":super_mallet")
 	public static Item ITEM_SUPER_MALLET;	
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_canvas")
 	public static Item ITEM_TENT_CANVAS;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_wall_piece")
 	public static Item ITEM_YURT_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_wall_piece")
 	public static Item ITEM_TEPEE_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_wall_piece")
 	public static Item ITEM_BEDOUIN_WALL;
 
 	public static void mainRegistry()
 	{
-		initBlocks();
-		initItemBlocks();
-		initItems();
+		GameRegistry.registerTileEntity(TileEntityTentDoor.class, NomadicTents.MODID + ".TileEntityTentDoor");
 		
-		registerBlocks();
-		registerItems();
-		registerTileEntity(TileEntityTentDoor.class, "TileEntityTentDoor");
+		//registerBlocks();
+		//registerItems();
+		//registerTileEntity(TileEntityTentDoor.class, "TileEntityTentDoor");
 	}
-	
+	/*
 	private static void initBlocks()
 	{
 		// blocks
@@ -89,9 +120,9 @@ public class Content
 		YURT_DOOR_SMALL = new BlockTentDoor(false);
 		YURT_DOOR_MEDIUM = new BlockTentDoor(false);
 		YURT_DOOR_LARGE = new BlockTentDoor(false);
-		TEPEE_DOOR_SMALL = new BlockTentDoor(true);
-		TEPEE_DOOR_MEDIUM = new BlockTentDoor(true);
-		TEPEE_DOOR_LARGE = new BlockTentDoor(true);
+		TEPEE_DOOR_SMALL = new BlockTentDoor(false);
+		TEPEE_DOOR_MEDIUM = new BlockTentDoor(false);
+		TEPEE_DOOR_LARGE = new BlockTentDoor(false);
 		BEDOUIN_DOOR_SMALL = new BlockTentDoor(false);
 		BEDOUIN_DOOR_MEDIUM = new BlockTentDoor(false);
 		BEDOUIN_DOOR_LARGE = new BlockTentDoor(false);
@@ -124,7 +155,7 @@ public class Content
 	private static void registerBlocks() 
 	{
 		register(TENT_BARRIER, "tentmod_barrier");
-		register(SUPER_DIRT, "indestructible_dirt", "super_dirt");
+		register(SUPER_DIRT, "super_dirt");
 		register(YURT_WALL_OUTER, "yurt_wall_outer");
 		register(YURT_WALL_INNER, "yurt_wall_inner");
 		register(YURT_ROOF, "yurt_roof");
@@ -164,38 +195,29 @@ public class Content
 	{
 		GameRegistry.registerTileEntity(te, NomadicTents.MODID + "." + name);	
 	}
-	
-	private static void register(Item item, String name, String unlocal)
+	/** Register the Item with the given name **
+	private static void register(final Item item, final String name)
 	{
-		item.setUnlocalizedName(unlocal).setRegistryName(NomadicTents.MODID, name);
+		item.setUnlocalizedName(name).setRegistryName(NomadicTents.MODID, name);
 		GameRegistry.register(item);
 	}
 	
-	private static void register(Block block, ItemBlock ib, String name, String unlocal)
+	/** Register the Block with the given ItemBlock and name **
+	private static void register(final Block block, @Nullable final ItemBlock ib, final String name)
 	{
-		block.setUnlocalizedName(unlocal).setRegistryName(NomadicTents.MODID, name);
-		ib.setUnlocalizedName(unlocal).setRegistryName(NomadicTents.MODID, name);
+		block.setUnlocalizedName(name).setRegistryName(NomadicTents.MODID, name);
 		GameRegistry.register(block);
-		GameRegistry.register(ib);
+		if(ib != null)
+		{
+			ib.setUnlocalizedName(name).setRegistryName(NomadicTents.MODID, name);
+			GameRegistry.register(ib);
+		}
 	}
 	
-	private static void register(Item item, String name)
+	/** Register the Block with an auto-generated ItemBlock and the given name **
+	private static void register(final Block block, final String name)
 	{
-		register(item, name, name);
-	}
-	
-	private static void register(Block block, ItemBlock ib, String name)
-	{
-		register(block, ib, name, name);
-	}
-	
-	private static void register(Block block, String name, String unlocal)
-	{
-		register(block, new ItemBlock(block), name, unlocal);
+		register(block, new ItemBlock(block), name);
 	}	
-	
-	private static void register(Block block, String name)
-	{
-		register(block, name, name);
-	}	
+	*/
 }

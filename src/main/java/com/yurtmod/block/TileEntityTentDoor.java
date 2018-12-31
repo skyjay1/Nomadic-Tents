@@ -2,16 +2,24 @@ package com.yurtmod.block;
 
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.structure.StructureHelper;
+import com.yurtmod.init.Config;
 import com.yurtmod.structure.StructureType;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayerMP;import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 
 public class TileEntityTentDoor extends TileEntity
 {
@@ -72,12 +80,16 @@ public class TileEntityTentDoor extends TileEntity
 		return nbt;
 	}
 	
-	/** Calculates what chunk offset x, z to give a door or item **/
-	public static int[] getChunkOffsetsFromXZ(int actualX, int actualZ)
+	/** Calculates what chunk offset x to give a door or item **/
+	public static final int getChunkOffsetX(int actualX)
 	{
-		int offsetX = actualX / (TentDimension.MAX_SQ_WIDTH);
-		int offsetZ = actualZ / (TentDimension.MAX_SQ_WIDTH);
-		return new int[] {offsetX, offsetZ};
+		return actualX / (TentDimension.MAX_SQ_WIDTH);
+	}
+	
+	/** Calculates what chunk offset x to give a door or item **/
+	public static final int getChunkOffsetZ(int actualZ)
+	{
+		return actualZ / (TentDimension.MAX_SQ_WIDTH);
 	}
 
 	public void setStructureType(StructureType type) 
@@ -126,12 +138,7 @@ public class TileEntityTentDoor extends TileEntity
 	{
 		return this.prevDimID;
 	}
-
-	public BlockPos getOverworldXYZ()
-	{
-		return new BlockPos(this.prevX, this.prevY, this.prevZ);
-	}
-
+	
 	public BlockPos getXYZFromOffsets()
 	{
 		int x = this.offsetX * (TentDimension.MAX_SQ_WIDTH);
@@ -139,51 +146,115 @@ public class TileEntityTentDoor extends TileEntity
 		int z = this.offsetZ * (TentDimension.MAX_SQ_WIDTH);
 		return new BlockPos(x,y,z);
 	}
-
-	public boolean onPlayerActivate(EntityPlayer player)
+	
+	/**
+	 * Teleports the given entity to/from the Tent Dimension.
+	 * Creates and calls custom TentTeleporter to handle this.
+	 * Tile Entity should call this AFTER recording the entity's location,
+	 * since that is about to change.
+	 * Note:  handles differently for EntityPlayerMP vs. other entities.
+	 * @param entity
+	 * @return
+	 **/
+	public boolean teleport(Entity entity)
 	{
-		if (!player.isRiding() && !player.isBeingRidden() && player instanceof EntityPlayerMP)
-        {
-            player.setPortal(pos);
-			MinecraftServer mcServer = player.getServer();
-			EntityPlayerMP playerMP = (EntityPlayerMP)player;
+        entity.setPortal(this.getPos());
+        int dimFrom = entity.getEntityWorld().provider.getDimension();
+		int dimTo = TentDimension.isTentDimension(dimFrom) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
+        
+		if(entity.timeUntilPortal > 0)
+		{
+			entity.timeUntilPortal = 10;
+		}
+		else
+		{
+			entity.timeUntilPortal = 10;
 			// where the corresponding structure is in Tent dimension
 			BlockPos corners = getXYZFromOffsets();
-			int dimensionFrom = playerMP.getEntityWorld().provider.getDimension();
-
-			if(playerMP.timeUntilPortal > 0)
+			// dimension to/from info for Teleporter object and math
+			MinecraftServer mcServer = entity.getServer();
+			WorldServer oldServer = mcServer.worldServerForDimension(dimFrom);
+			WorldServer newServer = mcServer.worldServerForDimension(dimTo);
+			// make the teleporter
+			TentTeleporter tel = new TentTeleporter(
+					dimFrom, newServer, corners, this.prevX, this.prevY, this.prevZ, this.structure);
+			
+			if(entity instanceof EntityPlayerMP)
 			{
-				playerMP.timeUntilPortal = 10;
+				EntityPlayerMP playerMP = (EntityPlayerMP) entity;
+				// use reflection to allow a certain value to be accessed and changed (required for teleporting properly)
+				try {
+					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true), "field_184851_cj", "invulnerableDimensionChange");
+				} catch(UnableToFindFieldException e) { }
+				// transfer player to dimension
+				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
 			}
-			else if(!TentDimension.isTentDimension(dimensionFrom))
+			else
 			{
-				// remember the player's coordinates from the overworld
-				this.setOverworldXYZ(playerMP.posX, playerMP.posY, playerMP.posZ);
-
-				TentTeleporter tel = new TentTeleporter(
-						dimensionFrom, mcServer.worldServerForDimension(TentDimension.DIMENSION_ID), 
-						corners, this.prevX, this.prevY, this.prevZ, this.structure);
-				// debug:
-				//System.out.print("Created teleporter to Tent Dimension: " + tel.toString());
-				// teleport the player to Tent Dimension
-				playerMP.timeUntilPortal = 10;	
-				mcServer.getPlayerList().transferPlayerToDimension(playerMP, TentDimension.DIMENSION_ID, tel);
-			}
-			else if(TentDimension.isTentDimension(dimensionFrom))
-			{
-				TentTeleporter tel = new TentTeleporter(
-						dimensionFrom, mcServer.worldServerForDimension(this.getPrevDimension()), 
-						corners, this.prevX, this.prevY, this.prevZ, this.structure);
-				// debug:
-				//System.out.print("Created teleporter to Overworld: " + tel.toString());
-				// teleport player to overworld
-				playerMP.timeUntilPortal = 10;
-				mcServer.getPlayerList().transferPlayerToDimension(playerMP, this.getPrevDimension(), tel);
-				
+				// transfer non-player entity to dimension
+				mcServer.getPlayerList().transferEntityToWorld(entity, dimFrom, oldServer, newServer, tel);
 			}
 			return true;
 		}
-
 		return false;
+	}
+	
+	/**
+	 * Attempts to teleport the entity and use
+	 * its XYZ to update TileEntity fields.
+	 * @param entity the Entity that collided with the tent door block
+	 * @param tentDir the EnumFacing direction for which the tent was valid
+	 * @return whether the teleport was successful
+	 */
+	public boolean onEntityCollide(Entity entity, EnumFacing tentDir)
+	{
+		if(canTeleportEntity(entity) &&
+				((entity instanceof EntityPlayer && Config.ALLOW_PLAYER_COLLIDE) ||
+				(!(entity instanceof EntityPlayer) && Config.ALLOW_NONPLAYER_COLLIDE)))
+		{
+			// remember the entity coordinates from the overworld
+			if(!TentDimension.isTentDimension(entity.getEntityWorld()))
+			{
+				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
+				double posX = respawn.getX() + 0.5D;
+				double posY = respawn.getY() + 0.01D;
+				double posZ = respawn.getZ() + 0.5D;
+				this.setOverworldXYZ(posX, posY, posZ);
+			}
+			// attempt teleport AFTER setting OverworldXYZ
+			return this.teleport(entity);
+		}
+		else return false;
+	}
+
+	/**
+	 * Attempts to teleport the entity and use
+	 * its XYZ to update TileEntity fields.
+	 * @param player the player who clicked on the tent door
+	 * @return whether the teleport was successful
+	 */
+	public boolean onPlayerActivate(EntityPlayer player)
+	{
+		if(canTeleportEntity(player))
+		{
+			// remember the entity coordinates from the overworld
+			if(!TentDimension.isTentDimension(player.getEntityWorld()))
+			{
+				double posX = player.posX;
+				double posY = player.posY;
+				double posZ = player.posZ;
+				this.setOverworldXYZ(posX, posY, posZ);
+			}
+			// attempt teleport AFTER setting OverworldXYZ
+			return this.teleport(player);
+		}
+		else return false;
+	}
+	
+	public static boolean canTeleportEntity(Entity entity)
+	{
+		boolean ridingFlag = entity.isRiding() || entity.isBeingRidden();
+		boolean isInvalidClass = entity instanceof EntityEnderman;
+		return !ridingFlag && !isInvalidClass && entity.isNonBoss();
 	}
 }

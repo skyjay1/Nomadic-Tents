@@ -20,9 +20,10 @@ public class WorldProviderTent extends WorldProvider
 	@Override
     protected void init()
     {
-		this.biomeProvider = new BiomeProviderSingle(Biomes.VOID);
+		this.biomeProvider = new BiomeProviderSingle(TentDimension.TENT);
 		this.setDimension(TentDimension.DIMENSION_ID);
 		this.setAllowedSpawnTypes(false, false);
+		this.hasSkyLight = true;
 		this.hasNoSky = false;
     }
     
@@ -41,20 +42,21 @@ public class WorldProviderTent extends WorldProvider
 	@Override
 	public Biome getBiomeForCoords(BlockPos pos)
 	{
-		return Biomes.VOID;
+		return TentDimension.TENT;
 	}
 
 	@Override
 	public boolean canRespawnHere()
 	{
 		// returning false from here makes beds explode when you try to sleep
-		return Config.ALLOW_RESPAWN_TENT_DIM || Config.ALLOW_SLEEP_TENT_DIM;
+		return Config.ALLOW_SLEEP_TENT_DIM;
 	}
 
 	@Override
 	public int getRespawnDimension(EntityPlayerMP player)
 	{
-		return canRespawnHere() ? TentDimension.DIMENSION_ID : 0;
+		// this actually is only called if #canRespawnHere returns false, but that might change in the future
+		return Config.ALLOW_SLEEP_TENT_DIM ? TentDimension.DIMENSION_ID : 0;
 	}
 
 	@Override

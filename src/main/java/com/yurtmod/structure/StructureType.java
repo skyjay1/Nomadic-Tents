@@ -9,10 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 
 public enum StructureType
 {
@@ -74,7 +71,7 @@ public enum StructureType
 	{
 		if(stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.OFFSET_X)) 
 		{
-			System.out.println("ItemStack did not have any NBT information to pass to the TileEntity!");
+			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}
@@ -217,7 +214,7 @@ public enum StructureType
 			// the following are not used now but might be later
 			//case HUGE:	return TextFormatting.YELLOW;
 			//case GIANT:	return TextFormatting.AQUA; 
-			//case VAST:	return TextFormatting.LIGHT_PURPLE;
+			//case MEGA:	return TextFormatting.LIGHT_PURPLE;
 			}
 			return TextFormatting.GRAY;
 		}
