@@ -78,13 +78,13 @@ public class TileEntityTentDoor extends TileEntity
 	}
 	
 	/** Calculates what chunk offset x to give a door or item **/
-	public static int getChunkOffsetX(int actualX)
+	public static final int getChunkOffsetX(int actualX)
 	{
 		return actualX / (TentDimension.MAX_SQ_WIDTH);
 	}
 	
 	/** Calculates what chunk offset x to give a door or item **/
-	public static int getChunkOffsetZ(int actualZ)
+	public static final int getChunkOffsetZ(int actualZ)
 	{
 		return actualZ / (TentDimension.MAX_SQ_WIDTH);
 	}
@@ -121,6 +121,7 @@ public class TileEntityTentDoor extends TileEntity
 
 	public void setOverworldXYZ(double posX, double posY, double posZ)
 	{
+		System.out.println("[TETD] Setting Overworld XYZ: " + posX + ", " + posY + ", " + posZ);
 		this.prevX = posX;
 		this.prevY = posY;
 		this.prevZ = posZ;
@@ -135,12 +136,27 @@ public class TileEntityTentDoor extends TileEntity
 	{
 		return this.prevDimID;
 	}
-
+	
+	public double getOverworldX()
+	{
+		return this.prevX;
+	}
+	
+	public double getOverworldY()
+	{
+		return this.prevY;
+	}
+	
+	public double getOverworldZ()
+	{
+		return this.prevZ;
+	}
+/*
 	public BlockPos getOverworldXYZ()
 	{
 		return new BlockPos(this.prevX, this.prevY, this.prevZ);
 	}
-
+*/
 	public BlockPos getXYZFromOffsets()
 	{
 		int x = this.offsetX * (TentDimension.MAX_SQ_WIDTH);
@@ -169,21 +185,26 @@ public class TileEntityTentDoor extends TileEntity
 			int dimFrom = entity.getEntityWorld().provider.getDimension();
 			WorldServer oldServer = mcServer.worldServerForDimension(dimFrom);
 			WorldServer newServer = mcServer.worldServerForDimension(dimTo);
-			
+			System.out.println("[TETD] Preparing Teleporter");
 			// make the teleporter
 			TentTeleporter tel = new TentTeleporter(
 					dimFrom, newServer, corners, this.prevX, this.prevY, this.prevZ, this.structure);
+			System.out.println(tel.toString());
 			entity.timeUntilPortal = 10;
 			if(entity instanceof EntityPlayerMP)
 			{
+				EntityPlayerMP playerMP = (EntityPlayerMP) entity;
+				System.out.println("[TETD] Teleporting EntityPlayerMP");
 				// transfer player to dimension
-				mcServer.getPlayerList().transferPlayerToDimension((EntityPlayerMP)entity, dimTo, tel);
+				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
+				System.out.println("[TETD] EntityPlayerMP is now at " + entity.posX + ", " + entity.posY + ", " + entity.posZ);
 			}
 			else
 			{
+				System.out.println("[TETD] Teleporting Entity (non-playerMP)");
 				// transfer non-player entity to dimension
 				// TODO find out why it doesn't spawn the entity in the tent dimension after removing the overworld one
-				// mcServer.getPlayerList().transferEntityToWorld(entity, this.getPrevDimension(), oldServer, newServer, tel);
+				mcServer.getPlayerList().transferEntityToWorld(entity, dimFrom, oldServer, newServer, tel);
 			}
 			return true;
 		}
@@ -199,7 +220,8 @@ public class TileEntityTentDoor extends TileEntity
 	 */
 	public boolean onEntityCollide(Entity entity, EnumFacing tentDir)
 	{
-		if(canTeleportEntity(entity) && Config.ALLOW_COLLIDE)
+		System.out.println("[TETD] onEntityCollide");
+		if(Config.ALLOW_COLLIDE && canTeleportEntity(entity))
 		{
 			// remember the entity coordinates from the overworld
 			if(!TentDimension.isTentDimension(entity.getEntityWorld()))
@@ -208,7 +230,9 @@ public class TileEntityTentDoor extends TileEntity
 				double posX = respawn.getX() + 0.5D;
 				double posY = respawn.getY() + 0.01D;
 				double posZ = respawn.getZ() + 0.5D;
+				System.out.println("[TETD] Setting XYZ: " + posX + ", " + posY + ", " + posZ);
 				this.setOverworldXYZ(posX, posY, posZ);
+				System.out.println("[TETD] Overworld XYZ is now: " + this.getOverworldX() + ", " + this.getOverworldY() + ", " + this.getOverworldZ());
 			}
 			// attempt teleport AFTER setting OverworldXYZ
 			return this.teleport(entity);
@@ -292,6 +316,6 @@ public class TileEntityTentDoor extends TileEntity
 		boolean ridingFlag = entity.isRiding() || entity.isBeingRidden();
 		boolean isInvalidClass = entity instanceof EntityEnderman;
 		//return isAlone && !isInvalidClass && entity.isNonBoss();
-		return !ridingFlag && entity instanceof EntityPlayer;
+		return !ridingFlag && entity instanceof EntityPlayerMP;
 	}
 }

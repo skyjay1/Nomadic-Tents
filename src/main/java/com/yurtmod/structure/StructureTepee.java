@@ -45,8 +45,9 @@ public class StructureTepee extends StructureBase
 			if(tentDim)
 			{
 				// place fire and barrier
-				BlockPos pos = getPosFromDoor(doorBase, 4, 0, 0, dirForward);
-				worldIn.setBlockState(pos, Blocks.FIRE.getDefaultState(), 3);
+				BlockPos pos = getPosFromDoor(doorBase, 4, -1, 0, dirForward);
+				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
+				worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 2);
 				super.buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER, BP_LARGE.getBarrierCoords());
 			}
 			return true;
@@ -59,8 +60,9 @@ public class StructureTepee extends StructureBase
 			if(tentDim)
 			{
 				// build fire and barrier
-				BlockPos pos = getPosFromDoor(doorBase, 3, 0, 0, dirForward);
-				worldIn.setBlockState(pos, Blocks.FIRE.getDefaultState(), 3);
+				BlockPos pos = getPosFromDoor(doorBase, 3, -1, 0, dirForward);
+				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
+				worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 2);
 				super.buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER, BP_MED.getBarrierCoords());
 			}
 			return true;

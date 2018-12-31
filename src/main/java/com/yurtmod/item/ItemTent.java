@@ -50,7 +50,7 @@ public class ItemTent extends Item
 	{
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
-		this.setCreativeTab(NomadicTents.tab);
+		this.setCreativeTab(NomadicTents.TAB);
 	}
 
 	@Override

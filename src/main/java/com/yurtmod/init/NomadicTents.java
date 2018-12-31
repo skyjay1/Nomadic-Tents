@@ -22,25 +22,24 @@ public class NomadicTents
 {
 	public static final String MODID = "yurtmod";
 	public static final String NAME = "Nomadic Tents";
-	public static final String VERSION = "8.01";
+	public static final String VERSION = "8.02";
 	public static final String MCVERSION = "1.11.2";
 	
 	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID + ".proxies.CommonProxy")
 	public static CommonProxy proxy;
 	
-	public static CreativeTabs tab;
+	public static final CreativeTabs TAB = new CreativeTabs("yurtMain")
+	{
+		@Override
+		public ItemStack getTabIconItem() 
+		{
+			return new ItemStack(Content.ITEM_TENT);
+		}
+	};
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		tab = new CreativeTabs("yurtMain")
-		{
-			@Override
-			public ItemStack getTabIconItem() 
-			{
-				return new ItemStack(Content.ITEM_TENT);
-			}
-		};
 		String path = event.getSuggestedConfigurationFile().getAbsolutePath().replaceFirst(MODID + ".cfg", "NomadicTents.cfg");
 		Config.mainRegistry(new Configuration(new File(path)));
 		Content.mainRegistry();

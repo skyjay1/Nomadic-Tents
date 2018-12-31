@@ -11,6 +11,7 @@ import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.BlockDoor.EnumDoorHalf;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -46,7 +47,12 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 		this.isCube = isFull;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER).withProperty(AXIS, EnumFacing.Axis.X));
 	}
-
+	// default constructor assumes this block is NOT full
+	public BlockTentDoor()
+	{
+		this(false);
+	}
+	
 	@Override
 	public boolean canPlaceBlockAt(World world, BlockPos pos)
 	{
@@ -58,6 +64,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
+		System.out.println("[BlockTentDoor] On Block Activated");
 		if(!worldIn.isRemote)
 		{
 			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
@@ -71,7 +78,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR : struct.getValidFacing(worldIn, base);
 				if(dir == null) return false;
 				// deconstruct the tent if the player uses a tentHammer on the door (and in overworld and with fully built tent)
-				if(player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet && !TentDimension.isTentDimension(worldIn))
+				if(!worldIn.isRemote && player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet && !TentDimension.isTentDimension(worldIn))
 				{
 					// prepare a tent item to drop
 					ItemStack toDrop = type.getDropStack(teyd.getOffsetX(), teyd.getOffsetZ());
@@ -97,7 +104,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	}
 	
 	@Override
-	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn)
+	public void onEntityWalk(final World worldIn, final BlockPos pos, final Entity entityIn)
 	{
 		this.onEntityCollidedWithBlock(worldIn, pos, worldIn.getBlockState(pos), entityIn);
 	}
@@ -106,26 +113,26 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
      * Called When an Entity Collided with the Block
      */
 	@Override
-    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
+    public void onEntityCollidedWithBlock(final World worldIn, final BlockPos pos, final IBlockState state, final Entity entityIn)
     {
-		 if(!worldIn.isRemote)
-		 {
-			 BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
-			 TileEntity te = worldIn.getTileEntity(base);
+		System.out.println("[BlockTentDoor] onEntityCollidedWithBlock");
+		if(!worldIn.isRemote && worldIn.getBlockState(pos).getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER)
+		{
+			 TileEntity te = worldIn.getTileEntity(pos);
 			 if(te != null && te instanceof TileEntityTentDoor)
 			 {
-				 TileEntityTentDoor teyd = (TileEntityTentDoor) te;
-				 StructureType type = teyd.getStructureType();
+				 TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
+				 StructureType type = teDoor.getStructureType();
 				 StructureBase struct = type.getNewStructure();
 				 // make sure there is a valid tent before doing anything
-				 EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR : struct.getValidFacing(worldIn, base);
+				 EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR : struct.getValidFacing(worldIn, pos);
 				 if(dir != null)
 				 {
-					 ((TileEntityTentDoor)te).onEntityCollide(entityIn, dir);
+					 teDoor.onEntityCollide(entityIn, dir);
 				 }
 			 }
-		 }
-	 }
+		}
+	}
 
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
@@ -179,7 +186,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
 	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state)
 	{
-		if(this.getMetaFromState(state) % 4 == 0)
+		if(state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER)
 		{
 			// if it's on the bottom
 			worldIn.setBlockToAir(pos.up(1));
@@ -221,7 +228,8 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
 	public boolean hasTileEntity(IBlockState state) 
 	{
-		return true;
+		// only store TileEntity information in the LOWER half of the door
+		return state.getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER;
 	}
 
 	@Override

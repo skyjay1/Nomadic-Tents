@@ -11,7 +11,7 @@ public class IBTepeeWall extends ItemBlock
 	public IBTepeeWall(Block block) 
 	{
 		super(block);
-		this.setCreativeTab(NomadicTents.tab);
+		this.setCreativeTab(NomadicTents.TAB);
 		this.setHasSubtypes(true);
 	}
 	

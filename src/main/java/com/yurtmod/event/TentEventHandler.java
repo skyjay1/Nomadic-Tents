@@ -24,7 +24,7 @@ public class TentEventHandler
 {
 	/** Used to sync world time in Overworld and Tent Dimension when a player sleeps and wakes up **/
 	@SubscribeEvent
-	public void onPlayerWake(PlayerWakeUpEvent event)
+	public void onPlayerWake(final PlayerWakeUpEvent event)
 	{
 		if(!event.getEntityPlayer().getEntityWorld().isRemote)
 		{
@@ -42,7 +42,7 @@ public class TentEventHandler
 	}
 	
 	/** Updates sleep and daylight-cycle info for overworld and tent dimension **/
-	public void handleSleepIn(WorldServer s, boolean reset)
+	public void handleSleepIn(final WorldServer s, final boolean reset)
 	{
 		if(reset && s.getGameRules().getBoolean("doDaylightCycle"))
         {
@@ -54,18 +54,15 @@ public class TentEventHandler
 	
 	/** EXPERIMENTAL cancel all non-creative player teleportation in tent dimension **/
 	@SubscribeEvent
-	public void onTeleport(EnderTeleportEvent event)
+	public void onTeleport(final EnderTeleportEvent event)
 	{
 		if(!Config.ALLOW_TELEPORT_TENT_DIM && event.getEntityLiving() instanceof EntityPlayer && TentDimension.isTentDimension(event.getEntityLiving().getEntityWorld()))
 		{
 			if(!((EntityPlayer)event.getEntityLiving()).isCreative())
 			{
 				event.setCanceled(true);
-				if(event.getEntityLiving() instanceof EntityPlayer)
-				{
-					EntityPlayer player = (EntityPlayer)event.getEntityLiving();
-					player.sendMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")));
-				}
+				EntityPlayer player = (EntityPlayer)event.getEntityLiving();
+				player.sendMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")));
 			}
 		}
 	}
@@ -109,7 +106,6 @@ public class TentEventHandler
 					// transfer player using Teleporter
 					TentTeleporter tel = new TentTeleporter(
 							TentDimension.DIMENSION_ID, newServer, new BlockPos(0,0,0), respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(), StructureType.get(0));
-					System.out.println("Teleporter: " + tel.toString());
 					mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
 				}
 				else return; // if they have a bed in Tent Dimension, skip all this stuff

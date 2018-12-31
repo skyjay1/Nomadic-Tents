@@ -66,13 +66,14 @@ public abstract class StructureBase
 	 * @param prevZ the players z-pos before teleporting to the structure
 	 * @return if a new structure was successfully built in the tent dimension
 	 **/
-	public final boolean generateInTentDimension(int prevDimension, World worldIn, int cornerX, int cornerZ, double prevX, double prevY, double prevZ)
+	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final int cornerX, final int cornerZ, final double prevX, final double prevY, final double prevZ)
 	{
 		final BlockPos corner = new BlockPos(cornerX, TentDimension.FLOOR_Y, cornerZ);
 		final BlockPos doorPos = new BlockPos(cornerX, TentDimension.FLOOR_Y + 1, cornerZ + this.structure.getDoorPosition());
 		// before building a new structure, check if it's already been made
 		if(worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor)
 		{
+			System.out.println("[StructureBase] door exists, updating info");
 			// door already exists, simply update TileEntity and skip building a new structure
 			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
 			return false;
@@ -86,6 +87,7 @@ public abstract class StructureBase
 			generatePlatform(worldIn, corner, this.structure.getSize());
 			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
 			// set tile entity door information
+			System.out.println("[StructureBase] Created new structure, updating info");
 			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
 			return true;
 		}
@@ -99,6 +101,8 @@ public abstract class StructureBase
 	 */
 	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final int cornerX, final int cornerZ, final StructureType structure, final double prevX, final double prevY, final double prevZ, final int prevDimension)
 	{
+		System.out.println("[StructureBase] Dimension: " + worldIn.provider.getDimension());
+		System.out.println("[StructureBase] Attempting to set TileEntity info at " + doorPos.toString() + "\nwith overworld coords " + prevX + ", " + prevY + ", " + prevZ);
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if(te != null && te instanceof TileEntityTentDoor)
 		{
@@ -108,6 +112,7 @@ public abstract class StructureBase
 			door.setOffsetZ(door.getChunkOffsetZ(cornerZ));
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevDimension(prevDimension);
+			System.out.println("[StructureBase] Updated Door Info.\nOverworldXYZ = " + door.getOverworldX() + ", " + door.getOverworldY() + ", " + door.getOverworldZ() );
 			return true;
 		} else System.out.println("Error! Failed to retrive TileEntityTentDoor at " + doorPos.toString());
 		return false;
@@ -117,7 +122,7 @@ public abstract class StructureBase
 	 * Builds a 2-block-deep platform from (cornerX, cornerY - 1, cornerZ) 
 	 * to (cornerX + sqWidth, cornerY, cornerZ + sqWidth), with the top layer
 	 * regular dirt and the bottom layer indestructible dirt.
-	 * Automatically places netherrack if fire is detected, or indestructible dirt
+	 * Automatically places indestructible dirt
 	 * if the bottom of the tent is detected.
 	 * Call this AFTER generating the structure or things will not work!
 	 * @return true if the platform was built successfully
@@ -130,12 +135,15 @@ public abstract class StructureBase
 		{
 			for(int j = 0; j < sqWidth; j++)
 			{
-				// place top block:  dirt, indestructible dirt, or netherrack based on what's above it
+				// place top block:  dirt or indestructible dirt based on what's above it
 				// (this assumes that the structure already exists)
 				BlockPos at = corner.add(i, 0, j);
 				Block above = worldIn.getBlockState(at.up(1)).getBlock();
-				Block topState = above instanceof BlockUnbreakable ? Content.SUPER_DIRT : (above instanceof BlockFire ? Blocks.NETHERRACK : Blocks.DIRT);
-				worldIn.setBlockState(at, topState.getDefaultState(), 3);  
+				Block topState = above instanceof BlockUnbreakable ? Content.SUPER_DIRT : Blocks.DIRT;
+				if(worldIn.isAirBlock(at) || topState == Content.SUPER_DIRT)
+				{
+					worldIn.setBlockState(at, topState.getDefaultState(), 2);
+				}
 				// place bottom block:  always indestructible dirt
 				worldIn.setBlockState(at.down(1), Content.SUPER_DIRT.getDefaultState(), 2);
 			}
@@ -185,15 +193,15 @@ public abstract class StructureBase
 		buildLayer(worldIn, door, dirForward, block.getDefaultState(), coordinates);
 	}
 	
-	/**  @return true if the frame blocks were placed successfully **/
-	public boolean generateFrameStructure(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureType.Size size)
+	/**  @return true if the frame blocks were placed successfully. Assumes that you are not in Tent Dimension. **/
+	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward, final StructureType.Size size)
 	{
 		return generate(worldIn, doorBase, dirForward, size, this.getType().getDoorBlock(), this.getType().getFrameBlock(false), this.getType().getFrameBlock(true));
 	}
 	
 
 	/**  @return true if the structure was successfully removed (replaced with AIR) **/
-	public boolean remove(World worldIn, BlockPos doorPos, EnumFacing dirForward, StructureType.Size size)
+	public boolean remove(final World worldIn, final BlockPos doorPos, final EnumFacing dirForward, final StructureType.Size size)
 	{
 		boolean flag = generate(worldIn, doorPos, dirForward, size, Blocks.AIR, Blocks.AIR, Blocks.AIR);
 		// delete door TileEntity if found
@@ -209,7 +217,7 @@ public abstract class StructureBase
 	}
 	
 	/** Test each IBlockState in the given locations against the given Predicate **/
-	public static final boolean validateArray(World worldIn, BlockPos doorPos, BlockPos[] posArray, EnumFacing facing, Predicate<IBlockState> predicate)
+	public static final boolean validateArray(final World worldIn, final BlockPos doorPos, final BlockPos[] posArray, final EnumFacing facing, final Predicate<IBlockState> predicate)
 	{
 		for(BlockPos p : posArray)
 		{
@@ -224,13 +232,13 @@ public abstract class StructureBase
 	}
 	
 	/** Test the IBlockState at the given location against a given Predicate **/
-	public static final boolean validateBlock(World worldIn, BlockPos pos, Predicate<IBlockState> p)
+	public static final boolean validateBlock(final World worldIn, final BlockPos pos, final Predicate<IBlockState> p)
 	{
 		return p.test(worldIn.getBlockState(pos));
 	}
 	
 	/** @return the EnumFacing direction in which it finds a valid and completed structure, null if none is found **/
-	public EnumFacing getValidFacing(World worldIn, BlockPos doorBase)
+	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase)
 	{
 		StructureType.Size s = this.getType().getSize();
 		for(EnumFacing dir : EnumFacing.HORIZONTALS)
@@ -243,12 +251,12 @@ public abstract class StructureBase
 	}
 	
 	/** @return true if a structure was successfully generated **/
-	public abstract boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureType.Size size, Block doorBlock, Block wallBlock, Block roofBlock);
+	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward, final StructureType.Size size, final Block doorBlock, final Block wallBlock, final Block roofBlock);
 
 	/** @return true if there is empty space to create a structure of given size at this location **/
-	public abstract boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureType.Size size);
+	public abstract boolean canSpawn(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward, final StructureType.Size size);
 
 	/** @return true if there is a valid structure at the given location for the given EnumFacing **/
-	public abstract boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureType.Size size, EnumFacing facing);
+	public abstract boolean isValidForFacing(final World worldIn, final BlockPos doorBase, final StructureType.Size size, final EnumFacing facing);
 	
 }

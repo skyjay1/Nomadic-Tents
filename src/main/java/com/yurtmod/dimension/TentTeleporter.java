@@ -32,7 +32,7 @@ public class TentTeleporter extends Teleporter
 	@Override
 	public void placeInPortal(Entity entity, float rotationYaw)
 	{
-		if(entity instanceof EntityPlayer)
+		//if(entity instanceof EntityPlayer)
 		{
 			double entityX;
 			double entityY;
@@ -42,6 +42,7 @@ public class TentTeleporter extends Teleporter
 
 			if(TentDimension.isTentDimension(worldServerTo))
 			{	
+				System.out.println("[Teleporter] traveling TO Tent Dimension.");
 				entityX = this.tentCorner.getX() + 1.5D;
 				entityY = this.tentCorner.getY() + 0.01D;
 				entityZ = this.tentCorner.getZ() + this.structure.getDoorPosition() + 0.5D;
@@ -53,12 +54,15 @@ public class TentTeleporter extends Teleporter
 			}
 			else
 			{	
+				System.out.println("[Teleporter] traveling FROM Tent Dimension.");
 				entityX = this.prevX;
 				entityY = this.prevY + 0.25D;
 				entityZ = this.prevZ;
 				yaw = entity.rotationYaw;
 			}
+			entity.setPositionAndUpdate(entityX, entityY, entityZ);
 			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, entity.rotationPitch);
+			System.out.println("[Teleporter] Entity should be at " + entityX + ", " + entityY + ", " + entityZ);
 		}
 	}
 

@@ -17,7 +17,7 @@ public class ItemMallet extends Item
 	public ItemMallet(ToolMaterial material)
 	{
 		this.setMaxDamage(material.getMaxUses());
-		this.setCreativeTab(NomadicTents.tab);
+		this.setCreativeTab(NomadicTents.TAB);
 		this.setFull3D();
 		this.setMaxStackSize(1);
 	}
