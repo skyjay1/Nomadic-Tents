@@ -73,7 +73,6 @@ public abstract class StructureBase
 		// before building a new structure, check if it's already been made
 		if(worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor)
 		{
-			System.out.println("[StructureBase] door exists, updating info");
 			// door already exists, simply update TileEntity and skip building a new structure
 			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
 			return false;
@@ -87,7 +86,6 @@ public abstract class StructureBase
 			generatePlatform(worldIn, corner, this.structure.getSize());
 			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
 			// set tile entity door information
-			System.out.println("[StructureBase] Created new structure, updating info");
 			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
 			return true;
 		}
@@ -101,8 +99,6 @@ public abstract class StructureBase
 	 */
 	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final int cornerX, final int cornerZ, final StructureType structure, final double prevX, final double prevY, final double prevZ, final int prevDimension)
 	{
-		System.out.println("[StructureBase] Dimension: " + worldIn.provider.getDimension());
-		System.out.println("[StructureBase] Attempting to set TileEntity info at " + doorPos.toString() + "\nwith overworld coords " + prevX + ", " + prevY + ", " + prevZ);
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if(te != null && te instanceof TileEntityTentDoor)
 		{
@@ -112,9 +108,8 @@ public abstract class StructureBase
 			door.setOffsetZ(door.getChunkOffsetZ(cornerZ));
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevDimension(prevDimension);
-			System.out.println("[StructureBase] Updated Door Info.\nOverworldXYZ = " + door.getOverworldX() + ", " + door.getOverworldY() + ", " + door.getOverworldZ() );
 			return true;
-		} else System.out.println("Error! Failed to retrive TileEntityTentDoor at " + doorPos.toString());
+		} else System.out.println("[StructureBase] Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
 		return false;
 	}
 	

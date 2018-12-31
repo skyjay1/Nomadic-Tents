@@ -157,9 +157,6 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock
 		}
 		if(pos == null) return null;	
 		boolean isLower = world.getBlockState(pos).getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER;
-		// debug:
-		//System.out.println("Found a door! " + pos);
-		//System.out.println("isLower = " + isLower);
 		return isLower ? pos : pos.down(1);
 	}
 

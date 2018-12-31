@@ -72,8 +72,9 @@ public class StructureBedouin extends StructureBase
 			if(tentDim)
 			{
 				// place a torch (too small for fire)
-				BlockPos pos = getPosFromDoor(doorBase, 2, 0, 0, TentDimension.STRUCTURE_DIR);
-				worldIn.setBlockState(pos, Blocks.TORCH.getDefaultState(), 2);				
+				BlockPos pos = getPosFromDoor(doorBase, 2, -1, 0, TentDimension.STRUCTURE_DIR);
+				worldIn.setBlockState(pos, Blocks.DIRT.getDefaultState(), 2);
+				worldIn.setBlockState(pos.up(1), Blocks.TORCH.getDefaultState(), 2);				
 			}
 			return true;
 		}

@@ -92,7 +92,6 @@ public class ItemTent extends Item
 			Block hitBlock = worldIn.getBlockState(pos).getBlock();
 			ItemStack stack = player.getHeldItem(hand);
 			EnumFacing hitSide = side;
-			//System.out.println("\nhitPos=" + hitPos.toString() + "\nhitBlock=" + hitBlock.getRegistryName() + "\nhitSide=" + side.toString());
 
 			if (hitBlock == null || stack == null || stack.isEmpty())
 			{

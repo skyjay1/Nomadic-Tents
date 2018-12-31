@@ -77,21 +77,42 @@ public class CommonProxy
 				new ItemTent().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "tent"),
 				new ItemMallet(ToolMaterial.IRON).setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "mallet").setUnlocalizedName("mallet"),
 				new ItemSuperMallet(ToolMaterial.DIAMOND).setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "super_mallet").setUnlocalizedName("super_mallet"),
-				new Item().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "tent_canvas").setUnlocalizedName("tent_canvas"),
-				new Item().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "yurt_wall_piece").setUnlocalizedName("yurt_wall_piece"),
-				new Item().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "tepee_wall_piece").setUnlocalizedName("tepee_wall_piece"),
-				new Item().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "bed_wall_piece").setUnlocalizedName("bed_wall_piece"),
+				makeItem("tent_canvas"),
+				makeItem("yurt_wall_piece"),
+				makeItem("tepee_wall_piece"),
+				makeItem("bed_wall_piece"),
 				
 				// ItemBlock
-				new ItemBlock(Content.TENT_BARRIER).setRegistryName(Content.TENT_BARRIER.getRegistryName()),
-				new ItemBlock(Content.SUPER_DIRT).setRegistryName(Content.SUPER_DIRT.getRegistryName()),
-				new ItemBlock(Content.YURT_WALL_INNER).setRegistryName(Content.YURT_WALL_INNER.getRegistryName()),
-				new ItemBlock(Content.YURT_WALL_OUTER).setRegistryName(Content.YURT_WALL_OUTER.getRegistryName()),
-				new ItemBlock(Content.YURT_ROOF).setRegistryName(Content.YURT_ROOF.getRegistryName()),
+				makeIB(Content.TENT_BARRIER),
+				makeIB(Content.SUPER_DIRT),
+				makeIB(Content.YURT_WALL_INNER),
+				makeIB(Content.YURT_WALL_OUTER),
+				makeIB(Content.YURT_ROOF),
 				new IBTepeeWall(Content.TEPEE_WALL).setRegistryName(Content.TEPEE_WALL.getRegistryName()),
-				new ItemBlock(Content.BEDOUIN_WALL).setRegistryName(Content.BEDOUIN_WALL.getRegistryName()),
-				new ItemBlock(Content.BEDOUIN_ROOF).setRegistryName(Content.BEDOUIN_ROOF.getRegistryName())
+				makeIB(Content.BEDOUIN_WALL),
+				makeIB(Content.BEDOUIN_ROOF)/*,
+				makeIB(Content.BEDOUIN_DOOR_LARGE),
+				makeIB(Content.BEDOUIN_DOOR_MEDIUM),
+				makeIB(Content.BEDOUIN_DOOR_SMALL),
+				makeIB(Content.TEPEE_DOOR_LARGE),
+				makeIB(Content.TEPEE_DOOR_MEDIUM),
+				makeIB(Content.TEPEE_DOOR_SMALL),
+				makeIB(Content.YURT_DOOR_LARGE),
+				makeIB(Content.YURT_DOOR_MEDIUM),
+				makeIB(Content.YURT_DOOR_SMALL)*/
 				);
+	}
+	
+	private static final Item makeItem(String name)
+	{
+		return new Item().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, name).setUnlocalizedName(name);
+	}
+	
+	private static final ItemBlock makeIB(Block base)
+	{
+		ItemBlock ib = new ItemBlock(base);
+		ib.setRegistryName(base.getRegistryName());
+		return ib;
 	}
 	
 }

@@ -42,6 +42,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock
 		super(Material.WOOD);
 		this.TO_BECOME = type;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(PROGRESS, 0));
+		this.setCreativeTab(null);
 	}
 
 	@Override

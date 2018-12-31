@@ -1,5 +1,8 @@
 package com.yurtmod.block;
 
+import java.util.List;
+import java.util.Random;
+
 import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
@@ -46,7 +49,9 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 		super(Material.WOOD);
 		this.isCube = isFull;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER).withProperty(AXIS, EnumFacing.Axis.X));
+		this.setCreativeTab(null);
 	}
+	
 	// default constructor assumes this block is NOT full
 	public BlockTentDoor()
 	{
@@ -64,7 +69,6 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
-		System.out.println("[BlockTentDoor] On Block Activated");
 		if(!worldIn.isRemote)
 		{
 			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
@@ -115,7 +119,6 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 	@Override
     public void onEntityCollidedWithBlock(final World worldIn, final BlockPos pos, final IBlockState state, final Entity entityIn)
     {
-		System.out.println("[BlockTentDoor] onEntityCollidedWithBlock");
 		if(!worldIn.isRemote && worldIn.getBlockState(pos).getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER)
 		{
 			 TileEntity te = worldIn.getTileEntity(pos);

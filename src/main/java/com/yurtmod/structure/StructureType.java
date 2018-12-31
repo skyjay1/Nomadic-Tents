@@ -71,7 +71,7 @@ public enum StructureType
 	{
 		if(stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.OFFSET_X)) 
 		{
-			System.out.println("ItemStack did not have any NBT information to pass to the TileEntity!");
+			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}

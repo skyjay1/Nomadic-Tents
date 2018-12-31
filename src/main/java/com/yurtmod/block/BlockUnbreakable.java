@@ -19,6 +19,6 @@ public class BlockUnbreakable extends BlockEmptyDrops
 		this.setResistance(6000001.0F);
 		this.setCreativeTab(NomadicTents.TAB);
 		this.setSoundType(SoundType.WOOD);
-		this.setHarvestLevel("pickaxe", 4);
+		this.setHarvestLevel("pickaxe", 10);
 	}
 }
