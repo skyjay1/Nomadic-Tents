@@ -4,6 +4,7 @@ import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.init.Config;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
@@ -78,7 +79,7 @@ public class BlockTentDoor extends BlockUnbreakable implements ITileEntityProvid
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR : struct.getValidFacing(worldIn, base);
 				if(dir == null) return false;
 				// deconstruct the tent if the player uses a tentHammer on the door (and in overworld and with fully built tent)
-				if(!worldIn.isRemote && player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet && !TentDimension.isTentDimension(worldIn))
+				if(player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet && !TentDimension.isTentDimension(worldIn))
 				{
 					// prepare a tent item to drop
 					ItemStack toDrop = type.getDropStack(teyd.getOffsetX(), teyd.getOffsetZ());

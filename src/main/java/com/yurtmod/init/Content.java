@@ -5,6 +5,7 @@ import com.yurtmod.block.TileEntityTentDoor;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class Content 
@@ -79,7 +80,7 @@ public class Content
 
 	public static void mainRegistry()
 	{
-		GameRegistry.registerTileEntity(TileEntityTentDoor.class, NomadicTents.MODID + ":TileEntityTentDoor");
+		GameRegistry.registerTileEntity(TileEntityTentDoor.class, new ResourceLocation(NomadicTents.MODID, "TileEntityTentDoor"));
 		
 		//registerBlocks();
 		//registerItems();

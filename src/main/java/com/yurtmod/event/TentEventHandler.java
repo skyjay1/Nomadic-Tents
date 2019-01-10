@@ -3,17 +3,21 @@ package com.yurtmod.event;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.init.Config;
+import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.BlockBed;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -50,6 +54,21 @@ public class TentEventHandler
             s.updateAllPlayersSleepingFlag();
         }
 	}
+	
+	/** Makes Tent items fireproof if enabled **/
+	@SubscribeEvent
+	public void onSpawnEntity(EntityJoinWorldEvent event)
+	{
+		if(Config.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem)
+		{
+			ItemStack stack = ((EntityItem)event.getEntity()).getItem();
+			if(stack != null && stack.getItem() instanceof ItemTent)
+			{
+				event.getEntity().setEntityInvulnerable(true);
+			}
+		}
+	}
+	
 	
 	/** EXPERIMENTAL cancel all non-creative player teleportation in tent dimension **/
 	@SubscribeEvent

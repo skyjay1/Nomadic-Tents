@@ -19,7 +19,7 @@ public class WorldProviderTent extends WorldProvider
 	@Override
     protected void init()
     {
-		this.biomeProvider = new BiomeProviderSingle(TentDimension.TENT);
+		this.biomeProvider = new BiomeProviderSingle(TentDimension.biomeTent);
 		this.setDimension(TentDimension.DIMENSION_ID);
 		this.setAllowedSpawnTypes(false, false);
 		this.hasSkyLight = true;
@@ -40,7 +40,7 @@ public class WorldProviderTent extends WorldProvider
 	@Override
 	public Biome getBiomeForCoords(BlockPos pos)
 	{
-		return TentDimension.TENT;
+		return TentDimension.biomeTent;
 	}
 
 	@Override

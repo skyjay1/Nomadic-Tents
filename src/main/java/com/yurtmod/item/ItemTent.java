@@ -1,6 +1,8 @@
 package com.yurtmod.item;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -24,18 +26,22 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentBase;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -107,12 +113,11 @@ public class ItemTent extends Item
 					player.sendMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_structure_ln2")));
 					player.sendMessage(lines);
 				}
-				//if(Config.ALLOW_REFUND)
-				//{
-					// TODO
-					//dropComponents(worldIn, player, stack);
-					//stack.setCount(stack.getCount()-1);
-				//}
+				if(Config.ALLOW_REFUND)
+				{
+					dropIngredients(worldIn, player, stack);
+					stack.setCount(stack.getCount()-1);
+				}
 				return EnumActionResult.FAIL;
 			}
 			else
@@ -120,7 +125,7 @@ public class ItemTent extends Item
 				// offset the BlockPos to build on if it's snow or plants
 				if(StructureBase.REPLACE_BLOCK_PRED.test(worldIn.getBlockState(hitPos)))
 				{
-					hitPos = hitPos.down(1);
+					//hitPos = hitPos.down(1);
 					hitSide = EnumFacing.UP;
 				}
 				else hitPos = hitPos.up(1);
@@ -174,6 +179,9 @@ public class ItemTent extends Item
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
     {
+		if(tab != NomadicTents.TAB)
+			return;
+		
 		for(StructureType type : StructureType.values())
 		{
 			ItemStack tent = type.getDropStack(ERROR_TAG, ERROR_TAG);
@@ -211,38 +219,71 @@ public class ItemTent extends Item
 		return true;
 	}
 
-	// TODO
-	/** Finds out what was used to make the ItemStack and 'refunds' the player by uncrafting it
-	public static void dropComponents(World world, EntityPlayer player, ItemStack stack)
+	/** Finds out what was used to make the ItemStack and 'refunds' the player by uncrafting it **/
+	public static void dropIngredients(World world, EntityPlayer player, ItemStack stack)
 	{
-		List<IRecipe> list = CraftingManager.getInstance().getRecipeList();
-		for(IRecipe r : list)
+		if(stack != null && stack.getCount() == 1 && stack.getItem() instanceof ItemTent)
 		{
-			ItemStack output = r.getRecipeOutput();
-			if(r instanceof ShapedRecipes && stack.isItemEqual(output))
+			// get the items used in this recipe
+			IRecipe recipe = getRecipeFor(stack);
+			List<ItemStack> itemsToDrop = addRecipeItemsToList(recipe, new LinkedList<ItemStack>());
+		
+			// drop the items as entities
+			for(ItemStack s : itemsToDrop)
 			{
-				ShapedRecipes sr = (ShapedRecipes)r;
-				ItemStack[] in = sr.recipeItems;
-				if(in.length > 0) 
+				EntityItem toSpawn = new EntityItem(world, player.posX, player.posY, player.posZ, s);
+				toSpawn.setNoPickupDelay();
+				if(!world.isRemote)
 				{
-					for(ItemStack i : in)
+					world.spawnEntity(toSpawn);
+				}
+			}
+		}
+	}
+	
+	private static IRecipe getRecipeFor(final ItemStack itemstack)
+	{
+		IRecipe ret = null;
+		for(java.util.Map.Entry<ResourceLocation, IRecipe> entry : ForgeRegistries.RECIPES.getEntries())
+		{
+			IRecipe recipe = entry.getValue();
+			if(recipe.getRecipeOutput().isItemEqual(itemstack))
+			{
+				return recipe;
+			}
+		}
+		
+		return null;
+	}
+	
+	// recursively add items to the list until recipe contains no tents
+	private static List<ItemStack> addRecipeItemsToList(final IRecipe recipe, final List<ItemStack> list)
+	{
+		if(recipe != null)
+		{
+			// get the items used in the recipe
+			for(Ingredient i : recipe.getIngredients())
+			{
+				for(ItemStack s : i.getMatchingStacks())
+				{
+					if(s != null && s.getItem() != null)
 					{
-						if(i != null && i.getItem() != null)
+						if(s.getItem() instanceof ItemTent)
 						{
-							//i.stackSize *= output.stackSize;
-							EntityItem toSpawn = new EntityItem(world, player.posX, player.posY, player.posZ, i);
-							toSpawn.setNoPickupDelay();
-							if(!world.isRemote)
-							{
-								world.spawnEntity(toSpawn);
-							}
+							// if it's a tent, get THAT tents recipe and items
+							addRecipeItemsToList(getRecipeFor(s), list);
+						}
+						else
+						{
+							list.add(s);
 						}
 					}
 				}
 			}
 		}
+		return list;
 	}
-	*/
+	
 
 	public void adjustSaveData(ItemStack stack, World world, EntityPlayer player)
 	{

@@ -6,7 +6,7 @@ import net.minecraft.world.biome.BiomeVoidDecorator;
 public class BiomeTent extends Biome
 {
 	public BiomeTent() {
-		super(new Biome.BiomeProperties("Tent"));
+		super(new Biome.BiomeProperties(TentDimension.BIOME_TENT_NAME));
 		this.spawnableMonsterList.clear();
         this.spawnableCreatureList.clear();
         this.spawnableWaterCreatureList.clear();
