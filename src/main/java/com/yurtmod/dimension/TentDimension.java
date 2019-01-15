@@ -41,8 +41,8 @@ public class TentDimension
 	
 	public static void init()
 	{
-		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(biomeTent, 100));
-		BiomeManager.addSpawnBiome(biomeTent);
+		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(biomeTent, 0));
+		//BiomeManager.addSpawnBiome(biomeTent);
 	}
 	
 	public static boolean isTentDimension(World world)
