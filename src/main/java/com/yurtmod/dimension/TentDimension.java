@@ -42,6 +42,7 @@ public class TentDimension
 	public static void init()
 	{
 		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(biomeTent, 0));
+		BiomeDictionary.addTypes(biomeTent, BiomeDictionary.Type.VOID);
 		//BiomeManager.addSpawnBiome(biomeTent);
 	}
 	

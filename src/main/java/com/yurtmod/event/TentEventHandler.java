@@ -123,7 +123,7 @@ public class TentEventHandler
 					}
 					// transfer player using Teleporter
 					TentTeleporter tel = new TentTeleporter(
-							TentDimension.DIMENSION_ID, newServer, new BlockPos(0,0,0), respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(), StructureType.get(0));
+							TentDimension.DIMENSION_ID, newServer, new BlockPos(0,0,0), respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(), StructureType.get(0), StructureType.get(0));
 					mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
 				}
 				else return; // if they have a bed in Tent Dimension, skip all this stuff

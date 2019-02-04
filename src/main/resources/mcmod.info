@@ -3,7 +3,7 @@
   "modid": "yurtmod",
   "name": "Nomadic Tents",
   "description": "Pocket dimensions -- set up your tent and keep everything in it!",
-  "version": "9.03",
+  "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
