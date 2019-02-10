@@ -1,77 +1,50 @@
 package com.yurtmod.dimension;
 
-import com.yurtmod.init.Config;
+import com.yurtmod.main.Config;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Biomes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.biome.BiomeProviderSingle;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.WorldChunkManager;
+import net.minecraft.world.chunk.IChunkProvider;
 
-public class WorldProviderTent extends WorldProvider
-{	
-	 /**
-     * creates a new world chunk manager for WorldProvider
-     */
+public class WorldProviderTent extends WorldProvider {
 	@Override
-    protected void init()
-    {
-		this.biomeProvider = new BiomeProviderSingle(Biomes.VOID);
-		this.setDimension(TentDimension.DIMENSION_ID);
+	public void registerWorldChunkManager() {
+		this.setDimension(Config.DIMENSION_ID);
 		this.setAllowedSpawnTypes(false, false);
+		this.worldChunkMgr = new WorldChunkManager(worldObj.getSeed(), terrainType);
 		this.hasNoSky = false;
-    }
-    
-	@Override
-    public BiomeProvider getBiomeProvider()
-	{
-		return this.biomeProvider;
 	}
 
 	@Override
-	public IChunkGenerator createChunkGenerator()
-	{
-		return new TentChunkGenerator(this.world, this.getDimension(), false);
+	public String getDimensionName() {
+		return TentDimension.DIM_NAME;
 	}
 
 	@Override
-	public Biome getBiomeForCoords(BlockPos pos)
-	{
-		return Biomes.VOID;
+	public IChunkProvider createChunkGenerator() {
+		return new TentChunkProvider(this.worldObj, this.dimensionId, false);
 	}
 
 	@Override
-	public boolean canRespawnHere()
-	{
+	public BiomeGenBase getBiomeGenForCoords(int x, int z) {
+		return BiomeGenBase.ocean;// super.getBiomeGenForCoords(x, z);
+	}
+
+	@Override
+	public boolean canRespawnHere() {
 		// returning false from here makes beds explode when you try to sleep
-		return Config.ALLOW_RESPAWN_TENT_DIM || Config.ALLOW_SLEEP_TENT_DIM;
+		return Config.ALLOW_SLEEP_TENT_DIM;
 	}
 
 	@Override
-	public int getRespawnDimension(EntityPlayerMP player)
-	{
-		return canRespawnHere() ? TentDimension.DIMENSION_ID : 0;
+	public int getRespawnDimension(EntityPlayerMP player) {
+		return canRespawnHere() ? Config.DIMENSION_ID : 0;
 	}
 
 	@Override
-	public boolean isSurfaceWorld()
-	{
+	public boolean isSurfaceWorld() {
 		return true;
-	}
-
-	@Override
-	public String getWelcomeMessage()
-	{
-		return "Entering your Tent";
-	}
-
-	@Override
-	public DimensionType getDimensionType() 
-	{
-		return TentDimension.TENT_DIMENSION;
 	}
 }

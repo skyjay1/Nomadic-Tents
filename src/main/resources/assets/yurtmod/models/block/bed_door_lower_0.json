@@ -1,7 +1,0 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "yurtmod:blocks/bed_door_lower_0",
-        "particle": "yurtmod:blocks/bed_door_lower_0"
-    }
-}
