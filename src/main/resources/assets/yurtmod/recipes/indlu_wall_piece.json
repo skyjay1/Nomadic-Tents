@@ -1,0 +1,42 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "FSF",
+   "FSF",
+   "FSF"],
+  "key": {
+    "F": [
+	  {
+        "item": "minecraft:leaves",
+        "data": 0
+      },
+	  {
+        "item": "minecraft:leaves",
+        "data": 1
+      },
+	  {
+        "item": "minecraft:leaves",
+        "data": 2
+      },
+	  {
+        "item": "minecraft:leaves",
+        "data": 3
+      },
+	  {
+        "item": "minecraft:leaves2",
+        "data": 0
+      },
+	  {
+        "item": "minecraft:leaves2",
+        "data": 1
+      }
+	],
+	"S": {
+		"item": "minecraft:stick"
+	  }
+  },
+  "result": {
+    "item": "yurtmod:indlu_wall_piece",
+    "count": 1
+  }
+}

@@ -9,6 +9,7 @@ import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Config;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.Material;
@@ -21,86 +22,86 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock
-{
-	public static final int NUM_TEXTURES = 15;		// how many textures can apply to this block
-	private static final int NUM_PATTERNS = 5;		// the first X textures excluding texture 0 are patterns
+public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
+	public static final int NUM_TEXTURES = 15; // how many textures can apply to this block
+	private static final int NUM_PATTERNS = 5; // the first X textures excluding texture 0 are patterns
 	public static final PropertyInteger TEXTURE = PropertyInteger.create("texture", 0, NUM_TEXTURES - 1);
 
-	public BlockTepeeWall() 
-	{
+	public BlockTepeeWall() {
 		super(Material.CLOTH);
+		this.setLightOpacity(LIGHT_OPACITY);
 	}
 
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState stateIn) 
-	{
+	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState stateIn) {
 		super.onBlockAdded(worldIn, pos, stateIn);
-		if(stateIn.getValue(TEXTURE).intValue() == 0)
-		{
+		if (stateIn.getValue(TEXTURE).intValue() == 0) {
 			IBlockState state;
 			BlockPos doorPos = this.findDoorNearby(worldIn, pos);
 			// this determines what pattern overworld tepees should have for each layer
-			if(!TentDimension.isTentDimension(worldIn) && doorPos != null && (Math.abs(pos.getY() - doorPos.getY()) % 2 == 0))
-			{
-				TileEntityTentDoor te = (TileEntityTentDoor)worldIn.getTileEntity(doorPos);
-				// psuedo-random seed guarantees all blocks that are same y-dis from door get the same seed
-				int randSeed = pos.getY() + doorPos.getX() + doorPos.getZ() + te.getOffsetX() * 123 + te.getOffsetZ() * 321;
+			if (!TentDimension.isTentDimension(worldIn) && doorPos != null
+					&& (Math.abs(pos.getY() - doorPos.getY()) % 2 == 0)) {
+				TileEntityTentDoor te = (TileEntityTentDoor) worldIn.getTileEntity(doorPos);
+				// psuedo-random seed guarantees all blocks that are same y-dis from door get
+				// the same seed
+				int randSeed = pos.getY() + doorPos.getX() + doorPos.getZ() + te.getOffsetX() * 123
+						+ te.getOffsetZ() * 321;
 				state = getStateForRandomPattern(new Random(randSeed));
+			} else {
+				state = getStateForRandomDesignWithChance(worldIn.rand);
 			}
-			else state = getStateForRandomDesignWithChance(worldIn.rand);
 			worldIn.setBlockState(pos, state, 2);
 		}
 	}
-	
+
 	/**
-     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate
-     */
-    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
-    {
-    	return this.getDefaultState().withProperty(TEXTURE, meta % NUM_TEXTURES);
-    }
-	
+	 * Called by ItemBlocks just before a block is actually set in the world, to
+	 * allow for adjustments to the IBlockstate
+	 */
+	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
+			int meta, EntityLivingBase placer) {
+		return this.getDefaultState().withProperty(TEXTURE, meta % NUM_TEXTURES);
+	}
+
 	/**
-	 * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
+	 * returns a list of blocks with the same ID, but different meta (eg: wood
+	 * returns 4 blocks)
 	 **/
+	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubBlocks(Item item, CreativeTabs tab, List<ItemStack> list)
-	{
-		for(int i = 0; i < NUM_TEXTURES; i++)
-		{
-			list.add(new ItemStack(item, 1, i));
+	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
+		if(tab != NomadicTents.TAB) {
+			return;
+		}
+		for (int i = 0; i < NUM_TEXTURES; i++) {
+			items.add(new ItemStack(this, 1, i));
 		}
 	}
 
 	@Override
-	protected BlockStateContainer createBlockState() 
-	{
-		return new BlockStateContainer(this, new IProperty[] {TEXTURE});
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, new IProperty[] { TEXTURE });
 	}
 
 	@Override
 	@Deprecated // because the super method is deprecated too
-	public IBlockState getStateFromMeta(int meta) 
-	{
+	public IBlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(TEXTURE, meta % NUM_TEXTURES);
 	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) 
-	{
+	public int getMetaFromState(IBlockState state) {
 		return state.getValue(TEXTURE).intValue();
 	}
 
 	@Override
-	public int quantityDropped(Random random)
-	{
+	public int quantityDropped(Random random) {
 		return 0;
 	}
 
@@ -108,81 +109,72 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock
 	 * Get the damage value that this Block should drop
 	 */
 	@Override
-	public int damageDropped(IBlockState state)
-	{
+	public int damageDropped(IBlockState state) {
 		return this.getMetaFromState(state);
 	}
-	
+
 	/** @return an IBlockState with a blank tepee block **/
-	public static IBlockState getStateForBase()
-	{
+	public static IBlockState getStateForBase() {
 		return Content.TEPEE_WALL.getDefaultState().withProperty(TEXTURE, 0);
 	}
 
 	/** @return an IBlockState with a random pattern on it **/
-	public static IBlockState getStateForRandomPattern(Random rand)
-	{
+	public static IBlockState getStateForRandomPattern(Random rand) {
 		return Content.TEPEE_WALL.getDefaultState().withProperty(TEXTURE, rand.nextInt(NUM_PATTERNS) + 1);
 	}
-	
-	/** 
-	 * Same as {@link #getStateForRandomDesign(Random)} 
-	 * but returns a blank design if it fails the Config-defined percentage chance 
+
+	/**
+	 * Same as {@link #getStateForRandomDesign(Random)} but returns a blank design
+	 * if it fails the Config-defined percentage chance
 	 **/
-	public static IBlockState getStateForRandomDesignWithChance(Random rand)
-	{
+	public static IBlockState getStateForRandomDesignWithChance(Random rand) {
 		return rand.nextInt(100) < Config.TEPEE_DECORATED_CHANCE ? getStateForRandomDesign(rand) : getStateForBase();
 	}
 
 	/** @return an IBlockState with a randomly decorated tepee block **/
-	public static IBlockState getStateForRandomDesign(Random rand)
-	{
+	public static IBlockState getStateForRandomDesign(Random rand) {
 		int meta = rand.nextInt(NUM_TEXTURES - NUM_PATTERNS - 1) + NUM_PATTERNS + 1;
 		return Content.TEPEE_WALL.getDefaultState().withProperty(TEXTURE, meta % NUM_TEXTURES);
 	}
 
 	/**
-	 * Traces all connected ITepeeBlock blocks (frames and tepee walls)
-	 * until it finds the lower door of the tepee.
+	 * Traces all connected ITepeeBlock blocks (frames and tepee walls) until it
+	 * finds the lower door of the tepee.
+	 * 
 	 * @param world the world
-	 * @param pos BlockPos to begin searching from
+	 * @param pos   BlockPos to begin searching from
 	 * @return BlockPos of lower tepee door if found, else null
 	 **/
-	private BlockPos findDoorNearby(World world, BlockPos pos)
-	{
+	private BlockPos findDoorNearby(World world, BlockPos pos) {
 		List checked = new LinkedList();
-		while(pos != null && !(world.getBlockState(pos).getBlock() instanceof BlockTentDoor))
-		{
+		while (pos != null && !(world.getBlockState(pos).getBlock() instanceof BlockTentDoor)) {
 			pos = getNextTepeeBlock(world, checked, pos);
 		}
-		if(pos == null) return null;	
+		if (pos == null)
+			return null;
 		boolean isLower = world.getBlockState(pos).getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER;
 		return isLower ? pos : pos.down(1);
 	}
 
 	/**
-	 * Searches a 3x3x3 box for an ITepeeBlock that
-	 * has not been added to the list already.
+	 * Searches a 3x3x3 box for an ITepeeBlock that has not been added to the list
+	 * already.
+	 * 
 	 * @param worldIn the world
 	 * @param exclude list of BlockPos already checked
-	 * @param pos center of the 3x3x3 box
+	 * @param pos     center of the 3x3x3 box
 	 **/
-	private BlockPos getNextTepeeBlock(World worldIn, List exclude, BlockPos pos)
-	{
+	private BlockPos getNextTepeeBlock(World worldIn, List exclude, BlockPos pos) {
 		int radius = 1;
-		// favor blocks below this one - useful because most tepee blocks will be above the door
-		for(int y = -radius; y <= radius; y++)
-		{
-			for(int x = -radius; x <= radius; x++)
-			{
-				for(int z = -radius; z <= radius; z++)
-				{
+		// favor blocks below this one - useful because most tepee blocks will be above
+		// the door
+		for (int y = -radius; y <= radius; y++) {
+			for (int x = -radius; x <= radius; x++) {
+				for (int z = -radius; z <= radius; z++) {
 					BlockPos checkPos = pos.add(x, y, z);
 					IBlockState stateAt = worldIn.getBlockState(checkPos);
-					if(!exclude.contains(checkPos))
-					{
-						if(stateAt.getBlock() instanceof ITepeeBlock || stateAt.getBlock() instanceof IFrameBlock)
-						{
+					if (!exclude.contains(checkPos)) {
+						if (stateAt.getBlock() instanceof ITepeeBlock || stateAt.getBlock() instanceof IFrameBlock) {
 							exclude.add(checkPos);
 							return checkPos;
 						}

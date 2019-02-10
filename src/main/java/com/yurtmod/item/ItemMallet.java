@@ -12,10 +12,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ItemMallet extends Item
-{	
-	public ItemMallet(ToolMaterial material)
-	{
+public class ItemMallet extends Item {
+	public ItemMallet(ToolMaterial material) {
 		this.setMaxDamage(material.getMaxUses());
 		this.setCreativeTab(NomadicTents.TAB);
 		this.setFull3D();
@@ -23,24 +21,21 @@ public class ItemMallet extends Item
 	}
 
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-	{
-		if(worldIn.getBlockState(pos).getBlock() instanceof IFrameBlock)
-		{
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand,
+			EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (worldIn.getBlockState(pos).getBlock() instanceof IFrameBlock) {
 			return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;
 	}
 
 	@Override
-	public boolean canHarvestBlock(IBlockState blockIn)
-	{
+	public boolean canHarvestBlock(IBlockState blockIn) {
 		return false;
 	}
 
 	@Override
-	public boolean canItemEditBlocks()
-    {
-        return true;
-    }
+	public boolean canItemEditBlocks() {
+		return true;
+	}
 }

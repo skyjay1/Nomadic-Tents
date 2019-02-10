@@ -8,6 +8,8 @@ public class Categories
 	public static interface ITepeeBlock {}
 	/** Blocks with this interface are formally used in Bedouin Structures **/
 	public static interface IBedouinBlock {}
+	/** Blocks with this interface are formally used in Indlu Structures **/
+	public static interface IIndluBlock {}
 	/** Blocks with this interface are formally used as tent frame blocks **/
 	public static interface IFrameBlock {}
 }

@@ -55,7 +55,7 @@ public class RecipeTent extends ShapedRecipes implements IRecipe {
 			NBTTagCompound nbt = inputTent.getTagCompound();
 			final int inputX = nbt.getInteger(ItemTent.OFFSET_X);
 			final int inputZ = nbt.getInteger(ItemTent.OFFSET_Z);
-			final int prevTent = inputTent.getItemDamage();
+			final int prevTent = nbt.getInteger(ItemTent.PREV_TENT_TYPE);
 			// transfer those values to the new tent
 			resultTag.setInteger(ItemTent.OFFSET_X, inputX);
 			resultTag.setInteger(ItemTent.OFFSET_Z, inputZ);

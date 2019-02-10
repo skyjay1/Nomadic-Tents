@@ -6,12 +6,14 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 
 public class TentSaveData extends WorldSavedData {
-	private static final String KEY_SMALL_YURT = "CraftCountYurt";
-	private static final String KEY_SMALL_TEPEE = "CraftCountTepee";
-	private static final String KEY_SMALL_BEDOUIN = "CraftCountBedouin";
-	private int craftcountYurtSmall;
-	private int craftcountTepeeSmall;
-	private int craftcountBedouinSmall;
+	private static final String KEY_YURT = "CraftCountYurt";
+	private static final String KEY_TEPEE = "CraftCountTepee";
+	private static final String KEY_BEDOUIN = "CraftCountBedouin";
+	private static final String KEY_INDLU = "CraftCountIndlu";
+	private int craftcountYurt;
+	private int craftcountTepee;
+	private int craftcountBedouin;
+	private int craftCountIndlu;
 
 	public TentSaveData(String s) {
 		super(s);
@@ -29,43 +31,54 @@ public class TentSaveData extends WorldSavedData {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		craftcountYurtSmall = nbt.getInteger(KEY_SMALL_YURT);
-		craftcountTepeeSmall = nbt.getInteger(KEY_SMALL_TEPEE);
-		craftcountBedouinSmall = nbt.getInteger(KEY_SMALL_BEDOUIN);
+		craftcountYurt = nbt.getInteger(KEY_YURT);
+		craftcountTepee = nbt.getInteger(KEY_TEPEE);
+		craftcountBedouin = nbt.getInteger(KEY_BEDOUIN);
+		craftCountIndlu = nbt.getInteger(KEY_INDLU);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		nbt.setInteger(KEY_SMALL_YURT, craftcountYurtSmall);
-		nbt.setInteger(KEY_SMALL_TEPEE, craftcountTepeeSmall);
-		nbt.setInteger(KEY_SMALL_BEDOUIN, craftcountBedouinSmall);
+		nbt.setInteger(KEY_YURT, craftcountYurt);
+		nbt.setInteger(KEY_TEPEE, craftcountTepee);
+		nbt.setInteger(KEY_BEDOUIN, craftcountBedouin);
+		nbt.setInteger(KEY_INDLU, craftCountIndlu);
 		return nbt;
 	}
 
-	public void addCountYurtSmall(int toAdd) {
-		this.craftcountYurtSmall += toAdd;
+	public void addCountYurt(int toAdd) {
+		this.craftcountYurt += toAdd;
 		this.markDirty();
 	}
 
-	public void addCountTepeeSmall(int toAdd) {
-		this.craftcountTepeeSmall += toAdd;
+	public void addCountTepee(int toAdd) {
+		this.craftcountTepee += toAdd;
 		this.markDirty();
 	}
 
-	public void addCountBedouinSmall(int toAdd) {
-		this.craftcountBedouinSmall += toAdd;
+	public void addCountBedouin(int toAdd) {
+		this.craftcountBedouin += toAdd;
+		this.markDirty();
+	}
+	
+	public void addCountIndlu(int toAdd) {
+		this.craftCountIndlu += toAdd;
 		this.markDirty();
 	}
 
-	public int getCountYurtSmall() {
-		return this.craftcountYurtSmall;
+	public int getCountYurt() {
+		return this.craftcountYurt;
 	}
 
-	public int getCountTepeeSmall() {
-		return this.craftcountTepeeSmall;
+	public int getCountTepee() {
+		return this.craftcountTepee;
 	}
 
-	public int getCountBedouinSmall() {
-		return this.craftcountBedouinSmall;
+	public int getCountBedouin() {
+		return this.craftcountBedouin;
+	}
+	
+	public int getCountIndlu() {
+		return this.craftCountIndlu;
 	}
 }

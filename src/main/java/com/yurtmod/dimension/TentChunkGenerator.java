@@ -12,31 +12,29 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
 
-public class TentChunkGenerator implements IChunkGenerator
-{
+public class TentChunkGenerator implements IChunkGenerator {
 	private World worldObj;
 
-	public TentChunkGenerator(World worldIn, long dimID, boolean mapFeaturesEnabled)
-	{
+	public TentChunkGenerator(World worldIn, long dimID, boolean mapFeaturesEnabled) {
 		worldIn.setSeaLevel(64);
 		this.worldObj = worldIn;
 	}
 
 	@Override
-	public void populate(int x, int z) {}
-	
-	@Override
-	public void recreateStructures(Chunk ch, int x, int z) {}
+	public void populate(int x, int z) {
+	}
 
 	@Override
-	public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) 
-	{
+	public void recreateStructures(Chunk ch, int x, int z) {
+	}
+
+	@Override
+	public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos) {
 		return new ArrayList();
 	}
 
 	@Override
-	public boolean generateStructures(Chunk chunkIn, int x, int z) 
-	{
+	public boolean generateStructures(Chunk chunkIn, int x, int z) {
 		return false;
 	}
 
@@ -45,14 +43,13 @@ public class TentChunkGenerator implements IChunkGenerator
 		ChunkPrimer chunkprimer = new ChunkPrimer();
 		Chunk chunk = new Chunk(this.worldObj, chunkprimer, x, z);
 		Biome[] abiomegenbase = this.worldObj.getBiomeProvider().getBiomes(null, x * 16, z * 16, 16, 16);
-        byte[] abyte = chunk.getBiomeArray();
+		byte[] abyte = chunk.getBiomeArray();
 
-        for (int l = 0; l < abyte.length; ++l)
-        {
-            abyte[l] = (byte)Biome.getIdForBiome(abiomegenbase[l]);
-        }
+		for (int l = 0; l < abyte.length; ++l) {
+			abyte[l] = (byte) Biome.getIdForBiome(abiomegenbase[l]);
+		}
 
-        chunk.generateSkylightMap();
+		chunk.generateSkylightMap();
 		return chunk;
 	}
 

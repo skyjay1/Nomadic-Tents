@@ -93,8 +93,8 @@ public class ItemTent extends Item {
 				// if you can't edit these blocks, return FAIL
 				if (!player.canPlayerEdit(hitPos, hitSide, stack)) {
 					return EnumActionResult.FAIL;
-				} else/* if (hitSide == EnumFacing.UP) */ {
-					// if they clicked the top, start checking to build structure
+				} else {
+					// start checking to build structure
 					final EnumFacing playerFacing = player.getHorizontalFacing();
 					final StructureType type = StructureType.get(stack.getItemDamage());
 					final StructureBase struct = type.getNewStructure();
@@ -139,7 +139,9 @@ public class ItemTent extends Item {
 
 		for (StructureType type : StructureType.values()) {
 			ItemStack tent = type.getDropStack(ERROR_TAG, ERROR_TAG, type.ordinal(), type.ordinal());
-			items.add(tent);
+			if(type.isEnabled()) {
+				items.add(tent);
+			}
 		}
 	}
 
@@ -170,38 +172,7 @@ public class ItemTent extends Item {
 		}
 		return true;
 	}
-
-	/**
-	 * Finds out what was used to make the ItemStack and 'refunds' the player by
-	 * uncrafting it
-	 *
-	 * public static void dropIngredients(World world, EntityPlayer player,
-	 * ItemStack stack) { if (stack != null && stack.getCount() == 1 &&
-	 * stack.getItem() instanceof ItemTent) { // get the items used in this recipe
-	 * IRecipe recipe = getRecipeFor(stack); List<ItemStack> itemsToDrop =
-	 * addRecipeItemsToList(recipe, new LinkedList<ItemStack>());
-	 * 
-	 * // drop the items as entities for (ItemStack s : itemsToDrop) { EntityItem
-	 * toSpawn = new EntityItem(world, player.posX, player.posY, player.posZ, s);
-	 * toSpawn.setNoPickupDelay(); if (!world.isRemote) {
-	 * world.spawnEntity(toSpawn); } } } }
-	 * 
-	 * private static IRecipe getRecipeFor(final ItemStack itemstack) { IRecipe ret
-	 * = null; for (java.util.Map.Entry<ResourceLocation, IRecipe> entry :
-	 * ForgeRegistries.RECIPES.getEntries()) { IRecipe recipe = entry.getValue(); if
-	 * (recipe.getRecipeOutput().isItemEqual(itemstack)) { return recipe; } }
-	 * 
-	 * return null; }
-	 * 
-	 * // recursively add items to the list until recipe contains no tents private
-	 * static List<ItemStack> addRecipeItemsToList(final IRecipe recipe, final
-	 * List<ItemStack> list) { if (recipe != null) { // get the items used in the
-	 * recipe for (Ingredient i : recipe.getIngredients()) { for (ItemStack s :
-	 * i.getMatchingStacks()) { if (s != null && s.getItem() != null) { if
-	 * (s.getItem() instanceof ItemTent) { // if it's a tent, get THAT tents recipe
-	 * and items addRecipeItemsToList(getRecipeFor(s), list); } else { list.add(s);
-	 * } } } } } return list; }
-	 */
+	
 	/** Calculates and returns the next available X location for a tent **/
 	public static int getOffsetX(World world, ItemStack tentStack) {
 		TentSaveData data = TentSaveData.forWorld(world);
@@ -209,19 +180,24 @@ public class ItemTent extends Item {
 		case BEDOUIN_LARGE:
 		case BEDOUIN_MEDIUM:
 		case BEDOUIN_SMALL:
-			data.addCountBedouinSmall(1);
-			return data.getCountBedouinSmall();
+			data.addCountBedouin(1);
+			return data.getCountBedouin();
 		case TEPEE_LARGE:
 		case TEPEE_MEDIUM:
 		case TEPEE_SMALL:
-			data.addCountTepeeSmall(1);
-			return data.getCountTepeeSmall();
+			data.addCountTepee(1);
+			return data.getCountTepee();
 		case YURT_LARGE:
 		case YURT_MEDIUM:
 		case YURT_SMALL:
+			data.addCountYurt(1);
+			return data.getCountYurt();
+		case INDLU_SMALL:
+		case INDLU_MEDIUM:
+		case INDLU_LARGE:
 		default:
-			data.addCountYurtSmall(1);
-			return data.getCountYurtSmall();
+			data.addCountIndlu(1);
+			return data.getCountIndlu();
 		}
 	}
 

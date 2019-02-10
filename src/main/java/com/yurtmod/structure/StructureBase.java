@@ -69,12 +69,12 @@ public abstract class StructureBase {
 		final BlockPos corner = new BlockPos(cornerX, TentDimension.FLOOR_Y, cornerZ);
 		final BlockPos doorPos = new BlockPos(cornerX, TentDimension.FLOOR_Y + 1,
 				cornerZ + this.structure.getDoorPosition());
+		final boolean resetFlag = prevStructure != this.structure;
 		// check if the structure needs to be reset
-		if (prevStructure != this.structure) {
+		if (resetFlag) {
 			BlockPos prevDoorPos = new BlockPos(cornerX, TentDimension.FLOOR_Y + 1,
 					cornerZ + prevStructure.getDoorPosition());
-			// remove previous structure and platform
-			removePlatform(worldIn, corner, prevStructure.getSize());
+			// remove previous structure			
 			prevStructure.getNewStructure().remove(worldIn, prevDoorPos, TentDimension.STRUCTURE_DIR, prevStructure.getSize());
 		}
 		
@@ -85,6 +85,7 @@ public abstract class StructureBase {
 			return false;
 		}
 
+		// it's made it this far, time to build the new structure!
 		final boolean success = this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.structure.getSize(),
 				this.structure.getDoorBlock(), this.structure.getWallBlock(TentDimension.DIMENSION_ID),
 				this.structure.getRoofBlock());
@@ -92,6 +93,7 @@ public abstract class StructureBase {
 		if (success) {
 			// make the platform
 			generatePlatform(worldIn, corner, this.structure.getSize());
+			
 			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
 			// set tile entity door information
 			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
@@ -129,7 +131,8 @@ public abstract class StructureBase {
 	 * Builds a 2-block-deep platform from (cornerX, cornerY - 1, cornerZ) to
 	 * (cornerX + sqWidth, cornerY, cornerZ + sqWidth), with the top layer regular
 	 * dirt and the bottom layer indestructible dirt. Automatically places
-	 * indestructible dirt if the bottom of the tent is detected. Call this AFTER
+	 * indestructible dirt if the bottom of the tent is detected, and automatically
+	 * fixes irregularities formed after a tent upgrade. Call this AFTER
 	 * generating the structure or things will not work!
 	 * 
 	 * @return true if the platform was built successfully
@@ -142,31 +145,16 @@ public abstract class StructureBase {
 				// place top block: dirt or indestructible dirt based on what's above it
 				// (this assumes that the structure already exists)
 				BlockPos at = corner.add(i, 0, j);
-				Block above = worldIn.getBlockState(at.up(1)).getBlock();
-				Block topState = above instanceof BlockUnbreakable ? Content.SUPER_DIRT : Blocks.DIRT;
-				if (worldIn.isAirBlock(at) || topState == Content.SUPER_DIRT) {
+				Block blockAt = worldIn.getBlockState(at).getBlock();
+				// if this position is below a BlockUnbreakable, use Super Dirt, else use regular dirt
+				Block topState = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable 
+						? Content.SUPER_DIRT : Blocks.DIRT;
+				// if this position is considered replaceable, place the block, else skip this step
+				if (blockAt == Blocks.AIR || blockAt == Blocks.DIRT || blockAt == Content.SUPER_DIRT) {
 					worldIn.setBlockState(at, topState.getDefaultState(), 2);
 				}
 				// place bottom block: always indestructible dirt
 				worldIn.setBlockState(at.down(1), Content.SUPER_DIRT.getDefaultState(), 2);
-			}
-		}
-		return true;
-	}
-
-	private static boolean removePlatform(final World worldIn, final BlockPos corner, StructureType.Size size) {
-		int sqWidth = size.getSquareWidth();
-		// make a base from corner x,y,z to +x,y,+z
-		for (int i = 0; i < sqWidth; i++) {
-			for (int j = 0; j < sqWidth; j++) {
-				// remove any DIRT or SUPER DIRT in the top layer of platform
-				BlockPos at = corner.add(i, 0, j);
-				Block blockAt = worldIn.getBlockState(at).getBlock();
-				if (blockAt == Blocks.DIRT || blockAt == Content.SUPER_DIRT) {
-					worldIn.setBlockToAir(at);
-					// remove the bottom layer of platform
-					worldIn.setBlockToAir(at.down(1));
-				}
 			}
 		}
 		return true;

@@ -1,10 +1,10 @@
 package com.yurtmod.block;
 
 import com.yurtmod.block.Categories.IBedouinBlock;
+import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.init.Config;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
@@ -33,7 +33,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockTentDoor extends BlockUnbreakable
-		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, IBedouinBlock {
+		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, IBedouinBlock, IIndluBlock {
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis",
 			EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
 	public static final int DECONSTRUCT_DAMAGE = 5;

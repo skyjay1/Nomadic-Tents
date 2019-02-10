@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "yurtmod:blocks/indlu_wall_inner",
+        "particle": "yurtmod:blocks/indlu_wall_inner"
+    }
+}

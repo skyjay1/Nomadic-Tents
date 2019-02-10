@@ -17,38 +17,35 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = NomadicTents.MODID, name = NomadicTents.NAME, version = NomadicTents.VERSION, acceptedMinecraftVersions = NomadicTents.MCVERSION)
-public class NomadicTents 
-{
+public class NomadicTents {
 	public static final String MODID = "yurtmod";
 	public static final String NAME = "Nomadic Tents";
 	public static final String VERSION = "9.0.4";
 	public static final String MCVERSION = "1.12.2";
-	
-	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID + ".proxies.CommonProxy")
+
+	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID
+			+ ".proxies.CommonProxy")
 	public static CommonProxy proxy;
-	
-	public static final CreativeTabs TAB = new CreativeTabs("yurtMain")
-	{
+
+	public static final CreativeTabs TAB = new CreativeTabs("yurtMain") {
 		@Override
-		public ItemStack getTabIconItem() 
-		{
+		public ItemStack getTabIconItem() {
 			return new ItemStack(Content.ITEM_TENT);
 		}
 	};
-	
+
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event)
-	{
-		String path = event.getSuggestedConfigurationFile().getAbsolutePath().replaceFirst(MODID + ".cfg", "NomadicTents.cfg");
+	public void preInit(FMLPreInitializationEvent event) {
+		String path = event.getSuggestedConfigurationFile().getAbsolutePath().replaceFirst(MODID + ".cfg",
+				"NomadicTents.cfg");
 		Config.mainRegistry(new Configuration(new File(path)));
 		Content.mainRegistry();
 		TentDimension.preInit();
 	}
-	
+
 	@EventHandler
-    public void init(FMLInitializationEvent event)
-    {    
+	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
 		TentDimension.init();
-    }
+	}
 }

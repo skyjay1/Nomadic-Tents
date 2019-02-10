@@ -3,6 +3,7 @@ package com.yurtmod.proxies;
 import com.yurtmod.block.BlockBarrier;
 import com.yurtmod.block.BlockBedouinRoof;
 import com.yurtmod.block.BlockBedouinWall;
+import com.yurtmod.block.BlockIndluWall;
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockTentFrame;
 import com.yurtmod.block.BlockTentFrame.BlockToBecome;
@@ -68,23 +69,24 @@ public class CommonProxy {
 						.setCreativeTab(NomadicTents.TAB),
 				new BlockBedouinRoof().setRegistryName(NomadicTents.MODID, "bed_roof").setUnlocalizedName("bed_roof")
 						.setCreativeTab(NomadicTents.TAB),
+				new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_outer").setUnlocalizedName("indlu_wall_outer")
+						.setCreativeTab(NomadicTents.TAB),
+				new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_inner").setUnlocalizedName("indlu_wall_inner")
+						.setCreativeTab(NomadicTents.TAB),
 
 				// door blocks
-				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "yurt_door_0")
-						.setUnlocalizedName("yurt_door_0"),
-				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "yurt_door_1")
-						.setUnlocalizedName("yurt_door_1"),
-				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "yurt_door_2")
-						.setUnlocalizedName("yurt_door_2"),
-				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "tepee_door_0")
-						.setUnlocalizedName("tepee_door_0"),
-				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "tepee_door_1")
-						.setUnlocalizedName("tepee_door_1"),
-				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "tepee_door_2")
-						.setUnlocalizedName("tepee_door_2"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "yurt_door_0").setUnlocalizedName("yurt_door_0"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "yurt_door_1").setUnlocalizedName("yurt_door_1"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "yurt_door_2").setUnlocalizedName("yurt_door_2"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "tepee_door_0").setUnlocalizedName("tepee_door_0"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "tepee_door_1").setUnlocalizedName("tepee_door_1"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "tepee_door_2").setUnlocalizedName("tepee_door_2"),
 				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "bed_door_0").setUnlocalizedName("bed_door_0"),
 				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "bed_door_1").setUnlocalizedName("bed_door_1"),
 				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "bed_door_2").setUnlocalizedName("bed_door_2"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "indlu_door_0").setUnlocalizedName("indlu_door_0"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "indlu_door_1").setUnlocalizedName("indlu_door_1"),
+				new BlockTentDoor().setRegistryName(NomadicTents.MODID, "indlu_door_2").setUnlocalizedName("indlu_door_2"),
 
 				// frame blocks
 				new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER).setRegistryName(NomadicTents.MODID, "frame_yurt_wall")
@@ -96,7 +98,9 @@ public class CommonProxy {
 				new BlockTentFrame(BlockToBecome.BEDOUIN_WALL).setRegistryName(NomadicTents.MODID, "frame_bed_wall")
 						.setUnlocalizedName("frame_bed_wall"),
 				new BlockTentFrame(BlockToBecome.BEDOUIN_ROOF).setRegistryName(NomadicTents.MODID, "frame_bed_roof")
-						.setUnlocalizedName("frame_bed_roof"));
+						.setUnlocalizedName("frame_bed_roof"),
+				new BlockTentFrame(BlockToBecome.INDLU_WALL).setRegistryName(NomadicTents.MODID, "frame_indlu_wall")
+						.setUnlocalizedName("frame_indlu_wall"));
 	}
 
 	@SubscribeEvent
@@ -111,19 +115,20 @@ public class CommonProxy {
 						.setRegistryName(NomadicTents.MODID, "super_mallet").setUnlocalizedName("super_mallet"),
 				makeItem("tent_canvas"), makeItem("yurt_wall_piece"), makeItem("tepee_wall_piece"),
 				makeItem("bed_wall_piece"),
+				makeItem("indlu_wall_piece"),
 
 				// ItemBlock
 				makeIB(Content.TENT_BARRIER), makeIB(Content.SUPER_DIRT), makeIB(Content.YURT_WALL_INNER),
 				makeIB(Content.YURT_WALL_OUTER), makeIB(Content.YURT_ROOF),
 				new IBTepeeWall(Content.TEPEE_WALL).setRegistryName(Content.TEPEE_WALL.getRegistryName()),
-				makeIB(Content.BEDOUIN_WALL),
-				makeIB(Content.BEDOUIN_ROOF)/*
-											 * , makeIB(Content.BEDOUIN_DOOR_LARGE),
-											 * makeIB(Content.BEDOUIN_DOOR_MEDIUM), makeIB(Content.BEDOUIN_DOOR_SMALL),
-											 * makeIB(Content.TEPEE_DOOR_LARGE), makeIB(Content.TEPEE_DOOR_MEDIUM),
-											 * makeIB(Content.TEPEE_DOOR_SMALL), makeIB(Content.YURT_DOOR_LARGE),
-											 * makeIB(Content.YURT_DOOR_MEDIUM), makeIB(Content.YURT_DOOR_SMALL)
-											 */
+				makeIB(Content.BEDOUIN_WALL), makeIB(Content.BEDOUIN_ROOF),
+				makeIB(Content.INDLU_WALL_OUTER), makeIB(Content.INDLU_WALL_INNER)
+				/* , makeIB(Content.BEDOUIN_DOOR_LARGE),
+				 * makeIB(Content.BEDOUIN_DOOR_MEDIUM), makeIB(Content.BEDOUIN_DOOR_SMALL),
+				 * makeIB(Content.TEPEE_DOOR_LARGE), makeIB(Content.TEPEE_DOOR_MEDIUM),
+				 * makeIB(Content.TEPEE_DOOR_SMALL), makeIB(Content.YURT_DOOR_LARGE),
+				 * makeIB(Content.YURT_DOOR_MEDIUM), makeIB(Content.YURT_DOOR_SMALL)
+				 */
 		);
 	}
 

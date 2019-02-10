@@ -1,5 +1,6 @@
 package com.yurtmod.crafting;
 
+import com.yurtmod.init.Config;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType;
 
@@ -14,6 +15,7 @@ public class RecipeManager {
 		final ItemStack yurtWall = new ItemStack(Content.ITEM_YURT_WALL);
 		final ItemStack tepeeWall = new ItemStack(Content.ITEM_TEPEE_WALL);
 		final ItemStack bedouinWall = new ItemStack(Content.ITEM_BEDOUIN_WALL);
+		final ItemStack indluWall = new ItemStack(Content.ITEM_INDLU_WALL);
 		
 		final RecipeTent[] YURT = new RecipeTent[] {
 				RecipeTent.makeRecipe(StructureType.YURT_SMALL, new ItemStack[] {
@@ -70,9 +72,38 @@ public class RecipeManager {
 						
 				})
 		};
+		final RecipeTent[] INDLU = new RecipeTent[] {
+				RecipeTent.makeRecipe(StructureType.INDLU_SMALL, new ItemStack[] {
+						null,		indluWall,	null,
+						indluWall,	null,		indluWall,
+						indluWall,	indluWall,	indluWall
+						
+				}),
+				RecipeTent.makeRecipe(StructureType.INDLU_MEDIUM, new ItemStack[] {
+						null,		indluWall,									null,
+						indluWall,	StructureType.INDLU_SMALL.getDropStack(),	indluWall,
+						indluWall,	indluWall,									indluWall
+						
+				}),
+				RecipeTent.makeRecipe(StructureType.INDLU_LARGE, new ItemStack[] {
+						null,		indluWall,									null,
+						indluWall,	StructureType.INDLU_MEDIUM.getDropStack(),	indluWall,
+						indluWall,	indluWall,									indluWall
+						
+				})
+		};
 		// register the tent recipes
-		event.getRegistry().registerAll(YURT);
-		event.getRegistry().registerAll(TEPEE);
-		event.getRegistry().registerAll(BEDOUIN);		
+		if(Config.ALLOW_YURT) {
+			event.getRegistry().registerAll(YURT);
+		}
+		if(Config.ALLOW_TEPEE) {
+			event.getRegistry().registerAll(TEPEE);
+		}
+		if(Config.ALLOW_BEDOUIN) {
+			event.getRegistry().registerAll(BEDOUIN);	
+		}
+		if(Config.ALLOW_INDLU) {
+			event.getRegistry().registerAll(INDLU);
+		}		
 	}
 }

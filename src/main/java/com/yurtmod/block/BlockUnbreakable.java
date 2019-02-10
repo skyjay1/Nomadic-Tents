@@ -7,12 +7,12 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.AxisAlignedBB;
 
-public class BlockUnbreakable extends BlockEmptyDrops
-{
+public class BlockUnbreakable extends BlockEmptyDrops {
 	public static final AxisAlignedBB SINGULAR_AABB = new AxisAlignedBB(0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D);
-	
-	public BlockUnbreakable(Material material)
-	{
+
+	public static final int LIGHT_OPACITY = 7;
+
+	public BlockUnbreakable(Material material) {
 		super(material);
 		this.setBlockUnbreakable();
 		this.disableStats();

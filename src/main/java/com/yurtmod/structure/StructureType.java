@@ -12,9 +12,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 
 public enum StructureType {
-	YURT_SMALL(Size.SMALL, 2), YURT_MEDIUM(Size.MEDIUM, 3), YURT_LARGE(Size.LARGE, 4), TEPEE_SMALL(Size.SMALL, 2),
-	TEPEE_MEDIUM(Size.MEDIUM, 3), TEPEE_LARGE(Size.LARGE, 4), BEDOUIN_SMALL(Size.SMALL, 2),
-	BEDOUIN_MEDIUM(Size.MEDIUM, 3), BEDOUIN_LARGE(Size.LARGE, 4);
+	YURT_SMALL(Size.SMALL, 2), YURT_MEDIUM(Size.MEDIUM, 3), YURT_LARGE(Size.LARGE, 4), 
+	TEPEE_SMALL(Size.SMALL, 2),	TEPEE_MEDIUM(Size.MEDIUM, 3), TEPEE_LARGE(Size.LARGE, 4), 
+	BEDOUIN_SMALL(Size.SMALL, 2), BEDOUIN_MEDIUM(Size.MEDIUM, 3), BEDOUIN_LARGE(Size.LARGE, 4),
+	INDLU_SMALL(Size.SMALL, 2), INDLU_MEDIUM(Size.MEDIUM, 3), INDLU_LARGE(Size.LARGE, 4);
 
 	private final StructureType.Size size;
 	private final int doorOffsetZ;
@@ -96,8 +97,34 @@ public enum StructureType {
 		case YURT_MEDIUM:
 		case YURT_SMALL:
 			return new StructureYurt(this);
+		case INDLU_SMALL:
+		case INDLU_MEDIUM:
+		case INDLU_LARGE:
+			return new StructureIndlu(this);
 		}
 		return null;
+	}
+	
+	public boolean isEnabled() {
+		switch (this) {
+		case BEDOUIN_LARGE:
+		case BEDOUIN_MEDIUM:
+		case BEDOUIN_SMALL:
+			return Config.ALLOW_BEDOUIN;
+		case TEPEE_LARGE:
+		case TEPEE_MEDIUM:
+		case TEPEE_SMALL:
+			return Config.ALLOW_TEPEE;
+		case YURT_LARGE:
+		case YURT_MEDIUM:
+		case YURT_SMALL:
+			return Config.ALLOW_YURT;
+		case INDLU_SMALL:
+		case INDLU_MEDIUM:
+		case INDLU_LARGE:
+			return Config.ALLOW_INDLU;
+		}
+		return false;
 	}
 
 	public Block getDoorBlock() {
@@ -120,6 +147,12 @@ public enum StructureType {
 			return Content.BEDOUIN_DOOR_MEDIUM;
 		case BEDOUIN_LARGE:
 			return Content.BEDOUIN_DOOR_LARGE;
+		case INDLU_SMALL:
+			return Content.INDLU_DOOR_SMALL;
+		case INDLU_MEDIUM:
+			return Content.INDLU_DOOR_MEDIUM;
+		case INDLU_LARGE:
+			return Content.INDLU_DOOR_LARGE;
 		}
 		return null;
 	}
@@ -138,6 +171,10 @@ public enum StructureType {
 		case BEDOUIN_MEDIUM:
 		case BEDOUIN_LARGE:
 			return Content.BEDOUIN_WALL;
+		case INDLU_SMALL:
+		case INDLU_MEDIUM:
+		case INDLU_LARGE:
+			return dimID == Config.DIM_ID ? Content.INDLU_WALL_INNER : Content.INDLU_WALL_OUTER;
 		}
 		return null;
 	}
@@ -156,6 +193,10 @@ public enum StructureType {
 		case BEDOUIN_MEDIUM:
 		case BEDOUIN_LARGE:
 			return Content.BEDOUIN_ROOF;
+		case INDLU_SMALL:
+		case INDLU_MEDIUM:
+		case INDLU_LARGE:
+			return Content.INDLU_WALL_OUTER;
 		}
 		return null;
 	}
@@ -174,13 +215,17 @@ public enum StructureType {
 		case BEDOUIN_MEDIUM:
 		case BEDOUIN_LARGE:
 			return isRoof ? Content.FRAME_BEDOUIN_ROOF : Content.FRAME_BEDOUIN_WALL;
+		case INDLU_SMALL:
+		case INDLU_MEDIUM:
+		case INDLU_LARGE:
+			return Content.FRAME_INDLU_WALL;
 		}
 		return null;
 	}
 
 	/** @return the Z-offset of this structure type in the Tent Dimension **/
 	public int getTagOffsetZ() {
-		return (this.ordinal() / 3) * 2;
+		return Math.floorDiv(this.ordinal(), 3) * 2;
 	}
 
 	public TextFormatting getTooltipColor() {
