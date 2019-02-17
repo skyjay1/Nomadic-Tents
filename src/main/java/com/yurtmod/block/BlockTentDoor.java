@@ -5,6 +5,7 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.init.Config;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
@@ -69,7 +70,7 @@ public class BlockTentDoor extends BlockUnbreakable
 			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			// attempt to activate the TileEntity associated with this door
-			if (te != null && te instanceof TileEntityTentDoor) {
+			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
 				StructureType type = teyd.getStructureType();
 				StructureBase struct = type.getNewStructure();
@@ -89,6 +90,10 @@ public class BlockTentDoor extends BlockUnbreakable
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
+						// alert the TileEntity
+						if(Config.ALLOW_OVERWORLD_SETSPAWN) {
+							TileEntityTentDoor.resetOverworldSpawn(player);
+						}
 						// remove the yurt structure
 						struct.remove(worldIn, base, dir, StructureType.Size.SMALL);
 						// damage the item
@@ -96,10 +101,12 @@ public class BlockTentDoor extends BlockUnbreakable
 
 						return true;
 					}
-				} else
+				} else {
 					return ((TileEntityTentDoor) te).onPlayerActivate(player);
-			} else
+				}
+			} else {
 				System.out.println("[BlockTentDoor] Error! Failed to retrieve TileEntityTentDoor at " + pos);
+			}
 		}
 		return false;
 	}
@@ -152,7 +159,7 @@ public class BlockTentDoor extends BlockUnbreakable
 			return FULL_BLOCK_AABB;
 		} else {
 			EnumFacing.Axis axis = (EnumFacing.Axis) state.getValue(AXIS);
-			if (axis.equals(EnumFacing.Axis.X))
+			if (axis == EnumFacing.Axis.X)
 				return AABB_X;
 			else
 				return AABB_Z;

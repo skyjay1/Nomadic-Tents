@@ -18,6 +18,7 @@ public class Config {
 	public static boolean ALLOW_SLEEP_TENT_DIM;
 	public static boolean ALLOW_TELEPORT_TENT_DIM;
 	public static boolean ALLOW_RESPAWN_INTERCEPT;
+	public static boolean ALLOW_OVERWORLD_SETSPAWN;
 
 	public static boolean IS_TENT_FIREPROOF;
 
@@ -43,12 +44,14 @@ public class Config {
 		ALLOW_NONPLAYER_COLLIDE = config.getBoolean("Allow Entity Walk-In", Configuration.CATEGORY_GENERAL, false,
 				"[Experimental] When true, non-player entities can enter the tent by walking through the door");
 		ALLOW_RESPAWN_INTERCEPT = config.getBoolean("Allow Respawn Logic", Configuration.CATEGORY_GENERAL, true,
-				"When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy.");
+				"When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy");
+		ALLOW_OVERWORLD_SETSPAWN = config.getBoolean("Allow Overworld spawnpoint", Configuration.CATEGORY_GENERAL, true, 
+				"When true, sleeping in a tent will set your Overworld spawn to the tent's outside location");
+		IS_TENT_FIREPROOF = config.getBoolean("Is Tent Fireproof", Configuration.CATEGORY_GENERAL, false,
+				"When true, the tent item will not be destroyed if it is burned");
 		int dim = config.getInt("Tent Dimension ID", Configuration.CATEGORY_GENERAL, -1, -1, 255,
 				"The ID for the Tent Dimension. Set this to -1 to allow Forge to find a dimension.");
 		DIM_ID = dim > -1 ? dim : DimensionManager.getNextFreeDimId();
-		IS_TENT_FIREPROOF = config.getBoolean("Is Tent Fireproof", Configuration.CATEGORY_GENERAL, false,
-				"When true, the tent item will not be destroyed if it is burned");
 
 		config.save();
 	}

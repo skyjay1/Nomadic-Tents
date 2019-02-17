@@ -1,8 +1,10 @@
 package com.yurtmod.event;
 
+import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.init.Config;
+import com.yurtmod.init.TentSaveData;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
@@ -86,42 +88,36 @@ public class TentEventHandler {
 	 **/
 	@SubscribeEvent
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		if (Config.ALLOW_RESPAWN_INTERCEPT && event.player instanceof EntityPlayerMP) {
+		if (event.player instanceof EntityPlayerMP && !event.player.getEntityWorld().isRemote) {
 			final int TENTDIM = TentDimension.DIMENSION_ID;
 			final int RESPAWN = 0;
 			final int CUR_DIM = event.player.getEntityWorld().provider.getDimension();
 			EntityPlayerMP playerMP = (EntityPlayerMP) event.player;
+			final MinecraftServer mcServer = playerMP.getServer();
+			final WorldServer tentServer = mcServer.getWorld(TENTDIM);
+			final WorldServer overworld = mcServer.getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
-			if (playerMP != null && !playerMP.getEntityWorld().isRemote && CUR_DIM == TENTDIM) {
+			if (Config.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
-				if (null == bedPos
-						|| !(playerMP.getEntityWorld().getBlockState(bedPos).getBlock() instanceof BlockBed)) {
+				BlockPos respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(tentServer, bedPos, false) : null;
+				if (null == respawnPos) {
 					// player respawned in tent dimension without a bed here
 					// this likely means they're falling to their death in the void
 					// let's do something about that
-
-					MinecraftServer mcServer = playerMP.getServer();
-					WorldServer oldServer = mcServer.getWorld(TENTDIM);
-					WorldServer newServer = mcServer.getWorld(RESPAWN);
-
-					BlockPos respawnPos = playerMP.getBedLocation(RESPAWN);
-					if (respawnPos != null && (newServer.getBlockState(bedPos).getBlock() instanceof BlockBed)) {
-						// they have a bed in overworld, send them there
-						// TODO find out why this isn't working (doesn't seem to detect bed in
-						// overworld)
-						respawnPos = playerMP.getBedSpawnLocation(newServer, respawnPos, playerMP.isSpawnForced(0));
-					} else {
+					// first:  try to find their overworld bed
+					bedPos = playerMP.getBedLocation(RESPAWN);
+					respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(overworld, bedPos, false) : null;
+					if (respawnPos == null) {
 						// they have no bed at all, send them to world spawn
-						respawnPos = newServer.provider.getRandomizedSpawnPoint();
+						respawnPos = overworld.provider.getRandomizedSpawnPoint();
 					}
 					// transfer player using Teleporter
-					TentTeleporter tel = new TentTeleporter(TentDimension.DIMENSION_ID, newServer,
+					final TentTeleporter tel = new TentTeleporter(TentDimension.DIMENSION_ID, overworld,
 							new BlockPos(0, 0, 0), respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(),
 							StructureType.get(0), StructureType.get(0));
 					mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
-				} else
-					return; // if they have a bed in Tent Dimension, skip all this stuff
-			}
+				}
+			} 
 		}
 	}
 

@@ -1,20 +1,26 @@
 package com.yurtmod.block;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.init.Config;
+import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureType;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
@@ -35,7 +41,6 @@ public class TileEntityTentDoor extends TileEntity {
 	private int offsetZ;
 	private double prevX, prevY, prevZ;
 	private int prevDimID;
-	private ItemStack tentStack;
 
 	public TileEntityTentDoor() {
 		super();
@@ -44,19 +49,7 @@ public class TileEntityTentDoor extends TileEntity {
 			this.setStructureType(StructureType.YURT_SMALL);
 		}
 	}
-/*
-	public TileEntityTentDoor(StructureType type) {
-		super();
-		this.structurePrev = type;
-		this.structure = type;
-	}
-	
-	public TileEntityTentDoor(StructureType prevType, StructureType type) {
-		super();
-		this.structurePrev = prevType;
-		this.structure = type;
-	}
-*/
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
@@ -187,9 +180,14 @@ public class TileEntityTentDoor extends TileEntity {
 					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
 							"field_184851_cj", "invulnerableDimensionChange");
 				} catch (UnableToFindFieldException e) {
+					return false;
 				}
 				// transfer player to dimension
 				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
+				// attempt to set spawnpoint, if enabled
+				if(Config.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
+					attemptSetSpawn(this.getWorld(), playerMP, this.getPos(), this.prevX, this.prevY, this.prevZ);
+				}
 			} else {
 				// transfer non-player entity to dimension
 				// TODO not working correctly
@@ -200,6 +198,87 @@ public class TileEntityTentDoor extends TileEntity {
 		}
 		return false;
 	}
+
+	/**
+	 * Assumes you are entering the overworld and does several things:
+	 * 1) Checks if you have a spawn point inside the tent
+	 * 2) Checks if your old spawn point has not already been mapped
+	 * 3) Maps your old spawn point for when you take down the tent
+	 */
+	private static boolean attemptSetSpawn(final World worldFrom, final EntityPlayerMP player, 
+			final BlockPos myPos, final double prevX, final double prevY, final double prevZ) {
+		
+		final int overworldId = 0;
+		final World overworld = worldFrom.getMinecraftServer().getWorld(overworldId);
+		final BlockPos center = new BlockPos(prevX, prevY, prevZ);
+		TentSaveData data = TentSaveData.forWorld(worldFrom);
+		UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
+		BlockPos oldSpawn = player.getBedLocation(overworldId);
+		BlockPos bedSpawn = oldSpawn != null ? EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) : null;
+		if(oldSpawn == null || bedSpawn == null) {
+			oldSpawn = overworld.provider.getRandomizedSpawnPoint();
+		}
+		BlockPos tentSpawn = player.getBedLocation(TentDimension.DIMENSION_ID);
+		if(tentSpawn != null) {
+			tentSpawn = EntityPlayer.getBedSpawnLocation(worldFrom, tentSpawn, false);
+		}
+		// if their Tent Dimension spawnpoint AND BED are inside the tent, update spawn location, as needed
+		if (tentSpawn != null && myPos.distanceSq(tentSpawn) <= Math.pow(TentDimension.MAX_SQ_WIDTH, 2)) {
+			// if we should / need to update the old spawn location...
+			if(!data.contains(uuid) && overworld.provider.canRespawnHere()) {
+				// First, map the player's old spawn point in case the tent is taken down
+				data.put(uuid, oldSpawn, overworldId);
+				// Next, set their spawn point to be this location
+				player.setSpawnChunk(center, true, overworldId);
+				return true;
+			}
+			} else {
+				// reset the player's spawn point
+				resetOverworldSpawn(player);
+			}
+		return false;
+	}
+	
+	@Nullable
+	public static BlockPos getNearbyTentDoor(final World world, final BlockPos center, final int radius) {
+		for(int x = -radius; x <= radius; ++x) {
+			for(int y = -radius; y <= radius; ++y) {
+				for(int z = -radius; z <= radius; ++z) {
+					BlockPos pos = center.add(x, y, z);
+					Block b = world.getBlockState(pos).getBlock();
+					if(b instanceof BlockTentDoor) {
+						return pos;
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+
+	public static void resetOverworldSpawn(EntityPlayer player) {
+    	// reset player spawn point when the tent is taken down
+		final World overworld = player.getEntityWorld().getMinecraftServer().getWorld(0);
+		final UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
+    	final TentSaveData data = TentSaveData.forWorld(overworld);
+    	// first, check if the player has a bed
+    	BlockPos posToSet = player.getBedLocation(0);
+    	if(posToSet == null || EntityPlayer.getBedSpawnLocation(overworld, posToSet, false) == null) {
+    		BlockPos oldSpawn = data.get(uuid);
+    		BlockPos bedSpawn = oldSpawn != null ? EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) : null;
+        	if(oldSpawn == null || bedSpawn == null) {
+        		// set spawn point random
+        		posToSet = player.getEntityWorld().provider.getRandomizedSpawnPoint();
+        	} else {
+        		posToSet = oldSpawn;
+        	}
+    	}
+    	// finally set the player's spawn point to whatever it was before tent was set up
+    	player.setSpawnPoint(posToSet, false);
+    	data.remove(uuid);
+    }
+	
+	
 
 	/**
 	 * Attempts to teleport the entity and use its XYZ to update TileEntity fields.
