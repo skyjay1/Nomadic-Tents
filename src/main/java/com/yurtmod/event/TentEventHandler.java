@@ -1,5 +1,8 @@
 package com.yurtmod.event;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
@@ -13,6 +16,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemChorusFruit;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +25,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
@@ -28,32 +33,53 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 public class TentEventHandler {
 	
 	/**
-	 * Used to sync world time in Overworld and Tent Dimension when a player sleeps
-	 * and wakes up
+	 * This code is called AFTER a player wakes up but BEFORE any subsequent
+	 * code has been called. Should be ok to change time values here.
+	 * Used to sync world time in Overworld and Tent Dimension when a player 
+	 * sleeps and wakes up in a Tent
 	 **/
 	@SubscribeEvent
 	public void onPlayerWake(final PlayerWakeUpEvent event) {
-		if (!event.getEntityPlayer().getEntityWorld().isRemote) {
-			MinecraftServer server = event.getEntityPlayer().getServer();
-			WorldServer overworld = server.getWorld(0);
-			WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
-			if (Config.ALLOW_SLEEP_TENT_DIM
-					&& TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
-				handleSleepIn(overworld, event.shouldSetSpawn());
-				handleSleepIn(tentDim, event.shouldSetSpawn());
+		if(!event.getEntityPlayer().getEntityWorld().isRemote 
+				&& event.getEntityPlayer().getEntityWorld().getGameRules().getBoolean("doDaylightCycle")) {
+			final MinecraftServer server = event.getEntityPlayer().getServer();
+			final WorldServer overworld = server.getWorld(0);
+			final WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
+			// only run this code for players waking up in a Tent
+			if(TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
+				boolean shouldChangeTime = Config.ALLOW_SLEEP_TENT_DIM;
+				// if config requires, check both overworld and tent players
+				if(Config.IS_SLEEPING_STRICT) {
+					final List<EntityPlayer> players = new ArrayList(overworld.playerEntities);
+					players.addAll(tentDim.playerEntities);
+					// find out if ALL players in BOTH dimensions are sleeping
+					for(EntityPlayer p : overworld.playerEntities) {
+						// (except for the one who just woke up, of course)
+						if(p != event.getEntityPlayer()) {
+							shouldChangeTime &= p.isPlayerSleeping();
+						}
+					}
+				}
+				if(shouldChangeTime) {
+					// the time just as the player wakes up, before it is changed to day
+					long currentTime = overworld.getWorldInfo().getWorldTime();
+					overworld.getWorldInfo().setWorldTime(currentTime - currentTime % 24000L);
+				}
 			}
-			// sleeping in overworld should affect tent dimension too
+			// sleeping anywhere should always sync tent to overworld
 			tentDim.getWorldInfo().setWorldTime(overworld.getWorldTime());
+			// update sleeping flags
+			overworld.updateAllPlayersSleepingFlag();
+			tentDim.updateAllPlayersSleepingFlag();
 		}
+		
 	}
 
 	/** Updates sleep and daylight-cycle info for overworld and tent dimension **/
-	public void handleSleepIn(final WorldServer s, final boolean reset) {
-		if (reset && s.getGameRules().getBoolean("doDaylightCycle")) {
-			long i = s.getWorldInfo().getWorldTime() + 24000L;
-			s.getWorldInfo().setWorldTime(i - i % 24000L);
-			s.updateAllPlayersSleepingFlag();
-		}
+	public void handleSleepIn(final WorldServer s) {
+		long i = s.getWorldInfo().getWorldTime() + 24000L;
+		s.getWorldInfo().setWorldTime(i - i % 24000L);
+		s.updateAllPlayersSleepingFlag();
 	}
 
 	/** Makes Tent items fireproof if enabled **/
@@ -66,20 +92,40 @@ public class TentEventHandler {
 			}
 		}
 	}
+	
+	/**
+	 * EXPERIMENTAL cancel non-creative player teleportation using Chorus Fruit
+	 **/
+	@SubscribeEvent
+	public void onItemUse(LivingEntityUseItemEvent.Start event) {
+		if(event.getEntityLiving() instanceof EntityPlayer && !event.getItem().isEmpty() 
+				&& event.getItem().getItem() instanceof ItemChorusFruit) {
+			EntityPlayer player = (EntityPlayer)event.getEntityLiving();
+			if(canCancelTeleport(player)) {
+				event.setDuration(-100);
+				player.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")), true);
+			}
+		}
+	}
 
 	/**
 	 * EXPERIMENTAL cancel all non-creative player teleportation in tent dimension
 	 **/
 	@SubscribeEvent
 	public void onTeleport(final EnderTeleportEvent event) {
-		if (!Config.ALLOW_TELEPORT_TENT_DIM && event.getEntityLiving() instanceof EntityPlayer
-				&& TentDimension.isTentDimension(event.getEntityLiving().getEntityWorld())) {
-			if (!((EntityPlayer) event.getEntityLiving()).isCreative()) {
+		if(event.getEntityLiving() instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer)event.getEntityLiving();
+			if(canCancelTeleport(player)) {
 				event.setCanceled(true);
-				EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-				player.sendMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")));
+				player.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")), true);
 			}
 		}
+	}
+	
+	/** @return whether the teleporting should be canceled according to conditions and config **/
+	private static boolean canCancelTeleport(EntityPlayer player) {
+		return !Config.ALLOW_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
+				&& !player.isCreative();
 	}
 
 	/**

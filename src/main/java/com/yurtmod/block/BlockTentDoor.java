@@ -92,7 +92,7 @@ public class BlockTentDoor extends BlockUnbreakable
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
 						if(Config.ALLOW_OVERWORLD_SETSPAWN) {
-							TileEntityTentDoor.resetOverworldSpawn(player);
+							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
 						struct.remove(worldIn, base, dir, StructureType.Size.SMALL);

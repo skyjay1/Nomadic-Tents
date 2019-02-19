@@ -39,7 +39,7 @@ public class TentTeleporter extends Teleporter {
 		if (TentDimension.isTentDimension(worldServerTo)) {
 			// if you're going to the tent dimension, set location accordingly and make sure
 			// a tent will be there
-			entityX = this.tentCorner.getX() + 1.5D;
+			entityX = this.tentCorner.getX() + 0.9D + entity.width;
 			entityY = this.tentCorner.getY() + 0.01D;
 			entityZ = this.tentCorner.getZ() + this.structure.getDoorPosition() + 0.5D;
 			yaw = -90F;
@@ -64,6 +64,7 @@ public class TentTeleporter extends Teleporter {
 
 	@Override
 	public boolean placeInExistingPortal(Entity entity, float f) {
+		placeInPortal(entity, f);
 		return true;
 	}
 

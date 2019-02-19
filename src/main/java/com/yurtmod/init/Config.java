@@ -19,6 +19,7 @@ public class Config {
 	public static boolean ALLOW_TELEPORT_TENT_DIM;
 	public static boolean ALLOW_RESPAWN_INTERCEPT;
 	public static boolean ALLOW_OVERWORLD_SETSPAWN;
+	public static boolean IS_SLEEPING_STRICT;
 
 	public static boolean IS_TENT_FIREPROOF;
 
@@ -39,9 +40,11 @@ public class Config {
 				"When true, only creative-mode players can teleport within the Tent Dimension");
 		ALLOW_SLEEP_TENT_DIM = !config.getBoolean("Beds explode in Tent Dim", Configuration.CATEGORY_GENERAL, false,
 				"When true, beds used in the Tent Dimension will explode.");
+		IS_SLEEPING_STRICT = config.getBoolean("Tent Sleeping Strict", Configuration.CATEGORY_GENERAL, true, 
+				"When true, players in a tent can only sleep through the night if overworld players are asleep too");
 		ALLOW_PLAYER_COLLIDE = config.getBoolean("Allow Player Walk-In", Configuration.CATEGORY_GENERAL, true,
 				"[Experimental] When true, players can enter the tent by walking through the door");
-		ALLOW_NONPLAYER_COLLIDE = config.getBoolean("Allow Entity Walk-In", Configuration.CATEGORY_GENERAL, false,
+		ALLOW_NONPLAYER_COLLIDE = config.getBoolean("Allow Entity Walk-In", Configuration.CATEGORY_GENERAL, true,
 				"[Experimental] When true, non-player entities can enter the tent by walking through the door");
 		ALLOW_RESPAWN_INTERCEPT = config.getBoolean("Allow Respawn Logic", Configuration.CATEGORY_GENERAL, true,
 				"When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy");
