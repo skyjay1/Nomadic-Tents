@@ -9,7 +9,8 @@
         "item": "minecraft:gold_block"
       },
 	"S": {
-		"item": "minecraft:stick"
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
 	  },
 	"C": {
 		"item": "yurtmod:tent_canvas"

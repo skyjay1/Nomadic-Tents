@@ -141,6 +141,10 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		mallet.damageItem(CONSTRUCT_DAMAGE, player);
 		return !worldIn.isRemote && worldIn.setBlockState(pos, this.TO_BECOME.getBlock(), 3);
 	}
+	
+	public BlockToBecome getEnumBlockToBecome() {
+		return this.TO_BECOME;
+	}
 
 	public boolean onMalletUsed(World worldIn, BlockPos pos, IBlockState state, ItemStack mallet, EntityPlayer player) {
 		int meta = this.getMetaFromState(state);

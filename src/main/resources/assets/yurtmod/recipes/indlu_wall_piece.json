@@ -5,34 +5,13 @@
    "FSF",
    "FSF"],
   "key": {
-    "F": [
-	  {
-        "item": "minecraft:leaves",
-        "data": 0
+    "F": {
+        "type": "forge:ore_dict",
+		"ore": "treeLeaves"
       },
-	  {
-        "item": "minecraft:leaves",
-        "data": 1
-      },
-	  {
-        "item": "minecraft:leaves",
-        "data": 2
-      },
-	  {
-        "item": "minecraft:leaves",
-        "data": 3
-      },
-	  {
-        "item": "minecraft:leaves2",
-        "data": 0
-      },
-	  {
-        "item": "minecraft:leaves2",
-        "data": 1
-      }
-	],
 	"S": {
-		"item": "minecraft:stick"
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
 	  }
   },
   "result": {

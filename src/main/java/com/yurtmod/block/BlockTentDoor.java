@@ -221,7 +221,8 @@ public class BlockTentDoor extends BlockUnbreakable
 	@Override
 	public boolean hasTileEntity(IBlockState state) {
 		// only store TileEntity information in the LOWER half of the door
-		return state.getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER;
+		//return state.getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER;
+		return true;
 	}
 
 	@Override

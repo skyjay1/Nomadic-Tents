@@ -9,7 +9,8 @@
         "item": "minecraft:rabbit_hide"
       },
 	"S": {
-		"item": "minecraft:stick"
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
 	  }
   },
   "result": {
