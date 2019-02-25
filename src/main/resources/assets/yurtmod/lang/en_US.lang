@@ -67,3 +67,4 @@ item.indlu_large.name=Large Indlu
 
 tooltip.extra_dimensional_space=Extra-dimensional space!
 chat.no_teleport=Teleporting is not allowed inside your tent.
+waila.progress=Progress: %s

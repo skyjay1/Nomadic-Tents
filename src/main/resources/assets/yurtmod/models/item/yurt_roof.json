@@ -1,5 +1,5 @@
 {
-    "parent": "yurtmod:block/yurt_roof_upper",
+    "parent": "yurtmod:block/yurt_roof_outside",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],

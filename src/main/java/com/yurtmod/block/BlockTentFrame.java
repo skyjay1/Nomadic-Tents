@@ -193,7 +193,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			case YURT_WALL_OUTER:
 				return Content.YURT_WALL_OUTER.getDefaultState();
 			case YURT_ROOF:
-				return Content.YURT_ROOF.getDefaultState();
+				return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true));
 			case TEPEE_WALL:
 				return Content.TEPEE_WALL.getDefaultState();
 			case BEDOUIN_WALL:
