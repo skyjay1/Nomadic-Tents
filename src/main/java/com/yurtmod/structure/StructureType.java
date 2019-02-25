@@ -51,12 +51,12 @@ public enum StructureType {
 		return new ItemStack(Content.itemTent, 1, this.ordinal());
 	}
 	
-	public ItemStack getDropStack(TileEntityTentDoor te) {
+	public static ItemStack getDropStack(TileEntityTentDoor te) {
 		return getDropStack(te.getOffsetX(), te.getOffsetZ(), te.getPrevStructureType().ordinal(), te.getStructureType().ordinal());
 	}
 
-	public ItemStack getDropStack(int tagChunkX, int tagChunkZ, int prevStructure, int tentType) {
-		ItemStack stack = this.getDropStack();
+	public static ItemStack getDropStack(int tagChunkX, int tagChunkZ, int prevStructure, int tentType) {
+		ItemStack stack = new ItemStack(Content.itemTent, 1, tentType);
 		if (stack.getTagCompound() == null) {
 			stack.setTagCompound(new NBTTagCompound());
 		}

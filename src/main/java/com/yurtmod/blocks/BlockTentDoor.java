@@ -6,6 +6,7 @@ import com.yurtmod.blocks.Categories.ITepeeBlock;
 import com.yurtmod.blocks.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.items.ItemTentMallet;
+import com.yurtmod.main.Config;
 import com.yurtmod.main.Content;
 import com.yurtmod.main.NomadicTents;
 import com.yurtmod.structure.BlockPosBeta;
@@ -137,6 +138,10 @@ public class BlockTentDoor extends BlockUnbreakable
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.delayBeforeCanPickup = 0;
 						worldIn.spawnEntityInWorld(dropItem);
+						// alert the TileEntity
+						if(Config.ALLOW_OVERWORLD_SETSPAWN) {
+							teyd.onPlayerRemove(player);
+						}
 						// remove the structure
 						teyd.getStructureType().getNewStructure().remove(worldIn, doorPos, dir,
 								StructureType.Size.SMALL);

@@ -58,8 +58,9 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	public IIcon getIcon(int side, int meta) {
 		if (side < 2) {
 			return this.icons[0];
-		} else
+		} else {
 			return this.icons[meta];
+		}
 	}
 
 	@Override
@@ -116,15 +117,16 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	 * @param pos   BlockPos to begin searching from
 	 * @return BlockPos of lower tepee door if found, else null
 	 **/
-	private BlockPosBeta findDoorNearby(World world, int myX, int myY, int myZ) {
+	private static BlockPosBeta findDoorNearby(World world, int myX, int myY, int myZ) {
 		List<BlockPosBeta> checked = new LinkedList();
 		BlockPosBeta pos = new BlockPosBeta(myX, myY, myZ);
 		while (pos != null && !(world.getBlock(pos.getX(), pos.getY(), pos.getZ()) instanceof BlockTentDoor)) {
 			pos = getNextTepeeBlock(world, checked, pos);
 		}
-		if (pos == null)
+		if (pos == null) {
 			return null;
-		boolean isLower = world.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ()) % 4 == 0;
+		}
+		boolean isLower = world.getBlockMetadata(pos.getX(), pos.getY(), pos.getZ()) % 2 == 0;
 		return isLower ? pos : pos.down(1);
 	}
 

@@ -18,8 +18,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
-	private final int CONSTRUCT_DAMAGE = 1; // 1 in x hits damages the tool
-	private final int MAX_META = 7;
+	public static final int CONSTRUCT_DAMAGE = 1;
+	public static final int MAX_META = 7;
 	private final BlockToBecome TO_BECOME;
 	@SideOnly(Side.CLIENT)
 	private IIcon[] frameIcons;
@@ -114,7 +114,8 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	public boolean becomeReal(World worldIn, int x, int y, int z, ItemStack mallet, EntityPlayer player) {
 		mallet.damageItem(CONSTRUCT_DAMAGE, player);
-		return worldIn.setBlock(x, y, z, this.TO_BECOME.getBlock());
+		int meta = this.TO_BECOME.getMetadata(worldIn, x, y, z);
+		return worldIn.setBlock(x, y, z, this.TO_BECOME.getBlock(), meta, 3);
 	}
 
 	public boolean onSuperMalletUsed(World worldIn, int myX, int myY, int myZ, ItemStack mallet, EntityPlayer player) {
@@ -138,6 +139,14 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			}
 		}
 		return true;
+	}
+	
+	public BlockToBecome getEnumBlockToBecome() {
+		return this.TO_BECOME;
+	}
+	
+	public Block getBlockToBecome() {
+		return this.TO_BECOME.getBlock();
 	}
 
 	public static enum BlockToBecome {
@@ -167,6 +176,10 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 				return Content.indluOuterWall;
 			}
 			return null;
+		}
+		
+		public int getMetadata(World world, int x, int y, int z) {
+			return this == YURT_ROOF && world.provider.dimensionId == 0 ? 1 : 0;
 		}
 	}
 }

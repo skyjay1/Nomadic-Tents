@@ -16,7 +16,7 @@ public class TentDimension {
 	public static final EnumFacing STRUCTURE_DIR = EnumFacing.EAST;
 
 	public static void mainRegistry() {
-		int id = getTentId();
+		int id = getDimId();
 		DimensionManager.registerProviderType(id, WorldProviderTent.class, false);
 		DimensionManager.registerDimension(id, id);
 	}
@@ -29,7 +29,7 @@ public class TentDimension {
 		return dimID == Config.DIMENSION_ID;
 	}
 	
-	public static int getTentId() {
+	public static int getDimId() {
 		return Config.DIMENSION_ID;
 	}
 }

@@ -1,12 +1,13 @@
 itemGroup.yurtMain=Nomadic Tents
 
-tile.yurt_wall_outer.name=Yurt Outer Wall
-tile.yurt_wall_inner.name=Yurt Inner Wall
-tile.frame_yurt_wall.name=Yurt Frame Block (Wall)
-tile.frame_yurt_roof.name=Yurt Frame Block (Roof)
-tile.frame_tepee_wall.name=Tepee Frame Block (Wall)
-tile.frame_bed_wall.name=Bedouin Frame Block (Wall)
-tile.frame_bed_roof.name=Bedouin Frame Block (Roof)
+tile.yurt_wall_outer.name=Yurt Wall
+tile.yurt_wall_inner.name=Yurt Wall
+tile.yurt_frame_wall.name=Yurt Frame Block
+tile.yurt_frame_roof.name=Yurt Frame Block
+tile.tepee_frame_wall.name=Tepee Frame Block
+tile.bedouin_frame_wall.name=Bedouin Frame Block
+tile.bedouin_frame_roof.name=Bedouin Frame Block
+tile.indlu_frame_wall.name=Indlu Frame Block
 tile.yurt_door_0.name=Yurt Door (Red)
 tile.yurt_door_1.name=Yurt Door (Blue)
 tile.yurt_door_2.name=Yurt Door (Green)
@@ -22,7 +23,7 @@ tile.bed_wall.name=Bedouin Wall
 tile.bed_roof.name=Bedouin Roof
 tile.indlu_wall_inner.name=Indlu Wall
 tile.indlu_wall_outer.name=Indlu Wall
-tile.super_dirt.name=Dirt (Indestructible)
+tile.yurt_floor.name=Dirt (Indestructible)
 tile.yurtmod_barrier.name=Barrier
 tile.tepee_wall.name=Tepee Wall
 tile.tepee_wall.0.name=Tepee Wall (Blank)
@@ -63,3 +64,4 @@ item.indlu_large.name=Large Indlu
 
 tooltip.extra_dimensional_space=Extra-dimensional space!
 chat.no_teleport=Teleporting is not allowed inside your tent
+waila.progress=Progress: %s

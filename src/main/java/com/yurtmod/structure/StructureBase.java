@@ -81,7 +81,7 @@ public abstract class StructureBase {
 		}
 
 		final boolean success = this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.structure.getSize(),
-				this.structure.getDoorBlock(), this.structure.getWallBlock(TentDimension.getTentId()),
+				this.structure.getDoorBlock(), this.structure.getWallBlock(TentDimension.getDimId()),
 				this.structure.getRoofBlock());
 
 		if (success) {

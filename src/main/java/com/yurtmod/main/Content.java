@@ -83,8 +83,8 @@ public class Content {
 		indluDoorMed = new BlockTentDoor(StructureType.INDLU_MEDIUM, "indlu").setBlockName("indlu_door_1");
 		indluDoorLarge = new BlockTentDoor(StructureType.INDLU_LARGE, "indlu").setBlockName("indlu_door_2");
 		// yurt blocks
-		yurtOuterWall = new BlockYurtWall("yurt_wall", "yurt_wall_inner_upper").setBlockName("yurt_wall_outer");
-		yurtInnerWall = new BlockYurtWall("yurt_wall_inner", "yurt_wall_inner_upper").setBlockName("yurt_wall_inner");
+		yurtOuterWall = new BlockYurtWall("yurt_wall", "yurt_roof_upper").setBlockName("yurt_wall_outer");
+		yurtInnerWall = new BlockYurtWall("yurt_wall_inner", "yurt_roof_upper").setBlockName("yurt_wall_inner");
 		yurtRoof = new BlockYurtRoof().setBlockName("yurt_roof");
 		// tepee blocks
 		tepeeWall = new BlockTepeeWall().setBlockName("tepee_wall");

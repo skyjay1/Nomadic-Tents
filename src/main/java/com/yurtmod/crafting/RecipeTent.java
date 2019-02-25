@@ -17,7 +17,7 @@ public class RecipeTent extends ShapedRecipes implements IRecipe {
 	}
 
 	public static RecipeTent makeRecipe(final StructureType output, final ItemStack[] input) {
-		return new RecipeTent(new ItemStack(Content.itemTent, 1, output.ordinal()), input);
+		return new RecipeTent(output.getDropStack(), input);
 	}
 
 	/**

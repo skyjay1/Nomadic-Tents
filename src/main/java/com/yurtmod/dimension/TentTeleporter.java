@@ -10,12 +10,12 @@ import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 
 public class TentTeleporter extends Teleporter {
-	public final StructureType prevStructure;
-	public final StructureType structure;
-	public final int yurtCornerX, yurtCornerY, yurtCornerZ;
-	public final double prevX, prevY, prevZ;
-	public final int prevDimID;
-	public final WorldServer worldServer;
+	private final StructureType prevStructure;
+	private final StructureType structure;
+	private final int yurtCornerX, yurtCornerY, yurtCornerZ;
+	private final double prevX, prevY, prevZ;
+	private final int prevDimID;
+	private final WorldServer worldServer;
 
 	public TentTeleporter(int dimensionFrom, WorldServer worldTo, int cornerX, int cornerY, int cornerZ, double lastX,
 			double lastY, double lastZ, StructureType prevStructureType, StructureType structureType) {
@@ -34,34 +34,24 @@ public class TentTeleporter extends Teleporter {
 
 	@Override
 	public void placeInPortal(Entity entity, double x, double y, double z, float f) {
-		if (entity instanceof EntityPlayer && !entity.worldObj.isRemote) {
-			EntityPlayer player = (EntityPlayer) entity;
-
-			double entityX;
-			double entityY;
-			double entityZ;
-			float yaw;
+		if (!entity.worldObj.isRemote) {
+			double entityX = getX();
+			double entityY = getY();
+			double entityZ = getZ();
+			float yaw = getYaw(entity);
 			entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 
 			if (TentDimension.isTent(this.worldServer)) {
-				entityX = this.yurtCornerX + 1.5D;
-				entityY = this.yurtCornerY + 0.01D;
-				entityZ = this.yurtCornerZ + this.structure.getDoorPosition() + 0.5D;
-				yaw = -90F;
-
+				entityX += entity.width;
 				// generate the structure - tent will check if it already exists
 				StructureBase gen = this.structure.getNewStructure();
 				if (gen != null) {
-					gen.generateInTentDimension(prevDimID, worldServer, yurtCornerX, yurtCornerZ, prevX, prevY, prevZ, prevStructure);
+					gen.generateInTentDimension(prevDimID, worldServer, yurtCornerX, yurtCornerZ, 
+							prevX, prevY, prevZ, prevStructure);
 				}
 				// also synchronize the time between Tent and Overworld dimensions
 				long overworldTime = MinecraftServer.getServer().worldServerForDimension(0).getWorldTime();
 				worldServer.getWorldInfo().setWorldTime(overworldTime);
-			} else {
-				entityX = this.prevX;
-				entityY = this.prevY;
-				entityZ = this.prevZ;
-				yaw = entity.rotationYaw;
 			}
 			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, entity.rotationPitch);
 		}
@@ -71,16 +61,20 @@ public class TentTeleporter extends Teleporter {
 	public boolean placeInExistingPortal(Entity entity, double x, double y, double z, float f) {
 		return true;
 	}
-
-	public String toString() {
-		String out = "\n[TentTeleporter]\n";
-		out += "structure=" + this.structure + "\n";
-		out += "yurtCornerX=" + this.yurtCornerX + "\n";
-		out += "yurtCornerZ=" + this.yurtCornerZ + "\n";
-		out += "prevX=" + this.prevX + "\n";
-		out += "prevY=" + this.prevY + "\n";
-		out += "prevZ=" + this.prevZ + "\n";
-		out += "prevDimID=" + this.prevDimID + "\n";
-		return out;
+	
+	public double getX() {
+		return TentDimension.isTent(this.worldServer) ? this.yurtCornerX + 0.9D : this.prevX;
+	}
+	
+	public double getY() {
+		return TentDimension.isTent(this.worldServer) ? this.yurtCornerY + 0.01D : this.prevY;
+	}
+	
+	public double getZ() {
+		return TentDimension.isTent(this.worldServer) ? this.yurtCornerZ + this.structure.getDoorPosition() + 0.5D : this.prevZ;
+	}
+	
+	public float getYaw(Entity e) {
+		return TentDimension.isTent(this.worldServer) ? -90F : e.rotationYaw;
 	}
 }
