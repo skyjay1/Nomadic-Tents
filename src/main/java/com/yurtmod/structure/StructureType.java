@@ -12,19 +12,36 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextFormatting;
 
 public enum StructureType {
-	YURT_SMALL(Size.SMALL, 2), YURT_MEDIUM(Size.MEDIUM, 3), YURT_LARGE(Size.LARGE, 4), 
-	TEPEE_SMALL(Size.SMALL, 2),	TEPEE_MEDIUM(Size.MEDIUM, 3), TEPEE_LARGE(Size.LARGE, 4), 
-	BEDOUIN_SMALL(Size.SMALL, 2), BEDOUIN_MEDIUM(Size.MEDIUM, 3), BEDOUIN_LARGE(Size.LARGE, 4),
-	INDLU_SMALL(Size.SMALL, 2), INDLU_MEDIUM(Size.MEDIUM, 3), INDLU_LARGE(Size.LARGE, 4);
+	// YURT
+	YURT_SMALL(Type.YURT, Size.SMALL), 
+	YURT_MEDIUM(Type.YURT, Size.MEDIUM), 
+	YURT_LARGE(Type.YURT, Size.LARGE), 
+	// TEPEE
+	TEPEE_SMALL(Type.TEPEE, Size.SMALL), 
+	TEPEE_MEDIUM(Type.TEPEE, Size.MEDIUM), 
+	TEPEE_LARGE(Type.TEPEE, Size.LARGE), 
+	// BEDOUIN
+	BEDOUIN_SMALL(Type.BEDOUIN, Size.SMALL), 
+	BEDOUIN_MEDIUM(Type.BEDOUIN, Size.MEDIUM), 
+	BEDOUIN_LARGE(Type.BEDOUIN, Size.LARGE),
+	// INDLU
+	INDLU_SMALL(Type.INDLU, Size.SMALL), 
+	INDLU_MEDIUM(Type.INDLU, Size.MEDIUM), 
+	INDLU_LARGE(Type.INDLU, Size.LARGE);
 
+	private final StructureType.Type type;
 	private final StructureType.Size size;
-	private final int doorOffsetZ;
 	public final String registryName;
 
-	private StructureType(StructureType.Size s, int doorZ) {
+	private StructureType(StructureType.Type t, StructureType.Size s) {
+		this.type = t;
 		this.size = s;
-		this.doorOffsetZ = doorZ;
 		this.registryName = this.toString().toLowerCase();
+	}
+	
+	/** @return the StructureType.Type value for this structure **/
+	public StructureType.Type getType() {
+		return this.type;
 	}
 
 	/** @return the StructureType.Size value for this structure **/
@@ -43,7 +60,7 @@ public enum StructureType {
 	 **/
 	public int getDoorPosition() {
 		// on z-axis in Tent Dimension
-		return doorOffsetZ;
+		return this.size.getDoorZ();
 	}
 
 	public ItemStack getDropStack() {
@@ -82,145 +99,43 @@ public enum StructureType {
 		te.setOffsetZ(offsetz);
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 	}
-
-	public StructureBase getNewStructure() {
+	
+	public Block getDoorBlock() {
 		switch (this) {
-		case BEDOUIN_LARGE:
-		case BEDOUIN_MEDIUM:
-		case BEDOUIN_SMALL:
-			return new StructureBedouin(this);
-		case TEPEE_LARGE:
-		case TEPEE_MEDIUM:
-		case TEPEE_SMALL:
-			return new StructureTepee(this);
-		case YURT_LARGE:
-		case YURT_MEDIUM:
-		case YURT_SMALL:
-			return new StructureYurt(this);
-		case INDLU_SMALL:
-		case INDLU_MEDIUM:
-		case INDLU_LARGE:
-			return new StructureIndlu(this);
+		case YURT_SMALL:	return Content.YURT_DOOR_SMALL;
+		case YURT_MEDIUM:	return Content.YURT_DOOR_MEDIUM;
+		case YURT_LARGE:	return Content.YURT_DOOR_LARGE;
+		case TEPEE_SMALL:	return Content.TEPEE_DOOR_SMALL;
+		case TEPEE_MEDIUM:	return Content.TEPEE_DOOR_MEDIUM;
+		case TEPEE_LARGE:	return Content.TEPEE_DOOR_LARGE;
+		case BEDOUIN_SMALL:	return Content.BEDOUIN_DOOR_SMALL;
+		case BEDOUIN_MEDIUM:return Content.BEDOUIN_DOOR_MEDIUM;
+		case BEDOUIN_LARGE:	return Content.BEDOUIN_DOOR_LARGE;
+		case INDLU_SMALL:	return Content.INDLU_DOOR_SMALL;
+		case INDLU_MEDIUM:	return Content.INDLU_DOOR_MEDIUM;
+		case INDLU_LARGE:	return Content.INDLU_DOOR_LARGE;
 		}
 		return null;
+	}
+
+	public StructureBase getNewStructure() {
+		return this.getType().getNewStructure(this);
 	}
 	
 	public boolean isEnabled() {
-		switch (this) {
-		case BEDOUIN_LARGE:
-		case BEDOUIN_MEDIUM:
-		case BEDOUIN_SMALL:
-			return Config.ALLOW_BEDOUIN;
-		case TEPEE_LARGE:
-		case TEPEE_MEDIUM:
-		case TEPEE_SMALL:
-			return Config.ALLOW_TEPEE;
-		case YURT_LARGE:
-		case YURT_MEDIUM:
-		case YURT_SMALL:
-			return Config.ALLOW_YURT;
-		case INDLU_SMALL:
-		case INDLU_MEDIUM:
-		case INDLU_LARGE:
-			return Config.ALLOW_INDLU;
-		}
-		return false;
-	}
-
-	public Block getDoorBlock() {
-		switch (this) {
-		case YURT_SMALL:
-			return Content.YURT_DOOR_SMALL;
-		case YURT_MEDIUM:
-			return Content.YURT_DOOR_MEDIUM;
-		case YURT_LARGE:
-			return Content.YURT_DOOR_LARGE;
-		case TEPEE_SMALL:
-			return Content.TEPEE_DOOR_SMALL;
-		case TEPEE_MEDIUM:
-			return Content.TEPEE_DOOR_MEDIUM;
-		case TEPEE_LARGE:
-			return Content.TEPEE_DOOR_LARGE;
-		case BEDOUIN_SMALL:
-			return Content.BEDOUIN_DOOR_SMALL;
-		case BEDOUIN_MEDIUM:
-			return Content.BEDOUIN_DOOR_MEDIUM;
-		case BEDOUIN_LARGE:
-			return Content.BEDOUIN_DOOR_LARGE;
-		case INDLU_SMALL:
-			return Content.INDLU_DOOR_SMALL;
-		case INDLU_MEDIUM:
-			return Content.INDLU_DOOR_MEDIUM;
-		case INDLU_LARGE:
-			return Content.INDLU_DOOR_LARGE;
-		}
-		return null;
+		return this.getType().isEnabled();
 	}
 
 	public Block getWallBlock(int dimID) {
-		switch (this) {
-		case YURT_SMALL:
-		case YURT_MEDIUM:
-		case YURT_LARGE:
-			return dimID == Config.DIM_ID ? Content.YURT_WALL_INNER : Content.YURT_WALL_OUTER;
-		case TEPEE_SMALL:
-		case TEPEE_MEDIUM:
-		case TEPEE_LARGE:
-			return Content.TEPEE_WALL;
-		case BEDOUIN_SMALL:
-		case BEDOUIN_MEDIUM:
-		case BEDOUIN_LARGE:
-			return Content.BEDOUIN_WALL;
-		case INDLU_SMALL:
-		case INDLU_MEDIUM:
-		case INDLU_LARGE:
-			return dimID == Config.DIM_ID ? Content.INDLU_WALL_INNER : Content.INDLU_WALL_OUTER;
-		}
-		return null;
+		return this.getType().getWallBlock(dimID);
 	}
 
 	public Block getRoofBlock() {
-		switch (this) {
-		case YURT_SMALL:
-		case YURT_MEDIUM:
-		case YURT_LARGE:
-			return Content.YURT_ROOF;
-		case TEPEE_SMALL:
-		case TEPEE_MEDIUM:
-		case TEPEE_LARGE:
-			return Content.TEPEE_WALL;
-		case BEDOUIN_SMALL:
-		case BEDOUIN_MEDIUM:
-		case BEDOUIN_LARGE:
-			return Content.BEDOUIN_ROOF;
-		case INDLU_SMALL:
-		case INDLU_MEDIUM:
-		case INDLU_LARGE:
-			return Content.INDLU_WALL_OUTER;
-		}
-		return null;
+		return this.getType().getRoofBlock();
 	}
 
 	public Block getFrameBlock(boolean isRoof) {
-		switch (this) {
-		case YURT_SMALL:
-		case YURT_MEDIUM:
-		case YURT_LARGE:
-			return isRoof ? Content.FRAME_YURT_ROOF : Content.FRAME_YURT_WALL;
-		case TEPEE_SMALL:
-		case TEPEE_MEDIUM:
-		case TEPEE_LARGE:
-			return Content.FRAME_TEPEE_WALL;
-		case BEDOUIN_SMALL:
-		case BEDOUIN_MEDIUM:
-		case BEDOUIN_LARGE:
-			return isRoof ? Content.FRAME_BEDOUIN_ROOF : Content.FRAME_BEDOUIN_WALL;
-		case INDLU_SMALL:
-		case INDLU_MEDIUM:
-		case INDLU_LARGE:
-			return Content.FRAME_INDLU_WALL;
-		}
-		return null;
+		return this.getType().getFrameBlock(isRoof);
 	}
 
 	/** @return the Z-offset of this structure type in the Tent Dimension **/
@@ -243,6 +158,65 @@ public enum StructureType {
 	public static StructureType get(int meta) {
 		return StructureType.values()[meta % StructureType.values().length];
 	}
+	
+	public static enum Type {
+		YURT,
+		TEPEE,
+		BEDOUIN,
+		INDLU;
+		
+		public StructureBase getNewStructure(StructureType structure) {
+			switch (this) {
+			case BEDOUIN:	return new StructureBedouin(structure);
+			case TEPEE:		return new StructureTepee(structure);
+			case YURT:		return new StructureYurt(structure);
+			case INDLU:		return new StructureIndlu(structure);
+			}
+			return null;
+		}
+		
+		public boolean isEnabled() {
+			switch (this) {
+			case BEDOUIN:	return Config.ALLOW_BEDOUIN;
+			case TEPEE:		return Config.ALLOW_TEPEE;
+			case YURT:		return Config.ALLOW_YURT;
+			case INDLU:		return Config.ALLOW_INDLU;
+			}
+			return false;
+		}
+
+		public Block getWallBlock(int dimID) {
+			switch (this) {
+			case YURT:		return dimID == Config.DIM_ID 
+							? Content.YURT_WALL_INNER : Content.YURT_WALL_OUTER;
+			case TEPEE:		return Content.TEPEE_WALL;
+			case BEDOUIN:	return Content.BEDOUIN_WALL;
+			case INDLU:		return dimID == Config.DIM_ID 
+							? Content.INDLU_WALL_INNER : Content.INDLU_WALL_OUTER;
+			}
+			return null;
+		}
+
+		public Block getRoofBlock() {
+			switch (this) {
+			case YURT:		return Content.YURT_ROOF;
+			case TEPEE:		return Content.TEPEE_WALL;
+			case BEDOUIN:	return Content.BEDOUIN_ROOF;
+			case INDLU:		return Content.INDLU_WALL_OUTER;
+			}
+			return null;
+		}
+
+		public Block getFrameBlock(boolean isRoof) {
+			switch (this) {
+			case YURT:		return isRoof ? Content.FRAME_YURT_ROOF : Content.FRAME_YURT_WALL;
+			case TEPEE:		return Content.FRAME_TEPEE_WALL;
+			case BEDOUIN:	return isRoof ? Content.FRAME_BEDOUIN_ROOF : Content.FRAME_BEDOUIN_WALL;
+			case INDLU:		return Content.FRAME_INDLU_WALL;
+			}
+			return null;
+		}
+	}
 
 	public static enum Size {
 		SMALL(5), MEDIUM(7), LARGE(9);
@@ -251,23 +225,26 @@ public enum StructureType {
 		// GIANT(13),
 		// MEGA(15);
 		private final int squareWidth;
+		private final int doorOffsetZ;
 
 		private Size(int sq) {
 			this.squareWidth = sq;
+			this.doorOffsetZ = this.ordinal() + 2;
 		}
 
 		public int getSquareWidth() {
 			return this.squareWidth;
 		}
+		
+		public int getDoorZ() {
+			return this.doorOffsetZ;
+		}
 
 		public TextFormatting getTooltipColor() {
 			switch (this) {
-			case SMALL:
-				return TextFormatting.RED;
-			case MEDIUM:
-				return TextFormatting.BLUE;
-			case LARGE:
-				return TextFormatting.GREEN;
+			case SMALL:		return TextFormatting.RED;
+			case MEDIUM:	return TextFormatting.BLUE;
+			case LARGE:		return TextFormatting.GREEN;
 			// the following are not used now but might be later
 			// case HUGE: return TextFormatting.YELLOW;
 			// case GIANT: return TextFormatting.AQUA;

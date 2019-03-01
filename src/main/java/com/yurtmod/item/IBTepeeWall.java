@@ -22,6 +22,7 @@ public class IBTepeeWall extends ItemBlock {
 	 * Returns the unlocalized name of this item. This version accepts an ItemStack
 	 * so different stacks can have different names based on their damage or NBT.
 	 */
+	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 		return this.block.getUnlocalizedName() + "." + stack.getMetadata();
 	}
