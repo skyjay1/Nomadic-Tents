@@ -1,6 +1,6 @@
 package com.yurtmod.crafting;
 
-import com.yurtmod.init.Config;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType;
 
@@ -93,16 +93,16 @@ public class RecipeManager {
 				})
 		};
 		// register the tent recipes
-		if(Config.ALLOW_YURT) {
+		if(TentConfig.ALLOW_YURT) {
 			event.getRegistry().registerAll(YURT);
 		}
-		if(Config.ALLOW_TEPEE) {
+		if(TentConfig.ALLOW_TEPEE) {
 			event.getRegistry().registerAll(TEPEE);
 		}
-		if(Config.ALLOW_BEDOUIN) {
+		if(TentConfig.ALLOW_BEDOUIN) {
 			event.getRegistry().registerAll(BEDOUIN);	
 		}
-		if(Config.ALLOW_INDLU) {
+		if(TentConfig.ALLOW_INDLU) {
 			event.getRegistry().registerAll(INDLU);
 		}		
 	}

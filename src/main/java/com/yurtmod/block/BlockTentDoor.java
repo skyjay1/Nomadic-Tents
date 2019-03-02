@@ -5,7 +5,7 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.init.Config;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
@@ -83,15 +83,19 @@ public class BlockTentDoor extends BlockUnbreakable
 				// overworld and with fully built tent)
 				if (player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet
 						&& !TentDimension.isTentDimension(worldIn)) {
+					// cancel deconstruction if player is not owner
+					if(TentConfig.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
+						return false;
+					}
 					// prepare a tent item to drop
-					ItemStack toDrop = type.getDropStack(teyd);
+					ItemStack toDrop = StructureType.getDropStack(teyd);
 					if (toDrop != null) {
 						// drop the tent item and damage the tool
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
-						if(Config.ALLOW_OVERWORLD_SETSPAWN) {
+						if(TentConfig.ALLOW_OVERWORLD_SETSPAWN) {
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
@@ -124,7 +128,7 @@ public class BlockTentDoor extends BlockUnbreakable
 			final Entity entityIn) {
 		if (!worldIn.isRemote && worldIn.getBlockState(pos).getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER) {
 			TileEntity te = worldIn.getTileEntity(pos);
-			if (te != null && te instanceof TileEntityTentDoor) {
+			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
 				StructureType type = teDoor.getStructureType();
 				StructureBase struct = type.getNewStructure();

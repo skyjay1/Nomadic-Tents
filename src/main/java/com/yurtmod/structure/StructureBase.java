@@ -61,10 +61,11 @@ public abstract class StructureBase {
 	 * @param prevX         the players x-pos before teleporting to the structure
 	 * @param prevY         the players y-pos before teleporting to the structure
 	 * @param prevZ         the players z-pos before teleporting to the structure
+	 * @param prevFacing	the players rotation yaw before teleporting to the structure
 	 * @return if a new structure was successfully built in the tent dimension
 	 **/
 	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final int cornerX,
-			final int cornerZ, final double prevX, final double prevY, final double prevZ,
+			final int cornerZ, final double prevX, final double prevY, final double prevZ, final float prevFacing,
 			final StructureType prevStructure) {
 		final BlockPos corner = new BlockPos(cornerX, TentDimension.FLOOR_Y, cornerZ);
 		final BlockPos doorPos = new BlockPos(cornerX, TentDimension.FLOOR_Y + 1,
@@ -81,7 +82,8 @@ public abstract class StructureBase {
 		// before building a new structure, check if it's already been made
 		if (worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor) {
 			// door already exists, simply update TileEntity and skip building a new structure
-			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
+			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, 
+					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return false;
 		}
 
@@ -96,7 +98,8 @@ public abstract class StructureBase {
 			
 			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
 			// set tile entity door information
-			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, prevX, prevY, prevZ, prevDimension);
+			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, 
+					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return true;
 		}
 		return false;
@@ -110,7 +113,7 @@ public abstract class StructureBase {
 	 */
 	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final int cornerX,
 			final int cornerZ, final StructureType structure, final double prevX, final double prevY,
-			final double prevZ, final int prevDimension) {
+			final double prevZ, final float prevFacing, final int prevDimension) {
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if (te instanceof TileEntityTentDoor) {
 			TileEntityTentDoor door = (TileEntityTentDoor) te;
@@ -120,6 +123,7 @@ public abstract class StructureBase {
 			door.setOffsetX(cornerX);
 			door.setOffsetZ(cornerZ);
 			door.setOverworldXYZ(prevX, prevY, prevZ);
+			door.setPrevFacing(prevFacing);
 			door.setPrevDimension(prevDimension);
 			return true;
 		} else

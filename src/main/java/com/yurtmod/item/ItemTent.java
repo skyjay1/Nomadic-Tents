@@ -138,7 +138,7 @@ public class ItemTent extends Item {
 		}
 
 		for (StructureType type : StructureType.values()) {
-			ItemStack tent = type.getDropStack(ERROR_TAG, ERROR_TAG, type.ordinal(), type.ordinal());
+			ItemStack tent = StructureType.getDropStack(ERROR_TAG, ERROR_TAG, type.id(), type.id());
 			if(type.isEnabled()) {
 				items.add(tent);
 			}
@@ -164,37 +164,21 @@ public class ItemTent extends Item {
 		TextFormatting color = StructureType.get(stack.getItemDamage()).getTooltipColor();
 		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
 	}
-
-	public static boolean hasInvalidCoords(ItemStack stack) {
-		if (stack.getTagCompound() != null) {
-			return stack.getTagCompound().getInteger(OFFSET_X) == ERROR_TAG
-					&& stack.getTagCompound().getInteger(OFFSET_Z) == ERROR_TAG;
-		}
-		return true;
-	}
 	
 	/** Calculates and returns the next available X location for a tent **/
 	public static int getOffsetX(World world, ItemStack tentStack) {
 		TentSaveData data = TentSaveData.forWorld(world);
-		switch (StructureType.get(tentStack.getItemDamage())) {
-		case BEDOUIN_LARGE:
-		case BEDOUIN_MEDIUM:
-		case BEDOUIN_SMALL:
+		switch (StructureType.get(tentStack.getItemDamage()).getType()) {
+		case BEDOUIN:
 			data.addCountBedouin(1);
 			return data.getCountBedouin();
-		case TEPEE_LARGE:
-		case TEPEE_MEDIUM:
-		case TEPEE_SMALL:
+		case TEPEE:
 			data.addCountTepee(1);
 			return data.getCountTepee();
-		case YURT_LARGE:
-		case YURT_MEDIUM:
-		case YURT_SMALL:
+		case YURT:
 			data.addCountYurt(1);
 			return data.getCountYurt();
-		case INDLU_SMALL:
-		case INDLU_MEDIUM:
-		case INDLU_LARGE:
+		case INDLU:
 		default:
 			data.addCountIndlu(1);
 			return data.getCountIndlu();

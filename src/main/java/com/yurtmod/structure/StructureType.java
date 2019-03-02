@@ -1,7 +1,8 @@
 package com.yurtmod.structure;
 
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.init.Config;
+import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.Content;
 import com.yurtmod.item.ItemTent;
 
@@ -13,30 +14,37 @@ import net.minecraft.util.text.TextFormatting;
 
 public enum StructureType {
 	// YURT
-	YURT_SMALL(Type.YURT, Size.SMALL), 
-	YURT_MEDIUM(Type.YURT, Size.MEDIUM), 
-	YURT_LARGE(Type.YURT, Size.LARGE), 
+	YURT_SMALL(0, Type.YURT, Size.SMALL), 
+	YURT_MEDIUM(1, Type.YURT, Size.MEDIUM), 
+	YURT_LARGE(2, Type.YURT, Size.LARGE), 
 	// TEPEE
-	TEPEE_SMALL(Type.TEPEE, Size.SMALL), 
-	TEPEE_MEDIUM(Type.TEPEE, Size.MEDIUM), 
-	TEPEE_LARGE(Type.TEPEE, Size.LARGE), 
+	TEPEE_SMALL(3, Type.TEPEE, Size.SMALL), 
+	TEPEE_MEDIUM(4, Type.TEPEE, Size.MEDIUM), 
+	TEPEE_LARGE(5, Type.TEPEE, Size.LARGE), 
 	// BEDOUIN
-	BEDOUIN_SMALL(Type.BEDOUIN, Size.SMALL), 
-	BEDOUIN_MEDIUM(Type.BEDOUIN, Size.MEDIUM), 
-	BEDOUIN_LARGE(Type.BEDOUIN, Size.LARGE),
+	BEDOUIN_SMALL(6, Type.BEDOUIN, Size.SMALL), 
+	BEDOUIN_MEDIUM(7, Type.BEDOUIN, Size.MEDIUM), 
+	BEDOUIN_LARGE(8, Type.BEDOUIN, Size.LARGE),
 	// INDLU
-	INDLU_SMALL(Type.INDLU, Size.SMALL), 
-	INDLU_MEDIUM(Type.INDLU, Size.MEDIUM), 
-	INDLU_LARGE(Type.INDLU, Size.LARGE);
+	INDLU_SMALL(9, Type.INDLU, Size.SMALL), 
+	INDLU_MEDIUM(10, Type.INDLU, Size.MEDIUM), 
+	INDLU_LARGE(11, Type.INDLU, Size.LARGE);
 
 	private final StructureType.Type type;
 	private final StructureType.Size size;
+	private final int id;
 	public final String registryName;
 
-	private StructureType(StructureType.Type t, StructureType.Size s) {
+	private StructureType(final int i, final StructureType.Type t, final StructureType.Size s) {
+		this.id = i;
 		this.type = t;
 		this.size = s;
 		this.registryName = this.toString().toLowerCase();
+	}
+	
+	/** @return the ID of this tent type (use in place of 'ordinal') **/
+	public int id() {
+		return this.id;
 	}
 	
 	/** @return the StructureType.Type value for this structure **/
@@ -64,11 +72,11 @@ public enum StructureType {
 	}
 
 	public ItemStack getDropStack() {
-		return new ItemStack(Content.ITEM_TENT, 1, this.ordinal());
+		return new ItemStack(Content.ITEM_TENT, 1, this.id());
 	}
 	
 	public static ItemStack getDropStack(TileEntityTentDoor te) {
-		return getDropStack(te.getOffsetX(), te.getOffsetZ(), te.getPrevStructureType().ordinal(), te.getStructureType().ordinal());
+		return getDropStack(te.getOffsetX(), te.getOffsetZ(), te.getPrevStructureType().id(), te.getStructureType().id());
 	}
 
 	public static ItemStack getDropStack(int tagChunkX, int tagChunkZ, int prevStructure, int tentType) {
@@ -98,6 +106,10 @@ public enum StructureType {
 		te.setOffsetX(offsetx);
 		te.setOffsetZ(offsetz);
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
+		te.setPrevFacing(player.rotationYaw);
+		if(TentConfig.OWNER_ENTRANCE || TentConfig.OWNER_PICKUP) {
+			te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
+		}
 	}
 	
 	public Block getDoorBlock() {
@@ -140,7 +152,7 @@ public enum StructureType {
 
 	/** @return the Z-offset of this structure type in the Tent Dimension **/
 	public int getTagOffsetZ() {
-		return Math.floorDiv(this.ordinal(), 3) * 2;
+		return Math.floorDiv(this.id(), 3) * 2;
 	}
 
 	public TextFormatting getTooltipColor() {
@@ -156,7 +168,13 @@ public enum StructureType {
 	}
 
 	public static StructureType get(int meta) {
-		return StructureType.values()[meta % StructureType.values().length];
+		for(StructureType t : StructureType.values()) {
+			if(t.id() == meta) {
+				return t;
+			}
+		}
+		// default
+		return StructureType.YURT_SMALL;
 	}
 	
 	public static enum Type {
@@ -177,21 +195,21 @@ public enum StructureType {
 		
 		public boolean isEnabled() {
 			switch (this) {
-			case BEDOUIN:	return Config.ALLOW_BEDOUIN;
-			case TEPEE:		return Config.ALLOW_TEPEE;
-			case YURT:		return Config.ALLOW_YURT;
-			case INDLU:		return Config.ALLOW_INDLU;
+			case BEDOUIN:	return TentConfig.ALLOW_BEDOUIN;
+			case TEPEE:		return TentConfig.ALLOW_TEPEE;
+			case YURT:		return TentConfig.ALLOW_YURT;
+			case INDLU:		return TentConfig.ALLOW_INDLU;
 			}
 			return false;
 		}
 
 		public Block getWallBlock(int dimID) {
 			switch (this) {
-			case YURT:		return dimID == Config.DIM_ID 
+			case YURT:		return TentDimension.isTentDimension(dimID) 
 							? Content.YURT_WALL_INNER : Content.YURT_WALL_OUTER;
 			case TEPEE:		return Content.TEPEE_WALL;
 			case BEDOUIN:	return Content.BEDOUIN_WALL;
-			case INDLU:		return dimID == Config.DIM_ID 
+			case INDLU:		return TentDimension.isTentDimension(dimID) 
 							? Content.INDLU_WALL_INNER : Content.INDLU_WALL_OUTER;
 			}
 			return null;
@@ -219,7 +237,9 @@ public enum StructureType {
 	}
 
 	public static enum Size {
-		SMALL(5), MEDIUM(7), LARGE(9);
+		SMALL(5), 
+		MEDIUM(7), 
+		LARGE(9);
 		// Might be implemented later:
 		// HUGE(11),
 		// GIANT(13),

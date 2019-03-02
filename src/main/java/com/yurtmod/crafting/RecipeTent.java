@@ -30,7 +30,7 @@ public class RecipeTent extends ShapedRecipes implements IRecipe {
 			}
 		}
 
-		return new RecipeTent(new ItemStack(Content.ITEM_TENT, 1, output.ordinal()), ingredients);
+		return new RecipeTent(new ItemStack(Content.ITEM_TENT, 1, output.id()), ingredients);
 	}
 
 	/**

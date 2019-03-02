@@ -1,7 +1,5 @@
 package com.yurtmod.init;
 
-import java.io.File;
-
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEventHandler;
 import com.yurtmod.proxies.CommonProxy;
@@ -9,7 +7,6 @@ import com.yurtmod.proxies.CommonProxy;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -26,6 +23,8 @@ public class NomadicTents {
 	public static final String MCVERSION = "1.12.2";
 	
 	public static final String HWYLA = "waila";
+	
+	public static final TentConfig CONFIG = new TentConfig();
 
 	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID
 			+ ".proxies.CommonProxy")
@@ -40,9 +39,6 @@ public class NomadicTents {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		String path = event.getSuggestedConfigurationFile().getAbsolutePath().replaceFirst(MODID + ".cfg",
-				"NomadicTents.cfg");
-		Config.mainRegistry(new Configuration(new File(path)));
 		Content.mainRegistry();
 		TentDimension.preInit();
 	}

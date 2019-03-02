@@ -1,6 +1,6 @@
 package com.yurtmod.dimension;
 
-import com.yurtmod.init.Config;
+import com.yurtmod.init.TentConfig;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
@@ -41,14 +41,14 @@ public class WorldProviderTent extends WorldProvider {
 	@Override
 	public boolean canRespawnHere() {
 		// returning false from here makes beds explode when you try to sleep
-		return Config.ALLOW_SLEEP_TENT_DIM;
+		return TentConfig.ALLOW_SLEEP_TENT_DIM;
 	}
 
 	@Override
 	public int getRespawnDimension(EntityPlayerMP player) {
 		// this actually is only called if #canRespawnHere returns false, but that might
 		// change in the future
-		return Config.ALLOW_SLEEP_TENT_DIM ? TentDimension.DIMENSION_ID : 0;
+		return TentConfig.ALLOW_SLEEP_TENT_DIM ? TentDimension.DIMENSION_ID : 0;
 	}
 
 	@Override

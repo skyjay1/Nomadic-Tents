@@ -1,8 +1,10 @@
 package com.yurtmod.item;
 
+import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.init.NomadicTents;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -23,7 +25,8 @@ public class ItemMallet extends Item {
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand,
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (worldIn.getBlockState(pos).getBlock() instanceof IFrameBlock) {
+		Block b = worldIn.getBlockState(pos).getBlock();
+		if (b instanceof IFrameBlock || b instanceof BlockTentDoor) {
 			return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;

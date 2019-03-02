@@ -1,17 +1,11 @@
 package com.yurtmod.event;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.init.Config;
-import com.yurtmod.init.TentSaveData;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
-import net.minecraft.block.BlockBed;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -47,11 +41,9 @@ public class TentEventHandler {
 			final WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
 			// only run this code for players waking up in a Tent
 			if(TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
-				boolean shouldChangeTime = Config.ALLOW_SLEEP_TENT_DIM;
+				boolean shouldChangeTime = TentConfig.ALLOW_SLEEP_TENT_DIM;
 				// if config requires, check both overworld and tent players
-				if(Config.IS_SLEEPING_STRICT) {
-					final List<EntityPlayer> players = new ArrayList(overworld.playerEntities);
-					players.addAll(tentDim.playerEntities);
+				if(TentConfig.IS_SLEEPING_STRICT) {
 					// find out if ALL players in BOTH dimensions are sleeping
 					for(EntityPlayer p : overworld.playerEntities) {
 						// (except for the one who just woke up, of course)
@@ -75,17 +67,17 @@ public class TentEventHandler {
 		
 	}
 
-	/** Updates sleep and daylight-cycle info for overworld and tent dimension **/
-	public void handleSleepIn(final WorldServer s) {
-		long i = s.getWorldInfo().getWorldTime() + 24000L;
-		s.getWorldInfo().setWorldTime(i - i % 24000L);
-		s.updateAllPlayersSleepingFlag();
-	}
+	// Updates sleep and daylight-cycle info for overworld and tent dimension
+	//public void handleSleepIn(final WorldServer s) {
+	//	long i = s.getWorldInfo().getWorldTime() + 24000L;
+	//	s.getWorldInfo().setWorldTime(i - i % 24000L);
+	//	s.updateAllPlayersSleepingFlag();
+	//}
 
 	/** Makes Tent items fireproof if enabled **/
 	@SubscribeEvent
 	public void onSpawnEntity(EntityJoinWorldEvent event) {
-		if (Config.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem) {
+		if (TentConfig.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem) {
 			ItemStack stack = ((EntityItem) event.getEntity()).getItem();
 			if (stack != null && stack.getItem() instanceof ItemTent) {
 				event.getEntity().setEntityInvulnerable(true);
@@ -124,7 +116,7 @@ public class TentEventHandler {
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
 	private static boolean canCancelTeleport(EntityPlayer player) {
-		return !Config.ALLOW_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
+		return TentConfig.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
 				&& !player.isCreative();
 	}
 
@@ -143,7 +135,7 @@ public class TentEventHandler {
 			final WorldServer tentServer = mcServer.getWorld(TENTDIM);
 			final WorldServer overworld = mcServer.getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
-			if (Config.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
+			if (TentConfig.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
 				BlockPos respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(tentServer, bedPos, false) : null;
 				if (null == respawnPos) {
@@ -160,8 +152,9 @@ public class TentEventHandler {
 					// transfer player using Teleporter
 					final TentTeleporter tel = new TentTeleporter(TentDimension.DIMENSION_ID, overworld,
 							new BlockPos(0, 0, 0), respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(),
-							StructureType.get(0), StructureType.get(0));
+							event.player.rotationYaw, StructureType.get(0), StructureType.get(0));
 					mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
+					event.player.setPositionAndUpdate(respawnPos.getX(), respawnPos.getY(), respawnPos.getZ());
 				}
 			} 
 		}

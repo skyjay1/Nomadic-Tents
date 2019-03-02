@@ -1,18 +1,16 @@
 package com.yurtmod.dimension;
 
-import com.yurtmod.init.Config;
 import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;
 import net.minecraftforge.common.BiomeManager.BiomeType;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class TentDimension {
 	
@@ -33,7 +31,7 @@ public class TentDimension {
 	public static final EnumFacing STRUCTURE_DIR = EnumFacing.EAST;
 
 	public static void preInit() {
-		DIMENSION_ID = Config.DIM_ID;
+		DIMENSION_ID = DimensionManager.getNextFreeDimId();
 		TENT_DIMENSION = DimensionType.register(DIM_NAME, "_tent", DIMENSION_ID, WorldProviderTent.class, false);
 		DimensionManager.registerDimension(DIMENSION_ID, TentDimension.TENT_DIMENSION);
 	}

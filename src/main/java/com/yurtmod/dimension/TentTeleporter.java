@@ -1,10 +1,13 @@
 package com.yurtmod.dimension;
 
+import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 
@@ -13,11 +16,12 @@ public class TentTeleporter extends Teleporter {
 	private final StructureType structure;
 	private final BlockPos tentCorner;
 	private final double prevX, prevY, prevZ;
+	private final float prevYaw;
 	private final int prevDimID;
 	private final WorldServer worldServerTo;
 
 	public TentTeleporter(int dimensionFrom, WorldServer worldTo, BlockPos corner, double oldX, double oldY,
-			double oldZ, StructureType prevType, StructureType type) {
+			double oldZ, float oldYaw, StructureType prevType, StructureType type) {
 		super(worldTo);
 		this.prevDimID = dimensionFrom;
 		this.worldServerTo = worldTo;
@@ -25,40 +29,38 @@ public class TentTeleporter extends Teleporter {
 		this.prevX = oldX;
 		this.prevY = oldY;
 		this.prevZ = oldZ;
+		this.prevYaw = oldYaw;
 		this.structurePrev = prevType;
 		this.structure = type;
+	}
+	
+	public TentTeleporter(final int worldFrom, final WorldServer worldTo, final TileEntityTentDoor te) {
+		this(worldFrom, worldTo, te.getXYZFromOffsets(), te.getPrevX(), te.getPrevY(), te.getPrevZ(),
+				te.getPrevFacing(), te.getPrevStructureType(), te.getStructureType());
 	}
 
 	@Override
 	public void placeInPortal(final Entity entity, final float rotationYaw) {
-		double entityX, entityY, entityZ;
-		float yaw = entity.rotationYaw;
+		double entityX = getX();
+		double entityY = getY();
+		double entityZ = getZ();
+		float yaw = getYaw();
 		float pitch = entity.rotationPitch;
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 
 		if (TentDimension.isTentDimension(worldServerTo)) {
-			// if you're going to the tent dimension, set location accordingly and make sure
-			// a tent will be there
-			entityX = this.tentCorner.getX() + 0.9D + entity.width;
-			entityY = this.tentCorner.getY() + 0.01D;
-			entityZ = this.tentCorner.getZ() + this.structure.getDoorPosition() + 0.5D;
-			yaw = -90F;
-
+			entityX += entity.width;
 			// try to build a tent in that location (tent should check if it already exists)
 			this.structure.getNewStructure().generateInTentDimension(prevDimID, worldServerTo, tentCorner.getX(),
-					tentCorner.getZ(), prevX, prevY, prevZ, structurePrev);
+					tentCorner.getZ(), prevX, prevY, prevZ, prevYaw, structurePrev);
 			// also synchronize the time between Tent and Overworld dimensions
 			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(0).getWorldTime());
-		} else {
-			// you're returning to your old location in your previous dimension
-			entityX = this.prevX;
-			entityY = this.prevY + 0.1D;
-			entityZ = this.prevZ;
 		}
-		entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
-
-		if (entity instanceof EntityPlayer) {
-			entity.setPositionAndUpdate(entityX, entityY, entityZ);
+		
+		if (entity instanceof EntityPlayerMP) {
+			 ((EntityPlayerMP)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);
+		} else {
+			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 		}
 	}
 
@@ -67,13 +69,33 @@ public class TentTeleporter extends Teleporter {
 		placeInPortal(entity, f);
 		return true;
 	}
+	
+	public double getX() {
+		return TentDimension.isTentDimension(this.worldServerTo) 
+				? this.tentCorner.getX() + 0.9D : this.prevX;
+	}
+	
+	public double getY() {
+		return TentDimension.isTentDimension(this.worldServerTo) 
+				? this.tentCorner.getY() + 0.01D : this.prevY;
+	}
+	
+	public double getZ() {
+		return TentDimension.isTentDimension(this.worldServerTo) 
+				? this.tentCorner.getZ() + this.structure.getDoorPosition() + 0.5D : this.prevZ;
+	}
+	
+	public float getYaw() {
+		return TentDimension.isTentDimension(this.worldServerTo) 
+				? -90F : MathHelper.wrapDegrees(this.prevYaw + 180F);
+	}
 
 	@Override
 	public String toString() {
-		String out = "\n[TentTeleporter]\n" + "structure=" + this.structure + "\n" + "tentCorner=" + this.tentCorner
-				+ "\n" + "prevX=" + this.prevX + "\n" + "prevY=" + this.prevY + "\n" + "prevZ=" + this.prevZ + "\n"
-				+ "prevDimID=" + this.prevDimID + "\n" + "nextDimID=" + this.worldServerTo.provider.getDimension()
-				+ "\n";
+		String out = "\n[TentTeleporter]\n" + "structure=" + this.structure + "\ntentCorner=" + this.tentCorner
+				+ "\nprevX=" + this.prevX + "\nprevY=" + this.prevY + "\nprevZ=" + this.prevZ + "\nprevFacing=" 
+				+ this.prevYaw + "\nprevDimID=" + this.prevDimID + "\n" + "nextDimID=" 
+				+ this.worldServerTo.provider.getDimension() + "\n";
 		return out;
 	}
 }

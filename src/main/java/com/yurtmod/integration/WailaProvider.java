@@ -87,7 +87,7 @@ public final class WailaProvider implements IWailaDataProvider {
 
 		if (tileEntity instanceof TileEntityTentDoor) {
 			TileEntityTentDoor tetd = (TileEntityTentDoor) tileEntity;
-			tag.setInteger(KEY_STRUCTURE_TYPE, tetd.getStructureType().ordinal());
+			tag.setInteger(KEY_STRUCTURE_TYPE, tetd.getStructureType().id());
 		}
 		return tag;
 	}
