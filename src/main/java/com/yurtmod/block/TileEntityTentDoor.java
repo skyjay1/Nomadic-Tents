@@ -246,7 +246,7 @@ public class TileEntityTentDoor extends TileEntity {
 				// transfer player to dimension
 				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
 				// attempt to set spawnpoint, if enabled
-				if(TentConfig.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
+				if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
 					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.structure.getDoorPosition(), 0, 0), 
 							this.prevX, this.prevY, this.prevZ);
 				}
@@ -312,7 +312,7 @@ public class TileEntityTentDoor extends TileEntity {
 	public void onPlayerRemove(EntityPlayer playerIn) {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
-		if(TentConfig.ALLOW_OVERWORLD_SETSPAWN) {
+		if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
 			BlockPos tentCenter = this.getXYZFromOffsets().add(this.getStructureType().getDoorPosition(), 0, this.getStructureType().getDoorPosition());
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
@@ -370,8 +370,8 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether the teleport was successful
 	 */
 	public boolean onEntityCollide(Entity entity, EnumFacing tentDir) {
-		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.ALLOW_PLAYER_COLLIDE)
-				|| (!(entity instanceof EntityPlayer) && TentConfig.ALLOW_NONPLAYER_COLLIDE))) {
+		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.general.ALLOW_PLAYER_COLLIDE)
+				|| (!(entity instanceof EntityPlayer) && TentConfig.general.ALLOW_NONPLAYER_COLLIDE))) {
 			// remember the entity coordinates from the overworld
 			if (!TentDimension.isTentDimension(entity.getEntityWorld())) {
 				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
@@ -413,7 +413,7 @@ public class TileEntityTentDoor extends TileEntity {
 		if(entity == null || entity.getEntityWorld().isRemote) {
 			return false;
 		}
-		if(!TentDimension.isTentDimension(entity.getEntityWorld()) && TentConfig.OWNER_ENTRANCE 
+		if(!TentDimension.isTentDimension(entity.getEntityWorld()) && TentConfig.general.OWNER_ENTRANCE 
 				&& entity instanceof EntityPlayer && !isOwner((EntityPlayer)entity)) {
 			return false;
 		}

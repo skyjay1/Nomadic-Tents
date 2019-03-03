@@ -1,8 +1,16 @@
 {
 	"variants": {
-		"axis=x,half=upper": { "model": "yurtmod:bed_door_upper_1"},
-		"axis=x,half=lower": { "model": "yurtmod:bed_door_lower_1"},
-		"axis=z,half=upper": { "model": "yurtmod:bed_door_upper_1", "y": 90 },
-		"axis=z,half=lower": { "model": "yurtmod:bed_door_lower_1", "y": 90 }
+		"axis=x,half=upper,size=huge": { "model": "yurtmod:bed_door_upper_3"},
+		"axis=x,half=lower,size=huge": { "model": "yurtmod:bed_door_lower"},
+		"axis=z,half=upper,size=huge": { "model": "yurtmod:bed_door_upper_3", "y": 90 },
+		"axis=z,half=lower,size=huge": { "model": "yurtmod:bed_door_lower", "y": 90 },
+		"axis=x,half=upper,size=giant": { "model": "yurtmod:bed_door_upper_4"},
+		"axis=x,half=lower,size=giant": { "model": "yurtmod:bed_door_lower"},
+		"axis=z,half=upper,size=giant": { "model": "yurtmod:bed_door_upper_4", "y": 90 },
+		"axis=z,half=lower,size=giant": { "model": "yurtmod:bed_door_lower", "y": 90 },
+		"axis=x,half=upper,size=mega": { "model": "yurtmod:bed_door_upper_5"},
+		"axis=x,half=lower,size=mega": { "model": "yurtmod:bed_door_lower"},
+		"axis=z,half=upper,size=mega": { "model": "yurtmod:bed_door_upper_5", "y": 90 },
+		"axis=z,half=lower,size=mega": { "model": "yurtmod:bed_door_lower", "y": 90 }
 	}
 }

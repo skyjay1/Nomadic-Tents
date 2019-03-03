@@ -19,13 +19,11 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class NomadicTents {
 	public static final String MODID = "yurtmod";
 	public static final String NAME = "Nomadic Tents";
-	public static final String VERSION = "9.0.7";
+	public static final String VERSION = "9.0.8";
 	public static final String MCVERSION = "1.12.2";
 	
 	public static final String HWYLA = "waila";
 	
-	public static final TentConfig CONFIG = new TentConfig();
-
 	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID
 			+ ".proxies.CommonProxy")
 	public static CommonProxy proxy;

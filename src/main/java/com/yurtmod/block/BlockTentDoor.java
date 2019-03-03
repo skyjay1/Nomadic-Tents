@@ -33,10 +33,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockTentDoor extends BlockUnbreakable
+public abstract class BlockTentDoor extends BlockUnbreakable
 		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, IBedouinBlock, IIndluBlock {
+	
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis",
 			EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
+			
 	public static final int DECONSTRUCT_DAMAGE = 5;
 	private static final double aabbDis = 0.375D;
 	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
@@ -46,7 +48,8 @@ public class BlockTentDoor extends BlockUnbreakable
 	public BlockTentDoor(boolean isFull) {
 		super(Material.WOOD);
 		this.isCube = isFull;
-		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER)
+		this.setDefaultState(this.blockState.getBaseState()
+				.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER)
 				.withProperty(AXIS, EnumFacing.Axis.X));
 		this.setCreativeTab(null);
 	}
@@ -84,7 +87,7 @@ public class BlockTentDoor extends BlockUnbreakable
 				if (player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet
 						&& !TentDimension.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
-					if(TentConfig.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
+					if(TentConfig.general.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
 					// prepare a tent item to drop
@@ -95,7 +98,7 @@ public class BlockTentDoor extends BlockUnbreakable
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
-						if(TentConfig.ALLOW_OVERWORLD_SETSPAWN) {
+						if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
@@ -146,9 +149,7 @@ public class BlockTentDoor extends BlockUnbreakable
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
 		if (state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER)) {
 			worldIn.setBlockState(pos.up(),
-					this.getDefaultState().withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER).withProperty(AXIS,
-							state.getValue(AXIS)),
-					3);
+					state.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER), 3);
 		}
 	}
 
@@ -204,10 +205,13 @@ public class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
+		EnumDoorHalf half = meta % 2 == 0 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER;
+		int metaDiv2 = Math.floorDiv(meta, 2);
+		EnumFacing.Axis axis = metaDiv2 < 8 && metaDiv2 % 2 == 1
+				? EnumFacing.Axis.Z : EnumFacing.Axis.X;
 		return getDefaultState()
-				.withProperty(BlockDoor.HALF,
-						meta % 2 == 0 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
-				.withProperty(AXIS, meta > 1 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
+				.withProperty(BlockDoor.HALF, half)
+				.withProperty(AXIS, axis);
 	}
 
 	@Override

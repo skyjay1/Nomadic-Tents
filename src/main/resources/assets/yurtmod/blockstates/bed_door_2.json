@@ -1,8 +1,0 @@
-{
-	"variants": {
-		"axis=x,half=upper": { "model": "yurtmod:bed_door_upper_2"},
-		"axis=x,half=lower": { "model": "yurtmod:bed_door_lower_2"},
-		"axis=z,half=upper": { "model": "yurtmod:bed_door_upper_2", "y": 90 },
-		"axis=z,half=lower": { "model": "yurtmod:bed_door_lower_2", "y": 90 }
-	}
-}

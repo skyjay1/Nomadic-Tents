@@ -21,7 +21,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class StructureBase {
+	
 	protected final StructureType structure;
+	protected final Blueprints BP_SMALL = makeBlueprints(StructureType.Size.SMALL, new Blueprints());
+	protected final Blueprints BP_MED = makeBlueprints(StructureType.Size.MEDIUM, new Blueprints());
+	protected final Blueprints BP_LARGE = makeBlueprints(StructureType.Size.LARGE, new Blueprints());
+	protected final Blueprints BP_HUGE = makeBlueprints(StructureType.Size.HUGE, new Blueprints());
+	protected final Blueprints BP_GIANT = makeBlueprints(StructureType.Size.GIANT, new Blueprints());
+	protected final Blueprints BP_MEGA = makeBlueprints(StructureType.Size.MEGA, new Blueprints());
 
 	/**
 	 * Predicate to test if a block can be replaced by frame blocks when setting up
@@ -37,11 +44,6 @@ public abstract class StructureBase {
 					|| b.getBlock() instanceof BlockSnow;
 		}
 	};
-
-	protected static final String DOOR = "door";
-	protected static final String BARRIER = "barrier";
-	protected static final String WALL = "wall";
-	protected static final String ROOF = "roof";
 
 	public StructureBase(StructureType type) {
 		this.structure = type;
@@ -180,15 +182,15 @@ public abstract class StructureBase {
 	 * Builds a door at given position. If that door is actually a BlockTentDoor,
 	 * use correct IProperty
 	 **/
-	public static void buildDoor(final World world, final BlockPos doorBase, final Block door, final EnumFacing dir) {
-		IBlockState doorL = door.getDefaultState(), doorU = door.getDefaultState();
-		if (door instanceof BlockTentDoor) {
+	public static void buildDoor(final World world, final BlockPos doorBase, final IBlockState door, final EnumFacing dir) {
+		IBlockState doorL, doorU;
+		if (door.getBlock() instanceof BlockTentDoor) {
 			EnumFacing.Axis axis = dir.getAxis() == EnumFacing.Axis.Z ? EnumFacing.Axis.Z : EnumFacing.Axis.X;
-			doorL = doorL.withProperty(BlockDoor.HALF, EnumDoorHalf.LOWER).withProperty(BlockTentDoor.AXIS, axis);
-			doorU = doorU.withProperty(BlockDoor.HALF, EnumDoorHalf.UPPER).withProperty(BlockTentDoor.AXIS, axis);
+			doorL = door.withProperty(BlockDoor.HALF, EnumDoorHalf.LOWER).withProperty(BlockTentDoor.AXIS, axis);
+			doorU = door.withProperty(BlockDoor.HALF, EnumDoorHalf.UPPER).withProperty(BlockTentDoor.AXIS, axis);
+			world.setBlockState(doorBase, doorL, 3);
+			world.setBlockState(doorBase.up(1), doorU, 3);
 		}
-		world.setBlockState(doorBase, doorL, 3);
-		world.setBlockState(doorBase.up(1), doorU, 3);
 	}
 
 	/**
@@ -227,7 +229,8 @@ public abstract class StructureBase {
 	 **/
 	public boolean remove(final World worldIn, final BlockPos doorPos, final EnumFacing dirForward,
 			final StructureType.Size size) {
-		boolean flag = generate(worldIn, doorPos, dirForward, size, Blocks.AIR, Blocks.AIR, Blocks.AIR);
+		IBlockState air = Blocks.AIR.getDefaultState();
+		boolean flag = generate(worldIn, doorPos, dirForward, size, air, air, air);
 		// delete door TileEntity if found
 		if (worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
 			worldIn.removeTileEntity(doorPos);
@@ -271,10 +274,22 @@ public abstract class StructureBase {
 		}
 		return null;
 	}
+	
+	public Blueprints getBlueprints(final StructureType.Size size) {
+		switch(size) {
+		case MEGA:		return BP_MEGA;
+		case GIANT:		return BP_GIANT;
+		case HUGE:		return BP_HUGE;
+		case LARGE:		return BP_LARGE;
+		case MEDIUM:	return BP_MED;
+		case SMALL:		return BP_SMALL;
+		}
+		return null;
+	}
 
 	/** @return true if a structure was successfully generated **/
 	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
-			final StructureType.Size size, final Block doorBlock, final Block wallBlock, final Block roofBlock);
+			final StructureType.Size size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
 
 	/**
 	 * @return true if there is empty space to create a structure of given size at
@@ -285,9 +300,13 @@ public abstract class StructureBase {
 
 	/**
 	 * @return true if there is a valid structure at the given location for the
-	 *         given EnumFacing
+	 *         given Size and EnumFacing
 	 **/
 	public abstract boolean isValidForFacing(final World worldIn, final BlockPos doorBase,
 			final StructureType.Size size, final EnumFacing facing);
-
+	
+	/**
+	 * @return the Blueprints for a structure of the given StructureType.Size
+	 */
+	public abstract Blueprints makeBlueprints(final StructureType.Size size, final Blueprints template);
 }

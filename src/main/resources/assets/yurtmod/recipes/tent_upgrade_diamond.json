@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "SIS",
+   "SBS",
+   "SIS"],
+  "key": {
+   "I": {
+        "item": "minecraft:diamond"
+      },
+   "B": {
+        "item": "minecraft:diamond_block"
+      },
+	"S": {
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
+	  }
+  },
+  "result": {
+    "item": "yurtmod:tent_upgrade_diamond",
+    "count": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "parent": "yurtmod:block/door_nonfull",
+    "textures": {
+        "t": "yurtmod:blocks/bed_door_lower"
+    }
+}

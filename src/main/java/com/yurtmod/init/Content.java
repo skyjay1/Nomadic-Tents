@@ -33,29 +33,24 @@ public class Content {
 	public static Block INDLU_WALL_INNER;
 
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_door_0")
-	public static Block YURT_DOOR_SMALL;
+	public static Block YURT_DOOR_SML;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_door_1")
-	public static Block YURT_DOOR_MEDIUM;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":yurt_door_2")
-	public static Block YURT_DOOR_LARGE;
+	public static Block YURT_DOOR_HGM;
+
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_door_0")
-	public static Block TEPEE_DOOR_SMALL;
+	public static Block TEPEE_DOOR_SML;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_door_1")
-	public static Block TEPEE_DOOR_MEDIUM;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tepee_door_2")
-	public static Block TEPEE_DOOR_LARGE;
+	public static Block TEPEE_DOOR_HGM;
+
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_door_0")
-	public static Block BEDOUIN_DOOR_SMALL;
+	public static Block BEDOUIN_DOOR_SML;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_door_1")
-	public static Block BEDOUIN_DOOR_MEDIUM;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":bed_door_2")
-	public static Block BEDOUIN_DOOR_LARGE;
+	public static Block BEDOUIN_DOOR_HGM;
+
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":indlu_door_0")
-	public static Block INDLU_DOOR_SMALL;
+	public static Block INDLU_DOOR_SML;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":indlu_door_1")
-	public static Block INDLU_DOOR_MEDIUM;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":indlu_door_2")
-	public static Block INDLU_DOOR_LARGE;
+	public static Block INDLU_DOOR_HGM;
 
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_yurt_wall")
 	public static Block FRAME_YURT_WALL;
@@ -90,6 +85,12 @@ public class Content {
 	public static Item ITEM_BEDOUIN_WALL;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":indlu_wall_piece")
 	public static Item ITEM_INDLU_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_gold")
+	public static Item ITEM_UPGRADE_GOLD;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_obsidian")
+	public static Item ITEM_UPGRADE_OBSDIDIAN;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_diamond")
+	public static Item ITEM_UPGRADE_DIAMOND;
 
 	public static void mainRegistry() {
 		GameRegistry.registerTileEntity(TileEntityTentDoor.class,

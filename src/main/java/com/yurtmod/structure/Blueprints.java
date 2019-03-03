@@ -61,11 +61,14 @@ public class Blueprints {
 	public final BlockPos[] getBarrierCoords() {
 		return this.barrierCoords.toArray(new BlockPos[this.barrierCoords.size()]);
 	}
+	
+	public final boolean isEmpty() {
+		return this.wallCoords.isEmpty() && this.roofCoords.isEmpty() && this.barrierCoords.isEmpty();
+	}
 
 	private static final boolean add(final List<BlockPos> l, int[] toAdd) {
 		if (toAdd != null && toAdd.length == 3) {
 			return l.add(new BlockPos(toAdd[0], toAdd[1], toAdd[2]));
-		}
-		else return false;
+		} else return false;
 	}
 }

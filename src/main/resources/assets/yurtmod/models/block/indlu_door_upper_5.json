@@ -1,0 +1,6 @@
+{
+    "parent": "yurtmod:block/door_nonfull",
+    "textures": {
+        "t": "yurtmod:blocks/indlu_door_upper_5"
+    }
+}

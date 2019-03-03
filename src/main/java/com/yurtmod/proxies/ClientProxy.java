@@ -45,6 +45,9 @@ public class ClientProxy extends CommonProxy {
 		register(Content.ITEM_INDLU_WALL);
 		register(Content.ITEM_MALLET);
 		register(Content.ITEM_SUPER_MALLET);
+		register(Content.ITEM_UPGRADE_GOLD);
+		register(Content.ITEM_UPGRADE_OBSDIDIAN);
+		register(Content.ITEM_UPGRADE_DIAMOND);
 		// register blocks
 		register(Content.TENT_BARRIER);
 		register(Content.SUPER_DIRT);
@@ -59,18 +62,14 @@ public class ClientProxy extends CommonProxy {
 		register(Content.INDLU_WALL_OUTER);
 		register(Content.INDLU_WALL_INNER);
 		//// door blocks
-		register(Content.YURT_DOOR_SMALL);
-		register(Content.YURT_DOOR_MEDIUM);
-		register(Content.YURT_DOOR_LARGE);
-		register(Content.TEPEE_DOOR_SMALL);
-		register(Content.TEPEE_DOOR_MEDIUM);
-		register(Content.TEPEE_DOOR_LARGE);
-		register(Content.BEDOUIN_DOOR_SMALL);
-		register(Content.BEDOUIN_DOOR_MEDIUM);
-		register(Content.BEDOUIN_DOOR_LARGE);
-		register(Content.INDLU_DOOR_SMALL);
-		register(Content.INDLU_DOOR_MEDIUM);
-		register(Content.INDLU_DOOR_LARGE);
+		register(Content.YURT_DOOR_SML);
+		register(Content.YURT_DOOR_HGM);
+		register(Content.TEPEE_DOOR_SML);
+		register(Content.TEPEE_DOOR_HGM);
+		register(Content.BEDOUIN_DOOR_SML);
+		register(Content.BEDOUIN_DOOR_HGM);
+		register(Content.INDLU_DOOR_SML);
+		register(Content.INDLU_DOOR_HGM);
 		//// frame blocks
 		int[] progress = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 		register(Content.FRAME_YURT_WALL, progress);

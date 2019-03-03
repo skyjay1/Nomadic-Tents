@@ -16,6 +16,9 @@ public class RecipeManager {
 		final ItemStack tepeeWall = new ItemStack(Content.ITEM_TEPEE_WALL);
 		final ItemStack bedouinWall = new ItemStack(Content.ITEM_BEDOUIN_WALL);
 		final ItemStack indluWall = new ItemStack(Content.ITEM_INDLU_WALL);
+		final ItemStack upgradeGold = new ItemStack(Content.ITEM_UPGRADE_GOLD);
+		final ItemStack upgradeObsid = new ItemStack(Content.ITEM_UPGRADE_OBSDIDIAN);
+		final ItemStack upgradeDiamond = new ItemStack(Content.ITEM_UPGRADE_DIAMOND);
 		
 		final RecipeTent[] YURT = new RecipeTent[] {
 				RecipeTent.makeRecipe(StructureType.YURT_SMALL, new ItemStack[] {
@@ -33,6 +36,21 @@ public class RecipeManager {
 						null,		null,										null,
 						null, 		yurtWall, 									null,
 						yurtWall, 	StructureType.YURT_MEDIUM.getDropStack(), 	yurtWall
+				}),
+				RecipeTent.makeRecipe(StructureType.YURT_HUGE, new ItemStack[] { 
+						null,				null,								null,
+						upgradeGold, 		yurtWall, 							upgradeGold,
+						yurtWall, 	StructureType.YURT_LARGE.getDropStack(), 	yurtWall
+				}),
+				RecipeTent.makeRecipe(StructureType.YURT_GIANT, new ItemStack[] { 
+						null,				null,								null,
+						upgradeObsid, 		yurtWall, 							upgradeObsid,
+						yurtWall, 	StructureType.YURT_HUGE.getDropStack(), 	yurtWall
+				}),
+				RecipeTent.makeRecipe(StructureType.YURT_MEGA, new ItemStack[] { 
+						null,				null,								null,
+						upgradeDiamond, 	yurtWall, 							upgradeDiamond,
+						yurtWall, 	StructureType.YURT_GIANT.getDropStack(), 	yurtWall
 				})
 			};
 		final RecipeTent[] TEPEE = new RecipeTent[] {
@@ -50,6 +68,21 @@ public class RecipeManager {
 						null,		tepeeWall,									null,
 						tepeeWall,	tepeeWall,									tepeeWall,
 						tepeeWall,	StructureType.TEPEE_MEDIUM.getDropStack(),	tepeeWall
+				}),
+				RecipeTent.makeRecipe(StructureType.TEPEE_HUGE, new ItemStack[] {
+						upgradeGold,tepeeWall,									upgradeGold,
+						tepeeWall,	tepeeWall,									tepeeWall,
+						tepeeWall,	StructureType.TEPEE_LARGE.getDropStack(),	tepeeWall
+				}),
+				RecipeTent.makeRecipe(StructureType.TEPEE_GIANT, new ItemStack[] {
+						upgradeObsid,tepeeWall,									upgradeObsid,
+						tepeeWall,	tepeeWall,									tepeeWall,
+						tepeeWall,	StructureType.TEPEE_HUGE.getDropStack(),	tepeeWall
+				}),
+				RecipeTent.makeRecipe(StructureType.TEPEE_MEGA, new ItemStack[] {
+						upgradeDiamond,tepeeWall,								upgradeDiamond,
+						tepeeWall,	tepeeWall,									tepeeWall,
+						tepeeWall,	StructureType.TEPEE_GIANT.getDropStack(),	tepeeWall
 				})
 		};
 		final RecipeTent[] BEDOUIN = new RecipeTent[] {
@@ -57,19 +90,31 @@ public class RecipeManager {
 						null,			bedouinWall,	null,
 						bedouinWall,	null,			bedouinWall,
 						bedouinWall,	bedouinWall,	bedouinWall
-						
 				}),
 				RecipeTent.makeRecipe(StructureType.BEDOUIN_MEDIUM, new ItemStack[] {
 						null,			bedouinWall,								null,
 						bedouinWall,	StructureType.BEDOUIN_SMALL.getDropStack(),	bedouinWall,
 						bedouinWall,	bedouinWall,								bedouinWall
-						
 				}),
 				RecipeTent.makeRecipe(StructureType.BEDOUIN_LARGE, new ItemStack[] {
 						null,			bedouinWall,									null,
 						bedouinWall,	StructureType.BEDOUIN_MEDIUM.getDropStack(),	bedouinWall,
 						bedouinWall,	bedouinWall,									bedouinWall
-						
+				}),
+				RecipeTent.makeRecipe(StructureType.BEDOUIN_HUGE, new ItemStack[] {
+						upgradeGold,	bedouinWall,									upgradeGold,
+						bedouinWall,	StructureType.BEDOUIN_LARGE.getDropStack(),		bedouinWall,
+						bedouinWall,	bedouinWall,									bedouinWall
+				}),
+				RecipeTent.makeRecipe(StructureType.BEDOUIN_GIANT, new ItemStack[] {
+						upgradeObsid,	bedouinWall,									upgradeObsid,
+						bedouinWall,	StructureType.BEDOUIN_HUGE.getDropStack(),		bedouinWall,
+						bedouinWall,	bedouinWall,									bedouinWall
+				}),
+				RecipeTent.makeRecipe(StructureType.BEDOUIN_MEGA, new ItemStack[] {
+						upgradeDiamond,	bedouinWall,									upgradeDiamond,
+						bedouinWall,	StructureType.BEDOUIN_GIANT.getDropStack(),		bedouinWall,
+						bedouinWall,	bedouinWall,									bedouinWall
 				})
 		};
 		final RecipeTent[] INDLU = new RecipeTent[] {
@@ -77,33 +122,53 @@ public class RecipeManager {
 						null,		indluWall,	null,
 						indluWall,	null,		indluWall,
 						indluWall,	indluWall,	indluWall
-						
 				}),
 				RecipeTent.makeRecipe(StructureType.INDLU_MEDIUM, new ItemStack[] {
 						null,		indluWall,									null,
 						indluWall,	StructureType.INDLU_SMALL.getDropStack(),	indluWall,
 						indluWall,	indluWall,									indluWall
-						
 				}),
 				RecipeTent.makeRecipe(StructureType.INDLU_LARGE, new ItemStack[] {
 						null,		indluWall,									null,
 						indluWall,	StructureType.INDLU_MEDIUM.getDropStack(),	indluWall,
 						indluWall,	indluWall,									indluWall
-						
+				}),
+				RecipeTent.makeRecipe(StructureType.INDLU_HUGE, new ItemStack[] {
+						upgradeGold,indluWall,									upgradeGold,
+						indluWall,	StructureType.INDLU_LARGE.getDropStack(),	indluWall,
+						indluWall,	indluWall,									indluWall
+				}),
+				RecipeTent.makeRecipe(StructureType.INDLU_GIANT, new ItemStack[] {
+						upgradeObsid,indluWall,									upgradeObsid,
+						indluWall,	StructureType.INDLU_HUGE.getDropStack(),	indluWall,
+						indluWall,	indluWall,									indluWall
+				}),
+				RecipeTent.makeRecipe(StructureType.INDLU_MEGA, new ItemStack[] {
+						upgradeDiamond,indluWall,								upgradeDiamond,
+						indluWall,	StructureType.INDLU_GIANT.getDropStack(),	indluWall,
+						indluWall,	indluWall,									indluWall
 				})
 		};
 		// register the tent recipes
-		if(TentConfig.ALLOW_YURT) {
-			event.getRegistry().registerAll(YURT);
+		if(TentConfig.tents.ALLOW_YURT) {
+			for(int i = 0, len = TentConfig.tents.TIERS_YURT; i < len; i++) {
+				event.getRegistry().register(YURT[i]);
+			}
 		}
-		if(TentConfig.ALLOW_TEPEE) {
-			event.getRegistry().registerAll(TEPEE);
+		if(TentConfig.tents.ALLOW_TEPEE) {
+			for(int i = 0, len = TentConfig.tents.TIERS_TEPEE; i < len; i++) {
+				event.getRegistry().register(TEPEE[i]);
+			}
 		}
-		if(TentConfig.ALLOW_BEDOUIN) {
-			event.getRegistry().registerAll(BEDOUIN);	
+		if(TentConfig.tents.ALLOW_BEDOUIN) {
+			for(int i = 0, len = TentConfig.tents.TIERS_BEDOUIN; i < len; i++) {
+				event.getRegistry().register(BEDOUIN[i]);
+			}
 		}
-		if(TentConfig.ALLOW_INDLU) {
-			event.getRegistry().registerAll(INDLU);
+		if(TentConfig.tents.ALLOW_INDLU) {
+			for(int i = 0, len = TentConfig.tents.TIERS_INDLU; i < len; i++) {
+				event.getRegistry().register(INDLU[i]);
+			}
 		}		
 	}
 }

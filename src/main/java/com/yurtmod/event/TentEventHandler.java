@@ -41,9 +41,9 @@ public class TentEventHandler {
 			final WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
 			// only run this code for players waking up in a Tent
 			if(TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
-				boolean shouldChangeTime = TentConfig.ALLOW_SLEEP_TENT_DIM;
+				boolean shouldChangeTime = TentConfig.general.ALLOW_SLEEP_TENT_DIM;
 				// if config requires, check both overworld and tent players
-				if(TentConfig.IS_SLEEPING_STRICT) {
+				if(TentConfig.general.IS_SLEEPING_STRICT) {
 					// find out if ALL players in BOTH dimensions are sleeping
 					for(EntityPlayer p : overworld.playerEntities) {
 						// (except for the one who just woke up, of course)
@@ -77,7 +77,7 @@ public class TentEventHandler {
 	/** Makes Tent items fireproof if enabled **/
 	@SubscribeEvent
 	public void onSpawnEntity(EntityJoinWorldEvent event) {
-		if (TentConfig.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem) {
+		if (TentConfig.general.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem) {
 			ItemStack stack = ((EntityItem) event.getEntity()).getItem();
 			if (stack != null && stack.getItem() instanceof ItemTent) {
 				event.getEntity().setEntityInvulnerable(true);
@@ -116,7 +116,7 @@ public class TentEventHandler {
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
 	private static boolean canCancelTeleport(EntityPlayer player) {
-		return TentConfig.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
+		return TentConfig.general.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
 				&& !player.isCreative();
 	}
 
@@ -135,7 +135,7 @@ public class TentEventHandler {
 			final WorldServer tentServer = mcServer.getWorld(TENTDIM);
 			final WorldServer overworld = mcServer.getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
-			if (TentConfig.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
+			if (TentConfig.general.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
 				BlockPos respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(tentServer, bedPos, false) : null;
 				if (null == respawnPos) {

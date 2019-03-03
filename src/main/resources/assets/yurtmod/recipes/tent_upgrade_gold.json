@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "SIS",
+   "SBS",
+   "SIS"],
+  "key": {
+   "I": {
+        "item": "minecraft:gold_ingot"
+      },
+   "B": {
+        "item": "minecraft:gold_block"
+      },
+	"S": {
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
+	  }
+  },
+  "result": {
+    "item": "yurtmod:tent_upgrade_gold",
+    "count": 1
+  }
+}
