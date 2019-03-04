@@ -75,7 +75,7 @@ public class StructureTepee extends StructureBase {
 			// if it's a tepee block, calculate what kind of design it should have
 			if (state.getBlock() instanceof BlockTepeeWall) {
 				IBlockState tepeeState;
-				if (pos.getY() % 2 == 1) {
+				if (pos.getY() % 2 == 0) {
 					// psuedo-random seed ensures that all blocks that are same y-dis from door get
 					// the same seed
 					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ());

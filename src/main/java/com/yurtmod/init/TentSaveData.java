@@ -83,24 +83,32 @@ public class TentSaveData extends WorldSavedData {
 		return nbt;
 	}
 
-	public void addCountYurt(int toAdd) {
+	/** @return the updated value of CraftCountYurt **/
+	public int addCountYurt(int toAdd) {
 		this.craftcountYurt += toAdd;
 		this.markDirty();
+		return this.craftcountYurt;
 	}
 
-	public void addCountTepee(int toAdd) {
+	/** @return the updated value of CraftCountTepee **/
+	public int addCountTepee(int toAdd) {
 		this.craftcountTepee += toAdd;
 		this.markDirty();
+		return this.craftcountTepee;
 	}
 
-	public void addCountBedouin(int toAdd) {
+	/** @return the updated value of CraftCountBedouin **/
+	public int addCountBedouin(int toAdd) {
 		this.craftcountBedouin += toAdd;
 		this.markDirty();
+		return this.craftcountBedouin;
 	}
 	
-	public void addCountIndlu(int toAdd) {
+	/** @return the updated value of CraftCountIndlu **/
+	public int addCountIndlu(int toAdd) {
 		this.craftCountIndlu += toAdd;
 		this.markDirty();
+		return this.craftCountIndlu;
 	}
 
 	public int getCountYurt() {

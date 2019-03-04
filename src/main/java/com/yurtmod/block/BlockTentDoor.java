@@ -79,7 +79,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				StructureBase struct = type.getNewStructure();
 				// make sure there is a valid tent before doing anything
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, base);
+						: struct.getValidFacing(worldIn, base, this.getOverworldSize(type));
 				if (dir == null)
 					return false;
 				// deconstruct the tent if the player uses a tentHammer on the door (and in
@@ -90,7 +90,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					if(TentConfig.general.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
-					// prepare a tent item to drop
+					// otherwise, prepare a tent item to drop
 					ItemStack toDrop = StructureType.getDropStack(teyd);
 					if (toDrop != null) {
 						// drop the tent item and damage the tool
@@ -102,7 +102,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
-						struct.remove(worldIn, base, dir, StructureType.Size.SMALL);
+						struct.remove(worldIn, base, dir, this.getOverworldSize(type));
 						// damage the item
 						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player);
 
@@ -137,7 +137,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				StructureBase struct = type.getNewStructure();
 				// make sure there is a valid tent before doing anything
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, pos);
+						: struct.getValidFacing(worldIn, pos, this.getOverworldSize(type));
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
 				}
@@ -238,5 +238,9 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 		TileEntityTentDoor ret = new TileEntityTentDoor();
 		ret.setWorld(worldIn);
 		return ret;
+	}
+	
+	public static StructureType.Size getOverworldSize(StructureType type) {
+		return type.isXL() ? StructureType.Size.MEDIUM : StructureType.Size.SMALL;
 	}
 }

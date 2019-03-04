@@ -24,7 +24,7 @@ public class TentDimension {
 	public static BiomeTent biomeTent;
 
 	/** Structures are spaced this far apart for consistency and compatibility **/
-	public static final int MAX_SQ_WIDTH = 16;
+	public static final int TENT_SPACING = 32;
 	/** Y-level for the floor of all tent structures in Tent Dimension **/
 	public static final int FLOOR_Y = 70;
 	/** Default facing for all tent structures in Tent Dimension **/

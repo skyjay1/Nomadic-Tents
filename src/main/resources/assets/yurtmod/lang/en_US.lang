@@ -89,9 +89,9 @@ item.yurt_wall_piece.name=Yurt Wall Section
 item.tepee_wall_piece.name=Tepee Wall Section
 item.bed_wall_piece.name=Bedouin Wall Section
 item.indlu_wall_piece.name=Indlu Wall Section
-item.tent_upgrade_gold=Golden Tent Supports
-item.tent_ugprade_obsidian=Obsidian Tent Supports
-item.tent_upgrade_diamond=Diamond Tent Supports
+item.tent_upgrade_gold.name=Golden Crossbeam
+item.tent_upgrade_obsidian.name=Obsidian Crossbeam
+item.tent_upgrade_diamond.name=Diamond Crossbeam
 
 # Chat / Tooltips / Waila
 tooltip.extra_dimensional_space=Extra-dimensional space!

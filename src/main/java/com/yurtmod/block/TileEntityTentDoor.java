@@ -90,12 +90,12 @@ public class TileEntityTentDoor extends TileEntity {
 
 	/** Calculates what chunk offset x to give a door or item **/
 	public static final int getChunkOffsetX(int actualX) {
-		return actualX / (TentDimension.MAX_SQ_WIDTH);
+		return actualX / (TentDimension.TENT_SPACING);
 	}
 
 	/** Calculates what chunk offset x to give a door or item **/
 	public static final int getChunkOffsetZ(int actualZ) {
-		return actualZ / (TentDimension.MAX_SQ_WIDTH);
+		return actualZ / (TentDimension.TENT_SPACING);
 	}
 	
 	public void resetPrevStructureType() {
@@ -168,11 +168,11 @@ public class TileEntityTentDoor extends TileEntity {
 		return this.prevFacing;
 	}
 
-	/** @return the corner of the tent linked to this door **/
-	public BlockPos getXYZFromOffsets() {
-		int x = this.offsetX * (TentDimension.MAX_SQ_WIDTH);
-		int y = TentDimension.FLOOR_Y + 1;
-		int z = this.offsetZ * (TentDimension.MAX_SQ_WIDTH);
+	/** @return the Tent Dimension location of the tent's door **/
+	public BlockPos getTentDoorPos() {
+		int x = this.offsetX * (TentDimension.TENT_SPACING);
+		int y = TentDimension.FLOOR_Y;
+		int z = this.offsetZ * (TentDimension.TENT_SPACING);
 		return new BlockPos(x, y, z);
 	}
 	
@@ -247,7 +247,7 @@ public class TileEntityTentDoor extends TileEntity {
 				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
 				// attempt to set spawnpoint, if enabled
 				if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
-					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.structure.getDoorPosition(), 0, 0), 
+					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.structure.getDoorOffsetZ(), 0, 0), 
 							this.prevX, this.prevY, this.prevZ);
 				}
 			} else {
@@ -313,7 +313,7 @@ public class TileEntityTentDoor extends TileEntity {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
 		if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
-			BlockPos tentCenter = this.getXYZFromOffsets().add(this.getStructureType().getDoorPosition(), 0, this.getStructureType().getDoorPosition());
+			BlockPos tentCenter = this.getTentDoorPos().add(this.getStructureType().getDoorOffsetZ(), 0, 0);
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
 			for(EntityPlayerMP player : mcServer.getPlayerList().getPlayers()) {
@@ -350,7 +350,7 @@ public class TileEntityTentDoor extends TileEntity {
 	/**
 	 * @param player the EntityPlayer
 	 * @param tentCenter the center of the tent in Tent Dimension
-	 * @param andBed whether to also check for a bed at the player's Tent spawn
+	 * @param andBed whether a bed must be at the player's Tent spawn point
 	 * @return whether this player has a spawn point near the given BlockPos
 	 */
 	private static boolean isSpawnInTent(EntityPlayer player, BlockPos tentCenter, boolean andBed) {
@@ -359,7 +359,7 @@ public class TileEntityTentDoor extends TileEntity {
 		if(andBed) {
 			tentSpawn = tentSpawn != null ? EntityPlayer.getBedSpawnLocation(tentWorld, tentSpawn, false) : null;
 		}
-		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) <= Math.pow((TentDimension.MAX_SQ_WIDTH / 2.0D) + 2.0D, 2.0D);
+		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) <= Math.pow((TentDimension.TENT_SPACING / 2.0D) + 2.0D, 2.0D);
 	}
 
 	/**

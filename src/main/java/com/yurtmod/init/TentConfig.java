@@ -61,7 +61,6 @@ public final class TentConfig {
 		public boolean IS_TENT_FIREPROOF = false;
 	}
 	
-	////Config(modid = NomadicTents.MODID, name = "NomadicTents", category = "tents")
 	public static class TENTS {
 		
 		@Config.Name("Enable Yurt")

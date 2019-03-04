@@ -66,25 +66,21 @@ public abstract class StructureBase {
 	 * @param prevFacing	the players rotation yaw before teleporting to the structure
 	 * @return if a new structure was successfully built in the tent dimension
 	 **/
-	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final int cornerX,
-			final int cornerZ, final double prevX, final double prevY, final double prevZ, final float prevFacing,
+	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
+			final double prevX, final double prevY, final double prevZ, final float prevFacing,
 			final StructureType prevStructure) {
-		final BlockPos corner = new BlockPos(cornerX, TentDimension.FLOOR_Y, cornerZ);
-		final BlockPos doorPos = new BlockPos(cornerX, TentDimension.FLOOR_Y + 1,
-				cornerZ + this.structure.getDoorPosition());
+		final BlockPos corner = doorPos.add(0, 0, -1 * this.structure.getDoorOffsetZ());
 		final boolean resetFlag = prevStructure != this.structure;
 		// check if the structure needs to be reset
 		if (resetFlag) {
-			BlockPos prevDoorPos = new BlockPos(cornerX, TentDimension.FLOOR_Y + 1,
-					cornerZ + prevStructure.getDoorPosition());
 			// remove previous structure			
-			prevStructure.getNewStructure().remove(worldIn, prevDoorPos, TentDimension.STRUCTURE_DIR, prevStructure.getSize());
+			prevStructure.getNewStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, prevStructure.getSize());
 		}
 		
 		// before building a new structure, check if it's already been made
 		if (worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor) {
 			// door already exists, simply update TileEntity and skip building a new structure
-			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, 
+			updateDoorInfo(worldIn, doorPos, corner, this.structure, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return false;
 		}
@@ -95,12 +91,12 @@ public abstract class StructureBase {
 				this.structure.getRoofBlock());
 
 		if (success) {
-			// make the platform
-			generatePlatform(worldIn, corner, this.structure.getSize());
+			// make the platform AFTER generating structure
+			generatePlatform(worldIn, corner.down(1), this.structure.getSize());
 			
 			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
 			// set tile entity door information
-			updateDoorInfo(worldIn, doorPos, cornerX, cornerZ, this.structure, 
+			updateDoorInfo(worldIn, doorPos, corner, this.structure, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return true;
 		}
@@ -113,8 +109,8 @@ public abstract class StructureBase {
 	 * 
 	 * @return true if a TileEntityTentDoor was found and all fields were set
 	 */
-	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final int cornerX,
-			final int cornerZ, final StructureType structure, final double prevX, final double prevY,
+	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final BlockPos corner, 
+			final StructureType structure, final double prevX, final double prevY,
 			final double prevZ, final float prevFacing, final int prevDimension) {
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if (te instanceof TileEntityTentDoor) {
@@ -122,8 +118,8 @@ public abstract class StructureBase {
 			// note: the inner door will always have same structures for previous / current
 			door.setPrevStructureType(structure);
 			door.setStructureType(structure);
-			door.setOffsetX(cornerX);
-			door.setOffsetZ(cornerZ);
+			door.setOffsetX(TileEntityTentDoor.getChunkOffsetX(corner.getX()));
+			door.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(corner.getZ()));
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevFacing(prevFacing);
 			door.setPrevDimension(prevDimension);
@@ -152,15 +148,25 @@ public abstract class StructureBase {
 				// (this assumes that the structure already exists)
 				BlockPos at = corner.add(i, 0, j);
 				Block blockAt = worldIn.getBlockState(at).getBlock();
-				// if this position is below a BlockUnbreakable, use Super Dirt, else use regular dirt
-				Block topState = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable 
-						? Content.SUPER_DIRT : Blocks.DIRT;
-				// if this position is considered replaceable, place the block, else skip this step
-				if (blockAt == Blocks.AIR || blockAt == Blocks.DIRT || blockAt == Content.SUPER_DIRT) {
-					worldIn.setBlockState(at, topState.getDefaultState(), 2);
+				// make sure this position isn't awkwardly at the corner of a rounded structure
+				boolean placeFloor = false;
+				for(int f = 0; f < 20; f++) {
+					if(worldIn.getBlockState(at.up(f)).getBlock() instanceof BlockUnbreakable) {
+						placeFloor = true;
+						break;
+					}
 				}
-				// place bottom block: always indestructible dirt
-				worldIn.setBlockState(at.down(1), Content.SUPER_DIRT.getDefaultState(), 2);
+				if(placeFloor) {
+					// if this position is below a BlockUnbreakable, use Super Dirt, else use regular dirt
+					Block topState = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable 
+							? Content.SUPER_DIRT : Blocks.DIRT;
+					// if this position is considered replaceable, place the block, else skip this step
+					if (blockAt == Blocks.AIR || blockAt == Blocks.DIRT || blockAt == Content.SUPER_DIRT) {
+						worldIn.setBlockState(at, topState.getDefaultState(), 2);
+					}
+					// place bottom block: always indestructible dirt
+					worldIn.setBlockState(at.down(1), Content.SUPER_DIRT.getDefaultState(), 2);
+				}
 			}
 		}
 		return true;
@@ -194,7 +200,7 @@ public abstract class StructureBase {
 	}
 
 	/**
-	 * Fill the locations given by an array { {x1,y1,z1}, {x2,y2,z2}...} with given
+	 * Fill the locations given by an array of BlockPos with given
 	 * block and given metadata
 	 **/
 	public void buildLayer(final World worldIn, final BlockPos door, final EnumFacing dirForward,
@@ -207,7 +213,7 @@ public abstract class StructureBase {
 
 	/**
 	 * Helper method for
-	 * {@code buildLayer(World,BlockPos,EnumFacing,IBlockState,BlockPos[])}
+	 * {@link #buildLayer(World,BlockPos,EnumFacing,IBlockState,BlockPos[])}
 	 **/
 	public void buildLayer(final World worldIn, final BlockPos door, final EnumFacing dirForward, final Block block,
 			final BlockPos[] coordinates) {
@@ -263,10 +269,10 @@ public abstract class StructureBase {
 	 * @return the EnumFacing direction in which it finds a valid and completed
 	 *         SMALL structure, null if none is found
 	 **/
-	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase) {
+	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase, final StructureType.Size size) {
 		//StructureType.Size s = this.getType().getSize();
 		for (EnumFacing dir : EnumFacing.HORIZONTALS) {
-			boolean isValid = isValidForFacing(worldIn, doorBase, StructureType.Size.SMALL, dir);
+			boolean isValid = isValidForFacing(worldIn, doorBase, size, dir);
 
 			if (isValid) {
 				return dir;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.NomadicTents;
@@ -97,12 +98,12 @@ public class ItemTent extends Item {
 					// start checking to build structure
 					final EnumFacing playerFacing = player.getHorizontalFacing();
 					final StructureType type = StructureType.get(stack.getItemDamage());
+					final StructureType.Size size = BlockTentDoor.getOverworldSize(type);
 					final StructureBase struct = type.getNewStructure();
 					// make sure the tent can be built here
-					// overworld version will always be Size.SMALL
-					if (struct.canSpawn(worldIn, hitPos, playerFacing, StructureType.Size.SMALL)) {
+					if (struct.canSpawn(worldIn, hitPos, playerFacing, size)) {
 						// build the frames
-						if (struct.generateFrameStructure(worldIn, hitPos, playerFacing, Size.SMALL)) {
+						if (struct.generateFrameStructure(worldIn, hitPos, playerFacing, size)) {
 							// update the TileEntity information
 							final TileEntity te = worldIn.getTileEntity(hitPos);
 							if (te instanceof TileEntityTentDoor) {
@@ -138,8 +139,8 @@ public class ItemTent extends Item {
 		}
 
 		for (StructureType type : StructureType.values()) {
-			ItemStack tent = StructureType.getDropStack(ERROR_TAG, ERROR_TAG, type.id(), type.id());
 			if(type.isEnabled()) {
+				ItemStack tent = StructureType.getDropStack(ERROR_TAG, ERROR_TAG, type.id(), type.id());
 				items.add(tent);
 			}
 		}
@@ -169,20 +170,12 @@ public class ItemTent extends Item {
 	public static int getOffsetX(World world, ItemStack tentStack) {
 		TentSaveData data = TentSaveData.forWorld(world);
 		switch (StructureType.get(tentStack.getItemDamage()).getType()) {
-		case BEDOUIN:
-			data.addCountBedouin(1);
-			return data.getCountBedouin();
-		case TEPEE:
-			data.addCountTepee(1);
-			return data.getCountTepee();
-		case YURT:
-			data.addCountYurt(1);
-			return data.getCountYurt();
-		case INDLU:
-		default:
-			data.addCountIndlu(1);
-			return data.getCountIndlu();
+		case BEDOUIN:	return data.addCountBedouin(1);
+		case TEPEE:		return data.addCountTepee(1);
+		case YURT:		return data.addCountYurt(1);
+		case INDLU:		return data.addCountIndlu(1);
 		}
+		return -1;
 	}
 
 	/** Calculates the Z location based on the tent type **/

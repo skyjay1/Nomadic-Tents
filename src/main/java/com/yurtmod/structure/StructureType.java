@@ -8,6 +8,7 @@ import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemTent;
 
+import mcp.mobius.waila.api.impl.ConfigHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -80,10 +81,10 @@ public enum StructureType implements IStringSerializable {
 	}
 
 	/**
-	 * @return The door is this number of blocks right from the front-left corner
-	 *         block
+	 * @return The door is this number of blocks right (positive Z) from 
+	 * the front-left corner of the tent space
 	 **/
-	public int getDoorPosition() {
+	public int getDoorOffsetZ() {
 		// on z-axis in Tent Dimension
 		return this.size.getDoorZ();
 	}
@@ -130,18 +131,18 @@ public enum StructureType implements IStringSerializable {
 	}
 	
 	public IBlockState getDoorBlock() {
-		boolean sml = this.getSize().ordinal() < 3;
-		Block block = getDoorBlockRaw(sml);
-		PropertyEnum sizeEnum = sml ? BlockTentDoorSML.SIZE : BlockTentDoorHGM.SIZE;
+		boolean xl = this.getSize().isXL();
+		Block block = getDoorBlockRaw(xl);
+		PropertyEnum sizeEnum = xl ? BlockTentDoorHGM.SIZE :  BlockTentDoorSML.SIZE;
 		return block.getDefaultState().withProperty(sizeEnum, this.getSize());
 	}
 	
-	private Block getDoorBlockRaw(boolean smallMedLarge) {
+	private Block getDoorBlockRaw(boolean isXL) {
 		switch (this.getType()) {
-		case YURT:		return smallMedLarge ? Content.YURT_DOOR_SML : Content.YURT_DOOR_HGM;
-		case TEPEE:		return smallMedLarge ? Content.TEPEE_DOOR_SML : Content.TEPEE_DOOR_HGM;
-		case BEDOUIN:	return smallMedLarge ? Content.BEDOUIN_DOOR_SML : Content.BEDOUIN_DOOR_HGM;
-		case INDLU:		return smallMedLarge ? Content.INDLU_DOOR_SML : Content.INDLU_DOOR_HGM;
+		case YURT:		return isXL ? Content.YURT_DOOR_HGM : Content.YURT_DOOR_SML;
+		case TEPEE:		return isXL ? Content.TEPEE_DOOR_HGM : Content.TEPEE_DOOR_SML;
+		case BEDOUIN:	return isXL ? Content.BEDOUIN_DOOR_HGM : Content.BEDOUIN_DOOR_SML;
+		case INDLU:		return isXL ? Content.INDLU_DOOR_HGM : Content.INDLU_DOOR_SML;
 		}
 		return Content.YURT_DOOR_SML;
 	}
@@ -156,8 +157,14 @@ public enum StructureType implements IStringSerializable {
 		return null;
 	}
 	
+	/** @return TRUE if both this tent's TYPE and SIZE are allowed by config **/
 	public boolean isEnabled() {
-		return this.getType().isEnabled();
+		return this.getType().isEnabled() && this.getSize().isEnabledFor(this.getType());
+	}
+
+	/** @return TRUE if this structure is Huge, Giant, or Mega **/
+	public boolean isXL() {
+		return this.getSize().isXL();
 	}
 
 	public IBlockState getWallBlock(int dimID) {
@@ -174,7 +181,7 @@ public enum StructureType implements IStringSerializable {
 
 	/** @return the Z-offset of this structure type in the Tent Dimension **/
 	public int getTagOffsetZ() {
-		return Math.floorDiv(this.id(), 3) * 2;
+		return Math.floorDiv(this.id(), 3);
 	}
 
 	public TextFormatting getTooltipColor() {
@@ -198,7 +205,7 @@ public enum StructureType implements IStringSerializable {
 		// default
 		return StructureType.YURT_SMALL;
 	}
-
+	
 	@Override
 	public String getName() {
 		return getName(this.id());
@@ -288,6 +295,16 @@ public enum StructureType implements IStringSerializable {
 			this.doorOffsetZ = this.ordinal() + 2;
 		}
 
+		public boolean isEnabledFor(StructureType.Type type) {
+			switch(type) {
+			case BEDOUIN: 	return this.ordinal() < TentConfig.tents.TIERS_BEDOUIN;
+			case INDLU:		return this.ordinal() < TentConfig.tents.TIERS_INDLU;
+			case TEPEE:		return this.ordinal() < TentConfig.tents.TIERS_TEPEE;
+			case YURT:		return this.ordinal() < TentConfig.tents.TIERS_YURT;
+			}
+			return false;
+		}
+
 		public int getSquareWidth() {
 			return this.squareWidth;
 		}
@@ -298,6 +315,11 @@ public enum StructureType implements IStringSerializable {
 
 		public TextFormatting getTooltipColor() {
 			return this.textFormatting;
+		}
+		
+		/** @return TRUE if this is HUGE, GIANT, or MEGA **/
+		public boolean isXL() {
+			return this == HUGE || this == GIANT || this == MEGA;
 		}
 
 		@Override
