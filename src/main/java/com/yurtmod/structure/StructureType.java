@@ -3,6 +3,11 @@ package com.yurtmod.structure;
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.TileEntityTentDoor;
+import com.yurtmod.block.Categories.IBedouinBlock;
+import com.yurtmod.block.Categories.IIndluBlock;
+import com.yurtmod.block.Categories.ITentBlockBase;
+import com.yurtmod.block.Categories.ITepeeBlock;
+import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
@@ -89,14 +94,17 @@ public enum StructureType implements IStringSerializable {
 		return this.size.getDoorZ();
 	}
 
+	/** @return an un-tagged ItemStack with the correct metadata **/
 	public ItemStack getDropStack() {
 		return new ItemStack(Content.ITEM_TENT, 1, this.id());
 	}
 	
+	/** @return an NBT-tagged ItemStack based on the passed TileEntityTentDoor **/
 	public static ItemStack getDropStack(TileEntityTentDoor te) {
 		return getDropStack(te.getOffsetX(), te.getOffsetZ(), te.getPrevStructureType().id(), te.getStructureType().id());
 	}
 
+	/** @return an NBT-tagged ItemStack based on the passed values **/
 	public static ItemStack getDropStack(int tagChunkX, int tagChunkZ, int prevStructure, int tentType) {
 		ItemStack stack = new ItemStack(Content.ITEM_TENT, 1, tentType);
 		if (stack.getTagCompound() == null) {
@@ -130,6 +138,7 @@ public enum StructureType implements IStringSerializable {
 		}
 	}
 	
+	/** @return the Tent Door instance used for this structure **/
 	public IBlockState getDoorBlock() {
 		boolean xl = this.getSize().isXL();
 		Block block = getDoorBlockRaw(xl);
@@ -147,6 +156,7 @@ public enum StructureType implements IStringSerializable {
 		return Content.YURT_DOOR_SML;
 	}
 
+	/** @return a new StructureBase representing this Tent type and size **/
 	public StructureBase getNewStructure() {
 		switch (this.getType()) {
 		case BEDOUIN:	return new StructureBedouin(this);
@@ -167,14 +177,17 @@ public enum StructureType implements IStringSerializable {
 		return this.getSize().isXL();
 	}
 
+	/** @return the block used to build walls, may be different inside tent **/
 	public IBlockState getWallBlock(int dimID) {
 		return this.getType().getWallBlock(dimID);
 	}
 
+	/** @return the block to build roof **/
 	public IBlockState getRoofBlock() {
 		return this.getType().getRoofBlock();
 	}
 
+	/** @return the block to use in frame structure, different for roof **/
 	public IBlockState getFrameBlock(boolean isRoof) {
 		return this.getType().getFrameBlock(isRoof);
 	}
@@ -184,6 +197,7 @@ public enum StructureType implements IStringSerializable {
 		return Math.floorDiv(this.id(), 3);
 	}
 
+	/** @return the color that represents this tent SIZE **/
 	public TextFormatting getTooltipColor() {
 		return this.size.getTooltipColor();
 	}
@@ -217,6 +231,7 @@ public enum StructureType implements IStringSerializable {
 		BEDOUIN,
 		INDLU;
 		
+		/** @return whether this tent type is enabled in the config **/
 		public boolean isEnabled() {
 			switch (this) {
 			case BEDOUIN:	return TentConfig.tents.ALLOW_BEDOUIN;
@@ -226,7 +241,19 @@ public enum StructureType implements IStringSerializable {
 			}
 			return false;
 		}
+		
+		/** @return the block interface expected by this structure type **/
+		public Class<? extends ITentBlockBase> getInterface() {
+			switch (this) {
+			case BEDOUIN:	return IBedouinBlock.class;
+			case TEPEE:		return ITepeeBlock.class;
+			case YURT:		return IYurtBlock.class;
+			case INDLU:		return IIndluBlock.class;
+			}
+			return ITentBlockBase.class;
+		}
 
+		/** @return the main building block for this tent type. May be different inside tent. **/
 		public IBlockState getWallBlock(int dimID) {
 			switch (this) {
 			case YURT:		return TentDimension.isTentDimension(dimID) 
@@ -241,6 +268,7 @@ public enum StructureType implements IStringSerializable {
 			return null;
 		}
 
+		/** @return the specific Roof block for this tent type **/
 		public IBlockState getRoofBlock() {
 			switch (this) {
 			case YURT:		return Content.YURT_ROOF.getDefaultState();
@@ -251,6 +279,7 @@ public enum StructureType implements IStringSerializable {
 			return null;
 		}
 
+		/** @return the specific Frame for this structure type. May be different for walls and roofs **/
 		public IBlockState getFrameBlock(boolean isRoof) {
 			switch (this) {
 			case YURT:		return isRoof 

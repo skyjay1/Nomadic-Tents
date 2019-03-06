@@ -48,7 +48,7 @@ public class BlockBedouinWall extends BlockUnbreakable implements IBedouinBlock 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
 		boolean above = meta % 2 == 1;
-		boolean beside = meta > 2;
+		boolean beside = meta >= 2;
 		return getDefaultState().withProperty(ABOVE_SIMILAR, above).withProperty(BESIDE_SIMILAR, beside);
 	}
 

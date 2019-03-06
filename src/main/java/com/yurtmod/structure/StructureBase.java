@@ -5,8 +5,11 @@ import java.util.function.Predicate;
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.TileEntityTentDoor;
+import com.yurtmod.block.Categories.ITentBlockBase;
+import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
+import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
@@ -29,6 +32,11 @@ public abstract class StructureBase {
 	protected final Blueprints BP_HUGE = makeBlueprints(StructureType.Size.HUGE, new Blueprints());
 	protected final Blueprints BP_GIANT = makeBlueprints(StructureType.Size.GIANT, new Blueprints());
 	protected final Blueprints BP_MEGA = makeBlueprints(StructureType.Size.MEGA, new Blueprints());
+	/** 
+	 * Used in {@link #isValidForFacing(World, BlockPos, Size, EnumFacing)} 
+	 * to determine if the given IBlockState is part of a specific type of tent
+	 **/
+	protected Predicate<IBlockState> TENT_PRED;
 
 	/**
 	 * Predicate to test if a block can be replaced by frame blocks when setting up
@@ -47,6 +55,8 @@ public abstract class StructureBase {
 
 	public StructureBase(StructureType type) {
 		this.structure = type;
+		this.TENT_PRED = (IBlockState b) 
+				-> this.structure.getType().getInterface().isAssignableFrom(b.getBlock().getClass());
 	}
 
 	public StructureType getType() {
@@ -212,15 +222,6 @@ public abstract class StructureBase {
 	}
 
 	/**
-	 * Helper method for
-	 * {@link #buildLayer(World,BlockPos,EnumFacing,IBlockState,BlockPos[])}
-	 **/
-	public void buildLayer(final World worldIn, final BlockPos door, final EnumFacing dirForward, final Block block,
-			final BlockPos[] coordinates) {
-		buildLayer(worldIn, door, dirForward, block.getDefaultState(), coordinates);
-	}
-
-	/**
 	 * @return true if the frame blocks were placed successfully. Assumes that you
 	 *         are not in Tent Dimension.
 	 **/
@@ -281,6 +282,40 @@ public abstract class StructureBase {
 		return null;
 	}
 	
+	/**
+	 * @return true if there is empty space to create a structure of given size at
+	 *         this location
+	 **/
+	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size) {
+		final Blueprints bp = this.getBlueprints(size);
+		// check wall and roof arrays
+		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED)) {
+			return false;
+		}
+		if (bp.hasRoofCoords() && !validateArray(worldIn, doorBase, bp.getRoofCoords(), dirForward, REPLACE_BLOCK_PRED)) {
+			return false;
+		}	
+		// passes all checks, so return true
+		return true;
+	}
+
+	/**
+	 * @return true if there is a valid structure at the given location for the
+	 *         given Size and EnumFacing
+	 **/
+	public boolean isValidForFacing(World worldIn, BlockPos doorBase, Size size, EnumFacing facing) {
+		final Blueprints bp = this.getBlueprints(size);
+		// check wall and roof arrays
+		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TENT_PRED)) {
+			return false;
+		}
+		if (bp.hasRoofCoords() && !validateArray(worldIn, doorBase, bp.getRoofCoords(), facing, TENT_PRED)) {
+			return false;
+		}
+		// passes all checks, so return true
+		return true;
+	}
+	
 	public Blueprints getBlueprints(final StructureType.Size size) {
 		switch(size) {
 		case MEGA:		return BP_MEGA;
@@ -297,20 +332,6 @@ public abstract class StructureBase {
 	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
 			final StructureType.Size size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
 
-	/**
-	 * @return true if there is empty space to create a structure of given size at
-	 *         this location
-	 **/
-	public abstract boolean canSpawn(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
-			final StructureType.Size size);
-
-	/**
-	 * @return true if there is a valid structure at the given location for the
-	 *         given Size and EnumFacing
-	 **/
-	public abstract boolean isValidForFacing(final World worldIn, final BlockPos doorBase,
-			final StructureType.Size size, final EnumFacing facing);
-	
 	/**
 	 * @return the Blueprints for a structure of the given StructureType.Size
 	 */

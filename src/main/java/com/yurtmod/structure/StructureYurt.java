@@ -43,40 +43,61 @@ public class StructureYurt extends StructureBase {
 				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
 				worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 3);
 			}
-			buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER, bp.getBarrierCoords());
+			buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(), bp.getBarrierCoords());
 		}
 		return !bp.isEmpty();
-	}
-
-	@Override
-	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size) {
-		// determine what blueprints to use
-		final Blueprints bp = this.getBlueprints(size);
-		// check wall and roof arrays
-		if (!validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED))
-			return false;
-		if (!validateArray(worldIn, doorBase, bp.getRoofCoords(), dirForward, REPLACE_BLOCK_PRED))
-			return false;
-		// passes all checks, so return true
-		return true;
-	}
-
-	@Override
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, Size size, EnumFacing facing) {
-		final Blueprints bp = this.getBlueprints(size);
-		// check wall and roof arrays
-		if (!validateArray(worldIn, doorBase, bp.getWallCoords(), facing, YURT_PRED))
-			return false;
-		if (!validateArray(worldIn, doorBase, bp.getRoofCoords(), facing, YURT_PRED))
-			return false;
-		// passes all checks, so return true
-		return true;
 	}
 
 	@Override
 	public Blueprints makeBlueprints(final StructureType.Size size, final Blueprints bp) {
 		switch (size) {
 		case MEGA:
+			bp.addWallCoords(new int[][] {
+				// layers 1, 2, and 3
+				{ 0, 0, -2 }, { 0, 0, -1 }, { 0, 0, 0 }, { 0, 0, 1 }, { 0, 0, 2 }, { 1, 0, 3 }, { 1, 0, 4 }, { 2, 0, 5 }, { 3, 0, 6 }, { 4, 0, 6 },
+				{ 5, 0, 7 }, { 6, 0, 7 }, { 7, 0, 7 }, { 8, 0, 7 }, { 9, 0, 7 }, { 10, 0, 6 }, { 11, 0, 6 }, { 12, 0, 5 }, { 13, 0, 4 }, { 13, 0, 3 },
+				{ 14, 0, 2 }, { 14, 0, 1 }, { 14, 0, 0 }, { 14, 0, -1 }, { 14, 0, -2 }, { 13, 0, -3 }, { 13, 0, -4 }, { 12, 0, -5 }, { 11, 0, -6 }, { 10, 0, -6 },
+				{ 9, 0, -7 }, { 8, 0, -7 }, { 7, 0, -7 }, { 6, 0, -7 }, { 5, 0, -7 }, { 4, 0, -6 }, { 3, 0, -6 }, { 2, 0, -5 }, { 1, 0, -4 }, { 1, 0, -3 },
+				{ 0, 1, -2 }, { 0, 1, -1 }, { 0, 1, 0 }, { 0, 1, 1 }, { 0, 1, 2 }, { 1, 1, 3 }, { 1, 1, 4 }, { 2, 1, 5 }, { 3, 1, 6 }, { 4, 1, 6 },
+				{ 5, 1, 7 }, { 6, 1, 7 }, { 7, 1, 7 }, { 8, 1, 7 }, { 9, 1, 7 }, { 10, 1, 6 }, { 11, 1, 6 }, { 12, 1, 5 }, { 13, 1, 4 }, { 13, 1, 3 },
+				{ 14, 1, 2 }, { 14, 1, 1 }, { 14, 1, 0 }, { 14, 1, -1 }, { 14, 1, -2 }, { 13, 1, -3 }, { 13, 1, -4 }, { 12, 1, -5 }, { 11, 1, -6 }, { 10, 1, -6 },
+				{ 9, 1, -7 }, { 8, 1, -7 }, { 7, 1, -7 }, { 6, 1, -7 }, { 5, 1, -7 }, { 4, 1, -6 }, { 3, 1, -6 }, { 2, 1, -5 }, { 1, 1, -4 }, { 1, 1, -3 },
+				{ 0, 2, -2 }, { 0, 2, -1 }, { 0, 2, 0 }, { 0, 2, 1 }, { 0, 2, 2 }, { 1, 2, 3 }, { 1, 2, 4 }, { 2, 2, 5 }, { 3, 2, 6 }, { 4, 2, 6 },
+				{ 5, 2, 7 }, { 6, 2, 7 }, { 7, 2, 7 }, { 8, 2, 7 }, { 9, 2, 7 }, { 10, 2, 6 }, { 11, 2, 6 }, { 12, 2, 5 }, { 13, 2, 4 }, { 13, 2, 3 },
+				{ 14, 2, 2 }, { 14, 2, 1 }, { 14, 2, 0 }, { 14, 2, -1 }, { 14, 2, -2 }, { 13, 2, -3 }, { 13, 2, -4 }, { 12, 2, -5 }, { 11, 2, -6 }, { 10, 2, -6 },
+				{ 9, 2, -7 }, { 8, 2, -7 }, { 7, 2, -7 }, { 6, 2, -7 }, { 5, 2, -7 }, { 4, 2, -6 }, { 3, 2, -6 }, { 2, 2, -5 }, { 1, 2, -4 }, { 1, 2, -3 }
+				
+			});
+			bp.addRoofCoords(new int[][] {
+				// layer 4
+				{ 1, 3, -2 }, { 1, 3, -1 }, { 1, 3, 0 }, { 1, 3, 1 }, { 1, 3, 2 }, { 2, 3, 3 }, { 2, 3, 4 },
+				{ 3, 3, 5 }, { 4, 3, 5 }, { 5, 3, 6 }, { 6, 3, 6 }, { 7, 3, 6 }, { 8, 3, 6 }, { 9, 3, 6 },
+				{ 10, 3, 5 }, { 11, 3, 5 }, { 12, 3, 4 }, { 12, 3, 3 }, { 13, 3, 2 }, { 13, 3, 1 }, { 13, 3, 0 },
+				{ 13, 3, -1 }, { 13, 3, -2 }, { 12, 3, -3 }, { 12, 3, -4 }, { 11, 3, -5 }, { 10, 3, -5 },
+				{ 10, 3, -6 }, { 9, 3, -6 }, { 8, 3, -6 }, { 7, 3, -6 }, { 6, 3, -6 }, { 5, 3, -6 }, { 4, 3, -5 },
+				{ 3, 3, -5 }, { 2, 3, -4 }, { 2, 3, -3 },
+				// layer 5
+				{ 2, 4, -2 }, { 2, 4, -1 }, { 2, 4, 0 }, { 2, 4, 1 }, { 2, 4, 2 }, { 3, 4, 2 }, { 3, 4, 3 },
+				{ 3, 4, 4 }, { 4, 4, 4 }, { 5, 4, 4 }, { 5, 4, 5 }, { 6, 4, 5 }, { 7, 4, 5 }, { 8, 4, 5 },
+				{ 9, 4, 5 }, { 9, 4, 4 }, { 10, 4, 4 }, { 11, 4, 4 }, { 11, 4, 3 }, { 11, 4, 2 }, { 12, 4, 2 },
+				{ 12, 4, 1 }, { 12, 4, 0 }, { 12, 4, -1 }, { 12, 4, -2 }, { 11, 4, -2 }, { 11, 4, -3 },
+				{ 11, 4, -4 }, { 10, 4, -4 }, { 9, 4, -4 }, { 9, 4, -5 }, { 8, 4, -5 }, { 7, 4, -5 }, { 6, 4, -5 },
+				{ 5, 4, -5 }, { 5, 4, -4 }, { 4, 4, -4 }, { 3, 4, -4 }, { 3, 4, -3 }, { 3, 4, -2 },
+				// layer 6
+				{ 3, 5, -1 }, { 3, 5, 0 }, { 3, 5, 1 }, { 4, 5, 1 }, { 4, 5, 2 }, { 4, 5, 3 }, { 5, 5, 3 },
+				{ 6, 5, 3 }, { 6, 5, 4 }, { 7, 5, 4 }, { 8, 5, 4 }, { 8, 5, 3 }, { 9, 5, 3 }, { 10, 5, 3 },
+				{ 10, 5, 2 }, { 10, 5, 1 }, { 11, 5, 1 }, { 11, 5, 0 }, { 11, 5, -1 }, { 10, 5, -1 }, { 10, 5, -2 },
+				{ 10, 5, -3 }, { 9, 5, -3 }, { 8, 5, -3 }, { 8, 5, -4 }, { 7, 5, -4 }, { 6, 5, -4 }, { 6, 5, -3 },
+				{ 5, 5, -3 }, { 4, 5, -3 }, { 4, 5, -2 }, { 4, 5, -1 },
+				{ 4, 5, 0 }, { 5, 5, -2 }, { 5, 5, 2 }, { 7, 5, -3 }, { 7, 5, 3 }, { 9, 5, -2 }, { 9, 5, 2 }, { 10, 5, 0 },
+				// layer 7
+				{ 5, 6, -1 }, { 5, 6, 0 }, { 5, 6, 1 }, { 6, 6, 2 }, { 7, 6, 2 }, { 8, 6, 2 }, { 9, 6, 1 },
+				{ 9, 6, 0 }, { 9, 6, -1 }, { 8, 6, -2 }, { 7, 6, -2 }, { 6, 6, -2 }, { 5, 6, -1 }, { 5, 6, 0 },
+				{ 5, 6, 1 }, { 6, 6, 2 }, { 7, 6, 2 }, { 8, 6, 2 }, { 9, 6, 1 }, { 9, 6, 0 }, { 9, 6, -1 },
+				{ 8, 6, -2 }, { 7, 6, -2 }, { 6, 6, -2 }, { 6, 7, -1 }, { 6, 7, 0 }, { 6, 7, 1 }, { 7, 7, 1 },
+				{ 8, 7, 1 }, { 8, 7, 0 }, { 8, 7, -1 }, { 7, 7, -1 }	
+			});
+			bp.addBarrierCoords(new int[][] { { 7, 8, 0 } });
 			break;
 		case GIANT:
 			bp.addWallCoords(new int[][] {
@@ -112,7 +133,7 @@ public class StructureYurt extends StructureBase {
 				{ 4, 5, -2 }, { 4, 5, -1 }, { 4, 5, 0 }, { 4, 5, 1 }, { 4, 5, 2 }, { 5, 5, 2 }, { 6, 5, 2 }, { 7, 5, 2 }, 
 				{ 8, 5, 2 }, { 8, 5, 1 }, { 8, 5, 0 }, { 8, 5, -1 }, { 8, 5, -2 }, { 7, 5, -2 }, { 6, 5, -2 }, { 5, 5, -2 },
 				// layer 7
-				{ 5, 6, -1 }, { 5, 6, 0 }, { 5, 6, 1 }, { 6, 6, 1 }, { 7, 6, 1 }, { 7, 6, 0 }, { 7, 6, -1 }, { 6, 6, -1 }
+				{ 5, 6, -1 }, { 5, 6, 0 }, { 5, 6, 1 }, { 6, 6, 1 }, { 7, 6, 1 }, { 7, 6, 0 }, { 7, 6, -1 }, { 6, 6, -1 }	
 			});
 			bp.addBarrierCoords(new int[][] { { 6, 7, 0 } });
 			break;

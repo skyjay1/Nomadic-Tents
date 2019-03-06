@@ -21,7 +21,7 @@ public final class TentConfig {
 		
 		@Config.Name("Owner-Only Pickup")
 		@Config.Comment("When true, only the player who placed the tent can pick it up")
-		public static boolean OWNER_PICKUP = false;
+		public boolean OWNER_PICKUP = false;
 		
 		@Config.Name("Allow Player Walk-In")
 		@Config.Comment("When true, players can enter the tent by walking through the door")

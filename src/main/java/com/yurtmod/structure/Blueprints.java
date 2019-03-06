@@ -25,6 +25,14 @@ public class Blueprints {
 		}
 		return true;
 	}
+	
+	// unused but just in case
+	public final boolean addWallCoords(BlockPos... pos) {
+		for (BlockPos a : pos) {
+			this.wallCoords.add(a);
+		}
+		return true;
+	}
 
 	/** 
 	 * Converts the given array into BlockPos objects to add to the ROOF list.
@@ -34,6 +42,14 @@ public class Blueprints {
 	public final boolean addRoofCoords(int[][] blockXYZpos) {
 		for (int[] a : blockXYZpos) {
 			add(this.roofCoords, a);
+		}
+		return true;
+	}
+	
+	// unused but just in case
+	public final boolean addRoofCoords(BlockPos... pos) {
+		for (BlockPos a : pos) {
+			this.roofCoords.add(a);
 		}
 		return true;
 	}
@@ -48,6 +64,26 @@ public class Blueprints {
 			add(this.barrierCoords, a);
 		}
 		return true;
+	}
+	
+	// unused but just in case
+	public final boolean addBarrierCoords(BlockPos... pos) {
+		for (BlockPos a : pos) {
+			this.barrierCoords.add(a);
+		}
+		return true;
+	}
+	
+	public final boolean hasWallCoords() {
+		return !this.wallCoords.isEmpty();
+	}
+	
+	public final boolean hasRoofCoords() {
+		return !this.roofCoords.isEmpty();
+	}
+	
+	public final boolean hasBarrierCoords() {
+		return !this.barrierCoords.isEmpty();
 	}
 
 	public final BlockPos[] getWallCoords() {
