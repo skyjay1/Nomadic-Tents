@@ -1,6 +1,7 @@
 package com.yurtmod.block;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -14,7 +15,11 @@ public class BlockLayered extends BlockUnbreakable {
 	public static final PropertyBool ABOVE_SIMILAR = PropertyBool.create("above_similar");
 
 	public BlockLayered(Material m) {
-		super(m);
+		this(m, m.getMaterialMapColor());
+	}
+	
+	public BlockLayered(Material m, MapColor c) {
+		super(m, c);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(ABOVE_SIMILAR, false));
 	}
 

@@ -9,6 +9,7 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -37,7 +38,7 @@ public class StructureTepee extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		if (tentDim) {
+		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
 			// place a fire to light up the place (since there's no window or skylight)
 			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentDimension.STRUCTURE_DIR);
@@ -78,7 +79,7 @@ public class StructureTepee extends StructureBase {
 				if (pos.getY() % 2 == 0) {
 					// psuedo-random seed ensures that all blocks that are same y-dis from door get
 					// the same seed
-					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ());
+					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.structure.id() * 321);
 					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed));
 				} else {
 					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand);

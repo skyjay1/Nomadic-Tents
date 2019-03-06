@@ -2,6 +2,7 @@ package com.yurtmod.block;
 
 import com.yurtmod.block.Categories.IYurtBlock;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -12,7 +13,7 @@ public class BlockYurtRoof extends BlockUnbreakable implements IYurtBlock {
 	public static final PropertyBool OUTSIDE = PropertyBool.create("outside");
 	
 	public BlockYurtRoof() {
-		super(Material.CLOTH);
+		super(Material.CLOTH, MapColor.LIGHT_BLUE);
 		this.setLightOpacity(LIGHT_OPACITY);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(OUTSIDE, Boolean.valueOf(false)));
 	}

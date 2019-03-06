@@ -1,17 +1,18 @@
 package com.yurtmod.block;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfig;
 
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
@@ -19,7 +20,6 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
@@ -34,7 +34,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	public static final PropertyInteger TEXTURE = PropertyInteger.create("texture", 0, NUM_TEXTURES - 1);
 
 	public BlockTepeeWall() {
-		super(Material.CLOTH);
+		super(Material.CLOTH, MapColor.SAND);
 		this.setLightOpacity(LIGHT_OPACITY);
 	}
 
@@ -46,12 +46,13 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 			BlockPos doorPos = this.findDoorNearby(worldIn, pos);
 			// this determines what pattern overworld tepees should have for each layer
 			if (!TentDimension.isTentDimension(worldIn) && doorPos != null
-					&& (Math.abs(pos.getY() - doorPos.getY()) % 2 == 0)) {
+					&& (Math.abs(pos.getY() - doorPos.getY()) % 2 == 0)
+					&& worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
 				TileEntityTentDoor te = (TileEntityTentDoor) worldIn.getTileEntity(doorPos);
 				// psuedo-random seed guarantees all blocks that are same y-dis from door get
 				// the same seed
 				int randSeed = pos.getY() + doorPos.getX() + doorPos.getZ() + te.getOffsetX() * 123
-						+ te.getOffsetZ() * 321;
+						+ te.getOffsetZ() * 321 + te.getStructureType().id() * 101;
 				state = getStateForRandomPattern(new Random(randSeed));
 			} else {
 				state = getStateForRandomDesignWithChance(worldIn.rand);
@@ -146,12 +147,13 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	 * @return BlockPos of lower tepee door if found, else null
 	 **/
 	private BlockPos findDoorNearby(World world, BlockPos pos) {
-		List checked = new LinkedList();
+		Set<BlockPos> checked = new HashSet<>();
 		while (pos != null && !(world.getBlockState(pos).getBlock() instanceof BlockTentDoor)) {
 			pos = getNextTepeeBlock(world, checked, pos);
 		}
-		if (pos == null)
+		if (pos == null) {
 			return null;
+		}
 		boolean isLower = world.getBlockState(pos).getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER;
 		return isLower ? pos : pos.down(1);
 	}
@@ -164,7 +166,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	 * @param exclude list of BlockPos already checked
 	 * @param pos     center of the 3x3x3 box
 	 **/
-	private BlockPos getNextTepeeBlock(World worldIn, List exclude, BlockPos pos) {
+	private static BlockPos getNextTepeeBlock(World worldIn, Set<BlockPos> exclude, BlockPos pos) {
 		int radius = 1;
 		// favor blocks below this one - useful because most tepee blocks will be above
 		// the door

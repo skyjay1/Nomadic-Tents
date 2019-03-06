@@ -6,6 +6,7 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.structure.StructureType.Size;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -34,7 +35,7 @@ public class StructureIndlu extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		if (tentDim) {
+		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
 			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
 			worldIn.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState(), 2);

@@ -3,6 +3,7 @@ package com.yurtmod.block;
 import com.yurtmod.block.Categories.IBedouinBlock;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -17,7 +18,7 @@ public class BlockBedouinWall extends BlockUnbreakable implements IBedouinBlock 
 	public static final PropertyBool BESIDE_SIMILAR = PropertyBool.create("beside_similar");
 
 	public BlockBedouinWall() {
-		super(Material.CLOTH);
+		super(Material.CLOTH, MapColor.WOOD);
 		this.setDefaultState(
 				this.blockState.getBaseState().withProperty(ABOVE_SIMILAR, false).withProperty(BESIDE_SIMILAR, false));
 	}
