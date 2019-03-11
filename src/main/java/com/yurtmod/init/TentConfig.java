@@ -1,7 +1,9 @@
 package com.yurtmod.init;
 
+import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Config;
 
 @Config(modid = NomadicTents.MODID, name = "NomadicTents", category = "config")
@@ -11,6 +13,33 @@ public final class TentConfig {
 	public static final TentConfig.TENTS tents = new TENTS();
 	
 	public static class GENERAL {
+		
+		@Config.Name("Dimension ID")
+		@Config.Comment({"ID for the Tent Dimension.", 
+			"Remove this field to automatically find an available ID"})
+		@Config.RangeInt(min = -255, max = 255)
+		public int TENT_DIM_ID = DimensionManager.getNextFreeDimId();
+		
+		@Config.Name("Allow Sleep in Tent")
+		@Config.Comment("When false, beds used in the Tent Dimension will explode")
+		public boolean ALLOW_SLEEP_TENT_DIM = true;
+		
+		@Config.Name("Restrict Teleporting")
+		@Config.Comment("When true, only creative-mode players can teleport within the Tent Dimension")
+		public boolean RESTRICT_TELEPORT_TENT_DIM = true;
+		
+		@Config.Name("Allow Respawn Logic")
+		@Config.Comment(value = {"When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy"})
+		public boolean ALLOW_RESPAWN_INTERCEPT = true;
+		
+		@Config.Name("Allow Overworld spawnpoint")
+		@Config.Comment("When true, sleeping in a tent will set your Overworld spawn to the tent's outside location")
+		public boolean ALLOW_OVERWORLD_SETSPAWN = true;
+		
+		@Config.Name("Tent Sleeping Strict")
+		@Config.Comment("When true, players in a tent can only sleep through the night if overworld players are asleep too")
+		public boolean IS_SLEEPING_STRICT = true;
+
 		@Config.Name("Super Mallet Creative Only")
 		@Config.Comment("When true, only Creative-mode players can use the Super Tent Mallet")
 		public boolean SUPER_MALLET_CREATIVE_ONLY = false;
@@ -36,29 +65,15 @@ public final class TentConfig {
 		@Config.RangeInt(min = 0, max = 100)
 		public int TEPEE_DECORATED_CHANCE = 35;
 	
-		@Config.Name("Allow Sleep in Tent")
-		@Config.Comment("When false, beds used in the Tent Dimension will explode")
-		public boolean ALLOW_SLEEP_TENT_DIM = true;
-		
-		@Config.Name("Restrict Teleporting")
-		@Config.Comment("When true, only creative-mode players can teleport within the Tent Dimension")
-		public boolean RESTRICT_TELEPORT_TENT_DIM = true;
-		
-		@Config.Name("Allow Respawn Logic")
-		@Config.Comment(value = {"When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy"})
-		public boolean ALLOW_RESPAWN_INTERCEPT = true;
-		
-		@Config.Name("Allow Overworld spawnpoint")
-		@Config.Comment("When true, sleeping in a tent will set your Overworld spawn to the tent's outside location")
-		public boolean ALLOW_OVERWORLD_SETSPAWN = true;
-		
-		@Config.Name("Tent Sleeping Strict")
-		@Config.Comment("When true, players in a tent can only sleep through the night if overworld players are asleep too")
-		public boolean IS_SLEEPING_STRICT = true;
-	
 		@Config.Name("Is Tent Fireproof")
 		@Config.Comment("When true, the tent item will not be destroyed if it is burned")
 		public boolean IS_TENT_FIREPROOF = false;
+		
+		@Config.Name("Copy is Creative-Only")
+		@Config.Comment({"When true, only Creative mode players can duplicate a tent item",
+			"(Note: this is done by clicking a tent door with any item that has NBT tag '" 
+			+ ItemTent.TAG_COPY_TOOL + "' set to true)"})
+		public boolean COPY_CREATIVE_ONLY = false;
 	}
 	
 	public static class TENTS {

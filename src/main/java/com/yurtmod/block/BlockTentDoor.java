@@ -5,8 +5,10 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
+import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
 
@@ -21,13 +23,16 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketHeldItemChange;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -70,21 +75,51 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
-			BlockPos base = state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER) ? pos : pos.down(1);
+			BlockPos base = state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			// attempt to activate the TileEntity associated with this door
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
 				StructureType type = teyd.getStructureType();
 				StructureBase struct = type.getNewStructure();
-				// make sure there is a valid tent before doing anything
+				ItemStack held = player.getHeldItem(hand);
+				// TODO this isn't working... 
+//				// check if it's the copy tool and creative-mode player
+//				if((player.capabilities.isCreativeMode || !TentConfig.general.COPY_CREATIVE_ONLY) 
+//						&& held != null && held.hasTagCompound() 
+//						&& held.getTagCompound().hasKey(ItemTent.TAG_COPY_TOOL)
+//						&& held.getTagCompound().getBoolean(ItemTent.TAG_COPY_TOOL)) {
+//					ItemStack stack = StructureType.getDropStack(teyd);
+//					if(stack.hasTagCompound()) {
+//						if(stack.getTagCompound().hasKey(ItemTent.OFFSET_X))
+//							System.out.println("tagX=" + stack.getTagCompound().getInteger(ItemTent.OFFSET_X));
+//						else System.out.println("no tagX");
+//						if(stack.getTagCompound().hasKey(ItemTent.OFFSET_Z))
+//							System.out.println("tagZ=" + stack.getTagCompound().getInteger(ItemTent.OFFSET_Z));
+//						else System.out.println("no tagZ");
+//					} else System.out.println("no tag compound");
+					// it's the copy tool, give the player a copy of this tent ItemStack
+//					String command = "/give @p " + Content.ITEM_TENT.getRegistryName() 
+//						+ " 1 " + teyd.getStructureType().id() + " {" 
+//						+ ItemTent.OFFSET_X + ":" + teyd.getOffsetX() + "," 
+//						+ ItemTent.OFFSET_Z + ":" + teyd.getOffsetZ() + "," 
+//						+ ItemTent.PREV_TENT_TYPE + ":" + teyd.getPrevStructureType().id() + "}";
+//					System.out.println("Running raw command: '" + command + "'");
+//					player.getServer().getCommandManager().executeCommand(player, command);
+//					int index = player.inventory.currentItem;
+//					player.setHeldItem(hand, stack);
+//					((EntityPlayerMP)player).connection.sendPacket(new SPacketHeldItemChange(index));
+//					return true;
+//				}
+				// make sure there is a valid tent before doing anything else
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, base, this.getOverworldSize(type));
-				if (dir == null)
+						: struct.getValidFacing(worldIn, base, getOverworldSize(type));
+				if (dir == null) {
 					return false;
+				}
 				// deconstruct the tent if the player uses a tentHammer on the door (and in
 				// overworld and with fully built tent)
-				if (player.getHeldItem(hand) != null && player.getHeldItem(hand).getItem() instanceof ItemMallet
+				if (held != null && held.getItem() instanceof ItemMallet
 						&& !TentDimension.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
 					if(TentConfig.general.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
@@ -102,7 +137,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
-						struct.remove(worldIn, base, dir, this.getOverworldSize(type));
+						struct.remove(worldIn, base, dir, getOverworldSize(type));
 						// damage the item
 						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player);
 
@@ -137,7 +172,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				StructureBase struct = type.getNewStructure();
 				// make sure there is a valid tent before doing anything
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, pos, this.getOverworldSize(type));
+						: struct.getValidFacing(worldIn, pos, getOverworldSize(type));
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
 				}
@@ -147,27 +182,23 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-		if (state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.LOWER)) {
+		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER) {
 			worldIn.setBlockState(pos.up(),
 					state.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER), 3);
 		}
 	}
 
-	/*
-	 * @Override public IBlockState onBlockPlaced(World worldIn, BlockPos pos,
-	 * EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
-	 * EntityLivingBase placer) { return this.getDefaultState(); }
-	 */
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		if (this.isCube) {
 			return FULL_BLOCK_AABB;
 		} else {
-			EnumFacing.Axis axis = (EnumFacing.Axis) state.getValue(AXIS);
-			if (axis == EnumFacing.Axis.X)
+			EnumFacing.Axis axis = state.getValue(AXIS);
+			if (axis == EnumFacing.Axis.X) {
 				return AABB_X;
-			else
+			} else {
 				return AABB_Z;
+			}
 		}
 	}
 
@@ -217,10 +248,10 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	@Override
 	public int getMetaFromState(IBlockState state) {
 		int meta = 0;
-		if (state.getValue(BlockDoor.HALF).equals(BlockDoor.EnumDoorHalf.UPPER)) {
+		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER) {
 			meta += 1;
 		}
-		if (state.getValue(AXIS).equals(EnumFacing.Axis.Z)) {
+		if (state.getValue(AXIS) == EnumFacing.Axis.Z) {
 			meta += 2;
 		}
 		return meta;

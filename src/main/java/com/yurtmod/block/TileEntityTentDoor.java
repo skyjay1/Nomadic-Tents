@@ -10,7 +10,6 @@ import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureType;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;

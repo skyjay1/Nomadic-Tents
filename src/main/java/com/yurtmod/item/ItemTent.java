@@ -33,11 +33,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemTent extends Item {
-	/** Tent ItemStack NBTs should have this value for x and z offsets **/
+	/** Tent ItemStack NBTs should have this value for x and z offsets before it's set **/
 	public static final int ERROR_TAG = Short.MIN_VALUE;
 	public static final String OFFSET_X = "TentOffsetX";
 	public static final String OFFSET_Z = "TentOffsetZ";
 	public static final String PREV_TENT_TYPE = "TentSpecsPrevious";
+	
+	public static final String TAG_COPY_TOOL = "TentCopyTool";
 
 	public ItemTent() {
 		this.setMaxStackSize(1);
