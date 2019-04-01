@@ -33,6 +33,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -59,7 +61,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 		this.setCreativeTab(null);
 	}
 
-	// default constructor assumes this block is NOT full
+	// default constructor assumes this block is NOT full cube
 	public BlockTentDoor() {
 		this(false);
 	}
@@ -83,52 +85,42 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				StructureType type = teyd.getStructureType();
 				StructureBase struct = type.getNewStructure();
 				ItemStack held = player.getHeldItem(hand);
-				// TODO this isn't working... 
-//				// check if it's the copy tool and creative-mode player
-//				if((player.capabilities.isCreativeMode || !TentConfig.general.COPY_CREATIVE_ONLY) 
-//						&& held != null && held.hasTagCompound() 
-//						&& held.getTagCompound().hasKey(ItemTent.TAG_COPY_TOOL)
-//						&& held.getTagCompound().getBoolean(ItemTent.TAG_COPY_TOOL)) {
-//					ItemStack stack = StructureType.getDropStack(teyd);
-//					if(stack.hasTagCompound()) {
-//						if(stack.getTagCompound().hasKey(ItemTent.OFFSET_X))
-//							System.out.println("tagX=" + stack.getTagCompound().getInteger(ItemTent.OFFSET_X));
-//						else System.out.println("no tagX");
-//						if(stack.getTagCompound().hasKey(ItemTent.OFFSET_Z))
-//							System.out.println("tagZ=" + stack.getTagCompound().getInteger(ItemTent.OFFSET_Z));
-//						else System.out.println("no tagZ");
-//					} else System.out.println("no tag compound");
-					// it's the copy tool, give the player a copy of this tent ItemStack
-//					String command = "/give @p " + Content.ITEM_TENT.getRegistryName() 
-//						+ " 1 " + teyd.getStructureType().id() + " {" 
-//						+ ItemTent.OFFSET_X + ":" + teyd.getOffsetX() + "," 
-//						+ ItemTent.OFFSET_Z + ":" + teyd.getOffsetZ() + "," 
-//						+ ItemTent.PREV_TENT_TYPE + ":" + teyd.getPrevStructureType().id() + "}";
-//					System.out.println("Running raw command: '" + command + "'");
-//					player.getServer().getCommandManager().executeCommand(player, command);
-//					int index = player.inventory.currentItem;
-//					player.setHeldItem(hand, stack);
-//					((EntityPlayerMP)player).connection.sendPacket(new SPacketHeldItemChange(index));
-//					return true;
-//				}
-				// make sure there is a valid tent before doing anything else
+				
+				// STEP 1:  check if it's the copy tool and creative-mode player
+				if((player.capabilities.isCreativeMode || !TentConfig.general.COPY_CREATIVE_ONLY) 
+						&& held != null && held.hasTagCompound() 
+						&& held.getTagCompound().hasKey(ItemTent.TAG_COPY_TOOL)
+						&& held.getTagCompound().getBoolean(ItemTent.TAG_COPY_TOOL)) {
+					final ItemStack copyStack = StructureType.getDropStack(teyd);
+					if (copyStack != null) {
+						// drop the tent item (without affecting the tent)
+						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, copyStack);
+						dropItem.setPickupDelay(0);
+						worldIn.spawnEntity(dropItem);
+						// prevent this interaction from triggering player teleport
+						player.timeUntilPortal = player.getPortalCooldown();
+					}
+					return true;
+				}
+				
+				// STEP 2:  make sure there is a valid tent before doing anything else
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, base, getOverworldSize(type));
 				if (dir == null) {
 					return false;
 				}
-				// deconstruct the tent if the player uses a tentHammer on the door (and in
-				// overworld and with fully built tent)
+				// STEP 3:  deconstruct the tent if the player uses a tentHammer on the door
+				// (and in overworld and with fully built tent)
 				if (held != null && held.getItem() instanceof ItemMallet
 						&& !TentDimension.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
 					if(TentConfig.general.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
-					// otherwise, prepare a tent item to drop
+					// STEP 4:  drop the tent item and damage the tool
 					ItemStack toDrop = StructureType.getDropStack(teyd);
 					if (toDrop != null) {
-						// drop the tent item and damage the tool
+						// drop the tent item
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
@@ -144,6 +136,8 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						return true;
 					}
 				} else {
+					// if the player did not use special items on this door,
+					// move on to TileEntity logic to teleport player
 					return ((TileEntityTentDoor) te).onPlayerActivate(player);
 				}
 			} else {
@@ -259,8 +253,6 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public boolean hasTileEntity(IBlockState state) {
-		// only store TileEntity information in the LOWER half of the door
-		//return state.getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER;
 		return true;
 	}
 

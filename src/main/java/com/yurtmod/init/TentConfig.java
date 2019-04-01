@@ -73,7 +73,7 @@ public final class TentConfig {
 		@Config.Comment({"When true, only Creative mode players can duplicate a tent item",
 			"(Note: this is done by clicking a tent door with any item that has NBT tag '" 
 			+ ItemTent.TAG_COPY_TOOL + "' set to true)"})
-		public boolean COPY_CREATIVE_ONLY = false;
+		public boolean COPY_CREATIVE_ONLY = true;
 	}
 	
 	public static class TENTS {

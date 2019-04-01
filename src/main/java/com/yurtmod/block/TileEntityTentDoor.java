@@ -186,9 +186,9 @@ public class TileEntityTentDoor extends TileEntity {
 	/** 
 	 * @param player the EntityPlayer to verify as owner
 	 * @return TRUE if one of the following is true: 
-	 * 1) there is no owner of this tent,
-	 * 2) the player's UUID matches, or
-	 * 3) the player is in creative-mode **/
+	 * <br>1) there is no owner of this tent,
+	 * <br>2) the player's UUID matches, or
+	 * <br>3) the player is in creative-mode **/
 	public boolean isOwner(EntityPlayer player) {
 		return !this.hasOwner() || EntityPlayer.getOfflineUUID(player.getName()).equals(this.owner) 
 				|| player.capabilities.isCreativeMode;
@@ -218,19 +218,19 @@ public class TileEntityTentDoor extends TileEntity {
 	 **/
 	private boolean teleport(Entity entity) {
 		entity.setPortal(this.getPos());
-		int dimFrom = entity.getEntityWorld().provider.getDimension();
-		int dimTo = TentDimension.isTentDimension(dimFrom) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
+		final int dimFrom = entity.getEntityWorld().provider.getDimension();
+		final int dimTo = TentDimension.isTentDimension(dimFrom) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
 
 		if (entity.timeUntilPortal > 0) {
-			entity.timeUntilPortal = 10;
+			entity.timeUntilPortal = entity.getPortalCooldown();
 		} else {
-			entity.timeUntilPortal = 10;
+			entity.timeUntilPortal = entity.getPortalCooldown();
 			// dimension to/from info for Teleporter object and math
-			MinecraftServer mcServer = entity.getServer();
-			WorldServer oldServer = mcServer.getWorld(dimFrom);
-			WorldServer newServer = mcServer.getWorld(dimTo);
+			final MinecraftServer mcServer = entity.getServer();
+			final WorldServer oldServer = mcServer.getWorld(dimFrom);
+			final WorldServer newServer = mcServer.getWorld(dimTo);
 			// make the teleporter
-			TentTeleporter tel = new TentTeleporter(dimFrom, newServer, this);
+			final TentTeleporter tel = new TentTeleporter(dimFrom, newServer, this);
 
 			if (entity instanceof EntityPlayerMP) {
 				EntityPlayerMP playerMP = (EntityPlayerMP) entity;
@@ -261,9 +261,9 @@ public class TileEntityTentDoor extends TileEntity {
 
 	/**
 	 * Assumes you are entering the overworld and does several things:
-	 * 1) Checks if you have a spawn point inside the tent
-	 * 2) Checks if your old spawn point has not already been mapped
-	 * 3) Maps your old spawn point for when you take down the tent
+	 * <br>1) Checks if you have a spawn point inside the tent
+	 * <br>2) Checks if your old spawn point has not already been mapped
+	 * <br>3) Maps your old spawn point for when you take down the tent
 	 */
 	private static boolean attemptSetSpawn(final World worldFrom, final EntityPlayerMP player, 
 			final BlockPos tentCenter, final double prevX, final double prevY, final double prevZ) {

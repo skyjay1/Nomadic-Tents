@@ -56,7 +56,7 @@ public enum StructureType implements IStringSerializable {
 	private final StructureType.Type type;
 	private final StructureType.Size size;
 	private final int id;
-	public final String registryName;
+	private final String registryName;
 
 	private StructureType(final int i, final StructureType.Type t, final StructureType.Size s) {
 		this.id = i;
