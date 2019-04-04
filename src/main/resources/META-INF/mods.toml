@@ -1,0 +1,31 @@
+# SEE AN EXAMPLE AT https://github.com/MinecraftForge/MinecraftForge/blob/1.13.x/mods.toml
+
+# The name of the mod loader type to load
+modLoader="javafml"
+# A version range to match for said mod loader
+loaderVersion="[2.0,)"
+# A URL to query for updates
+#updateJSONURL="http://myurl.me/"
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://github.com/skyjay1/Nomadic-Tents/issues"
+
+[[mods]]
+    modId="yurtmod"
+    version="10.0.0"
+    displayName="Nomadic Tents"
+    # multi line!
+    description='''
+		Adds portable houses to Minecraft!
+    '''
+    [[dependencies.yurtmod]]
+        modId="forge"
+        mandatory=true
+        versionRange="[25.0.107,)"
+        ordering="NONE"
+        side="BOTH"
+    [[dependencies.yurtmod]]
+        modId="minecraft"
+        mandatory=true
+        versionRange="[1.13.2]"
+        ordering="NONE"
+        side="BOTH"

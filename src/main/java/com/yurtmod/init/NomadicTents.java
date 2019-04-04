@@ -1,53 +1,99 @@
 package com.yurtmod.init;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEventHandler;
+import com.yurtmod.proxies.ClientProxy;
 import com.yurtmod.proxies.CommonProxy;
 
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(modid = NomadicTents.MODID, name = NomadicTents.NAME, version = NomadicTents.VERSION, acceptedMinecraftVersions = NomadicTents.MCVERSION)
+@Mod(NomadicTents.MODID)
+@Mod.EventBusSubscriber(modid = NomadicTents.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NomadicTents {
 	public static final String MODID = "yurtmod";
-	public static final String NAME = "Nomadic Tents";
-	public static final String VERSION = "9.1.1";
-	public static final String MCVERSION = "1.12.2";
 	
 	public static final String HWYLA = "waila";
 	
-	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID
-			+ ".proxies.CommonProxy")
-	public static CommonProxy proxy;
+	public static final CommonProxy PROXY = DistExecutor.runForDist(() -> () -> new ClientProxy(),
+			() -> () -> new CommonProxy());
+	
+	public static TentConfig TENT_CONFIG = null;
+	public static ForgeConfigSpec SERVER_CONFIG = null;
 
-	public static final CreativeTabs TAB = new CreativeTabs("yurtMain") {
+	public static final ItemGroup TAB = new ItemGroup("yurtMain") {
 		@Override
-		public ItemStack getTabIconItem() {
+		public ItemStack createIcon() {
 			return new ItemStack(Content.ITEM_TENT);
 		}
 	};
-
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		Content.mainRegistry();
-		TentDimension.preInit();
-	}
-
-	@EventHandler
-	public void init(FMLInitializationEvent event) {
-		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
+	
+	public NomadicTents() {
+		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
+		setupConfig();
 		TentDimension.init();
-		if (Loader.isModLoaded(HWYLA)) {
-			FMLInterModComms.sendMessage(HWYLA, "register",
-				"com.yurtmod.integration.WailaProvider.callbackRegister");
-		}
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
+		MinecraftForge.EVENT_BUS.register(this);
 	}
+	
+	private void setup(final FMLCommonSetupEvent event) {
+		
+	}
+	
+	@SubscribeEvent
+	public static void registerItems(final RegistryEvent.Register<Item> event) {
+		System.out.println("yurtmod: RegisterItems");
+		PROXY.registerItems(event);
+	}
+	
+	@SubscribeEvent
+	public static void registerModels(final ModelRegistryEvent event) {
+		System.out.println("flintmod: RegisterModels");
+		PROXY.registerRenders(event);
+	}
+	
+	@SubscribeEvent
+	public static void onLoadConfig(final ModConfig.Loading configEvent) {
+		
+	}
+	
+	@SubscribeEvent
+	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
+		PROXY.registerBiome(event);
+	}
+	
+	public static void setupConfig() {
+		final Pair<TentConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(TentConfig::new);
+		SERVER_CONFIG = specPair.getRight();
+		TENT_CONFIG = specPair.getLeft();
+	}
+
+//	public void preInit(FMLPreInitializationEvent event) {
+//		Content.mainRegistry();
+//		TentDimension.preInit();
+//	}
+
+//	public void init(FMLInitializationEvent event) {
+//		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
+//		TentDimension.init();
+//		if (Loader.isModLoaded(HWYLA)) {
+//			FMLInterModComms.sendMessage(HWYLA, "register",
+//				"com.yurtmod.integration.WailaProvider.callbackRegister");
+//	}
 }

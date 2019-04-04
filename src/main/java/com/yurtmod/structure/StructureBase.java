@@ -5,8 +5,6 @@ import java.util.function.Predicate;
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.block.Categories.ITentBlockBase;
-import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
@@ -128,14 +126,15 @@ public abstract class StructureBase {
 			// note: the inner door will always have same structures for previous / current
 			door.setPrevStructureType(structure);
 			door.setStructureType(structure);
-			door.setOffsetX(TileEntityTentDoor.getChunkOffsetX(corner.getX()));
-			door.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(corner.getZ()));
+			door.setOffsetX(TileEntityTentDoor.getChunkOffsetX(doorPos.getX()));
+			door.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(doorPos.getZ()));
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevFacing(prevFacing);
 			door.setPrevDimension(prevDimension);
 			return true;
-		} else
+		} else {
 			System.out.println("[StructureBase] Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
+		}
 		return false;
 	}
 

@@ -11,7 +11,6 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
-import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -37,6 +36,7 @@ public class ItemTent extends Item {
 	public static final int ERROR_TAG = Short.MIN_VALUE;
 	public static final String OFFSET_X = "TentOffsetX";
 	public static final String OFFSET_Z = "TentOffsetZ";
+	public static final String TENT_TYPE = "TentSpecs";
 	public static final String PREV_TENT_TYPE = "TentSpecsPrevious";
 	
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
@@ -50,12 +50,11 @@ public class ItemTent extends Item {
 	@Override
 	public void onCreated(ItemStack stack, World world, EntityPlayer player) {
 		if (!world.isRemote) {
-			NBTTagCompound currentTag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
-			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInteger(OFFSET_X) == ERROR_TAG) {
+			NBTTagCompound currentTag = stack.getOrCreateTag();
+			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInt(OFFSET_X) == ERROR_TAG) {
 				// if the nbt is missing or has been set incorrectly, fix that
-				currentTag.setInteger(OFFSET_X, getOffsetX(world, stack));
-				currentTag.setInteger(OFFSET_Z, getOffsetZ(stack));
-				stack.setTagCompound(currentTag);
+				currentTag.setInt(OFFSET_X, getOffsetX(world, stack));
+				currentTag.setInt(OFFSET_Z, getOffsetZ(stack));
 			}
 		}
 	}
@@ -67,12 +66,11 @@ public class ItemTent extends Item {
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
 		if (!world.isRemote) {
-			NBTTagCompound currentTag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
-			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInteger(OFFSET_X) == ERROR_TAG) {
+			NBTTagCompound currentTag = stack.getOrCreateTag();
+			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInt(OFFSET_X) == ERROR_TAG) {
 				// if the nbt is missing or has been set incorrectly, fix that
-				currentTag.setInteger(OFFSET_X, getOffsetX(world, stack));
-				currentTag.setInteger(OFFSET_Z, getOffsetZ(stack));
-				stack.setTagCompound(currentTag);
+				currentTag.setInt(OFFSET_X, getOffsetX(world, stack));
+				currentTag.setInt(OFFSET_Z, getOffsetZ(stack));
 			}
 		}
 	}
@@ -86,7 +84,7 @@ public class ItemTent extends Item {
 			ItemStack stack = player.getHeldItem(hand);
 			EnumFacing hitSide = side;
 
-			if (worldIn.getBlockState(pos) == null || stack == null || stack.isEmpty() || !stack.hasTagCompound()) {
+			if (worldIn.getBlockState(pos) == null || stack == null || stack.isEmpty() || !stack.hasTag()) {
 				return EnumActionResult.FAIL;
 			} else {
 				// offset the BlockPos to build on if it's not replaceable
@@ -99,7 +97,7 @@ public class ItemTent extends Item {
 				} else {
 					// start checking to build structure
 					final EnumFacing playerFacing = player.getHorizontalFacing();
-					final StructureType type = StructureType.get(stack.getItemDamage());
+					final StructureType type = StructureType.get(stack);
 					final StructureType.Size size = BlockTentDoor.getOverworldSize(type);
 					final StructureBase struct = type.getNewStructure();
 					// make sure the tent can be built here

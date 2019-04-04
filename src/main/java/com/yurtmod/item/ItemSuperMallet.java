@@ -1,6 +1,5 @@
 package com.yurtmod.item;
 
-import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.init.TentConfig;
 
 import net.minecraft.entity.player.EntityPlayer;

@@ -2,18 +2,17 @@ package com.yurtmod.structure;
 
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
-import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITentBlockBase;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
-import com.yurtmod.init.TentConfig;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 
-import mcp.mobius.waila.api.impl.ConfigHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -56,7 +55,7 @@ public enum StructureType implements IStringSerializable {
 	private final StructureType.Type type;
 	private final StructureType.Size size;
 	private final int id;
-	public final String registryName;
+	private final String registryName;
 
 	private StructureType(final int i, final StructureType.Type t, final StructureType.Size s) {
 		this.id = i;
@@ -106,26 +105,25 @@ public enum StructureType implements IStringSerializable {
 
 	/** @return an NBT-tagged ItemStack based on the passed values **/
 	public static ItemStack getDropStack(int tagChunkX, int tagChunkZ, int prevStructure, int tentType) {
-		ItemStack stack = new ItemStack(Content.ITEM_TENT, 1, tentType);
-		if (stack.getTagCompound() == null) {
-			stack.setTagCompound(new NBTTagCompound());
-		}
-		stack.getTagCompound().setInteger(ItemTent.OFFSET_X, tagChunkX);
-		stack.getTagCompound().setInteger(ItemTent.OFFSET_Z, tagChunkZ);
-		stack.getTagCompound().setInteger(ItemTent.PREV_TENT_TYPE, prevStructure);
+		ItemStack stack = new ItemStack(Content.ITEM_TENT, 1);
+		NBTTagCompound nbt = stack.getOrCreateTag();
+		nbt.setInt(ItemTent.OFFSET_X, tagChunkX);
+		nbt.setInt(ItemTent.OFFSET_Z, tagChunkZ);
+		nbt.setInt(ItemTent.TENT_TYPE, tentType);
+		nbt.setInt(ItemTent.PREV_TENT_TYPE, prevStructure);
 		return stack;
 	}
 
 	public static void applyToTileEntity(EntityPlayer player, ItemStack stack, TileEntityTentDoor te) {
-		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.OFFSET_X)) {
+		if (stack.getTag() == null || !stack.getTag().hasKey(ItemTent.OFFSET_X)) {
 			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}
 
-		int offsetx = stack.getTagCompound().getInteger(ItemTent.OFFSET_X);
-		int offsetz = stack.getTagCompound().getInteger(ItemTent.OFFSET_Z);
-		int prevStructure = stack.getTagCompound().getInteger(ItemTent.PREV_TENT_TYPE);
+		int offsetx = stack.getTag().getInteger(ItemTent.OFFSET_X);
+		int offsetz = stack.getTag().getInteger(ItemTent.OFFSET_Z);
+		int prevStructure = stack.getTag().getInteger(ItemTent.PREV_TENT_TYPE);
 		int curStructure = stack.getItemDamage();
 		te.setPrevStructureType(get(prevStructure));
 		te.setStructureType(get(curStructure));
@@ -133,7 +131,7 @@ public enum StructureType implements IStringSerializable {
 		te.setOffsetZ(offsetz);
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
-		if(TentConfig.general.OWNER_ENTRANCE || TentConfig.general.OWNER_PICKUP) {
+		if(NomadicTents.TENT_CONFIG.general.OWNER_ENTRANCE || NomadicTents.TENT_CONFIG.general.OWNER_PICKUP) {
 			te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
 		}
 	}
@@ -142,7 +140,7 @@ public enum StructureType implements IStringSerializable {
 	public IBlockState getDoorBlock() {
 		boolean xl = this.getSize().isXL();
 		Block block = getDoorBlockRaw(xl);
-		PropertyEnum sizeEnum = xl ? BlockTentDoorHGM.SIZE :  BlockTentDoorSML.SIZE;
+		PropertyEnum sizeEnum = xl ? BlockTentDoorHGM.SIZE_HGM :  BlockTentDoorSML.SIZE_SML;
 		return block.getDefaultState().withProperty(sizeEnum, this.getSize());
 	}
 	
@@ -203,11 +201,15 @@ public enum StructureType implements IStringSerializable {
 	}
 
 	public static String getName(ItemStack stack) {
-		return getName(stack.getItemDamage());
+		return getName(stack.getTag().getInt(ItemTent.TENT_TYPE));
 	}
 
 	public static String getName(int metadata) {
 		return get(metadata).registryName;
+	}
+	
+	public static StructureType get(ItemStack stack) {
+		return get(stack.getTag().getInt(ItemTent.TENT_TYPE));
 	}
 
 	public static StructureType get(int meta) {
@@ -234,10 +236,10 @@ public enum StructureType implements IStringSerializable {
 		/** @return whether this tent type is enabled in the config **/
 		public boolean isEnabled() {
 			switch (this) {
-			case BEDOUIN:	return TentConfig.tents.ALLOW_BEDOUIN;
-			case TEPEE:		return TentConfig.tents.ALLOW_TEPEE;
-			case YURT:		return TentConfig.tents.ALLOW_YURT;
-			case INDLU:		return TentConfig.tents.ALLOW_INDLU;
+			case BEDOUIN:	return NomadicTents.TENT_CONFIG.ALLOW_BEDOUIN.get();
+			case TEPEE:		return NomadicTents.TENT_CONFIG.ALLOW_TEPEE.get();
+			case YURT:		return NomadicTents.TENT_CONFIG.ALLOW_YURT.get();
+			case INDLU:		return NomadicTents.TENT_CONFIG.ALLOW_INDLU.get();
 			}
 			return false;
 		}
@@ -326,10 +328,10 @@ public enum StructureType implements IStringSerializable {
 
 		public boolean isEnabledFor(StructureType.Type type) {
 			switch(type) {
-			case BEDOUIN: 	return this.ordinal() < TentConfig.tents.TIERS_BEDOUIN;
-			case INDLU:		return this.ordinal() < TentConfig.tents.TIERS_INDLU;
-			case TEPEE:		return this.ordinal() < TentConfig.tents.TIERS_TEPEE;
-			case YURT:		return this.ordinal() < TentConfig.tents.TIERS_YURT;
+			case BEDOUIN: 	return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_BEDOUIN.get();
+			case INDLU:		return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_INDLU.get();
+			case TEPEE:		return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_TEPEE.get();
+			case YURT:		return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_YURT.get();
 			}
 			return false;
 		}

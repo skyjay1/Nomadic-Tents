@@ -3,13 +3,13 @@ package com.yurtmod.item;
 import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 public class IBTepeeWall extends ItemBlock {
 	public IBTepeeWall(Block block) {
-		super(block);
-		this.setCreativeTab(NomadicTents.TAB);
+		super(block, new Item.Properties().group(NomadicTents.TAB));
 		this.setHasSubtypes(true);
 	}
 

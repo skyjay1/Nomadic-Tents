@@ -4,8 +4,8 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;

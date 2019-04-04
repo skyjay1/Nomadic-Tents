@@ -6,20 +6,19 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelBakery;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class ClientProxy extends CommonProxy {
 
-	@SubscribeEvent
-	public static void onRenderEvent(ModelRegistryEvent event) {
+	@Override
+	public void registerRenders(ModelRegistryEvent event) {
 		// register variant renders
 		int len = StructureType.values().length;
 		ResourceLocation[] RLTentItem = new ResourceLocation[len];
@@ -62,8 +61,8 @@ public class ClientProxy extends CommonProxy {
 		register(Content.INDLU_WALL_OUTER);
 		register(Content.INDLU_WALL_INNER);
 		//// door blocks
-		register(Content.YURT_DOOR_SML);
-		register(Content.YURT_DOOR_HGM);
+		register(Content.YURT_DOOR_SM);
+		register(Content.YURT_DOOR_MED);
 		register(Content.TEPEE_DOOR_SML);
 		register(Content.TEPEE_DOOR_HGM);
 		register(Content.BEDOUIN_DOOR_SML);

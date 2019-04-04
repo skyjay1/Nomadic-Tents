@@ -9,18 +9,18 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 
-public class RecipeTent extends ShapedRecipes implements IRecipe {
+public class RecipeTent extends ShapedRecipe implements IRecipe {
 
-	public RecipeTent(final ItemStack output, final NonNullList<Ingredient> ingredients) {
-		super("tentcrafting", 3, 3, ingredients, output);
-		this.setRegistryName(NomadicTents.MODID, "tent_" + output.getMetadata());
+	public RecipeTent(final String name, final ItemStack output, final NonNullList<Ingredient> ingredients) {
+		super(new ResourceLocation(NomadicTents.MODID, name), "tentcrafting", 3, 3, ingredients, output);
 	}
 
-	public static RecipeTent makeRecipe(final StructureType output, final ItemStack[] input) {
+	public static RecipeTent makeRecipe(final String name, final StructureType output, final ItemStack[] input) {
 		NonNullList<Ingredient> ingredients = NonNullList.create();
 		for (ItemStack i : input) {
 			if (i != null && !i.isEmpty()) {
@@ -29,8 +29,10 @@ public class RecipeTent extends ShapedRecipes implements IRecipe {
 				ingredients.add(Ingredient.EMPTY);
 			}
 		}
-
-		return new RecipeTent(new ItemStack(Content.ITEM_TENT, 1, output.id()), ingredients);
+		ItemStack outputStack = new ItemStack(Content.ITEM_TENT, 1);
+		final NBTTagCompound nbt = outputStack.getOrCreateTag();
+		nbt.setInt(ItemTent.TENT_TYPE, output.id());
+		return new RecipeTent(name, outputStack, ingredients);
 	}
 
 	/**
@@ -48,25 +50,27 @@ public class RecipeTent extends ShapedRecipes implements IRecipe {
 			}
 		}
 		ItemStack result = super.getCraftingResult(inv);
-		NBTTagCompound resultTag = result.hasTagCompound() ? result.getTagCompound() : new NBTTagCompound();
+		NBTTagCompound resultTag = result.getOrCreateTag();
 
 		// attempt to transfer over NBT information
-		if (inputTent != null && inputTent.hasTagCompound()) {
-			NBTTagCompound nbt = inputTent.getTagCompound();
-			final int inputX = nbt.getInteger(ItemTent.OFFSET_X);
-			final int inputZ = nbt.getInteger(ItemTent.OFFSET_Z);
-			final int prevTent = nbt.getInteger(ItemTent.PREV_TENT_TYPE);
+		if (inputTent != null && inputTent.hasTag() 
+				&& inputTent.getTag().getInt(ItemTent.OFFSET_X) != ItemTent.ERROR_TAG) {
+			NBTTagCompound nbt = inputTent.getTag();
+			final int inputX = nbt.getInt(ItemTent.OFFSET_X);
+			final int inputZ = nbt.getInt(ItemTent.OFFSET_Z);
+			final int prevTent = nbt.getInt(ItemTent.PREV_TENT_TYPE);
 			// transfer those values to the new tent
-			resultTag.setInteger(ItemTent.OFFSET_X, inputX);
-			resultTag.setInteger(ItemTent.OFFSET_Z, inputZ);
-			resultTag.setInteger(ItemTent.PREV_TENT_TYPE, prevTent);
+			resultTag.setInt(ItemTent.OFFSET_X, inputX);
+			resultTag.setInt(ItemTent.OFFSET_Z, inputZ);
+			resultTag.setInt(ItemTent.PREV_TENT_TYPE, prevTent);
 		} else {
 			// if there was no tent in the prior recipe (ie, it's a small tent)
-			resultTag.setInteger(ItemTent.OFFSET_X, ItemTent.ERROR_TAG);
-			resultTag.setInteger(ItemTent.OFFSET_Z, ItemTent.ERROR_TAG);
-			resultTag.setInteger(ItemTent.PREV_TENT_TYPE, result.getMetadata());
+			// TODO error checking
+			final int tentType = inputTent.getTag().getInt(ItemTent.TENT_TYPE);
+			resultTag.setInt(ItemTent.OFFSET_X, ItemTent.ERROR_TAG);
+			resultTag.setInt(ItemTent.OFFSET_Z, ItemTent.ERROR_TAG);
+			resultTag.setInt(ItemTent.PREV_TENT_TYPE, tentType);
 		}
-		result.setTagCompound(resultTag);
 		return result;
 	}
 

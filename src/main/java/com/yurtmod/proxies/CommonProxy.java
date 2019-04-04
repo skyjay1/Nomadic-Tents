@@ -4,7 +4,6 @@ import com.yurtmod.block.BlockBarrier;
 import com.yurtmod.block.BlockBedouinRoof;
 import com.yurtmod.block.BlockBedouinWall;
 import com.yurtmod.block.BlockIndluWall;
-import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.BlockTentFrame;
@@ -30,26 +29,23 @@ import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod.EventBusSubscriber
 public class CommonProxy {
+	
+	public void registerRenders(ModelRegistryEvent event) { }
 
-	@SubscribeEvent
-	public static void registerRecipes(final RegistryEvent.Register<IRecipe> event) {
+	public void registerRecipes(final RegistryEvent.Register<IRecipe> event) {
 		RecipeManager.mainRegistry(event);
 	}
 
-	@SubscribeEvent
-	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
+	public void registerBiome(final RegistryEvent.Register<Biome> event) {
 		event.getRegistry()
 				.register(new BiomeTent().setRegistryName(NomadicTents.MODID, TentDimension.BIOME_TENT_NAME));
 	}
 
-	@SubscribeEvent
-	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
+	public void registerBlocks(final RegistryEvent.Register<Block> event) {
 		event.getRegistry().registerAll(
 
 				// helpful blocks
@@ -101,8 +97,7 @@ public class CommonProxy {
 						.setUnlocalizedName("frame_indlu_wall"));
 	}
 
-	@SubscribeEvent
-	public static void registerItems(final RegistryEvent.Register<Item> event) {
+	public void registerItems(final RegistryEvent.Register<Item> event) {
 		// Item
 		event.getRegistry().registerAll(
 				// items
