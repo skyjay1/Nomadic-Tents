@@ -14,11 +14,11 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.state.EnumProperty;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.TextFormatting;
 
@@ -95,7 +95,9 @@ public enum StructureType implements IStringSerializable {
 
 	/** @return an un-tagged ItemStack with the correct metadata **/
 	public ItemStack getDropStack() {
-		return new ItemStack(Content.ITEM_TENT, 1, this.id());
+		ItemStack stack = new ItemStack(Content.ITEM_TENT);
+		stack.getOrCreateTag().setInt(ItemTent.TENT_TYPE, this.id());
+		return stack;
 	}
 	
 	/** @return an NBT-tagged ItemStack based on the passed TileEntityTentDoor **/
@@ -121,18 +123,18 @@ public enum StructureType implements IStringSerializable {
 			return;
 		}
 
-		int offsetx = stack.getTag().getInteger(ItemTent.OFFSET_X);
-		int offsetz = stack.getTag().getInteger(ItemTent.OFFSET_Z);
-		int prevStructure = stack.getTag().getInteger(ItemTent.PREV_TENT_TYPE);
-		int curStructure = stack.getItemDamage();
+		int offsetx = stack.getTag().getInt(ItemTent.OFFSET_X);
+		int offsetz = stack.getTag().getInt(ItemTent.OFFSET_Z);
+		int prevStructure = stack.getTag().getInt(ItemTent.PREV_TENT_TYPE);
+		int curStructure = stack.getTag().getInt(ItemTent.TENT_TYPE);
 		te.setPrevStructureType(get(prevStructure));
 		te.setStructureType(get(curStructure));
 		te.setOffsetX(offsetx);
 		te.setOffsetZ(offsetz);
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
-		if(NomadicTents.TENT_CONFIG.general.OWNER_ENTRANCE || NomadicTents.TENT_CONFIG.general.OWNER_PICKUP) {
-			te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
+		if(NomadicTents.TENT_CONFIG.OWNER_ENTRANCE.get() || NomadicTents.TENT_CONFIG.OWNER_PICKUP.get()) {
+			te.setOwner(EntityPlayer.getOfflineUUID(player.getName().getUnformattedComponentText()));
 		}
 	}
 	
@@ -140,8 +142,8 @@ public enum StructureType implements IStringSerializable {
 	public IBlockState getDoorBlock() {
 		boolean xl = this.getSize().isXL();
 		Block block = getDoorBlockRaw(xl);
-		PropertyEnum sizeEnum = xl ? BlockTentDoorHGM.SIZE_HGM :  BlockTentDoorSML.SIZE_SML;
-		return block.getDefaultState().withProperty(sizeEnum, this.getSize());
+		EnumProperty<StructureType.Size> sizeEnum = xl ? BlockTentDoorHGM.SIZE_HGM :  BlockTentDoorSML.SIZE_SML;
+		return block.getDefaultState().with(sizeEnum, this.getSize());
 	}
 	
 	private Block getDoorBlockRaw(boolean isXL) {

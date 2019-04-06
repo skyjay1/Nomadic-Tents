@@ -1,64 +1,56 @@
 package com.yurtmod.block;
 
-import java.util.Random;
-
-import com.yurtmod.init.NomadicTents;
+import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 
 public class BlockUnbreakable extends Block {
 	public static final AxisAlignedBB SINGULAR_AABB = new AxisAlignedBB(0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D);
 
 	public static final int LIGHT_OPACITY = 7;
+	
+	public BlockUnbreakable(Block.Properties prop) {
+		super(prop.hardnessAndResistance(-1.0F, 6000001.0F));
+	}
 
-	public BlockUnbreakable(Material material) {
-		this(material, material.getMaterialMapColor());		
-	}
-	
-	public BlockUnbreakable(Material material, MapColor color) {
-		super(material, color);
-		this.setBlockUnbreakable();
-		this.disableStats();
-		this.setResistance(6000001.0F);
-		this.setCreativeTab(NomadicTents.TAB);
-		this.setSoundType(SoundType.WOOD);
-		this.setHarvestLevel("pickaxe", 10);
-	}
-	
-	/**
-	 * Returns the quantity of items to drop on block destruction.
-	 */
 	@Override
-	public int quantityDropped(Random random) {
-		return 0;
+	public int getHarvestLevel(IBlockState state) {
+		return -1;
+	}
+
+	@Nullable
+	@Override
+	public ToolType getHarvestTool(IBlockState state) {
+		return null;
 	}
 
 	/**
 	 * Get the Item that this Block should drop when harvested.
 	 */
 	@Override
-	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+	public IItemProvider getItemDropped(IBlockState state, World worldIn, BlockPos pos, int fortune) {
 		return Items.AIR;
 	}
-	
+
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
+	public boolean canDropFromExplosion(Explosion explosionIn) {
 		return false;
 	}
-	
+
 	@Override
-	public EnumPushReaction getMobilityFlag(IBlockState state) {
+	public EnumPushReaction getPushReaction(IBlockState state) {
 		return EnumPushReaction.BLOCK;
 	}
 }

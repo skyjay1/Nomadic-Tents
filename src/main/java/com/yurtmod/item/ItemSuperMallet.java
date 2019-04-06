@@ -1,25 +1,23 @@
 package com.yurtmod.item;
 
-import com.yurtmod.init.TentConfig;
+import com.yurtmod.init.NomadicTents;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.IItemTier;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class ItemSuperMallet extends ItemMallet {
-	public ItemSuperMallet(ToolMaterial material) {
-		super(material);
+	
+	public ItemSuperMallet(final String name, final IItemTier material) {
+		super(name, material);
 	}
 
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand,
-			EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (TentConfig.general.SUPER_MALLET_CREATIVE_ONLY && !playerIn.isCreative()) {
+	public EnumActionResult onItemUse(final ItemUseContext context) {
+		if (NomadicTents.TENT_CONFIG.SUPER_MALLET_CREATIVE_ONLY.get() 
+				&& (context.getPlayer() == null || !context.getPlayer().isCreative())) {
 			return EnumActionResult.PASS;
 		}
-		return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
+		return super.onItemUse(context);
 	}
 }

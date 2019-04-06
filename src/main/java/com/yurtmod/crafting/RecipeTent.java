@@ -5,7 +5,7 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -34,12 +34,16 @@ public class RecipeTent extends ShapedRecipe implements IRecipe {
 		nbt.setInt(ItemTent.TENT_TYPE, output.id());
 		return new RecipeTent(name, outputStack, ingredients);
 	}
+	
+	public static RecipeTent makeRecipe(final StructureType output, final ItemStack[] input) {
+		return makeRecipe(output.getName(), output, input);
+	}
 
 	/**
 	 * Returns an Item that is the result of this recipe
 	 */
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
+	public ItemStack getCraftingResult(IInventory inv) {
 		// find the tent in the input
 		ItemStack inputTent = ItemStack.EMPTY;
 		for (int i = 0, l = inv.getSizeInventory(); i < l && inputTent.isEmpty(); i++) {
