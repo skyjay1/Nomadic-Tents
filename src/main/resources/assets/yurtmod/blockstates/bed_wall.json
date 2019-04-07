@@ -1,8 +1,8 @@
 {
     "variants": {
-        "above_similar=true,beside_similar=false": { "model": "yurtmod:bed_wall_upper_1"},
-		"above_similar=false,beside_similar=false": { "model": "yurtmod:bed_wall_lower_1"},
-		"above_similar=true,beside_similar=true": { "model": "yurtmod:bed_wall_upper_2"},
-		"above_similar=false,beside_similar=true": { "model": "yurtmod:bed_wall_lower_2"}
+        "above_similar=true,beside_similar=false": { "model": "yurtmod:block/bed_wall_upper_1"},
+		"above_similar=false,beside_similar=false": { "model": "yurtmod:block/bed_wall_lower_1"},
+		"above_similar=true,beside_similar=true": { "model": "yurtmod:block/bed_wall_upper_2"},
+		"above_similar=false,beside_similar=true": { "model": "yurtmod:block/bed_wall_lower_2"}
     }
 }

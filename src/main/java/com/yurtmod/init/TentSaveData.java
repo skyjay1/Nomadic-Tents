@@ -50,17 +50,6 @@ public class TentSaveData extends WorldSavedData {
 		return result;
 	}
 
-//	public static TentSaveData forWorld(World world) {
-		// TODO universal (not per-world) storage
-//		WorldSavedDataStorage storage = world.getMapStorage();
-//		TentSaveData result = (TentSaveData) storage.getOrLoadData(TentSaveData.class, NomadicTents.MODID);
-//		if (result == null) {
-//			result = new TentSaveData(NomadicTents.MODID);
-//			storage.setData(NomadicTents.MODID, result);
-//		}
-//		return result;
-//	}
-
 	@Override
 	public void read(NBTTagCompound nbt) {
 		craftcountYurt = nbt.getInt(KEY_YURT);

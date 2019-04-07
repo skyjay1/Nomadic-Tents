@@ -2,7 +2,7 @@ package com.yurtmod.event;
 
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
@@ -42,9 +42,9 @@ public class TentEventHandler {
 			final WorldServer tentDim = server.getWorld(DimensionType.getById(DimensionManagerTent.DIMENSION_ID));
 			// only run this code for players waking up in a Tent
 			if(DimensionManagerTent.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
-				boolean shouldChangeTime = NomadicTents.TENT_CONFIG.ALLOW_SLEEP_TENT_DIM.get();
+				boolean shouldChangeTime = TentConfiguration.CONFIG.ALLOW_SLEEP_TENT_DIM.get();
 				// if config requires, check both overworld and tent players
-				if(NomadicTents.TENT_CONFIG.IS_SLEEPING_STRICT.get()) {
+				if(TentConfiguration.CONFIG.IS_SLEEPING_STRICT.get()) {
 					// find out if ALL players in BOTH dimensions are sleeping
 					for(EntityPlayer p : overworld.playerEntities) {
 						// (except for the one who just woke up, of course)
@@ -78,7 +78,7 @@ public class TentEventHandler {
 	/** Makes Tent items fireproof if enabled **/
 	@SubscribeEvent
 	public void onSpawnEntity(EntityJoinWorldEvent event) {
-		if (NomadicTents.TENT_CONFIG.IS_TENT_FIREPROOF.get() && event.getEntity() instanceof EntityItem) {
+		if (TentConfiguration.CONFIG.IS_TENT_FIREPROOF.get() && event.getEntity() instanceof EntityItem) {
 			ItemStack stack = ((EntityItem) event.getEntity()).getItem();
 			if (stack != null && stack.getItem() instanceof ItemTent) {
 				event.getEntity().setInvulnerable(true);
@@ -117,7 +117,7 @@ public class TentEventHandler {
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
 	private static boolean canCancelTeleport(EntityPlayer player) {
-		return NomadicTents.TENT_CONFIG.RESTRICT_TELEPORT_TENT_DIM.get() 
+		return TentConfiguration.CONFIG.RESTRICT_TELEPORT_TENT_DIM.get() 
 				&& DimensionManagerTent.isTentDimension(player.getEntityWorld()) 
 				&& !player.isCreative();
 	}
@@ -137,7 +137,7 @@ public class TentEventHandler {
 			final WorldServer tentServer = mcServer.getWorld(TENTDIM);
 			final WorldServer overworld = mcServer.getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
-			if (NomadicTents.TENT_CONFIG.ALLOW_RESPAWN_INTERCEPT.get() && CUR_DIM == TENTDIM) {
+			if (TentConfiguration.CONFIG.ALLOW_RESPAWN_INTERCEPT.get() && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
 				BlockPos respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(tentServer, bedPos, false) : null;
 				if (null == respawnPos) {

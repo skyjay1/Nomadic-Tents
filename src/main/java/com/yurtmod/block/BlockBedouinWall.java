@@ -21,6 +21,7 @@ public class BlockBedouinWall extends BlockLayered implements IBedouinBlock {
 
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
+		super.fillStateContainer(builder);
 		builder.add(BESIDE_SIMILAR);
 	}
 

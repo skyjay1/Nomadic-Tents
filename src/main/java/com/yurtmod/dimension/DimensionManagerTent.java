@@ -1,35 +1,22 @@
 package com.yurtmod.dimension;
 
-import java.util.function.Function;
-
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfiguration;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.world.RegisterDimensionsEvent;
-import net.minecraftforge.registries.ObjectHolder;
 
 public class DimensionManagerTent {
 	
-	public static int DIMENSION_ID; // TODO
-	public static final String DIM_NAME = "TENT";
-	public static final String BIOME_TENT_NAME = "Tent";
-	public static ModDimension MOD_DIMENSION = new ModDimension() {
-		@Override
-		public Function<DimensionType, ? extends net.minecraft.world.dimension.Dimension> getFactory() {
-			return TentDimension::new;
-		}
-	}.setRegistryName(NomadicTents.MODID, DIM_NAME);
-
-	@ObjectHolder(NomadicTents.MODID + ":" + BIOME_TENT_NAME)
-	public static Biome biomeTent;
+	public static int DIMENSION_ID = -2; // TODO
+	public static final String DIM_NAME = "tent_dimension";
+	public static final String BIOME_TENT_NAME = "tent";
 	
 	/** Structures are spaced this far apart for consistency and compatibility **/
 	public static final int TENT_SPACING = 32;
@@ -39,8 +26,8 @@ public class DimensionManagerTent {
 	public static final EnumFacing STRUCTURE_DIR = EnumFacing.EAST;
 
 	public static void setup(RegisterDimensionsEvent event) {
-		DIMENSION_ID = NomadicTents.TENT_CONFIG.TENT_DIM_ID.get();
-		DimensionManager.registerDimension(MOD_DIMENSION.getRegistryName(), MOD_DIMENSION, null);
+		DIMENSION_ID = TentConfiguration.CONFIG.TENT_DIM_ID.get();
+		DimensionManager.registerDimension(Content.TENT_DIMENSION.getRegistryName(), Content.TENT_DIMENSION, null);
 	}
 
 	/** Just for convenience **/
@@ -49,6 +36,7 @@ public class DimensionManagerTent {
 	}
 
 	/** Convenience method to detect tent dimension **/
+	// TODO not working!
 	public static boolean isTentDimension(final DimensionType type) {
 		return type.getId() == DIMENSION_ID;
 	}

@@ -1,11 +1,33 @@
 package com.yurtmod.init;
 
+import java.util.function.Function;
+
+import com.yurtmod.dimension.DimensionManagerTent;
+import com.yurtmod.dimension.TentDimension;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.registries.ObjectHolder;
 
 public final class Content {
+	
+	// dimension
+	@ObjectHolder(NomadicTents.MODID + ":" + DimensionManagerTent.DIM_NAME)
+	public static ModDimension TENT_DIMENSION;
+	
+	// biome
+	@ObjectHolder(NomadicTents.MODID + ":" + DimensionManagerTent.BIOME_TENT_NAME)
+	public static Biome BIOME_TENT;
+	
+	// tile entity
+	@ObjectHolder(NomadicTents.MODID + ":tileentitytentdoor")
+	public static TileEntityType<?> TE_TENT_DOOR;
+	
+	/////////////////////////////////////////////////////////
 	
 	// utility blocks
 	@ObjectHolder(NomadicTents.MODID + ":tentmod_barrier")
@@ -96,10 +118,7 @@ public final class Content {
 	@ObjectHolder(NomadicTents.MODID + ":frame_indlu_wall")
 	public static Block FRAME_INDLU_WALL;
 
-	// Items and ItemBlocks
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall")
-	public static ItemBlock IB_TEPEE_WALL;
-
+	// Items
 	@ObjectHolder(NomadicTents.MODID + ":tent")
 	public static Item ITEM_TENT;
 	@ObjectHolder(NomadicTents.MODID + ":mallet")

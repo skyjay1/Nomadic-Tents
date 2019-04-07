@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "yurtmod:bed_roof" }
+        "": { "model": "yurtmod:block/bed_roof" }
     }
 }

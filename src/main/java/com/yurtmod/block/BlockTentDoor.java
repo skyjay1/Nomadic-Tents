@@ -7,7 +7,8 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.DimensionManagerTent;
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
@@ -47,9 +48,8 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
 			
 	public static final int DECONSTRUCT_DAMAGE = 5;
-	private static final double aabbDis = 0.375D;
-	public static final VoxelShape AABB_X = Block.makeCuboidShape(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
-	public static final VoxelShape AABB_Z = Block.makeCuboidShape(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
+	public static final VoxelShape AABB_X = Block.makeCuboidShape(6, 0, 0, 10, 16, 16);
+	public static final VoxelShape AABB_Z = Block.makeCuboidShape(0, 0, 6, 16, 16, 10);
 	public final boolean isCube;
 
 	public BlockTentDoor(boolean isFull) {
@@ -86,7 +86,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				ItemStack held = player.getHeldItem(hand);
 
 				// STEP 1: check if it's the copy tool and creative-mode player
-				if ((player.isCreative() || !NomadicTents.TENT_CONFIG.COPY_CREATIVE_ONLY.get()) && held != null
+				if ((player.isCreative() || !TentConfiguration.CONFIG.COPY_CREATIVE_ONLY.get()) && held != null
 						&& held.hasTag() && held.getTag().hasKey(ItemTent.TAG_COPY_TOOL)
 						&& held.getTag().getBoolean(ItemTent.TAG_COPY_TOOL)) {
 					final ItemStack copyStack = StructureType.getDropStack(teyd);
@@ -111,7 +111,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				// (and in overworld and with fully built tent)
 				if (held != null && held.getItem() instanceof ItemMallet && !DimensionManagerTent.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
-					if (NomadicTents.TENT_CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
+					if (TentConfiguration.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
 					// STEP 4: drop the tent item and damage the tool
@@ -122,7 +122,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
-						if (NomadicTents.TENT_CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
+						if (TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
@@ -265,11 +265,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-		TileEntityTentDoor ret = new TileEntityTentDoor();
-		if(worldIn instanceof World) {
-			ret.setWorld((World)worldIn);
-		}
-		return ret;
+		return new TileEntityTentDoor();
 	}
 	
 	public static StructureType.Size getOverworldSize(StructureType type) {

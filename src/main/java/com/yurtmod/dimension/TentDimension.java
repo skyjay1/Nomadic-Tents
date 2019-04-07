@@ -1,6 +1,6 @@
 package com.yurtmod.dimension;
 
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
@@ -29,17 +29,7 @@ public class TentDimension extends Dimension {
 		this.setAllowedSpawnTypes(false, false);
 		this.hasSkyLight = true;
 	}
-//
-//	@Override
-//	public BiomeProvider getBiomeProvider() {
-//		return this.biomeProvider;
-//	}
-//
-//	@Override
-//	public Biome getBiomeForCoords(BlockPos pos) {
-//		return DimensionManagerTent.biomeTent;
-//	}
-	
+
 	@Override
 	public IChunkGenerator<? extends IChunkGenSettings> createChunkGenerator() {
 		return new TentChunkGenerator(this.world, this.getDimension(), new OverworldGenSettings());
@@ -48,14 +38,14 @@ public class TentDimension extends Dimension {
 	@Override
 	public boolean canRespawnHere() {
 		// returning false from here makes beds explode when you try to sleep
-		return NomadicTents.TENT_CONFIG.ALLOW_SLEEP_TENT_DIM.get();
+		return TentConfiguration.CONFIG.ALLOW_SLEEP_TENT_DIM.get();
 	}
 
 	@Override
 	public DimensionType getRespawnDimension(EntityPlayerMP player) {
 		// this actually is only called if #canRespawnHere returns false, but that might
 		// change in the future
-		return NomadicTents.TENT_CONFIG.ALLOW_SLEEP_TENT_DIM.get() ? this.dimensionType : DimensionType.OVERWORLD;
+		return TentConfiguration.CONFIG.ALLOW_SLEEP_TENT_DIM.get() ? this.dimensionType : DimensionType.OVERWORLD;
 	}
 
 	@Override

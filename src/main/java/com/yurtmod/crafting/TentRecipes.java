@@ -1,11 +1,10 @@
 package com.yurtmod.crafting;
 
 import com.yurtmod.init.Content;
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipeManager;
 
 public class TentRecipes {
 		
@@ -149,23 +148,23 @@ public class TentRecipes {
 				})
 		};
 		// register the tent recipes
-		if(NomadicTents.TENT_CONFIG.ALLOW_YURT.get()) {
-			for(int i = 0, len = NomadicTents.TENT_CONFIG.TIERS_YURT.get(); i < len; i++) {
+		if(TentConfiguration.CONFIG.ALLOW_YURT.get()) {
+			for(int i = 0, len = TentConfiguration.CONFIG.TIERS_YURT.get(); i < len; i++) {
 				//MinecraftServer.RecipeManager.addRecipe(YURT[i]);
 			}
 		}
-		if(NomadicTents.TENT_CONFIG.ALLOW_TEPEE.get()) {
-			for(int i = 0, len = NomadicTents.TENT_CONFIG.TIERS_TEPEE.get(); i < len; i++) {
+		if(TentConfiguration.CONFIG.ALLOW_TEPEE.get()) {
+			for(int i = 0, len = TentConfiguration.CONFIG.TIERS_TEPEE.get(); i < len; i++) {
 				//MinecraftServer.RecipeManager.addRecipe(TEPEE[i]);
 			}
 		}
-		if(NomadicTents.TENT_CONFIG.ALLOW_BEDOUIN.get()) {
-			for(int i = 0, len = NomadicTents.TENT_CONFIG.TIERS_BEDOUIN.get(); i < len; i++) {
+		if(TentConfiguration.CONFIG.ALLOW_BEDOUIN.get()) {
+			for(int i = 0, len = TentConfiguration.CONFIG.TIERS_BEDOUIN.get(); i < len; i++) {
 				//MinecraftServer.RecipeManager.addRecipe(BEDOUIN[i]);
 			}
 		}
-		if(NomadicTents.TENT_CONFIG.ALLOW_INDLU.get()) {
-			for(int i = 0, len = NomadicTents.TENT_CONFIG.TIERS_INDLU.get(); i < len; i++) {
+		if(TentConfiguration.CONFIG.ALLOW_INDLU.get()) {
+			for(int i = 0, len = TentConfiguration.CONFIG.TIERS_INDLU.get(); i < len; i++) {
 				//MinecraftServer.RecipeManager.addRecipe(INDLU[i]);
 			}
 		}		

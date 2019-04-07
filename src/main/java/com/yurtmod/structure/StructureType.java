@@ -10,7 +10,7 @@ import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.item.ItemTent;
 
 import net.minecraft.block.Block;
@@ -134,7 +134,7 @@ public enum StructureType implements IStringSerializable {
 		te.setOffsetZ(offsetz);
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
-		if(NomadicTents.TENT_CONFIG.OWNER_ENTRANCE.get() || NomadicTents.TENT_CONFIG.OWNER_PICKUP.get()) {
+		if(TentConfiguration.CONFIG.OWNER_ENTRANCE.get() || TentConfiguration.CONFIG.OWNER_PICKUP.get()) {
 			te.setOwner(EntityPlayer.getOfflineUUID(player.getName().getUnformattedComponentText()));
 		}
 	}
@@ -239,10 +239,10 @@ public enum StructureType implements IStringSerializable {
 		/** @return whether this tent type is enabled in the config **/
 		public boolean isEnabled() {
 			switch (this) {
-			case BEDOUIN:	return NomadicTents.TENT_CONFIG.ALLOW_BEDOUIN.get();
-			case TEPEE:		return NomadicTents.TENT_CONFIG.ALLOW_TEPEE.get();
-			case YURT:		return NomadicTents.TENT_CONFIG.ALLOW_YURT.get();
-			case INDLU:		return NomadicTents.TENT_CONFIG.ALLOW_INDLU.get();
+			case BEDOUIN:	return TentConfiguration.CONFIG.ALLOW_BEDOUIN.get();
+			case TEPEE:		return TentConfiguration.CONFIG.ALLOW_TEPEE.get();
+			case YURT:		return TentConfiguration.CONFIG.ALLOW_YURT.get();
+			case INDLU:		return TentConfiguration.CONFIG.ALLOW_INDLU.get();
 			}
 			return false;
 		}
@@ -331,10 +331,10 @@ public enum StructureType implements IStringSerializable {
 
 		public boolean isEnabledFor(StructureType.Type type) {
 			switch(type) {
-			case BEDOUIN: 	return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_BEDOUIN.get();
-			case INDLU:		return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_INDLU.get();
-			case TEPEE:		return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_TEPEE.get();
-			case YURT:		return this.ordinal() < NomadicTents.TENT_CONFIG.TIERS_YURT.get();
+			case BEDOUIN: 	return this.ordinal() < TentConfiguration.CONFIG.TIERS_BEDOUIN.get();
+			case INDLU:		return this.ordinal() < TentConfiguration.CONFIG.TIERS_INDLU.get();
+			case TEPEE:		return this.ordinal() < TentConfiguration.CONFIG.TIERS_TEPEE.get();
+			case YURT:		return this.ordinal() < TentConfiguration.CONFIG.TIERS_YURT.get();
 			}
 			return false;
 		}

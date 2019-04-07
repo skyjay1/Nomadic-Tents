@@ -1,5 +1,9 @@
 package com.yurtmod.proxies;
 
+import java.util.function.Function;
+
+import com.mojang.datafixers.DataFixUtils;
+import com.mojang.datafixers.types.Type;
 import com.yurtmod.block.BlockBarrier;
 import com.yurtmod.block.BlockBedouinRoof;
 import com.yurtmod.block.BlockBedouinWall;
@@ -13,9 +17,9 @@ import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.BlockYurtRoof;
 import com.yurtmod.block.BlockYurtWall;
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.crafting.TentRecipes;
 import com.yurtmod.dimension.BiomeTent;
 import com.yurtmod.dimension.DimensionManagerTent;
+import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemMallet;
@@ -29,10 +33,13 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemTier;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.SharedConstants;
+import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.datafix.TypeReferences;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
@@ -48,6 +55,8 @@ public class CommonProxy {
 	public void registerBiome(final RegistryEvent.Register<Biome> event) {
 		event.getRegistry().register(
 				new BiomeTent().setRegistryName(NomadicTents.MODID, DimensionManagerTent.BIOME_TENT_NAME));
+		//BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(DimensionManagerTent.biomeTent, 0));
+		//BiomeDictionary.addTypes(DimensionManagerTent.biomeTent, BiomeDictionary.Type.VOID);
 	}
 
 	public void registerBlocks(final RegistryEvent.Register<Block> event) {
@@ -57,17 +66,33 @@ public class CommonProxy {
 			new BlockBarrier().setRegistryName(NomadicTents.MODID, "tentmod_barrier"),
 			new BlockUnbreakable(Block.Properties.create(Material.GROUND, MaterialColor.DIRT)
 					.sound(SoundType.GROUND)).setRegistryName(NomadicTents.MODID, "super_dirt"),
-
+			
 			// wall and roof blocks
 			new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_outer"),
 			new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_inner"),
 			new BlockYurtRoof().setRegistryName(NomadicTents.MODID, "yurt_roof"),
-			new BlockTepeeWall().setRegistryName(NomadicTents.MODID, "tepee_wall"),
 			new BlockBedouinWall().setRegistryName(NomadicTents.MODID, "bed_wall"),
 			new BlockBedouinRoof().setRegistryName(NomadicTents.MODID, "bed_roof"),
 			new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_outer"),
 			new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_inner"),
-
+			
+			// tepee blocks
+			new BlockTepeeWall("tepee_wall_blank"),
+			new BlockTepeeWall("tepee_wall_black"),
+			new BlockTepeeWall("tepee_wall_red"),
+			new BlockTepeeWall("tepee_wall_yellow"),
+			new BlockTepeeWall("tepee_wall_orange"),
+			new BlockTepeeWall("tepee_wall_white"),
+			new BlockTepeeWall("tepee_wall_hope"),
+			new BlockTepeeWall("tepee_wall_sun"),
+			new BlockTepeeWall("tepee_wall_creeper"),
+			new BlockTepeeWall("tepee_wall_universe"),
+			new BlockTepeeWall("tepee_wall_eagle"),
+			new BlockTepeeWall("tepee_wall_triforce"),
+			new BlockTepeeWall("tepee_wall_dreamcatcher"),
+			new BlockTepeeWall("tepee_wall_rain"),
+			new BlockTepeeWall("tepee_wall_magic"),
+			
 			// door blocks
 			new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "yurt_door_0"),
 			new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "yurt_door_1"),
@@ -125,12 +150,41 @@ public class CommonProxy {
 	}
 	 
 	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
-		event.getRegistry().register(DimensionManagerTent.MOD_DIMENSION);	
+		event.getRegistry().register(new ModDimension() {
+			@Override
+			public Function<DimensionType, ? extends net.minecraft.world.dimension.Dimension> getFactory() {
+				return TentDimension::new;
+			}
+		}.setRegistryName(NomadicTents.MODID, DimensionManagerTent.DIM_NAME));	
 	}
 	
 	public void registerTileEntity(final RegistryEvent.Register<TileEntityType<? extends TileEntity>> event) {
-		// TODO register tile entity
-		event.getRegistry().register(TileEntityType.Builder.create(TileEntityTentDoor::new).build(null));
+		// Tile Entity Tent Door
+		String name = NomadicTents.MODID + ":tileentitytentdoor";
+//		TileEntityType<TileEntityTentDoor> tetype = 
+//				TileEntityType.register(name, TileEntityType.Builder.create(TileEntityTentDoor::new));
+//		tetype.setRegistryName(name);
+//		event.getRegistry().register(tetype);
+		// copied from vanilla code
+		Type<?> type = null;
+		try {
+			
+			System.out.println("trying to make data fixer type...");
+			type = DataFixesManager.getDataFixer().getSchema(DataFixUtils.makeKey(1631))
+					.getChoiceType(TypeReferences.BLOCK_ENTITY, name);
+			
+		} catch (IllegalArgumentException illegalstateexception) {
+			illegalstateexception.printStackTrace();
+			if (SharedConstants.developmentMode) {
+				throw illegalstateexception;
+			}
+        }
+		
+		System.out.println("...registering tileentitytentdoor");
+		TileEntityType<TileEntityTentDoor> tileentity = TileEntityType.Builder.create(TileEntityTentDoor::new)
+				.build(type);
+		tileentity.setRegistryName(name);
+		event.getRegistry().register(tileentity);
 	}
 
 	private static final Item basicItem(String name) {

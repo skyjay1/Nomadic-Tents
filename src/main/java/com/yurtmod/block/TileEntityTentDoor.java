@@ -6,7 +6,8 @@ import javax.annotation.Nullable;
 
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureType;
 
@@ -23,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraftforge.common.util.ITeleporter;
 
 public class TileEntityTentDoor extends TileEntity {
@@ -45,11 +47,9 @@ public class TileEntityTentDoor extends TileEntity {
 	private float prevFacing;
 	private int prevDimID;
 	private UUID owner;
-	
-	public TileEntityTentDoor() { this(null); }
 
-	public TileEntityTentDoor(TileEntityType<?> tileEntityTypeIn) {
-		super(tileEntityTypeIn);
+	public TileEntityTentDoor() {
+		super(Content.TE_TENT_DOOR);
 		if (this.structure == null) {
 			this.setPrevStructureType(StructureType.YURT_SMALL);
 			this.setStructureType(StructureType.YURT_SMALL);
@@ -249,7 +249,7 @@ public class TileEntityTentDoor extends TileEntity {
 				// transfer player to dimension
 				mcServer.getPlayerList().changePlayerDimension(playerMP, dimTo, tel);
 				// attempt to set spawnpoint, if enabled
-				if(NomadicTents.TENT_CONFIG.ALLOW_OVERWORLD_SETSPAWN.get() && 
+				if(TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN.get() && 
 						DimensionManagerTent.isTentDimension(dimFrom) && dimTo == DimensionType.OVERWORLD) {
 					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.structure.getDoorOffsetZ(), 0, 0), 
 							this.prevX, this.prevY, this.prevZ);
@@ -316,7 +316,7 @@ public class TileEntityTentDoor extends TileEntity {
 	public void onPlayerRemove(EntityPlayer playerIn) {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
-		if(NomadicTents.TENT_CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
+		if(TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
 			BlockPos tentCenter = this.getTentDoorPos().add(this.getStructureType().getDoorOffsetZ(), 0, 0);
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
@@ -375,8 +375,8 @@ public class TileEntityTentDoor extends TileEntity {
 	 */
 	public boolean onEntityCollide(Entity entity, EnumFacing tentDir) {
 		if (canTeleportEntity(entity) 
-				&& ((entity instanceof EntityPlayer && NomadicTents.TENT_CONFIG.ALLOW_PLAYER_COLLIDE.get())
-				|| (!(entity instanceof EntityPlayer) && NomadicTents.TENT_CONFIG.ALLOW_NONPLAYER_COLLIDE.get()))) {
+				&& ((entity instanceof EntityPlayer && TentConfiguration.CONFIG.ALLOW_PLAYER_COLLIDE.get())
+				|| (!(entity instanceof EntityPlayer) && TentConfiguration.CONFIG.ALLOW_NONPLAYER_COLLIDE.get()))) {
 			// remember the entity coordinates from the overworld
 			if (!DimensionManagerTent.isTentDimension(entity.getEntityWorld())) {
 				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
@@ -419,7 +419,7 @@ public class TileEntityTentDoor extends TileEntity {
 			return false;
 		}
 		if(!DimensionManagerTent.isTentDimension(entity.getEntityWorld()) 
-				&& NomadicTents.TENT_CONFIG.OWNER_ENTRANCE.get() 
+				&& TentConfiguration.CONFIG.OWNER_ENTRANCE.get() 
 				&& entity instanceof EntityPlayer && !isOwner((EntityPlayer)entity)) {
 			return false;
 		}

@@ -1,6 +1,6 @@
 package com.yurtmod.item;
 
-import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 
 import net.minecraft.item.IItemTier;
 import net.minecraft.item.ItemUseContext;
@@ -14,7 +14,7 @@ public class ItemSuperMallet extends ItemMallet {
 
 	@Override
 	public EnumActionResult onItemUse(final ItemUseContext context) {
-		if (NomadicTents.TENT_CONFIG.SUPER_MALLET_CREATIVE_ONLY.get() 
+		if (TentConfiguration.CONFIG.SUPER_MALLET_CREATIVE_ONLY.get() 
 				&& (context.getPlayer() == null || !context.getPlayer().isCreative())) {
 			return EnumActionResult.PASS;
 		}

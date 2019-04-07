@@ -9,6 +9,7 @@ import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
@@ -34,8 +35,9 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 		Content.TEPEE_WALL_WHITE, Content.TEPEE_WALL_YELLOW
 	};
 
-	public BlockTepeeWall() {
+	public BlockTepeeWall(final String name) {
 		super(Block.Properties.create(Material.CLOTH, MaterialColor.SAND).variableOpacity());
+		this.setRegistryName(NomadicTents.MODID, name);
 	}
 
 	@Override
@@ -76,7 +78,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	 * if it fails the Config-defined percentage chance
 	 **/
 	public static IBlockState getStateForRandomDesignWithChance(Random rand) {
-		return rand.nextInt(100) < NomadicTents.TENT_CONFIG.TEPEE_DECORATED_CHANCE.get() 
+		return rand.nextInt(100) < TentConfiguration.CONFIG.TEPEE_DECORATED_CHANCE.get() 
 				? getStateForRandomDesign(rand) : getStateForBase();
 	}
 

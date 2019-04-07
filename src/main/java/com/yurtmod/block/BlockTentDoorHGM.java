@@ -6,9 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.state.EnumProperty;
-import net.minecraft.state.IProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.world.chunk.BlockStateContainer;
 
 public class BlockTentDoorHGM extends BlockTentDoor {
 	

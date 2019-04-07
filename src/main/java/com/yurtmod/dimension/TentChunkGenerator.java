@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.yurtmod.structure.StructureBase;
+import com.yurtmod.init.Content;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
@@ -19,14 +19,10 @@ import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.biome.provider.SingleBiomeProvider;
 import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.ChunkPrimerWrapper;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.GenerationStage.Carving;
-import net.minecraft.world.gen.IChunkGenSettings;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -54,7 +50,7 @@ public class TentChunkGenerator implements IChunkGenerator<OverworldGenSettings>
 	@Override
 	public void makeBase(IChunk chunkIn) {
 		ChunkPos pos = chunkIn.getPos();
-		Chunk chunk = new Chunk(this.worldObj, pos.x, pos.z, new Biome[] { DimensionManagerTent.biomeTent });
+		Chunk chunk = new Chunk(this.worldObj, pos.x, pos.z, new Biome[] { Content.BIOME_TENT });
 		chunk.generateSkylightMap();
 		chunk.setStatus(ChunkStatus.BASE);
 	}
@@ -106,7 +102,7 @@ public class TentChunkGenerator implements IChunkGenerator<OverworldGenSettings>
 
 	@Override
 	public BiomeProvider getBiomeProvider() {
-		return new SingleBiomeProvider(new SingleBiomeProviderSettings().setBiome(DimensionManagerTent.biomeTent));
+		return new SingleBiomeProvider(new SingleBiomeProviderSettings().setBiome(Content.BIOME_TENT));
 	}
 
 	@Override

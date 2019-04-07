@@ -14,7 +14,9 @@ import com.yurtmod.structure.StructureType;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -24,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -46,6 +49,15 @@ public class ItemTent extends Item {
 		super(new Item.Properties().maxStackSize(1).group(NomadicTents.TAB));
 	//	this.setHasSubtypes(true);
 		this.setRegistryName(NomadicTents.MODID, name);
+		this.addPropertyOverride(new ResourceLocation(NomadicTents.MODID, name),  new IItemPropertyGetter() {
+            @Override
+            public float call(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
+            	if(stack.hasTag() && stack.getTag().hasKey(TENT_TYPE)) {
+            		return (float)stack.getTag().getInt(TENT_TYPE);
+            	}
+                return 0;
+            }
+        });
 	}
 
 	@Override
@@ -102,7 +114,7 @@ public class ItemTent extends Item {
 					final StructureType.Size size = BlockTentDoor.getOverworldSize(type);
 					final StructureBase struct = type.getNewStructure();
 					// make sure the tent can be built here
-					if (struct.canSpawn(context.getWorld(), hitPos, playerFacing, size)) {
+					if (type.isEnabled() && struct.canSpawn(context.getWorld(), hitPos, playerFacing, size)) {
 						// build the frames
 						if (struct.generateFrameStructure(context.getWorld(), hitPos, playerFacing, size)) {
 							// update the TileEntity information
@@ -114,7 +126,7 @@ public class ItemTent extends Item {
 										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
 							}
 							// remove tent from inventory
-							stack.shrink(1);
+							stack.setCount(0);
 						}
 					}
 				}
@@ -135,10 +147,10 @@ public class ItemTent extends Item {
 	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
 		if (this.isInGroup(group)) {
 			for (StructureType type : StructureType.values()) {
-				if (type.isEnabled()) {
+				//if (type.isEnabled()) {
 					ItemStack tent = StructureType.getDropStack(ERROR_TAG, ERROR_TAG, type.id(), type.id());
 					items.add(tent);
-				}
+				//}
 			}
 		}
 	}

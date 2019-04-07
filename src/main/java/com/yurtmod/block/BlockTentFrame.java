@@ -3,11 +3,13 @@ package com.yurtmod.block;
 import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.item.ItemMallet;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,7 +21,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -31,9 +32,9 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	public static final int BASE_EFFECTIVENESS = 2;
 	public static final IntegerProperty PROGRESS = IntegerProperty.create("progress", 0, MAX_META);
 
-	public static final VoxelShape AABB_PROGRESS_0 = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D);
-	public static final VoxelShape AABB_PROGRESS_1 = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D);
-	public static final VoxelShape AABB_PROGRESS_2 = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+	public static final VoxelShape AABB_PROGRESS_0 = Block.makeCuboidShape(0, 0, 0, 16, 4, 16);
+	public static final VoxelShape AABB_PROGRESS_1 = Block.makeCuboidShape(0, 0, 0, 16, 8, 16);
+	public static final VoxelShape AABB_PROGRESS_2 = Block.makeCuboidShape(0, 0, 0, 16, 16, 16);
 
 	private final BlockToBecome TO_BECOME;
 
@@ -41,6 +42,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).doesNotBlockMovement());
 		this.TO_BECOME = type;
 		this.setDefaultState(this.stateContainer.getBaseState().with(PROGRESS, 0));
+		this.setRegistryName(NomadicTents.MODID, name);
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		return false;
 	}
 
-	@Deprecated
+	@Override
 	public VoxelShape getShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
 		int meta = state.get(PROGRESS).intValue();
 		if (meta <= 1) {
@@ -68,10 +70,31 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			return AABB_PROGRESS_2;
 		}
 	}
+	
+	@Override
+	public VoxelShape getRaytraceShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+		return getShape(state, worldIn, pos);
+	}
+	
+	/**
+	 * Get the geometry of the queried face at the given position and state. This is
+	 * used to decide whether things like buttons are allowed to be placed on the
+	 * face, or how glass panes connect to the face, among other things.
+	 * <p>
+	 * Common values are {@code SOLID}, which is the default, and {@code UNDEFINED},
+	 * which represents something that does not fit the other descriptions and will
+	 * generally cause other things not to connect to the face.
+	 * 
+	 * @return an approximation of the form of the given face
+	 */
+	@Override
+	public BlockFaceShape getBlockFaceShape(IBlockReader worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
+		return BlockFaceShape.UNDEFINED;
+	}
 
 	@Override
-	public VoxelShape getCollisionShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
-		return VoxelShapes.empty();
+	public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+		return 0;
 	}
 
 	/**
@@ -114,10 +137,10 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		builder.add(PROGRESS);
 	}
 
-	@Override
-	public boolean isCollidable() {
-		return false;
-	}
+//	@Override
+//	public boolean isCollidable() {
+//		return false;
+//	}
 
 	/** @return the number by which to increment PROGRESS **/
 	public int getEffectiveness(World worldIn, BlockPos pos, ItemStack mallet, EntityPlayer player) {
@@ -146,7 +169,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	public boolean onSuperMalletUsed(World worldIn, BlockPos pos, IBlockState state, ItemStack mallet,
 			EntityPlayer player) {
-		if (NomadicTents.TENT_CONFIG.SUPER_MALLET_CREATIVE_ONLY.get() && !player.isCreative()) {
+		if (TentConfiguration.CONFIG.SUPER_MALLET_CREATIVE_ONLY.get() && !player.isCreative()) {
 			return false;
 		}
 
