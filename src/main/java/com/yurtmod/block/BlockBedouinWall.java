@@ -9,7 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
 
 public class BlockBedouinWall extends BlockLayered implements IBedouinBlock {
 	public static final BooleanProperty BESIDE_SIMILAR = BooleanProperty.create("beside_similar");
@@ -17,24 +17,6 @@ public class BlockBedouinWall extends BlockLayered implements IBedouinBlock {
 	public BlockBedouinWall() {
 		super(Block.Properties.create(Material.CLOTH, MaterialColor.WOOD));
 		this.setDefaultState(this.stateContainer.getBaseState().with(ABOVE_SIMILAR, false).with(BESIDE_SIMILAR, false));
-	}
-
-	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-		updateState(worldIn, pos);
-	}
-
-	@Override
-	public void onNeighborChange(IBlockAccess world, BlockPos myPos, BlockPos neighbor) {
-		if (world instanceof World) {
-			updateState((World) world, myPos);
-		}
-	}
-
-	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
-		updateState(worldIn, pos);
 	}
 
 	@Override
@@ -56,7 +38,8 @@ public class BlockBedouinWall extends BlockLayered implements IBedouinBlock {
 //		return above + beside;
 //	}
 
-	private void updateState(World worldIn, BlockPos myPos) {
+	@Override
+	protected IBlockState updateState(IWorld worldIn, BlockPos myPos, IBlockState state) {
 		boolean above = worldIn.getBlockState(myPos.down(1)).getBlock() == this
 				&& worldIn.getBlockState(myPos.down(2)).getBlock() != this;
 		boolean beside = (worldIn.getBlockState(myPos.north(1)).getBlock() == this && myPos.getZ() % 2 == 0)
@@ -66,5 +49,6 @@ public class BlockBedouinWall extends BlockLayered implements IBedouinBlock {
 		IBlockState toSet = this.getDefaultState().with(ABOVE_SIMILAR, above).with(BESIDE_SIMILAR,
 				beside);
 		worldIn.setBlockState(myPos, toSet, 3);
+		return toSet;
 	}
 }

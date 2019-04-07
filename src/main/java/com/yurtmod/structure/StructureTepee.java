@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import com.yurtmod.block.BlockTepeeWall;
 import com.yurtmod.block.Categories.ITepeeBlock;
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
 
@@ -28,7 +28,7 @@ public class StructureTepee extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
-		boolean tentDim = TentDimension.isTentDimension(worldIn);
+		boolean tentDim = DimensionManagerTent.isTentDimension(worldIn);
 		Blueprints bp = getBlueprints(size);
 		if(bp == null) {
 			return false;
@@ -41,7 +41,7 @@ public class StructureTepee extends StructureBase {
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
 			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentDimension.STRUCTURE_DIR);
+			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, DimensionManagerTent.STRUCTURE_DIR);
 			if(sizeNum > 2 && (worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
 					&& worldIn.isAirBlock(pos.up(1))) {
 				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);

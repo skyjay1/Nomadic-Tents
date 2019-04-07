@@ -6,10 +6,15 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.yurtmod.dimension.DimensionManagerTent;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.world.storage.WorldSavedDataStorage;
 
 public class TentSaveData extends WorldSavedData {
 	private static final String KEY_YURT = "CraftCountYurt";
@@ -31,6 +36,18 @@ public class TentSaveData extends WorldSavedData {
 
 	public TentSaveData(String s) {
 		super(s);
+	}
+	
+	public static TentSaveData get(MinecraftServer server) {
+		DimensionType tentType = DimensionType.getById(DimensionManagerTent.DIMENSION_ID);
+		WorldSavedDataStorage storage = DimensionManagerTent.getTentDimension(server).getMapStorage();
+		TentSaveData result = storage.func_212426_a(DimensionType.getById(DimensionManagerTent.DIMENSION_ID), 
+				TentSaveData::new, NomadicTents.MODID);
+		if (result == null) {
+			result = new TentSaveData(NomadicTents.MODID);
+			storage.func_212424_a(tentType, NomadicTents.MODID, result);
+		}
+		return result;
 	}
 
 //	public static TentSaveData forWorld(World world) {
@@ -130,7 +147,7 @@ public class TentSaveData extends WorldSavedData {
 		return this.craftCountIndlu;
 	}
 	
-	public void put(final UUID uuid, final BlockPos pos, final int dimId) {
+	public void put(final UUID uuid, final BlockPos pos) {
 		if(uuid != null) {
 			prevSpawnMap.put(uuid, pos);
 			this.markDirty();

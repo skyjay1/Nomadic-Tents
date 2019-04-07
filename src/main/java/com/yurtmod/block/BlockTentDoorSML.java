@@ -2,11 +2,11 @@ package com.yurtmod.block;
 
 import com.yurtmod.structure.StructureType;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.state.EnumProperty;
-import net.minecraft.state.IProperty;
-import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraft.state.StateContainer;
 
 public class BlockTentDoorSML extends BlockTentDoor {
 	
@@ -22,24 +22,24 @@ public class BlockTentDoorSML extends BlockTentDoor {
 		this(false);
 	}
 	
-	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		IBlockState state = super.getStateFromMeta(meta);
-		int sizeInt = Math.floorDiv(meta, 4);
-		StructureType.Size size = StructureType.Size.values()[sizeInt];
-		return state.with(SIZE_SML, size);
-	}
+//	@Override
+//	public IBlockState getStateFromMeta(int meta) {
+//		IBlockState state = super.getStateFromMeta(meta);
+//		int sizeInt = Math.floorDiv(meta, 4);
+//		StructureType.Size size = StructureType.Size.values()[sizeInt];
+//		return state.with(SIZE_SML, size);
+//	}
+//
+//	@Override
+//	public int getMetaFromState(IBlockState state) {
+//		int meta = super.getMetaFromState(state);
+//		int size = state.get(SIZE_SML).ordinal();
+//		meta += size * 4;
+//		return meta;
+//	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
-		int meta = super.getMetaFromState(state);
-		int size = state.get(SIZE_SML).ordinal();
-		meta += size * 4;
-		return meta;
-	}
-
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { BlockDoor.HALF, AXIS, SIZE_SML });
+	protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {	
+		builder.add(BlockDoor.HALF, AXIS, SIZE_SML);
 	}
 }

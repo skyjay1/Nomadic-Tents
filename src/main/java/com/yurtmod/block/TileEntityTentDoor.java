@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.init.TentConfig;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureType;
 
@@ -17,13 +17,13 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.ITeleporter;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper.UnableToFindFieldException;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class TileEntityTentDoor extends TileEntity {
 	
@@ -45,9 +45,11 @@ public class TileEntityTentDoor extends TileEntity {
 	private float prevFacing;
 	private int prevDimID;
 	private UUID owner;
+	
+	public TileEntityTentDoor() { this(null); }
 
-	public TileEntityTentDoor() {
-		super();
+	public TileEntityTentDoor(TileEntityType<?> tileEntityTypeIn) {
+		super(tileEntityTypeIn);
 		if (this.structure == null) {
 			this.setPrevStructureType(StructureType.YURT_SMALL);
 			this.setStructureType(StructureType.YURT_SMALL);
@@ -55,32 +57,32 @@ public class TileEntityTentDoor extends TileEntity {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
-		super.readFromNBT(nbt);
-		this.structurePrev = StructureType.get(nbt.getInteger(KEY_STRUCTURE_TYPE_PREV));
-		this.structure = StructureType.get(nbt.getInteger(KEY_STRUCTURE_TYPE));
-		this.offsetX = nbt.getInteger(S_OFFSET_X);
-		this.offsetZ = nbt.getInteger(S_OFFSET_Z);
+	public void read(NBTTagCompound nbt) {
+		super.read(nbt);
+		this.structurePrev = StructureType.get(nbt.getInt(KEY_STRUCTURE_TYPE_PREV));
+		this.structure = StructureType.get(nbt.getInt(KEY_STRUCTURE_TYPE));
+		this.offsetX = nbt.getInt(S_OFFSET_X);
+		this.offsetZ = nbt.getInt(S_OFFSET_Z);
 		this.prevX = nbt.getDouble(S_PLAYER_X);
 		this.prevY = nbt.getDouble(S_PLAYER_Y);
 		this.prevZ = nbt.getDouble(S_PLAYER_Z);
 		this.prevFacing = nbt.getFloat(S_PLAYER_YAW);
-		this.prevDimID = nbt.getInteger(S_PLAYER_DIM);
+		this.prevDimID = nbt.getInt(S_PLAYER_DIM);
 		this.owner = nbt.hasKey(S_PLAYER_UUID) ? nbt.getUniqueId(S_PLAYER_UUID) : null;
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		super.writeToNBT(nbt);
-		nbt.setInteger(KEY_STRUCTURE_TYPE_PREV, this.structurePrev.id());
-		nbt.setInteger(KEY_STRUCTURE_TYPE, this.structure.id());
-		nbt.setInteger(S_OFFSET_X, this.offsetX);
-		nbt.setInteger(S_OFFSET_Z, this.offsetZ);
+	public NBTTagCompound write(NBTTagCompound nbt) {
+		super.write(nbt);
+		nbt.setInt(KEY_STRUCTURE_TYPE_PREV, this.structurePrev.id());
+		nbt.setInt(KEY_STRUCTURE_TYPE, this.structure.id());
+		nbt.setInt(S_OFFSET_X, this.offsetX);
+		nbt.setInt(S_OFFSET_Z, this.offsetZ);
 		nbt.setDouble(S_PLAYER_X, prevX);
 		nbt.setDouble(S_PLAYER_Y, prevY);
 		nbt.setDouble(S_PLAYER_Z, prevZ);
 		nbt.setFloat(S_PLAYER_YAW, prevFacing);
-		nbt.setInteger(S_PLAYER_DIM, this.getPrevDimension());
+		nbt.setInt(S_PLAYER_DIM, this.getPrevDimension());
 		if(this.owner != null) {
 			nbt.setUniqueId(S_PLAYER_UUID, owner);
 		}
@@ -89,12 +91,12 @@ public class TileEntityTentDoor extends TileEntity {
 
 	/** Calculates what chunk offset x to give a door or item **/
 	public static final int getChunkOffsetX(int actualX) {
-		return actualX / (TentDimension.TENT_SPACING);
+		return actualX / (DimensionManagerTent.TENT_SPACING);
 	}
 
 	/** Calculates what chunk offset x to give a door or item **/
 	public static final int getChunkOffsetZ(int actualZ) {
-		return actualZ / (TentDimension.TENT_SPACING);
+		return actualZ / (DimensionManagerTent.TENT_SPACING);
 	}
 	
 	public void resetPrevStructureType() {
@@ -169,9 +171,9 @@ public class TileEntityTentDoor extends TileEntity {
 
 	/** @return the Tent Dimension location of the tent's door **/
 	public BlockPos getTentDoorPos() {
-		int x = this.offsetX * (TentDimension.TENT_SPACING);
-		int y = TentDimension.FLOOR_Y;
-		int z = this.offsetZ * (TentDimension.TENT_SPACING);
+		int x = this.offsetX * (DimensionManagerTent.TENT_SPACING);
+		int y = DimensionManagerTent.FLOOR_Y;
+		int z = this.offsetZ * (DimensionManagerTent.TENT_SPACING);
 		return new BlockPos(x, y, z);
 	}
 	
@@ -190,8 +192,8 @@ public class TileEntityTentDoor extends TileEntity {
 	 * <br>2) the player's UUID matches, or
 	 * <br>3) the player is in creative-mode **/
 	public boolean isOwner(EntityPlayer player) {
-		return !this.hasOwner() || EntityPlayer.getOfflineUUID(player.getName()).equals(this.owner) 
-				|| player.capabilities.isCreativeMode;
+		return !this.hasOwner() || EntityPlayer.getOfflineUUID(player.getName().getUnformattedComponentText()).equals(this.owner) 
+				|| player.isCreative();
 	}
 	
 	@Nullable
@@ -202,7 +204,7 @@ public class TileEntityTentDoor extends TileEntity {
 	@Nullable
 	public EntityPlayer getOwner() {
 		if(hasOwner() && !this.world.isRemote) {
-			return this.world.getMinecraftServer().getPlayerList().getPlayerByUUID(this.owner);
+			return this.world.getServer().getPlayerList().getPlayerByUUID(this.owner);
 		}
 		return null;
 	}
@@ -218,8 +220,10 @@ public class TileEntityTentDoor extends TileEntity {
 	 **/
 	private boolean teleport(Entity entity) {
 		entity.setPortal(this.getPos());
-		final int dimFrom = entity.getEntityWorld().provider.getDimension();
-		final int dimTo = TentDimension.isTentDimension(dimFrom) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
+		final DimensionType dimFrom = entity.getEntityWorld().getDimension().getType();
+		final DimensionType dimTo = DimensionType.getById(
+				DimensionManagerTent.isTentDimension(dimFrom) 
+				? this.getPrevDimension() : DimensionManagerTent.DIMENSION_ID);
 
 		if (entity.timeUntilPortal > 0) {
 			entity.timeUntilPortal = entity.getPortalCooldown();
@@ -230,22 +234,23 @@ public class TileEntityTentDoor extends TileEntity {
 			final WorldServer oldServer = mcServer.getWorld(dimFrom);
 			final WorldServer newServer = mcServer.getWorld(dimTo);
 			// make the teleporter
-			final TentTeleporter tel = new TentTeleporter(dimFrom, newServer, this);
+			final TentTeleporter tel = new TentTeleporter(dimFrom.getId(), newServer, this);
 
 			if (entity instanceof EntityPlayerMP) {
 				EntityPlayerMP playerMP = (EntityPlayerMP) entity;
 				// use reflection to allow a certain value to be accessed and changed (required
 				// for teleporting properly)
-				try {
-					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
-							"field_184851_cj", "invulnerableDimensionChange");
-				} catch (UnableToFindFieldException e) {
-					return false;
-				}
+//				try {
+//					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
+//							"field_184851_cj", "invulnerableDimensionChange");
+//				} catch (UnableToFindFieldException e) {
+//					return false;
+//				}
 				// transfer player to dimension
-				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
+				mcServer.getPlayerList().changePlayerDimension(playerMP, dimTo, tel);
 				// attempt to set spawnpoint, if enabled
-				if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
+				if(NomadicTents.TENT_CONFIG.ALLOW_OVERWORLD_SETSPAWN.get() && 
+						DimensionManagerTent.isTentDimension(dimFrom) && dimTo == DimensionType.OVERWORLD) {
 					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.structure.getDoorOffsetZ(), 0, 0), 
 							this.prevX, this.prevY, this.prevZ);
 				}
@@ -268,22 +273,22 @@ public class TileEntityTentDoor extends TileEntity {
 	private static boolean attemptSetSpawn(final World worldFrom, final EntityPlayerMP player, 
 			final BlockPos tentCenter, final double prevX, final double prevY, final double prevZ) {
 		
-		final int overworldId = 0;
-		final World overworld = worldFrom.getMinecraftServer().getWorld(overworldId);
+		final DimensionType overworldId = DimensionType.OVERWORLD;
+		final World overworld = worldFrom.getServer().getWorld(overworldId);
 		final BlockPos prevCoords = new BlockPos(prevX, prevY, prevZ);
-		TentSaveData data = TentSaveData.forWorld(worldFrom);
-		UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
+		TentSaveData data = TentSaveData.get(worldFrom.getServer());
+		UUID uuid = EntityPlayer.getOfflineUUID(player.getName().getUnformattedComponentText());
 		BlockPos oldSpawn = player.getBedLocation(overworldId);
 		BlockPos bedSpawn = oldSpawn != null ? EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) : null;
 		if(bedSpawn == null) {
-			oldSpawn = overworld.provider.getRandomizedSpawnPoint();
+			oldSpawn = overworld.getSpawnPoint();
 		}
 		// if their Tent Dimension spawnpoint AND BED are inside the tent, update spawn location, as needed
-		if (isSpawnInTent(player, tentCenter, true) && !data.contains(uuid) && overworld.provider.canRespawnHere()) {
+		if (isSpawnInTent(player, tentCenter, true) && !data.contains(uuid) && overworld.getDimension().canRespawnHere()) {
 			// First, map the player's old spawn point in case the tent is taken down
-			data.put(uuid, oldSpawn, overworldId);
+			data.put(uuid, oldSpawn);
 			// Next, set their spawn point to be this location
-			player.setSpawnChunk(prevCoords, true, overworldId);
+			player.setSpawnPoint(prevCoords, true, overworldId);
 			return true;
 		} else if (isSpawnInTent(player, tentCenter, false)) {
 			// if their spawnpoint was in the tent but NOT their bed
@@ -311,9 +316,9 @@ public class TileEntityTentDoor extends TileEntity {
 	public void onPlayerRemove(EntityPlayer playerIn) {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
-		if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
+		if(NomadicTents.TENT_CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
 			BlockPos tentCenter = this.getTentDoorPos().add(this.getStructureType().getDoorOffsetZ(), 0, 0);
-			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
+			final MinecraftServer mcServer = playerIn.getEntityWorld().getServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
 			for(EntityPlayerMP player : mcServer.getPlayerList().getPlayers()) {
 				if(player != null && isSpawnInTent(player, tentCenter, false)) {
@@ -326,23 +331,23 @@ public class TileEntityTentDoor extends TileEntity {
 
 	private static void resetOverworldSpawn(EntityPlayer player) {
     	// reset player spawn point when the tent is taken down
-		final World overworld = player.getEntityWorld().getMinecraftServer().getWorld(0);
-		final UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
-    	final TentSaveData data = TentSaveData.forWorld(overworld);
+		final World overworld = player.getEntityWorld().getServer().getWorld(DimensionType.OVERWORLD);
+		final UUID uuid = EntityPlayer.getOfflineUUID(player.getName().getUnformattedComponentText());
+    	final TentSaveData data = TentSaveData.get(overworld.getServer());
     	// first, check if the player has a bed
-    	BlockPos posToSet = player.getBedLocation(0);
+    	BlockPos posToSet = player.getBedLocation(DimensionType.OVERWORLD);
     	if(posToSet == null || EntityPlayer.getBedSpawnLocation(overworld, posToSet, false) == null) {
     		// they don't, so check if the previous stored location was a valid bed
     		BlockPos oldSpawn = data.get(uuid);
         	if(oldSpawn == null || EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) == null) {
         		// set spawn point random
-        		posToSet = player.getEntityWorld().provider.getRandomizedSpawnPoint();
+        		posToSet = player.getEntityWorld().getDimension().getSpawnPoint();
         	} else {
         		posToSet = oldSpawn;
         	}
     	}
     	// finally set the player's spawn point to whatever it was before tent was set up
-    	player.setSpawnPoint(posToSet, false);
+    	player.setSpawnPoint(posToSet, false, overworld.getDimension().getType());
     	data.remove(uuid);
     }
 	
@@ -353,12 +358,12 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether this player has a spawn point near the given BlockPos
 	 */
 	private static boolean isSpawnInTent(EntityPlayer player, BlockPos tentCenter, boolean andBed) {
-		World tentWorld = player.getServer().getWorld(TentDimension.DIMENSION_ID);
-		BlockPos tentSpawn = player.getBedLocation(TentDimension.DIMENSION_ID);
+		World tentWorld = DimensionManagerTent.getTentDimension(player);
+		BlockPos tentSpawn = player.getBedLocation(tentWorld.getDimension().getType());
 		if(andBed) {
 			tentSpawn = tentSpawn != null ? EntityPlayer.getBedSpawnLocation(tentWorld, tentSpawn, false) : null;
 		}
-		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) <= Math.pow((TentDimension.TENT_SPACING / 2.0D) + 2.0D, 2.0D);
+		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) <= Math.pow((DimensionManagerTent.TENT_SPACING / 2.0D) + 2.0D, 2.0D);
 	}
 
 	/**
@@ -369,10 +374,11 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether the teleport was successful
 	 */
 	public boolean onEntityCollide(Entity entity, EnumFacing tentDir) {
-		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.general.ALLOW_PLAYER_COLLIDE)
-				|| (!(entity instanceof EntityPlayer) && TentConfig.general.ALLOW_NONPLAYER_COLLIDE))) {
+		if (canTeleportEntity(entity) 
+				&& ((entity instanceof EntityPlayer && NomadicTents.TENT_CONFIG.ALLOW_PLAYER_COLLIDE.get())
+				|| (!(entity instanceof EntityPlayer) && NomadicTents.TENT_CONFIG.ALLOW_NONPLAYER_COLLIDE.get()))) {
 			// remember the entity coordinates from the overworld
-			if (!TentDimension.isTentDimension(entity.getEntityWorld())) {
+			if (!DimensionManagerTent.isTentDimension(entity.getEntityWorld())) {
 				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
 				double posX = respawn.getX() + 0.5D;
 				double posY = respawn.getY() + 0.01D;
@@ -396,7 +402,7 @@ public class TileEntityTentDoor extends TileEntity {
 	public boolean onPlayerActivate(EntityPlayer player) {
 		if (canTeleportEntity(player)) {
 			// remember the entity coordinates from the overworld
-			if (!TentDimension.isTentDimension(player.getEntityWorld())) {
+			if (!DimensionManagerTent.isTentDimension(player.getEntityWorld())) {
 				double posX = player.posX;
 				double posY = player.posY;
 				double posZ = player.posZ;
@@ -412,11 +418,12 @@ public class TileEntityTentDoor extends TileEntity {
 		if(entity == null || entity.getEntityWorld().isRemote) {
 			return false;
 		}
-		if(!TentDimension.isTentDimension(entity.getEntityWorld()) && TentConfig.general.OWNER_ENTRANCE 
+		if(!DimensionManagerTent.isTentDimension(entity.getEntityWorld()) 
+				&& NomadicTents.TENT_CONFIG.OWNER_ENTRANCE.get() 
 				&& entity instanceof EntityPlayer && !isOwner((EntityPlayer)entity)) {
 			return false;
 		}
-		boolean ridingFlag = entity.isRiding() || entity.isBeingRidden();
+		boolean ridingFlag = entity.getRidingEntity() != null || entity.isBeingRidden();
 		boolean isInvalidClass = entity instanceof EntityEnderman;
 		return !ridingFlag && !isInvalidClass && entity.isNonBoss();
 	}

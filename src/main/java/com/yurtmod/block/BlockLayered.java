@@ -30,15 +30,21 @@ public class BlockLayered extends BlockUnbreakable {
 	}
 
 	@Override
-	@Deprecated // because super method is
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
 		updateState(worldIn, pos, state);
 	}
 
+
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, IBlockState> builder) {
 		builder.add(ABOVE_SIMILAR);
+	}
+	
+
+	@Override
+	public void onBlockAdded(IBlockState state, World worldIn, BlockPos pos, IBlockState oldState) {
+		updateState(worldIn, pos, state);
 	}
 
 //	@Override
@@ -52,7 +58,7 @@ public class BlockLayered extends BlockUnbreakable {
 //		return state.getValue(ABOVE_SIMILAR).booleanValue() ? 1 : 0;
 //	}
 
-	private IBlockState updateState(IWorld worldIn, BlockPos myPos, IBlockState state) {
+	protected IBlockState updateState(IWorld worldIn, BlockPos myPos, IBlockState state) {
 		boolean above = worldIn.getBlockState(myPos.down(1)).getBlock() == this
 				&& worldIn.getBlockState(myPos.down(2)).getBlock() != this;
 		IBlockState toSet = state.with(ABOVE_SIMILAR, above);

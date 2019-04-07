@@ -3,7 +3,7 @@ package com.yurtmod.structure;
 import java.util.function.Predicate;
 
 import com.yurtmod.block.Categories.IBedouinBlock;
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.material.Material;
@@ -24,7 +24,7 @@ public class StructureBedouin extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
-		final boolean tentDim = TentDimension.isTentDimension(worldIn);
+		final boolean tentDim = DimensionManagerTent.isTentDimension(worldIn);
 		final Blueprints bp = getBlueprints(size);
 		if(bp == null) {
 			return false;
@@ -38,7 +38,7 @@ public class StructureBedouin extends StructureBase {
 		final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentDimension.STRUCTURE_DIR);
+			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, DimensionManagerTent.STRUCTURE_DIR);
 			if((worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
 					&& worldIn.isAirBlock(pos.up(1))) {
 				if(sizeNum > 2) {

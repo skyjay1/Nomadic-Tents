@@ -2,24 +2,27 @@ package com.yurtmod.structure;
 
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDoor.EnumDoorHalf;
 import net.minecraft.block.BlockSnow;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 
 public abstract class StructureBase {
 	
@@ -82,7 +85,7 @@ public abstract class StructureBase {
 		// check if the structure needs to be reset
 		if (resetFlag) {
 			// remove previous structure			
-			prevStructure.getNewStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, prevStructure.getSize());
+			prevStructure.getNewStructure().remove(worldIn, doorPos, DimensionManagerTent.STRUCTURE_DIR, prevStructure.getSize());
 		}
 		
 		// before building a new structure, check if it's already been made
@@ -94,15 +97,15 @@ public abstract class StructureBase {
 		}
 
 		// it's made it this far, time to build the new structure!
-		final boolean success = this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.structure.getSize(),
-				this.structure.getDoorBlock(), this.structure.getWallBlock(TentDimension.DIMENSION_ID),
+		final boolean success = this.generate(worldIn, doorPos, DimensionManagerTent.STRUCTURE_DIR, this.structure.getSize(),
+				this.structure.getDoorBlock(), this.structure.getWallBlock(DimensionType.getById(DimensionManagerTent.DIMENSION_ID)),
 				this.structure.getRoofBlock());
 
 		if (success) {
 			// make the platform AFTER generating structure
 			generatePlatform(worldIn, corner.down(1), this.structure.getSize());
 			
-			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
+			worldIn.getChunk(doorPos).generateSkylightMap();
 			// set tile entity door information
 			updateDoorInfo(worldIn, doorPos, corner, this.structure, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
@@ -201,8 +204,8 @@ public abstract class StructureBase {
 		IBlockState doorL, doorU;
 		if (door.getBlock() instanceof BlockTentDoor) {
 			EnumFacing.Axis axis = dir.getAxis() == EnumFacing.Axis.Z ? EnumFacing.Axis.Z : EnumFacing.Axis.X;
-			doorL = door.withProperty(BlockDoor.HALF, EnumDoorHalf.LOWER).withProperty(BlockTentDoor.AXIS, axis);
-			doorU = door.withProperty(BlockDoor.HALF, EnumDoorHalf.UPPER).withProperty(BlockTentDoor.AXIS, axis);
+			doorL = door.with(BlockDoor.HALF, DoubleBlockHalf.LOWER).with(BlockTentDoor.AXIS, axis);
+			doorU = door.with(BlockDoor.HALF, DoubleBlockHalf.UPPER).with(BlockTentDoor.AXIS, axis);
 			world.setBlockState(doorBase, doorL, 3);
 			world.setBlockState(doorBase.up(1), doorU, 3);
 		}
@@ -269,9 +272,10 @@ public abstract class StructureBase {
 	 * @return the EnumFacing direction in which it finds a valid and completed
 	 *         SMALL structure, null if none is found
 	 **/
+	@Nullable
 	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase, final StructureType.Size size) {
 		//StructureType.Size s = this.getType().getSize();
-		for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+		for (EnumFacing dir : new EnumFacing[] { EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST }) {
 			boolean isValid = isValidForFacing(worldIn, doorBase, size, dir);
 
 			if (isValid) {
@@ -315,6 +319,7 @@ public abstract class StructureBase {
 		return true;
 	}
 	
+	@Nullable
 	public Blueprints getBlueprints(final StructureType.Size size) {
 		switch(size) {
 		case MEGA:		return BP_MEGA;
@@ -332,6 +337,8 @@ public abstract class StructureBase {
 			final StructureType.Size size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
 
 	/**
+	 * @param size the StructureType.Size used for these blueprints
+	 * @param template the Blueprints object to add to (empty by default)
 	 * @return the Blueprints for a structure of the given StructureType.Size
 	 */
 	public abstract Blueprints makeBlueprints(final StructureType.Size size, final Blueprints template);

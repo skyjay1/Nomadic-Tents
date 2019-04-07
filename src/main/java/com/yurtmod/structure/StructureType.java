@@ -8,7 +8,7 @@ import com.yurtmod.block.Categories.ITentBlockBase;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
@@ -21,6 +21,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.dimension.DimensionType;
 
 public enum StructureType implements IStringSerializable {
 	// YURT
@@ -178,7 +179,7 @@ public enum StructureType implements IStringSerializable {
 	}
 
 	/** @return the block used to build walls, may be different inside tent **/
-	public IBlockState getWallBlock(int dimID) {
+	public IBlockState getWallBlock(DimensionType dimID) {
 		return this.getType().getWallBlock(dimID);
 	}
 
@@ -258,14 +259,14 @@ public enum StructureType implements IStringSerializable {
 		}
 
 		/** @return the main building block for this tent type. May be different inside tent. **/
-		public IBlockState getWallBlock(int dimID) {
+		public IBlockState getWallBlock(DimensionType dimID) {
 			switch (this) {
-			case YURT:		return TentDimension.isTentDimension(dimID) 
+			case YURT:		return DimensionManagerTent.isTentDimension(dimID) 
 								? Content.YURT_WALL_INNER.getDefaultState() 
 								: Content.YURT_WALL_OUTER.getDefaultState();
-			case TEPEE:		return Content.TEPEE_WALL.getDefaultState();
+			case TEPEE:		return Content.TEPEE_WALL_BLANK.getDefaultState();
 			case BEDOUIN:	return Content.BEDOUIN_WALL.getDefaultState();
-			case INDLU:		return TentDimension.isTentDimension(dimID) 
+			case INDLU:		return DimensionManagerTent.isTentDimension(dimID) 
 								? Content.INDLU_WALL_INNER.getDefaultState() 
 								: Content.INDLU_WALL_OUTER.getDefaultState();
 			}
@@ -276,7 +277,7 @@ public enum StructureType implements IStringSerializable {
 		public IBlockState getRoofBlock() {
 			switch (this) {
 			case YURT:		return Content.YURT_ROOF.getDefaultState();
-			case TEPEE:		return Content.TEPEE_WALL.getDefaultState();
+			case TEPEE:		return Content.TEPEE_WALL_BLANK.getDefaultState();
 			case BEDOUIN:	return Content.BEDOUIN_ROOF.getDefaultState();
 			case INDLU:		return Content.INDLU_WALL_OUTER.getDefaultState();
 			}

@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
@@ -79,7 +79,7 @@ public class ItemTent extends Item {
 	@Override
 	public EnumActionResult onItemUse(final ItemUseContext context) {
 		// looks at the item info and spawns the correct tent in the correct form
-		if (!TentDimension.isTentDimension(context.getWorld()) && !context.getWorld().isRemote) {
+		if (!DimensionManagerTent.isTentDimension(context.getWorld()) && !context.getWorld().isRemote) {
 			BlockPos hitPos = context.getPos();
 			ItemStack stack = context.getItem();
 			EnumFacing hitSide = context.getFace();
@@ -166,7 +166,7 @@ public class ItemTent extends Item {
 	
 	/** Calculates and returns the next available X location for a tent **/
 	public static int getOffsetX(World world, ItemStack tentStack) {
-		TentSaveData data = TentSaveData.forWorld(world);
+		TentSaveData data = TentSaveData.get(world.getServer());
 		switch (StructureType.get(tentStack).getType()) {
 		case BEDOUIN:	return data.addCountBedouin(1);
 		case TEPEE:		return data.addCountTepee(1);

@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.DimensionType;
 
 public class TentTeleporter extends Teleporter {
 	private final StructureType structurePrev;
@@ -47,13 +48,13 @@ public class TentTeleporter extends Teleporter {
 		float pitch = entity.rotationPitch;
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
 
-		if (TentDimension.isTentDimension(worldServerTo)) {
+		if (DimensionManagerTent.isTentDimension(worldServerTo)) {
 			entityX += entity.width;
 			// try to build a tent in that location (tent should check if it already exists)
 			this.structure.getNewStructure().generateInTentDimension(prevDimID, worldServerTo, tentDoorPos, 
 					prevX, prevY, prevZ, prevYaw, structurePrev);
 			// also synchronize the time between Tent and Overworld dimensions
-			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(0).getWorldTime());
+			worldServerTo.getWorldInfo().setDayTime(entity.getServer().getWorld(DimensionType.OVERWORLD).getDayTime());
 		}
 		
 		if (entity instanceof EntityPlayerMP) {
@@ -70,22 +71,22 @@ public class TentTeleporter extends Teleporter {
 	}
 	
 	public double getX() {
-		return TentDimension.isTentDimension(this.worldServerTo) 
+		return DimensionManagerTent.isTentDimension(this.worldServerTo) 
 				? this.tentDoorPos.getX() + 0.9D : this.prevX;
 	}
 	
 	public double getY() {
-		return TentDimension.isTentDimension(this.worldServerTo) 
+		return DimensionManagerTent.isTentDimension(this.worldServerTo) 
 				? this.tentDoorPos.getY() + 0.01D : this.prevY;
 	}
 	
 	public double getZ() {
-		return TentDimension.isTentDimension(this.worldServerTo) 
+		return DimensionManagerTent.isTentDimension(this.worldServerTo) 
 				? this.tentDoorPos.getZ() + 0.5D : this.prevZ;
 	}
 	
 	public float getYaw() {
-		return TentDimension.isTentDimension(this.worldServerTo) 
+		return DimensionManagerTent.isTentDimension(this.worldServerTo) 
 				? -90F : MathHelper.wrapDegrees(this.prevYaw + 180F);
 	}
 
@@ -94,7 +95,7 @@ public class TentTeleporter extends Teleporter {
 		String out = "\n[TentTeleporter]\n" + "structure=" + this.structure + "\ntentDoorPos=" + this.tentDoorPos
 				+ "\nprevX=" + this.prevX + "\nprevY=" + this.prevY + "\nprevZ=" + this.prevZ + "\nprevFacing=" 
 				+ this.prevYaw + "\nprevDimID=" + this.prevDimID + "\n" + "nextDimID=" 
-				+ this.worldServerTo.provider.getDimension() + "\n";
+				+ this.worldServerTo.getDimension().getType().getId() + "\n";
 		return out;
 	}
 }

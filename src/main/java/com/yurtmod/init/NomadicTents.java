@@ -2,7 +2,7 @@ package com.yurtmod.init;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.event.TentEventHandler;
 import com.yurtmod.proxies.ClientProxy;
 import com.yurtmod.proxies.CommonProxy;
@@ -14,13 +14,14 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.RegisterDimensionsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(NomadicTents.MODID)
@@ -46,16 +47,15 @@ public class NomadicTents {
 	public NomadicTents() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG);
 		setupConfig();
-		TentDimension.init();
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
 		MinecraftForge.EVENT_BUS.register(this);
 	}
-	
-	private void setup(final FMLCommonSetupEvent event) {
-		
+
+	public void setup(final RegisterDimensionsEvent event) {
+		DimensionManagerTent.setup(event);
 	}
-	
+
 	@SubscribeEvent
 	public static void registerItems(final RegistryEvent.Register<Item> event) {
 		System.out.println("yurtmod: RegisterItems");
@@ -71,6 +71,11 @@ public class NomadicTents {
 	@SubscribeEvent
 	public static void onLoadConfig(final ModConfig.Loading configEvent) {
 		
+	}
+	
+	@SubscribeEvent
+	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
+		PROXY.registerDimension(event);
 	}
 	
 	@SubscribeEvent

@@ -1,5 +1,7 @@
 package com.yurtmod.block;
 
+import java.util.Random;
+
 import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
@@ -20,7 +22,7 @@ public class BlockUnbreakable extends Block {
 	public static final AxisAlignedBB SINGULAR_AABB = new AxisAlignedBB(0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D);
 
 	public static final int LIGHT_OPACITY = 7;
-	
+
 	public BlockUnbreakable(Block.Properties prop) {
 		super(prop.hardnessAndResistance(-1.0F, 6000001.0F));
 	}
@@ -52,5 +54,10 @@ public class BlockUnbreakable extends Block {
 	@Override
 	public EnumPushReaction getPushReaction(IBlockState state) {
 		return EnumPushReaction.BLOCK;
+	}
+
+	@Override
+	public int quantityDropped(IBlockState state, Random random) {
+		return 0;
 	}
 }

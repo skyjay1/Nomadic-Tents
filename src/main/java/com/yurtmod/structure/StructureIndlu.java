@@ -3,7 +3,7 @@ package com.yurtmod.structure;
 import java.util.function.Predicate;
 
 import com.yurtmod.block.Categories.IIndluBlock;
-import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.material.Material;
@@ -24,7 +24,7 @@ public class StructureIndlu extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
-		boolean tentDim = TentDimension.isTentDimension(worldIn);
+		boolean tentDim = DimensionManagerTent.isTentDimension(worldIn);
 		Blueprints bp = getBlueprints(size);
 		if(bp == null) {
 			return false;
