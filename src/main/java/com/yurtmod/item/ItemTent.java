@@ -36,6 +36,11 @@ public class ItemTent extends Item {
 	public static final int ERROR_TAG = Short.MIN_VALUE;
 	public static final String OFFSET_X = "TentOffsetX";
 	public static final String OFFSET_Z = "TentOffsetZ";
+	//////////////////////////////////////////
+	// These may or may not be implemented in the future:
+	// public static final String DEPTH = "TentDepth";
+	// public static final String PREV_DEPTH = "TentDepthPrevious";
+	//////////////////////////////////////////
 	public static final String PREV_TENT_TYPE = "TentSpecsPrevious";
 	
 	public static final String TAG_COPY_TOOL = "TentCopyTool";

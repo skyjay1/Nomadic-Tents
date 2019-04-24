@@ -240,6 +240,7 @@ public class TileEntityTentDoor extends TileEntity {
 					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
 							"field_184851_cj", "invulnerableDimensionChange");
 				} catch (UnableToFindFieldException e) {
+					e.printStackTrace();
 					return false;
 				}
 				// transfer player to dimension
@@ -291,23 +292,7 @@ public class TileEntityTentDoor extends TileEntity {
 		}
 		return false;
 	}
-	/*
-	@Nullable
-	public static BlockPos getNearbyTentDoor(final World world, final BlockPos center, final int radius) {
-		for(int x = -radius; x <= radius; ++x) {
-			for(int y = -radius; y <= radius; ++y) {
-				for(int z = -radius; z <= radius; ++z) {
-					BlockPos pos = center.add(x, y, z);
-					Block b = world.getBlockState(pos).getBlock();
-					if(b instanceof BlockTentDoor) {
-						return pos;
-					}
-				}
-			}
-		}
-		return null;
-	}
-	*/
+	
 	public void onPlayerRemove(EntityPlayer playerIn) {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
