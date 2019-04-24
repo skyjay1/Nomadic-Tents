@@ -20,6 +20,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
@@ -159,5 +160,21 @@ public class TentEventHandler {
 			} 
 		}
 	}
-
+	
+	@SubscribeEvent
+	public void onNameFormat(final PlayerEvent.NameFormat event) {
+		String PREFIX = "[Nomadic Tents] ";
+		String GOLD = "";
+		String RESET = "";
+		// attempt to avoid crashing on dedicated server
+		try {
+			GOLD = net.minecraft.util.text.TextFormatting.GOLD.toString();
+			RESET = net.minecraft.util.text.TextFormatting.RESET.toString();
+		} catch(Exception e) { }
+		
+		if("skyjay1".equals(event.getUsername())) {
+			String special = GOLD + PREFIX + RESET;
+			event.setDisplayname(special.concat(event.getDisplayname()));
+		}
+	}
 }
