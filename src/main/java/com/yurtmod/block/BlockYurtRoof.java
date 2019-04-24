@@ -1,6 +1,7 @@
 package com.yurtmod.block;
 
 import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -16,6 +17,7 @@ public class BlockYurtRoof extends BlockUnbreakable implements IYurtBlock {
 		super(Material.CLOTH, MapColor.LIGHT_BLUE);
 		this.setLightOpacity(LIGHT_OPACITY);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(OUTSIDE, Boolean.valueOf(false)));
+		this.setCreativeTab(NomadicTents.TAB);
 	}
 	
 	@Override

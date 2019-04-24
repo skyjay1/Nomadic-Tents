@@ -1,6 +1,7 @@
 package com.yurtmod.block;
 
 import com.yurtmod.block.Categories.IBedouinBlock;
+import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
@@ -21,6 +22,7 @@ public class BlockBedouinWall extends BlockUnbreakable implements IBedouinBlock 
 		super(Material.CLOTH, MapColor.WOOD);
 		this.setDefaultState(
 				this.blockState.getBaseState().withProperty(ABOVE_SIMILAR, false).withProperty(BESIDE_SIMILAR, false));
+		this.setCreativeTab(NomadicTents.TAB);
 	}
 
 	@Override

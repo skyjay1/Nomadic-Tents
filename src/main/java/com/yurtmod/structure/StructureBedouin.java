@@ -1,8 +1,5 @@
 package com.yurtmod.structure;
 
-import java.util.function.Predicate;
-
-import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.structure.StructureType.Size;
 
@@ -15,8 +12,6 @@ import net.minecraft.world.World;
 
 public class StructureBedouin extends StructureBase {
 	
-	private static final Predicate<IBlockState> BEDOUIN_PRED = (IBlockState b) -> b.getBlock() instanceof IBedouinBlock;
-
 	public StructureBedouin(StructureType type) {
 		super(type);
 	}

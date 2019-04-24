@@ -5,10 +5,9 @@ import java.util.function.Predicate;
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.block.Categories.ITentBlockBase;
-import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.block.Block;
@@ -152,6 +151,10 @@ public abstract class StructureBase {
 	 **/
 	private static boolean generatePlatform(final World worldIn, final BlockPos corner, final StructureType.Size size) {
 		int sqWidth = size.getSquareWidth();
+		// specify the block to use for the platform's "harvestable" layer
+		Block topLayer = TentConfig.general.getFloorBlock();
+		// specify the block to use for the platform's "indestructible" layer
+		Block bottomLayer = Content.SUPER_DIRT;
 		// make a base from corner x,y,z to +x,y,+z
 		for (int i = 0; i < sqWidth; i++) {
 			for (int j = 0; j < sqWidth; j++) {
@@ -161,7 +164,7 @@ public abstract class StructureBase {
 				Block blockAt = worldIn.getBlockState(at).getBlock();
 				// make sure this position isn't awkwardly at the corner of a rounded structure
 				boolean placeFloor = false;
-				for(int f = 0; f < 20; f++) {
+				for(int f = 1; f < 24; f++) {
 					if(worldIn.getBlockState(at.up(f)).getBlock() instanceof BlockUnbreakable) {
 						placeFloor = true;
 						break;
@@ -170,13 +173,13 @@ public abstract class StructureBase {
 				if(placeFloor) {
 					// if this position is below a BlockUnbreakable, use Super Dirt, else use regular dirt
 					Block topState = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable 
-							? Content.SUPER_DIRT : Blocks.DIRT;
+							? bottomLayer : topLayer;
 					// if this position is considered replaceable, place the block, else skip this step
-					if (blockAt == Blocks.AIR || blockAt == Blocks.DIRT || blockAt == Content.SUPER_DIRT) {
+					if (blockAt == Blocks.AIR || blockAt == topLayer || blockAt == bottomLayer) {
 						worldIn.setBlockState(at, topState.getDefaultState(), 2);
 					}
 					// place bottom block: always indestructible dirt
-					worldIn.setBlockState(at.down(1), Content.SUPER_DIRT.getDefaultState(), 2);
+					worldIn.setBlockState(at.down(1), bottomLayer.getDefaultState(), 2);
 				}
 			}
 		}

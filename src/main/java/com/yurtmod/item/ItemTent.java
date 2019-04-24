@@ -11,7 +11,6 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.StructureType;
-import com.yurtmod.structure.StructureType.Size;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;

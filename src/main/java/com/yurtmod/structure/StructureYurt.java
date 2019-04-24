@@ -1,8 +1,5 @@
 package com.yurtmod.structure;
 
-import java.util.function.Predicate;
-
-import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
@@ -16,8 +13,6 @@ import net.minecraft.world.World;
 
 public class StructureYurt extends StructureBase {
 	
-	private static final Predicate<IBlockState> YURT_PRED = (IBlockState b) -> b.getBlock() instanceof IYurtBlock;
-
 	public StructureYurt(StructureType type) {
 		super(type);
 	}

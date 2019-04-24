@@ -2,18 +2,17 @@ package com.yurtmod.structure;
 
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
-import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITentBlockBase;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemTent;
 
-import mcp.mobius.waila.api.impl.ConfigHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -259,7 +258,7 @@ public enum StructureType implements IStringSerializable {
 			case YURT:		return TentDimension.isTentDimension(dimID) 
 								? Content.YURT_WALL_INNER.getDefaultState() 
 								: Content.YURT_WALL_OUTER.getDefaultState();
-			case TEPEE:		return Content.TEPEE_WALL.getDefaultState();
+			case TEPEE:		return Content.TEPEE_WALL_BLANK.getDefaultState();
 			case BEDOUIN:	return Content.BEDOUIN_WALL.getDefaultState();
 			case INDLU:		return TentDimension.isTentDimension(dimID) 
 								? Content.INDLU_WALL_INNER.getDefaultState() 
@@ -272,7 +271,7 @@ public enum StructureType implements IStringSerializable {
 		public IBlockState getRoofBlock() {
 			switch (this) {
 			case YURT:		return Content.YURT_ROOF.getDefaultState();
-			case TEPEE:		return Content.TEPEE_WALL.getDefaultState();
+			case TEPEE:		return Content.TEPEE_WALL_BLANK.getDefaultState();
 			case BEDOUIN:	return Content.BEDOUIN_ROOF.getDefaultState();
 			case INDLU:		return Content.INDLU_WALL_OUTER.getDefaultState();
 			}

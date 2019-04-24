@@ -1,0 +1,6 @@
+{
+	"variants": {
+		"above_similar=true": { "model": "yurtmod:yurt_wall_inner_upper"},
+		"above_similar=false": { "model": "yurtmod:yurt_wall_inner_lower"}
+	}
+}

@@ -2,8 +2,6 @@ package com.yurtmod.block;
 
 import java.util.Random;
 
-import com.yurtmod.init.NomadicTents;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.EnumPushReaction;
@@ -31,7 +29,6 @@ public class BlockUnbreakable extends Block {
 		this.setBlockUnbreakable();
 		this.disableStats();
 		this.setResistance(6000001.0F);
-		this.setCreativeTab(NomadicTents.TAB);
 		this.setSoundType(SoundType.WOOD);
 		this.setHarvestLevel("pickaxe", 10);
 	}

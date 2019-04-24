@@ -1,7 +1,7 @@
 package com.yurtmod.crafting;
 
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.item.ItemStack;

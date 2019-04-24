@@ -1,6 +1,5 @@
 package com.yurtmod.proxies;
 
-import com.yurtmod.block.BlockTepeeWall;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.structure.StructureType;
@@ -23,19 +22,12 @@ public class ClientProxy extends CommonProxy {
 		// register variant renders
 		int len = StructureType.values().length;
 		ResourceLocation[] RLTentItem = new ResourceLocation[len];
-		ResourceLocation[] RLTepeeWall = new ResourceLocation[BlockTepeeWall.NUM_TEXTURES];
 		for (int i = 0; i < len; i++) {
 			String modelName = NomadicTents.MODID + ":" + StructureType.getName(i);
 			RLTentItem[i] = new ResourceLocation(modelName);
 			register(Content.ITEM_TENT, modelName, i);
 		}
-		for (int j = 0; j < BlockTepeeWall.NUM_TEXTURES; j++) {
-			String modelName = Content.IB_TEPEE_WALL.getRegistryName() + "_" + j;
-			RLTepeeWall[j] = new ResourceLocation(modelName);
-			register(Content.IB_TEPEE_WALL, modelName, j);
-		}
 		ModelBakery.registerItemVariants(Content.ITEM_TENT, RLTentItem);
-		ModelBakery.registerItemVariants(Content.IB_TEPEE_WALL, RLTepeeWall);
 
 		// register items
 		register(Content.ITEM_TENT_CANVAS);
@@ -61,6 +53,22 @@ public class ClientProxy extends CommonProxy {
 		//// indlu blocks
 		register(Content.INDLU_WALL_OUTER);
 		register(Content.INDLU_WALL_INNER);
+		//// tepee blocks
+		register(Content.TEPEE_WALL_BLANK);
+		register(Content.TEPEE_WALL_BLACK);
+		register(Content.TEPEE_WALL_RED);
+		register(Content.TEPEE_WALL_YELLOW);
+		register(Content.TEPEE_WALL_ORANGE);
+		register(Content.TEPEE_WALL_WHITE);
+		register(Content.TEPEE_WALL_HOPE);
+		register(Content.TEPEE_WALL_SUN);
+		register(Content.TEPEE_WALL_CREEPER);
+		register(Content.TEPEE_WALL_UNIVERSE);
+		register(Content.TEPEE_WALL_EAGLE);
+		register(Content.TEPEE_WALL_TRIFORCE);
+		register(Content.TEPEE_WALL_DREAMCATCHER);
+		register(Content.TEPEE_WALL_RAIN);
+		register(Content.TEPEE_WALL_MAGIC);
 		//// door blocks
 		register(Content.YURT_DOOR_SML);
 		register(Content.YURT_DOOR_HGM);
@@ -70,6 +78,29 @@ public class ClientProxy extends CommonProxy {
 		register(Content.BEDOUIN_DOOR_HGM);
 		register(Content.INDLU_DOOR_SML);
 		register(Content.INDLU_DOOR_HGM);
+		//// cosmetic blocks
+		register(Content.COS_BEDOUIN_ROOF);
+		register(Content.COS_BEDOUIN_WALL);
+		register(Content.COS_INDLU_WALL_OUTER);
+		register(Content.COS_INDLU_WALL_INNER);
+		register(Content.COS_YURT_ROOF);
+		register(Content.COS_YURT_WALL_OUTER);
+		register(Content.COS_YURT_WALL_INNER);
+		register(Content.COS_TEPEE_WALL_BLANK);
+		register(Content.COS_TEPEE_WALL_BLACK);
+		register(Content.COS_TEPEE_WALL_RED);
+		register(Content.COS_TEPEE_WALL_YELLOW);
+		register(Content.COS_TEPEE_WALL_ORANGE);
+		register(Content.COS_TEPEE_WALL_WHITE);
+		register(Content.COS_TEPEE_WALL_HOPE);
+		register(Content.COS_TEPEE_WALL_SUN);
+		register(Content.COS_TEPEE_WALL_CREEPER);
+		register(Content.COS_TEPEE_WALL_UNIVERSE);
+		register(Content.COS_TEPEE_WALL_EAGLE);
+		register(Content.COS_TEPEE_WALL_TRIFORCE);
+		register(Content.COS_TEPEE_WALL_DREAMCATCHER);
+		register(Content.COS_TEPEE_WALL_RAIN);
+		register(Content.COS_TEPEE_WALL_MAGIC);
 		//// frame blocks
 		int[] progress = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 		register(Content.FRAME_YURT_WALL, progress);

@@ -4,7 +4,6 @@ import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.structure.StructureType;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;

@@ -3,8 +3,8 @@ package com.yurtmod.block;
 import javax.annotation.Nullable;
 
 import com.yurtmod.block.Categories.IFrameBlock;
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
 
 import net.minecraft.block.Block;
@@ -42,7 +42,6 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		super(Material.WOOD);
 		this.TO_BECOME = type;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(PROGRESS, 0));
-		this.setCreativeTab(null);
 	}
 
 	@Override
@@ -195,7 +194,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			case YURT_ROOF:
 				return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true));
 			case TEPEE_WALL:
-				return Content.TEPEE_WALL.getDefaultState();
+				return Content.TEPEE_WALL_BLANK.getDefaultState();
 			case BEDOUIN_WALL:
 				return Content.BEDOUIN_WALL.getDefaultState();
 			case BEDOUIN_ROOF:

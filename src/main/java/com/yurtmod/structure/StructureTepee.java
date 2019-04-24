@@ -1,10 +1,8 @@
 package com.yurtmod.structure;
 
 import java.util.Random;
-import java.util.function.Predicate;
 
 import com.yurtmod.block.BlockTepeeWall;
-import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.StructureType.Size;
@@ -19,8 +17,6 @@ import net.minecraft.world.World;
 public class StructureTepee extends StructureBase {
 	public static final int LAYER_DEPTH = 2;
 	
-	private static final Predicate<IBlockState> TEPEE_PRED = (IBlockState b) -> b.getBlock() instanceof ITepeeBlock;
-
 	public StructureTepee(StructureType type) {
 		super(type);
 	}
@@ -65,7 +61,7 @@ public class StructureTepee extends StructureBase {
 	public boolean isValidForFacing(World worldIn, BlockPos doorBase, Size size, EnumFacing facing) {
 		final Blueprints bp = this.getBlueprints(size);
 		// check wall arrays
-		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TEPEE_PRED);
+		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
 	}
 
 	@Override
@@ -80,9 +76,9 @@ public class StructureTepee extends StructureBase {
 					// psuedo-random seed ensures that all blocks that are same y-dis from door get
 					// the same seed
 					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.structure.id() * 321);
-					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed));
+					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
 				} else {
-					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand);
+					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
 				}
 				worldIn.setBlockState(pos, tepeeState, 3);
 			} else {

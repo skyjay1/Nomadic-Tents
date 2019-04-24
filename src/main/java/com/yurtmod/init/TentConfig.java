@@ -3,6 +3,8 @@ package com.yurtmod.init;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureType;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Config;
 
@@ -74,6 +76,21 @@ public final class TentConfig {
 			"(Note: this is done by clicking a tent door with any item that has NBT tag '" 
 			+ ItemTent.TAG_COPY_TOOL + "' set to true)"})
 		public boolean COPY_CREATIVE_ONLY = true;
+		
+		@Config.Name("Tent Floor")
+		@Config.Comment({"Specify the block used for the harvestable layer of all tent floors",
+				"Format: [mod]:[name] ~ Example: minecraft:sand"})
+		public String FLOOR_BLOCK = Blocks.DIRT.getRegistryName().toString();
+		
+		/** @return the Block to use in a tent platform (floor) **/
+		public Block getFloorBlock() {
+			Block floor = Block.getBlockFromName(FLOOR_BLOCK);
+			// Why do we prevent using diamond or gold for the floor? Because I said so, that's why.
+			if(floor == null || floor == Blocks.DIAMOND_BLOCK || floor == Blocks.GOLD_BLOCK) {
+				floor = Blocks.DIRT;
+			}
+			return floor;
+		}
 	}
 	
 	public static class TENTS {

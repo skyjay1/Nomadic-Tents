@@ -1,8 +1,5 @@
 package com.yurtmod.structure;
 
-import java.util.function.Predicate;
-
-import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.structure.StructureType.Size;
 
@@ -15,8 +12,6 @@ import net.minecraft.world.World;
 
 public class StructureIndlu extends StructureBase {
 	
-	private static final Predicate<IBlockState> INDLU_PRED = (IBlockState b) -> b.getBlock() instanceof IIndluBlock;
-
 	public StructureIndlu(StructureType type) {
 		super(type);
 	}
