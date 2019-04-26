@@ -1,6 +1,6 @@
 package com.yurtmod.block;
 
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.properties.IProperty;
@@ -10,12 +10,12 @@ import net.minecraft.block.state.IBlockState;
 
 public class BlockTentDoorHGM extends BlockTentDoor {
 	
-	public static final PropertyEnum<StructureType.Size> SIZE = PropertyEnum.<StructureType.Size>create("size",
-			StructureType.Size.class, StructureType.Size.HUGE, StructureType.Size.GIANT, StructureType.Size.MEGA);
+	public static final PropertyEnum<StructureWidth> SIZE = PropertyEnum.<StructureWidth>create("size",
+			StructureWidth.class, StructureWidth.HUGE, StructureWidth.GIANT, StructureWidth.MEGA);
 
 	public BlockTentDoorHGM(boolean isFull) {
 		super(isFull);
-		this.setDefaultState(this.getDefaultState().withProperty(SIZE, StructureType.Size.HUGE));
+		this.setDefaultState(this.getDefaultState().withProperty(SIZE, StructureWidth.HUGE));
 	}
 	
 	public BlockTentDoorHGM() {
@@ -26,7 +26,7 @@ public class BlockTentDoorHGM extends BlockTentDoor {
 	public IBlockState getStateFromMeta(int meta) {
 		IBlockState state = super.getStateFromMeta(meta);
 		int sizeInt = Math.floorDiv(meta, 4);
-		StructureType.Size size = StructureType.Size.values()[sizeInt + 3];
+		StructureWidth size = StructureWidth.values()[sizeInt + 3];
 		return state.withProperty(SIZE, size);
 	}
 

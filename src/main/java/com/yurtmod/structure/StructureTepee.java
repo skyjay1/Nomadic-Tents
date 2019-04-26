@@ -5,7 +5,8 @@ import java.util.Random;
 import com.yurtmod.block.BlockTepeeWall;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
-import com.yurtmod.structure.StructureType.Size;
+import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -15,14 +16,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class StructureTepee extends StructureBase {
-	public static final int LAYER_DEPTH = 2;
 	
-	public StructureTepee(StructureType type) {
-		super(type);
-	}
+	public static final int LAYER_DEPTH = 2;
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, 
+	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
 		boolean tentDim = TentDimension.isTentDimension(worldIn);
 		Blueprints bp = getBlueprints(size);
@@ -49,7 +47,7 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size) {
+	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size) {
 		// determine what blueprints to use
 		final Blueprints bp = this.getBlueprints(size);
 
@@ -58,7 +56,7 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, Size size, EnumFacing facing) {
+	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, EnumFacing facing) {
 		final Blueprints bp = this.getBlueprints(size);
 		// check wall arrays
 		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
@@ -75,7 +73,7 @@ public class StructureTepee extends StructureBase {
 				if (pos.getY() % 2 == 0) {
 					// psuedo-random seed ensures that all blocks that are same y-dis from door get
 					// the same seed
-					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.structure.id() * 321);
+					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.data.getWidth().getId() * 321);
 					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
 				} else {
 					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
@@ -88,7 +86,7 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public Blueprints makeBlueprints(final StructureType.Size size, Blueprints bp) {
+	public Blueprints makeBlueprints(final StructureWidth size, Blueprints bp) {
 		switch (size) {
 		case MEGA:
 			bp.addWallCoords(new int[][] {

@@ -4,7 +4,7 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemTent;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
@@ -153,7 +153,7 @@ public class TentEventHandler {
 					// transfer player using Teleporter
 					final TentTeleporter tel = new TentTeleporter(TentDimension.DIMENSION_ID, overworld,
 							new BlockPos(0, 0, 0), respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(),
-							event.player.rotationYaw, StructureType.get(0), StructureType.get(0));
+							event.player.rotationYaw, new StructureData());
 					mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
 					event.player.setPositionAndUpdate(respawnPos.getX(), respawnPos.getY(), respawnPos.getZ());
 				}

@@ -1,0 +1,33 @@
+{
+    "parent": "item/generated",
+	"textures": {
+        "layer0": "yurtmod:items/mallet"
+    },
+    "overrides": [
+		{ "predicate": { "yurtmod:tent": 0 }, "model": "yurtmod:item/yurt_small" },
+		{ "predicate": { "yurtmod:tent": 1 }, "model": "yurtmod:item/yurt_medium" },
+		{ "predicate": { "yurtmod:tent": 2 }, "model": "yurtmod:item/yurt_large" },
+		{ "predicate": { "yurtmod:tent": 3 }, "model": "yurtmod:item/yurt_huge" },
+		{ "predicate": { "yurtmod:tent": 4 }, "model": "yurtmod:item/yurt_giant" },
+		{ "predicate": { "yurtmod:tent": 5 }, "model": "yurtmod:item/yurt_mega" },
+		{ "predicate": { "yurtmod:tent": 6 }, "model": "yurtmod:item/tepee_small" },
+		{ "predicate": { "yurtmod:tent": 7 }, "model": "yurtmod:item/tepee_medium" },
+		{ "predicate": { "yurtmod:tent": 8 }, "model": "yurtmod:item/tepee_large" },
+		{ "predicate": { "yurtmod:tent": 9 }, "model": "yurtmod:item/tepee_huge" },
+		{ "predicate": { "yurtmod:tent": 10 }, "model": "yurtmod:item/tepee_giant" },
+		{ "predicate": { "yurtmod:tent": 11 }, "model": "yurtmod:item/tepee_mega" },
+		{ "predicate": { "yurtmod:tent": 12 }, "model": "yurtmod:item/bedouin_small" },
+		{ "predicate": { "yurtmod:tent": 13 }, "model": "yurtmod:item/bedouin_medium" },
+		{ "predicate": { "yurtmod:tent": 14 }, "model": "yurtmod:item/bedouin_large" },
+		{ "predicate": { "yurtmod:tent": 15 }, "model": "yurtmod:item/bedouin_huge" },
+		{ "predicate": { "yurtmod:tent": 16 }, "model": "yurtmod:item/bedouin_giant" },
+		{ "predicate": { "yurtmod:tent": 17 }, "model": "yurtmod:item/bedouin_mega" },
+		{ "predicate": { "yurtmod:tent": 18 }, "model": "yurtmod:item/indlu_small" },
+		{ "predicate": { "yurtmod:tent": 19 }, "model": "yurtmod:item/indlu_medium" },
+		{ "predicate": { "yurtmod:tent": 20 }, "model": "yurtmod:item/indlu_large" },
+		{ "predicate": { "yurtmod:tent": 21 }, "model": "yurtmod:item/indlu_huge" },
+		{ "predicate": { "yurtmod:tent": 22 }, "model": "yurtmod:item/indlu_giant" },
+		{ "predicate": { "yurtmod:tent": 23 }, "model": "yurtmod:item/indlu_mega" }
+		
+	]
+}

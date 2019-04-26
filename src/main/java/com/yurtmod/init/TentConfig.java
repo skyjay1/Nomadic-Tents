@@ -1,7 +1,7 @@
 package com.yurtmod.init;
 
 import com.yurtmod.item.ItemTent;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -112,23 +112,23 @@ public final class TentConfig {
 		public boolean ALLOW_INDLU = true;
 		
 		@Config.Name("Max Tiers: Yurt")
-		@Config.Comment("Limit the upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment("Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
 		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_YURT = StructureType.Size.values().length;
+		public int TIERS_YURT = StructureWidth.values().length;
 		
 		@Config.Name("Max Tiers: Tepee")
-		@Config.Comment("Limit the upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment("Limit the size upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
 		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_TEPEE = StructureType.Size.values().length;
+		public int TIERS_TEPEE = StructureWidth.values().length;
 		
 		@Config.Name("Max Tiers: Bedouin")
-		@Config.Comment("Limit the upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment("Limit the size upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
 		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_BEDOUIN = StructureType.Size.values().length;
+		public int TIERS_BEDOUIN = StructureWidth.values().length;
 		
 		@Config.Name("Max Tiers: Indlu")
-		@Config.Comment("Limit the upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment("Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
 		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_INDLU = StructureType.Size.values().length;
+		public int TIERS_INDLU = StructureWidth.values().length;
 	}
 }

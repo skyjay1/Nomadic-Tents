@@ -4,19 +4,23 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,6 +29,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -36,12 +41,7 @@ public class ItemTent extends Item {
 	public static final int ERROR_TAG = Short.MIN_VALUE;
 	public static final String OFFSET_X = "TentOffsetX";
 	public static final String OFFSET_Z = "TentOffsetZ";
-	//////////////////////////////////////////
-	// These may or may not be implemented in the future:
-	// public static final String DEPTH = "TentDepth";
-	// public static final String PREV_DEPTH = "TentDepthPrevious";
-	//////////////////////////////////////////
-	public static final String PREV_TENT_TYPE = "TentSpecsPrevious";
+	public static final String TENT_DATA = "TentData";
 	
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
 
@@ -49,6 +49,16 @@ public class ItemTent extends Item {
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
 		this.setCreativeTab(NomadicTents.TAB);
+		this.addPropertyOverride(new ResourceLocation(NomadicTents.MODID, "tent"),  new IItemPropertyGetter() {
+			@Override
+			public float apply(ItemStack stack, World worldIn, EntityLivingBase entityIn) {
+				if(stack.hasTagCompound() && stack.getTagCompound().hasKey(TENT_DATA)) {
+            		final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
+            		return (float)(data.getTent().getId() * StructureWidth.NUM_ENTRIES + data.getWidth().getId());
+            	}
+				return 0;
+			}
+        });
 	}
 
 	@Override
@@ -103,17 +113,19 @@ public class ItemTent extends Item {
 				} else {
 					// start checking to build structure
 					final EnumFacing playerFacing = player.getHorizontalFacing();
-					final StructureType type = StructureType.get(stack.getItemDamage());
-					final StructureType.Size size = BlockTentDoor.getOverworldSize(type);
-					final StructureBase struct = type.getNewStructure();
+					final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
+					// DEBUG
+					System.out.print(data.toString() + "\n");
+					final StructureWidth width = data.getWidth().getOverworldSize();
+					final StructureBase struct = data.getStructure();
 					// make sure the tent can be built here
-					if (struct.canSpawn(worldIn, hitPos, playerFacing, size)) {
+					if (struct.canSpawn(worldIn, hitPos, playerFacing, width)) {
 						// build the frames
-						if (struct.generateFrameStructure(worldIn, hitPos, playerFacing, size)) {
+						if (struct.generateFrameStructure(worldIn, hitPos, playerFacing, width)) {
 							// update the TileEntity information
 							final TileEntity te = worldIn.getTileEntity(hitPos);
 							if (te instanceof TileEntityTentDoor) {
-								StructureType.applyToTileEntity(player, stack, (TileEntityTentDoor) te);
+								StructureData.applyToTileEntity(player, stack, (TileEntityTentDoor) te);
 							} else {
 								System.out.println(
 										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
@@ -135,7 +147,8 @@ public class ItemTent extends Item {
 
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
-		return "item." + StructureType.getName(stack);
+		final StructureData data = new StructureData(stack);
+		return "item." + data.getTent().getName() + "_" + data.getWidth().getName();
 	}
 
 	@Override
@@ -143,11 +156,13 @@ public class ItemTent extends Item {
 		if (tab != NomadicTents.TAB) {
 			return;
 		}
-
-		for (StructureType type : StructureType.values()) {
-			if(type.isEnabled()) {
-				ItemStack tent = StructureType.getDropStack(ERROR_TAG, ERROR_TAG, type.id(), type.id());
-				items.add(tent);
+		
+		final StructureDepth depth = StructureDepth.NORMAL;
+		for(StructureTent tent : StructureTent.values()) {
+			for(StructureWidth size : StructureWidth.values()) {
+				final ItemStack i = StructureData.getDropStack(ERROR_TAG, ERROR_TAG, 
+						new StructureData(tent, size, depth));
+				items.add(i);
 			}
 		}
 	}
@@ -168,14 +183,15 @@ public class ItemTent extends Item {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		TextFormatting color = StructureType.get(stack.getItemDamage()).getTooltipColor();
+		TextFormatting color = new StructureData(stack).getWidth().getTooltipColor();
 		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
 	}
 	
 	/** Calculates and returns the next available X location for a tent **/
 	public static int getOffsetX(World world, ItemStack tentStack) {
-		TentSaveData data = TentSaveData.forWorld(world);
-		switch (StructureType.get(tentStack.getItemDamage()).getType()) {
+		final TentSaveData data = TentSaveData.forWorld(world);
+		final StructureTent tent = new StructureData(tentStack).getTent();
+		switch (tent) {
 		case BEDOUIN:	return data.addCountBedouin(1);
 		case TEPEE:		return data.addCountTepee(1);
 		case YURT:		return data.addCountYurt(1);
@@ -186,6 +202,6 @@ public class ItemTent extends Item {
 
 	/** Calculates the Z location based on the tent type **/
 	public static int getOffsetZ(ItemStack tentStack) {
-		return StructureType.get(tentStack.getItemDamage()).getTagOffsetZ();
+		return new StructureData(tentStack).getTagOffsetZ();
 	}
 }

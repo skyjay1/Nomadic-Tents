@@ -8,7 +8,10 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -27,8 +30,9 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldExcep
 
 public class TileEntityTentDoor extends TileEntity {
 	
-	private static final String KEY_STRUCTURE_TYPE_PREV = "StructureTypePrevious";
-	private static final String KEY_STRUCTURE_TYPE = "StructureTypeOrdinal";
+//	private static final String KEY_STRUCTURE_TYPE_PREV = "StructureTypePrevious";
+//	private static final String KEY_STRUCTURE_TYPE = "StructureTypeOrdinal";
+	private static final String S_TENT_DATA = "TentData";
 	private static final String S_OFFSET_X = "TentOffsetX";
 	private static final String S_OFFSET_Z = "TentOffsetZ";
 	private static final String S_PLAYER_X = "PlayerPrevX";
@@ -37,8 +41,8 @@ public class TileEntityTentDoor extends TileEntity {
 	private static final String S_PLAYER_YAW = "PlayerPrevFacing";
 	private static final String S_PLAYER_UUID = "PlayerUUID";
 	private static final String S_PLAYER_DIM = "PreviousPlayerDimension";
-	private StructureType structurePrev;
-	private StructureType structure;
+
+	private StructureData tent;
 	private int offsetX;
 	private int offsetZ;
 	private double prevX, prevY, prevZ;
@@ -48,17 +52,27 @@ public class TileEntityTentDoor extends TileEntity {
 
 	public TileEntityTentDoor() {
 		super();
-		if (this.structure == null) {
-			this.setPrevStructureType(StructureType.YURT_SMALL);
-			this.setStructureType(StructureType.YURT_SMALL);
+		if (this.tent == null) {
+			this.tent = new StructureData(StructureTent.YURT, StructureWidth.SMALL, StructureDepth.NORMAL);
 		}
 	}
-
+	
+	public void setTentData(final StructureData tentData) {
+		this.tent = tentData;
+	}
+	
+	public StructureData getTentData() {
+		return this.tent;
+	}
+	
+	public void resetPrevTentData() {
+		this.tent.resetPrevData();
+	}
+	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		this.structurePrev = StructureType.get(nbt.getInteger(KEY_STRUCTURE_TYPE_PREV));
-		this.structure = StructureType.get(nbt.getInteger(KEY_STRUCTURE_TYPE));
+		this.tent = new StructureData(nbt.getCompoundTag(S_TENT_DATA));
 		this.offsetX = nbt.getInteger(S_OFFSET_X);
 		this.offsetZ = nbt.getInteger(S_OFFSET_Z);
 		this.prevX = nbt.getDouble(S_PLAYER_X);
@@ -72,8 +86,7 @@ public class TileEntityTentDoor extends TileEntity {
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
-		nbt.setInteger(KEY_STRUCTURE_TYPE_PREV, this.structurePrev.id());
-		nbt.setInteger(KEY_STRUCTURE_TYPE, this.structure.id());
+		nbt.setTag(S_TENT_DATA, this.tent.serializeNBT());
 		nbt.setInteger(S_OFFSET_X, this.offsetX);
 		nbt.setInteger(S_OFFSET_Z, this.offsetZ);
 		nbt.setDouble(S_PLAYER_X, prevX);
@@ -95,26 +108,6 @@ public class TileEntityTentDoor extends TileEntity {
 	/** Calculates what chunk offset x to give a door or item **/
 	public static final int getChunkOffsetZ(int actualZ) {
 		return actualZ / (TentDimension.TENT_SPACING);
-	}
-	
-	public void resetPrevStructureType() {
-		this.structurePrev = this.structure;
-	}
-	
-	public void setPrevStructureType(StructureType type) {
-		this.structurePrev = type;
-	}
-
-	public StructureType getPrevStructureType() {
-		return this.structurePrev;
-	}
-
-	public void setStructureType(StructureType type) {
-		this.structure = type;
-	}
-
-	public StructureType getStructureType() {
-		return this.structure;
 	}
 
 	public void setOffsetX(int toSet) {
@@ -247,14 +240,14 @@ public class TileEntityTentDoor extends TileEntity {
 				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
 				// attempt to set spawnpoint, if enabled
 				if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
-					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.structure.getDoorOffsetZ(), 0, 0), 
+					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
 							this.prevX, this.prevY, this.prevZ);
 				}
 			} else {
 				// transfer non-player entity to dimension
 				mcServer.getPlayerList().transferEntityToWorld(entity, dimFrom, oldServer, newServer, (ITeleporter)tel);
 			}
-			this.resetPrevStructureType();
+			this.resetPrevTentData();
 			return true;
 		}
 		return false;
@@ -297,7 +290,7 @@ public class TileEntityTentDoor extends TileEntity {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
 		if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
-			BlockPos tentCenter = this.getTentDoorPos().add(this.getStructureType().getDoorOffsetZ(), 0, 0);
+			BlockPos tentCenter = this.getTentDoorPos().add(this.getTentData().getWidth().getDoorZ(), 0, 0);
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
 			for(EntityPlayerMP player : mcServer.getPlayerList().getPlayers()) {

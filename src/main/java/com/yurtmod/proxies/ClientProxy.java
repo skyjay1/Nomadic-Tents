@@ -1,14 +1,10 @@
 package com.yurtmod.proxies;
 
 import com.yurtmod.init.Content;
-import com.yurtmod.init.NomadicTents;
-import com.yurtmod.structure.StructureType;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Mod;
@@ -19,17 +15,8 @@ public class ClientProxy extends CommonProxy {
 
 	@SubscribeEvent
 	public static void onRenderEvent(ModelRegistryEvent event) {
-		// register variant renders
-		int len = StructureType.values().length;
-		ResourceLocation[] RLTentItem = new ResourceLocation[len];
-		for (int i = 0; i < len; i++) {
-			String modelName = NomadicTents.MODID + ":" + StructureType.getName(i);
-			RLTentItem[i] = new ResourceLocation(modelName);
-			register(Content.ITEM_TENT, modelName, i);
-		}
-		ModelBakery.registerItemVariants(Content.ITEM_TENT, RLTentItem);
-
 		// register items
+		register(Content.ITEM_TENT);
 		register(Content.ITEM_TENT_CANVAS);
 		register(Content.ITEM_YURT_WALL);
 		register(Content.ITEM_TEPEE_WALL);

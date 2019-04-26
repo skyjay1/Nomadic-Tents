@@ -1,4 +1,4 @@
-package com.yurtmod.structure;
+package com.yurtmod.structure.util;
 
 import java.util.ArrayList;
 import java.util.List;

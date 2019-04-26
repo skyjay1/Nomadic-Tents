@@ -1,7 +1,7 @@
 package com.yurtmod.dimension;
 
 import com.yurtmod.block.TileEntityTentDoor;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -11,8 +11,7 @@ import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
 
 public class TentTeleporter extends Teleporter {
-	private final StructureType structurePrev;
-	private final StructureType structure;
+	private final StructureData tentData;
 	private final BlockPos tentDoorPos;
 	private final double prevX, prevY, prevZ;
 	private final float prevYaw;
@@ -20,7 +19,7 @@ public class TentTeleporter extends Teleporter {
 	private final WorldServer worldServerTo;
 
 	public TentTeleporter(int dimensionFrom, WorldServer worldTo, BlockPos doorPos, double oldX, double oldY,
-			double oldZ, float oldYaw, StructureType prevType, StructureType type) {
+			double oldZ, float oldYaw, StructureData data) {
 		super(worldTo);
 		this.prevDimID = dimensionFrom;
 		this.worldServerTo = worldTo;
@@ -29,13 +28,12 @@ public class TentTeleporter extends Teleporter {
 		this.prevY = oldY;
 		this.prevZ = oldZ;
 		this.prevYaw = oldYaw;
-		this.structurePrev = prevType;
-		this.structure = type;
+		this.tentData = data;
 	}
 	
 	public TentTeleporter(final int worldFrom, final WorldServer worldTo, final TileEntityTentDoor te) {
 		this(worldFrom, worldTo, te.getTentDoorPos(), te.getPrevX(), te.getPrevY(), te.getPrevZ(),
-				te.getPrevFacing(), te.getPrevStructureType(), te.getStructureType());
+				te.getPrevFacing(), te.getTentData());
 	}
 
 	@Override
@@ -50,8 +48,8 @@ public class TentTeleporter extends Teleporter {
 		if (TentDimension.isTentDimension(worldServerTo)) {
 			entityX += entity.width;
 			// try to build a tent in that location (tent should check if it already exists)
-			this.structure.getNewStructure().generateInTentDimension(prevDimID, worldServerTo, tentDoorPos, 
-					prevX, prevY, prevZ, prevYaw, structurePrev);
+			this.tentData.getStructure().generateInTentDimension(prevDimID, worldServerTo, tentDoorPos, 
+					prevX, prevY, prevZ, prevYaw);
 			// also synchronize the time between Tent and Overworld dimensions
 			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(0).getWorldTime());
 		}
@@ -91,7 +89,7 @@ public class TentTeleporter extends Teleporter {
 
 	@Override
 	public String toString() {
-		String out = "\n[TentTeleporter]\n" + "structure=" + this.structure + "\ntentDoorPos=" + this.tentDoorPos
+		String out = "\n[TentTeleporter]\n" + "structure=" + this.tentData + "\ntentDoorPos=" + this.tentDoorPos
 				+ "\nprevX=" + this.prevX + "\nprevY=" + this.prevY + "\nprevZ=" + this.prevZ + "\nprevFacing=" 
 				+ this.prevYaw + "\nprevDimID=" + this.prevDimID + "\n" + "nextDimID=" 
 				+ this.worldServerTo.provider.getDimension() + "\n";

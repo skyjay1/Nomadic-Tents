@@ -9,7 +9,7 @@ import com.yurtmod.block.BlockTentFrame;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.init.NomadicTents;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
 
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.Optional;
 @Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = NomadicTents.HWYLA)
 public final class WailaProvider implements IWailaDataProvider {
 
-	private static final String KEY_STRUCTURE_TYPE = "StructureTypeOrdinal";
+	private static final String KEY_STRUCTURE_DATA = "StructureData";
 
 	@Optional.Method(modid = NomadicTents.HWYLA)
 	public static void callbackRegister(final IWailaRegistrar register) {
@@ -54,8 +54,8 @@ public final class WailaProvider implements IWailaDataProvider {
 		IBlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
 		if (state != null) {
 			if (state.getBlock() instanceof BlockTentDoor) {
-				int ordinal = accessor.getNBTInteger(accessor.getNBTData(), KEY_STRUCTURE_TYPE);
-				return StructureType.getDropStack(0, 0, 0, ordinal);
+				final StructureData data = new StructureData(accessor.getNBTData().getCompoundTag(KEY_STRUCTURE_DATA));
+				return StructureData.getDropStack(0, 0, data);
 			} else if (state.getBlock() instanceof BlockTentFrame) {
 				return new ItemStack(((BlockTentFrame) state.getBlock()).getEnumBlockToBecome().getBlock().getBlock());
 			}
@@ -87,7 +87,7 @@ public final class WailaProvider implements IWailaDataProvider {
 
 		if (tileEntity instanceof TileEntityTentDoor) {
 			TileEntityTentDoor tetd = (TileEntityTentDoor) tileEntity;
-			tag.setInteger(KEY_STRUCTURE_TYPE, tetd.getStructureType().id());
+			tag.setTag(KEY_STRUCTURE_DATA, tetd.getTentData().serializeNBT());
 		}
 		return tag;
 	}

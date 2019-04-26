@@ -2,7 +2,9 @@ package com.yurtmod.structure;
 
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
-import com.yurtmod.structure.StructureType.Size;
+import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -12,14 +14,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class StructureYurt extends StructureBase {
-	
-	public StructureYurt(StructureType type) {
-		super(type);
-	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, IBlockState doorBlock,
-			IBlockState wallBlock, IBlockState roofBlock) {
+	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size, 
+			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
 		boolean tentDim = TentDimension.isTentDimension(worldIn);
 		Blueprints bp = getBlueprints(size);
 		if(bp == null) {
@@ -45,7 +43,7 @@ public class StructureYurt extends StructureBase {
 	}
 
 	@Override
-	public Blueprints makeBlueprints(final StructureType.Size size, final Blueprints bp) {
+	public Blueprints makeBlueprints(final StructureWidth size, final Blueprints bp) {
 		switch (size) {
 		case MEGA:
 			bp.addWallCoords(new int[][] {

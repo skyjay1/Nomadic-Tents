@@ -1,7 +1,8 @@
 package com.yurtmod.structure;
 
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.structure.StructureType.Size;
+import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -12,15 +13,11 @@ import net.minecraft.world.World;
 
 public class StructureBedouin extends StructureBase {
 	
-	public StructureBedouin(StructureType type) {
-		super(type);
-	}
-
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, 
+	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth StructureWidth, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
 		final boolean tentDim = TentDimension.isTentDimension(worldIn);
-		final Blueprints bp = getBlueprints(size);
+		final Blueprints bp = getBlueprints(StructureWidth);
 		if(bp == null) {
 			return false;
 		}
@@ -30,13 +27,13 @@ public class StructureBedouin extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
+		final int StructureWidthNum = Math.floorDiv(StructureWidth.getSquareWidth(), 2);
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentDimension.STRUCTURE_DIR);
+			BlockPos pos = getPosFromDoor(doorBase, StructureWidthNum, -1, 0, TentDimension.STRUCTURE_DIR);
 			if((worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
 					&& worldIn.isAirBlock(pos.up(1))) {
-				if(sizeNum > 2) {
+				if(StructureWidthNum > 2) {
 					worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
 					worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 2);
 				} else {
@@ -50,8 +47,8 @@ public class StructureBedouin extends StructureBase {
 	}
 
 	@Override
-	public Blueprints makeBlueprints(final StructureType.Size size, final Blueprints bp) {
-		switch (size) {
+	public Blueprints makeBlueprints(final StructureWidth StructureWidth, final Blueprints bp) {
+		switch (StructureWidth) {
 		case SMALL:
 			bp.addWallCoords(new int[][] {
 					// layer 1
