@@ -85,7 +85,7 @@ public abstract class StructureBase {
 		// check if the structure needs to be reset
 		if (data.needsUpdate()) {
 			// remove previous structure			
-			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
+			data.makeStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
 			// should we pass data.getWidth or data.getPrevWidth ?
 			removePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getPrevDepth());
 		}
@@ -93,7 +93,7 @@ public abstract class StructureBase {
 		// before building a new structure, check if it's already been made
 		if (worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor) {
 			// door already exists, simply update TileEntity and skip building a new structure
-			updateDoorInfo(worldIn, doorPos, corner, this.data, 
+			updateDoorInfo(worldIn, doorPos, this.data, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return false;
 		}
@@ -109,7 +109,7 @@ public abstract class StructureBase {
 			
 			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
 			// set tile entity door information
-			updateDoorInfo(worldIn, doorPos, corner, this.data, 
+			updateDoorInfo(worldIn, doorPos, this.data, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return true;
 		}
@@ -122,15 +122,16 @@ public abstract class StructureBase {
 	 * 
 	 * @return true if a TileEntityTentDoor was found and all fields were set
 	 */
-	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final BlockPos corner, 
+	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, 
 			final StructureData data, final double prevX, final double prevY,
 			final double prevZ, final float prevFacing, final int prevDimension) {
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if (te instanceof TileEntityTentDoor) {
 			TileEntityTentDoor door = (TileEntityTentDoor) te;
+			data.setOffsetX(TileEntityTentDoor.getChunkOffsetX(doorPos.getX()));
+			data.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(doorPos.getZ()));
+			data.resetPrevData();
 			door.setTentData(data);
-			door.setOffsetX(TileEntityTentDoor.getChunkOffsetX(doorPos.getX()));
-			door.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(doorPos.getZ()));
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevFacing(prevFacing);
 			door.setPrevDimension(prevDimension);
@@ -167,10 +168,10 @@ public abstract class StructureBase {
 					// definitely indestructible blocks underneath other indestructible
 					placeFloor = true;
 					filler = bottom;					
-				} else if(worldIn.isAirBlock(at.up(1))) {
+				} else /* if(worldIn.isAirBlock(at.up(1))) */ {
 					// not sure, so let's check blocks above this one 
 					// to see if we need to do anything
-					for(int f = 1; f < 24; f++) {
+					for(int f = 1, maxExpectedHeight = 24; f < maxExpectedHeight; f++) {
 						if(worldIn.getBlockState(at.up(f)).getBlock() instanceof BlockUnbreakable) {
 							placeFloor = true;
 							filler = floor;
@@ -182,7 +183,10 @@ public abstract class StructureBase {
 				if(placeFloor && filler != null) {
 					// for each block in this column, place filler with super dirt underneath
 					for(int k = 0, l = depth.getLayers(); k < l; k++) {
-						worldIn.setBlockState(at.down(k), filler.getDefaultState());
+						// only replace if this block is air
+						if(worldIn.isAirBlock(at.down(k))) {
+							worldIn.setBlockState(at.down(k), filler.getDefaultState());
+						}
 					}
 					worldIn.setBlockState(at.down(depth.getLayers()), bottom.getDefaultState(), 2);
 				}
@@ -197,14 +201,15 @@ public abstract class StructureBase {
 	private static boolean removePlatform(final World worldIn, final BlockPos corner, 
 			final StructureWidth size, final StructureDepth depth) {
 		final int sqWidth = size.getSquareWidth();
-		final int layers = depth.getLayers();
+		// layers +1 to include bottom layer
+		final int layers = depth.getLayers() + 1;
 		final Block bottom = Content.SUPER_DIRT;
 		final Block floor = TentConfig.general.getFloorBlock();
 		// remove base from corner x,y,z to +x,-y,+z
 		for (int i = 0; i < sqWidth; i++) {
 			for (int j = 0; j < sqWidth; j++) {
 				for(int k = 0; k < layers; k++) {
-					// for each block, check if it's filler or indestructible
+					// for each block, check if it's filler or indestructible (only those will be removed)
 					final BlockPos at = corner.add(i, -k, j);
 					final Block blockAt = worldIn.getBlockState(at).getBlock();
 					if(blockAt == bottom || blockAt == floor || blockAt instanceof BlockUnbreakable) {

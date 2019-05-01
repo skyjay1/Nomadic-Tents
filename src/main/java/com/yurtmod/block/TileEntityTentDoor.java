@@ -9,9 +9,6 @@ import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.util.StructureData;
-import com.yurtmod.structure.util.StructureDepth;
-import com.yurtmod.structure.util.StructureTent;
-import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEnderman;
@@ -33,8 +30,7 @@ public class TileEntityTentDoor extends TileEntity {
 //	private static final String KEY_STRUCTURE_TYPE_PREV = "StructureTypePrevious";
 //	private static final String KEY_STRUCTURE_TYPE = "StructureTypeOrdinal";
 	private static final String S_TENT_DATA = "TentData";
-	private static final String S_OFFSET_X = "TentOffsetX";
-	private static final String S_OFFSET_Z = "TentOffsetZ";
+	
 	private static final String S_PLAYER_X = "PlayerPrevX";
 	private static final String S_PLAYER_Y = "PlayerPrevY";
 	private static final String S_PLAYER_Z = "PlayerPrevZ";
@@ -43,8 +39,6 @@ public class TileEntityTentDoor extends TileEntity {
 	private static final String S_PLAYER_DIM = "PreviousPlayerDimension";
 
 	private StructureData tent;
-	private int offsetX;
-	private int offsetZ;
 	private double prevX, prevY, prevZ;
 	private float prevFacing;
 	private int prevDimID;
@@ -53,7 +47,7 @@ public class TileEntityTentDoor extends TileEntity {
 	public TileEntityTentDoor() {
 		super();
 		if (this.tent == null) {
-			this.tent = new StructureData(StructureTent.YURT, StructureWidth.SMALL, StructureDepth.NORMAL);
+			this.tent = new StructureData();
 		}
 	}
 	
@@ -73,8 +67,6 @@ public class TileEntityTentDoor extends TileEntity {
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
 		this.tent = new StructureData(nbt.getCompoundTag(S_TENT_DATA));
-		this.offsetX = nbt.getInteger(S_OFFSET_X);
-		this.offsetZ = nbt.getInteger(S_OFFSET_Z);
 		this.prevX = nbt.getDouble(S_PLAYER_X);
 		this.prevY = nbt.getDouble(S_PLAYER_Y);
 		this.prevZ = nbt.getDouble(S_PLAYER_Z);
@@ -87,8 +79,6 @@ public class TileEntityTentDoor extends TileEntity {
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setTag(S_TENT_DATA, this.tent.serializeNBT());
-		nbt.setInteger(S_OFFSET_X, this.offsetX);
-		nbt.setInteger(S_OFFSET_Z, this.offsetZ);
 		nbt.setDouble(S_PLAYER_X, prevX);
 		nbt.setDouble(S_PLAYER_Y, prevY);
 		nbt.setDouble(S_PLAYER_Z, prevZ);
@@ -110,21 +100,21 @@ public class TileEntityTentDoor extends TileEntity {
 		return actualZ / (TentDimension.TENT_SPACING);
 	}
 
-	public void setOffsetX(int toSet) {
-		this.offsetX = toSet;
-	}
-
-	public int getOffsetX() {
-		return this.offsetX;
-	}
-
-	public void setOffsetZ(int toSet) {
-		this.offsetZ = toSet;
-	}
-
-	public int getOffsetZ() {
-		return this.offsetZ;
-	}
+//	public void setOffsetX(int toSet) {
+//		this.offsetX = toSet;
+//	}
+//
+//	public int getOffsetX() {
+//		return this.offsetX;
+//	}
+//
+//	public void setOffsetZ(int toSet) {
+//		this.offsetZ = toSet;
+//	}
+//
+//	public int getOffsetZ() {
+//		return this.offsetZ;
+//	}
 
 	public void setOverworldXYZ(double posX, double posY, double posZ) {
 		this.prevX = posX;
@@ -162,9 +152,9 @@ public class TileEntityTentDoor extends TileEntity {
 
 	/** @return the Tent Dimension location of the tent's door **/
 	public BlockPos getTentDoorPos() {
-		int x = this.offsetX * (TentDimension.TENT_SPACING);
+		int x = this.tent.getOffsetX() * (TentDimension.TENT_SPACING);
 		int y = TentDimension.FLOOR_Y;
-		int z = this.offsetZ * (TentDimension.TENT_SPACING);
+		int z = this.tent.getOffsetZ() * (TentDimension.TENT_SPACING);
 		return new BlockPos(x, y, z);
 	}
 	
@@ -360,9 +350,8 @@ public class TileEntityTentDoor extends TileEntity {
 			}
 			// attempt teleport AFTER setting OverworldXYZ
 			return this.teleport(entity);
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -383,7 +372,8 @@ public class TileEntityTentDoor extends TileEntity {
 			}
 			// attempt teleport AFTER setting OverworldXYZ
 			return this.teleport(player);
-		} else return false;
+		}
+		return false;
 	}
 
 	public boolean canTeleportEntity(Entity entity) {

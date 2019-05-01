@@ -122,5 +122,6 @@ item.tent_upgrade_diamond.name=Diamond Crossbeam
 
 # Chat / Tooltips / Waila
 tooltip.extra_dimensional_space=Extra-dimensional space!
+tooltip.depth_upgrades=Depth Upgrades: %s / %s
 chat.no_teleport=Teleporting is not allowed inside your tent.
 waila.progress=Progress: %s

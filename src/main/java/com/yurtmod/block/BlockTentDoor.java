@@ -76,7 +76,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
 				StructureData data = teyd.getTentData();
-				StructureBase struct = data.getStructure();
+				StructureBase struct = data.makeStructure();
 				ItemStack held = player.getHeldItem(hand);
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
@@ -84,7 +84,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						&& held != null && held.hasTagCompound() 
 						&& held.getTagCompound().hasKey(ItemTent.TAG_COPY_TOOL)
 						&& held.getTagCompound().getBoolean(ItemTent.TAG_COPY_TOOL)) {
-					final ItemStack copyStack = StructureData.getDropStack(teyd);
+					final ItemStack copyStack = teyd.getTentData().getDropStack();
 					if (copyStack != null) {
 						// drop the tent item (without affecting the tent)
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, copyStack);
@@ -110,7 +110,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						return false;
 					}
 					// STEP 4:  drop the tent item and damage the tool
-					ItemStack toDrop = StructureData.getDropStack(teyd);
+					ItemStack toDrop = teyd.getTentData().getDropStack();
 					if (toDrop != null) {
 						// drop the tent item
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
@@ -155,7 +155,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
 				StructureData type = teDoor.getTentData();
-				StructureBase struct = type.getStructure();
+				StructureBase struct = type.makeStructure();
 				// make sure there is a valid tent before doing anything
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, pos, type.getWidth().getOverworldSize());

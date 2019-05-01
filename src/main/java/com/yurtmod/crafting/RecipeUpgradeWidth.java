@@ -47,10 +47,11 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 			} else {
 				final StructureData data = new StructureData(
 						tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
+				final StructureWidth upgrade = data.getWidth().getUpgrade(data);
 				// return true if the tent is upgradeable to match this one
 				if (data.getTent() == this.tent 
-					&& data.getWidth().canUpgrade() 
-					&& data.getWidth().getUpgrade() == this.width) {
+					&& upgrade != data.getWidth() 
+					&& upgrade == this.width) {
 					return true;
 				}
 			}
@@ -70,20 +71,13 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		
 		if (!inputTent.isEmpty() && inputTent.hasTagCompound()) {
 			final StructureData tentData = new StructureData(inputTent);
-			NBTTagCompound nbt = inputTent.getTagCompound();
-			final int inputX = nbt.getInteger(ItemTent.OFFSET_X);
-			final int inputZ = nbt.getInteger(ItemTent.OFFSET_Z);
 			tentData.setPrevWidth(tentData.getPrevWidth());
-			tentData.setWidth(tentData.getWidth().getUpgrade());
+			tentData.setWidth(tentData.getWidth().getUpgrade(tentData));
 			// transfer those values to the new tent
-			resultTag.setInteger(ItemTent.OFFSET_X, inputX);
-			resultTag.setInteger(ItemTent.OFFSET_Z, inputZ);
 			resultTag.setTag(ItemTent.TENT_DATA, tentData.serializeNBT());
 		} else {
 			// no tent was found, user is making a small tent
-			final StructureData data = new StructureData(this.tent, this.width, StructureDepth.NORMAL);
-			resultTag.setInteger(ItemTent.OFFSET_X, ItemTent.ERROR_TAG);
-			resultTag.setInteger(ItemTent.OFFSET_Z, ItemTent.ERROR_TAG);
+			final StructureData data = new StructureData().setBoth(this.tent, this.width, StructureDepth.NORMAL);
 			resultTag.setTag(ItemTent.TENT_DATA, data.serializeNBT());
 		}
 		result.setTagCompound(resultTag);
@@ -94,7 +88,4 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	public boolean isDynamic() {
 		return true;
 	}
-	
-
-
 }

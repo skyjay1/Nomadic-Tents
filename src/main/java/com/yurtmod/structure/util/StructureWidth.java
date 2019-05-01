@@ -36,12 +36,12 @@ public enum StructureWidth implements IStringSerializable {
 		return false;
 	}
 	
-	public StructureWidth getUpgrade() {
+	public StructureWidth getUpgrade(final StructureData data) {
 		final int index = Math.min(this.ordinal() + 1, NUM_ENTRIES - 1);
-		return values()[index];
+		return this.canUpgrade(data) ? values()[index] : this;
 	}
 	
-	public boolean canUpgrade() {
+	protected boolean canUpgrade(final StructureData data) {
 		return this.ordinal() < NUM_ENTRIES - 1;
 	}
 

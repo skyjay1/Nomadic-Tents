@@ -17,30 +17,26 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class StructureData implements net.minecraftforge.common.util.INBTSerializable<NBTTagCompound> {
 	
+	////// String keys for NBT //////
 	public static final String KEY_TENT_CUR = "StructureTentType";
 	public static final String KEY_WIDTH_PREV = "StructureWidthPrevious";
 	public static final String KEY_WIDTH_CUR = "StructureWidthCurrent";
 	public static final String KEY_DEPTH_PREV = "StructureDepthPrevious";
 	public static final String KEY_DEPTH_CUR = "StructureDepthCurrent";
+	public static final String KEY_OFFSET_X = "StructureOffsetX";
+	public static final String KEY_OFFSET_Z = "StructureOffsetZ";
 	
-	private StructureTent tent;
-	private StructureWidth width;
-	private StructureDepth depth;
+	////// Important fields and default values //////
+	private StructureTent tent = StructureTent.getById((short)0);
+	private StructureWidth width = StructureWidth.getById((short)0);
+	private StructureDepth depth = StructureDepth.getById((short)0);
+	private StructureWidth prevWidth = StructureWidth.getById((short)0);
+	private StructureDepth prevDepth = StructureDepth.getById((short)0);
+	private int offsetX = ItemTent.ERROR_TAG;
+	private int offsetZ = ItemTent.ERROR_TAG;
 	
-	private StructureWidth prevWidth;
-	private StructureDepth prevDepth;
-	
-	public StructureData(final StructureWidth widthPrev, final StructureDepth depthPrev,
-			final StructureTent tentCur, final StructureWidth widthCur, final StructureDepth depthCur) {
-		this.tent = tentCur;
-		this.width = widthCur;
-		this.depth = depthCur;
-		this.prevWidth = widthPrev;
-		this.prevDepth = depthPrev;
-	}
-
-	public StructureData(final StructureTent t, final StructureWidth w, final StructureDepth d) {
-		this(w, d, t, w, d);
+	public StructureData() {
+		// empty constructor (uses defaults)
 	}
 	
 	public StructureData(final NBTTagCompound nbt) {
@@ -51,17 +47,51 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	public StructureData(final ItemStack tentStack) {
-		this(tentStack.getSubCompound(ItemTent.TENT_DATA));
+		this(tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
 	}
 	
-	public StructureData() {
-		// default values
-		this(StructureTent.YURT, StructureWidth.SMALL, StructureDepth.NORMAL);
+	public StructureData setBoth(final StructureTent tentIn, final StructureWidth widthIn, final StructureDepth depthIn) {
+		this.setCurrent(tentIn, widthIn, depthIn);
+		this.setPrev(widthIn, depthIn);
+		return this;
+	}
+	
+	public StructureData setCurrent(final StructureTent tentCur, final StructureWidth widthCur, final StructureDepth depthCur) {
+		this.tent = tentCur;
+		this.width = widthCur;
+		this.depth = depthCur;
+		return this;
+	}
+	
+	public StructureData setPrev(final StructureWidth widthPrev, final StructureDepth depthPrev) {
+		this.prevWidth = widthPrev;
+		this.prevDepth = depthPrev;
+		return this;
+	}
+
+	public StructureData setOffsets(final int x, final int z) {
+		this.offsetX = x;
+		this.offsetZ = z;
+		return this;
 	}
 	
 	public StructureData prevData() {
-		return new StructureData(tent, prevWidth, prevDepth);
+		return new StructureData()
+				.setCurrent(tent, prevWidth, prevDepth)
+				.setPrev(prevWidth, prevDepth)
+				.setOffsets(offsetX, offsetZ);
 	}
+	
+	public StructureData copy() {
+		return new StructureData()
+				.setCurrent(tent, width, depth)
+				.setPrev(prevWidth, prevDepth)
+				.setOffsets(offsetX, offsetZ);
+	}
+	
+	//////////////////////////////////
+	////// GETTERS AND SETTERS ///////
+	//////////////////////////////////
 
 	public StructureTent getTent() {
 		return this.tent;
@@ -81,6 +111,14 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	
 	public StructureDepth getPrevDepth() {
 		return this.prevDepth;
+	}
+	
+	public int getOffsetX() {
+		return this.offsetX;
+	}
+	
+	public int getOffsetZ() {
+		return this.offsetZ;
 	}
 	
 	public void setTent(final StructureTent tentIn) {
@@ -103,15 +141,17 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		this.prevDepth = depthIn;
 	}
 	
-	public void resetPrevData() {
-		this.prevWidth = this.width;
-		this.prevDepth = this.depth;
+	public void setOffsetX(final int toSet) {
+		this.offsetX = toSet;
 	}
 	
-	public boolean needsUpdate() {
-		return  this.depth != this.prevDepth ||
-				this.width != this.prevWidth;
+	public void setOffsetZ(final int toSet) {
+		this.offsetZ = toSet;
 	}
+	
+	//////////////////////////////////
+	//////// STRUCTURE BLOCKS ////////
+	//////////////////////////////////
 	
 	/** @return the Tent Door instance used for this structure **/
 	public IBlockState getDoorBlock() {
@@ -145,54 +185,54 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	public IBlockState getWallBlock(final int dimID) {
 		return this.tent.getWallBlock(dimID);
 	}
+
+	///////////////////////////////
+	/////// OTHER HELPFUL /////////
+	///////////////////////////////
+	
+	public void resetPrevData() {
+		this.prevWidth = this.width;
+		this.prevDepth = this.depth;
+	}
+	
+	public boolean needsUpdate() {
+		return  this.depth != this.prevDepth ||
+				this.width != this.prevWidth;
+	}
 	
 	public static void applyToTileEntity(final EntityPlayer player, final ItemStack stack, final TileEntityTentDoor te) {
-		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.OFFSET_X)) {
+		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.TENT_DATA)) {
 			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}
-
-		int offsetx = stack.getTagCompound().getInteger(ItemTent.OFFSET_X);
-		int offsetz = stack.getTagCompound().getInteger(ItemTent.OFFSET_Z);
+		
 		te.setTentData(new StructureData(stack));
-		te.setOffsetX(offsetx);
-		te.setOffsetZ(offsetz);
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
 		if(TentConfig.general.OWNER_ENTRANCE || TentConfig.general.OWNER_PICKUP) {
 			te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
 		}
 	}
-	
-	/** @return an NBT-tagged ItemStack based on the passed TileEntityTentDoor **/
-	public static ItemStack getDropStack(TileEntityTentDoor te) {
-		return getDropStack(te.getOffsetX(), te.getOffsetZ(), te.getTentData());
-	}
 
 	/** @return an NBT-tagged ItemStack based on the passed values **/
-	public static ItemStack getDropStack(int tagChunkX, int tagChunkZ, StructureData data) {
+	public ItemStack getDropStack() {
 		ItemStack stack = new ItemStack(Content.ITEM_TENT, 1);
 		if (stack.getTagCompound() == null) {
 			stack.setTagCompound(new NBTTagCompound());
 		}
-		stack.getTagCompound().setInteger(ItemTent.OFFSET_X, tagChunkX);
-		stack.getTagCompound().setInteger(ItemTent.OFFSET_Z, tagChunkZ);
-		stack.getTagCompound().setTag(ItemTent.TENT_DATA, data.serializeNBT());
+		stack.getTagCompound().setTag(ItemTent.TENT_DATA, this.serializeNBT());
 		return stack;
 	}
+
+	/** Note: the StructureBase only contains a COPY of this StructureData **/
+	public StructureBase makePrevStructure() {
+		return this.tent.makeStructure(this.prevData().copy());
+	}
 	
-	/** @return the Z-offset of this structure type in the Tent Dimension **/
-	public int getTagOffsetZ() {
-		return this.tent.getId();
-	}
-
-	public StructureBase getPrevStructure() {
-		return this.tent.getStructure(this.prevData());
-	}
-
-	public StructureBase getStructure() {
-		return this.tent.getStructure(this);
+	/** Note: the StructureBase only contains a COPY of this StructureData **/
+	public StructureBase makeStructure() {
+		return this.tent.makeStructure(this.copy());
 	}
 
 	@Override
@@ -201,12 +241,15 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		// only write if non-null
 		if(this.tent != null) {
 			// 'Current' values
-			nbt.setShort(KEY_TENT_CUR, this.getTent().getId());
-			nbt.setShort(KEY_WIDTH_CUR, this.getWidth().getId());
-			nbt.setShort(KEY_DEPTH_CUR, this.getDepth().getId());
+			nbt.setShort(KEY_TENT_CUR, this.tent.getId());
+			nbt.setShort(KEY_WIDTH_CUR, this.width.getId());
+			nbt.setShort(KEY_DEPTH_CUR, this.depth.getId());
 			// 'Previous' values
-			nbt.setShort(KEY_WIDTH_PREV, this.getPrevWidth().getId());
-			nbt.setShort(KEY_DEPTH_PREV, this.getPrevDepth().getId());
+			nbt.setShort(KEY_WIDTH_PREV, this.prevWidth.getId());
+			nbt.setShort(KEY_DEPTH_PREV, this.prevDepth.getId());
+			// Offsets (tent location)
+			nbt.setInteger(KEY_OFFSET_X, this.offsetX);
+			nbt.setInteger(KEY_OFFSET_Z, this.offsetZ);
 		}
 		
 		return nbt;
@@ -219,6 +262,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		this.depth = StructureDepth.getById(nbt.getShort(KEY_DEPTH_CUR));
 		this.prevWidth = StructureWidth.getById(nbt.getShort(KEY_WIDTH_PREV));
 		this.prevDepth = StructureDepth.getById(nbt.getShort(KEY_DEPTH_PREV));
+		this.offsetX = nbt.getInteger(KEY_OFFSET_X);
+		this.offsetZ = nbt.getInteger(KEY_OFFSET_Z);
 	}
 	
 	@Override
@@ -226,6 +271,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return "StructureData: [TENT = " + tent.getName() + "; WIDTH = " 
 				+ width.getName() + "; DEPTH = " + depth.getName() + 
 				"; PREV_WIDTH = " + prevWidth.getName() + "; PREV_DEPTH = " 
-				+ prevDepth.getName() + "]";
+				+ prevDepth.getName() + "; OFFSET_X = " + offsetX
+				+ "; OFFSET_Z = " + offsetZ + "]";
 	}
 }

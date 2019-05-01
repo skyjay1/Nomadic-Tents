@@ -22,13 +22,22 @@ public enum StructureDepth implements IStringSerializable {
 		return this.size;
 	}
 	
-	public StructureDepth getUpgrade() {
+	public StructureDepth getUpgrade(final StructureData data) {
 		final int index = Math.min(this.ordinal() + 1, NUM_ENTRIES - 1);
-		return values()[index];
+		return this.canUpgrade(data) ? values()[index] : this;
 	}
 	
-	public boolean canUpgrade() {
+	protected boolean canUpgrade(final StructureData data) {
+		// TODO better upgrade rules
 		return this.ordinal() < NUM_ENTRIES - 1;
+	}
+	
+	public int maxUpgrades(final StructureData data) {
+		return data.getWidth().getId();
+	}
+	
+	public int countUpgrades(final StructureData data) {
+		return data.getDepth().ordinal();
 	}
 
 	public short getId() {

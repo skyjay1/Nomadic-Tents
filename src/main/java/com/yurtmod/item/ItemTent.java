@@ -39,8 +39,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemTent extends Item {
 	/** Tent ItemStack NBTs should have this value for x and z offsets before it's set **/
 	public static final int ERROR_TAG = Short.MIN_VALUE;
-	public static final String OFFSET_X = "TentOffsetX";
-	public static final String OFFSET_Z = "TentOffsetZ";
+//	public static final String StructureData.KEY_OFFSET_X = "TentOffsetX";
+//	public static final String StructureData.KEY_OFFSET_Z = "TentOffsetZ";
 	public static final String TENT_DATA = "TentData";
 	
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
@@ -62,16 +62,8 @@ public class ItemTent extends Item {
 	}
 
 	@Override
-	public void onCreated(ItemStack stack, World world, EntityPlayer player) {
-		if (!world.isRemote) {
-			NBTTagCompound currentTag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
-			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInteger(OFFSET_X) == ERROR_TAG) {
-				// if the nbt is missing or has been set incorrectly, fix that
-				currentTag.setInteger(OFFSET_X, getOffsetX(world, stack));
-				currentTag.setInteger(OFFSET_Z, getOffsetZ(stack));
-				stack.setTagCompound(currentTag);
-			}
-		}
+	public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
+		fixStructureData(world, stack);
 	}
 
 	/**
@@ -80,15 +72,7 @@ public class ItemTent extends Item {
 	 **/
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-		if (!world.isRemote) {
-			NBTTagCompound currentTag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
-			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInteger(OFFSET_X) == ERROR_TAG) {
-				// if the nbt is missing or has been set incorrectly, fix that
-				currentTag.setInteger(OFFSET_X, getOffsetX(world, stack));
-				currentTag.setInteger(OFFSET_Z, getOffsetZ(stack));
-				stack.setTagCompound(currentTag);
-			}
-		}
+		fixStructureData(world, stack);
 	}
 
 	@Override
@@ -117,7 +101,7 @@ public class ItemTent extends Item {
 					// DEBUG
 					System.out.print(data.toString() + "\n");
 					final StructureWidth width = data.getWidth().getOverworldSize();
-					final StructureBase struct = data.getStructure();
+					final StructureBase struct = data.makeStructure();
 					// make sure the tent can be built here
 					if (struct.canSpawn(worldIn, hitPos, playerFacing, width)) {
 						// build the frames
@@ -160,9 +144,7 @@ public class ItemTent extends Item {
 		final StructureDepth depth = StructureDepth.NORMAL;
 		for(StructureTent tent : StructureTent.values()) {
 			for(StructureWidth size : StructureWidth.values()) {
-				final ItemStack i = StructureData.getDropStack(ERROR_TAG, ERROR_TAG, 
-						new StructureData(tent, size, depth));
-				items.add(i);
+				items.add(new StructureData().setBoth(tent, size, depth).getDropStack());
 			}
 		}
 	}
@@ -177,20 +159,46 @@ public class ItemTent extends Item {
 	 */
 	@Override
 	public int getEntityLifespan(ItemStack itemStack, World world) {
-		return Integer.MAX_VALUE;
+		return Integer.MAX_VALUE - 1;
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-		TextFormatting color = new StructureData(stack).getWidth().getTooltipColor();
+		final StructureData data = new StructureData(stack);
+		// tooltip for all tents
+		final TextFormatting color = data.getWidth().getTooltipColor();
 		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
+		// tooltip if depth upgrades applied (or shift held)
+		final int depthCount = data.getDepth().countUpgrades(data);
+		final int maxCount = data.getDepth().maxUpgrades(data);
+		if(depthCount > 0 || flagIn.isAdvanced() || net.minecraft.client.gui.GuiScreen.isShiftKeyDown()) {
+			tooltip.add(TextFormatting.GRAY + I18n.format("tooltip.depth_upgrades", depthCount, maxCount));
+		}
+	}
+	
+	public static void fixStructureData(final World world, final ItemStack stack) {
+		if (!world.isRemote) {
+			// make sure tag exists
+			if(!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
+			// check if data is missing or set incorrectly
+			StructureData data = new StructureData(stack);
+			if(data.getOffsetX() == ERROR_TAG) {
+				// update offset X and Z and the stack NBT
+				data.setOffsetX(getOffsetX(world, data.getTent()));
+				data.setOffsetZ(getOffsetZ(data.getTent()));
+				System.out.println("Updated information in ItemStack. It is now: " + data.toString());
+				stack.getTagCompound().setTag(TENT_DATA, data.serializeNBT());
+				System.out.println("Again, that's " + new StructureData(stack));
+			}
+		}
 	}
 	
 	/** Calculates and returns the next available X location for a tent **/
-	public static int getOffsetX(World world, ItemStack tentStack) {
+	public static int getOffsetX(World world, StructureTent tent) {
 		final TentSaveData data = TentSaveData.forWorld(world);
-		final StructureTent tent = new StructureData(tentStack).getTent();
 		switch (tent) {
 		case BEDOUIN:	return data.addCountBedouin(1);
 		case TEPEE:		return data.addCountTepee(1);
@@ -201,7 +209,7 @@ public class ItemTent extends Item {
 	}
 
 	/** Calculates the Z location based on the tent type **/
-	public static int getOffsetZ(ItemStack tentStack) {
-		return new StructureData(tentStack).getTagOffsetZ();
+	public static int getOffsetZ(StructureTent tent) {
+		return tent.getId();
 	}
 }

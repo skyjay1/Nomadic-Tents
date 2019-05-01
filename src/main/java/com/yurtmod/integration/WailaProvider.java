@@ -54,8 +54,7 @@ public final class WailaProvider implements IWailaDataProvider {
 		IBlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
 		if (state != null) {
 			if (state.getBlock() instanceof BlockTentDoor) {
-				final StructureData data = new StructureData(accessor.getNBTData().getCompoundTag(KEY_STRUCTURE_DATA));
-				return StructureData.getDropStack(0, 0, data);
+				return new StructureData(accessor.getNBTData().getCompoundTag(KEY_STRUCTURE_DATA)).getDropStack();
 			} else if (state.getBlock() instanceof BlockTentFrame) {
 				return new ItemStack(((BlockTentFrame) state.getBlock()).getEnumBlockToBecome().getBlock().getBlock());
 			}

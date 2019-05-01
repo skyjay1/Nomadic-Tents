@@ -91,7 +91,7 @@ public enum StructureTent implements IStringSerializable {
 		return null;
 	}
 	
-	public StructureBase getStructure(final StructureData data) {
+	public StructureBase makeStructure(final StructureData data) {
 		return this.structure.setData(data);
 	}
 	

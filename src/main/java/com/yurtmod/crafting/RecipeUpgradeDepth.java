@@ -4,7 +4,6 @@ import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
-import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -38,8 +37,8 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 			} else {
 				final StructureData data = new StructureData(
 						tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
-				// return true if the tent depth is upgradeable
-				return data.getDepth().canUpgrade();
+				// return true if the tent depth has valid upgrade
+				return data.getDepth().getUpgrade(data) != data.getDepth();
 			}
 		}
 		return false;
@@ -56,18 +55,18 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 		final NBTTagCompound resultTag = result.hasTagCompound() ? result.getTagCompound() : new NBTTagCompound();
 		
 		if (inputTent != null && inputTent.hasTagCompound()) {
-			NBTTagCompound nbt = inputTent.getTagCompound();
 			final StructureData tentData = new StructureData(inputTent);		
-			final int inputX = nbt.getInteger(ItemTent.OFFSET_X);
-			final int inputZ = nbt.getInteger(ItemTent.OFFSET_Z);
 			tentData.setPrevDepth(tentData.getPrevDepth());
-			tentData.setDepth(tentData.getDepth().getUpgrade());
+			tentData.setDepth(tentData.getDepth().getUpgrade(tentData));
 			// transfer those values to the new tent
-			resultTag.setInteger(ItemTent.OFFSET_X, inputX);
-			resultTag.setInteger(ItemTent.OFFSET_Z, inputZ);
 			resultTag.setTag(ItemTent.TENT_DATA, tentData.serializeNBT());
 		}
 		result.setTagCompound(resultTag);
 		return result;
+	}
+	
+	@Override
+	public boolean isDynamic() {
+		return true;
 	}
 }

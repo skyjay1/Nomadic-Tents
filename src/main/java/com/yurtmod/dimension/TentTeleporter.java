@@ -48,7 +48,7 @@ public class TentTeleporter extends Teleporter {
 		if (TentDimension.isTentDimension(worldServerTo)) {
 			entityX += entity.width;
 			// try to build a tent in that location (tent should check if it already exists)
-			this.tentData.getStructure().generateInTentDimension(prevDimID, worldServerTo, tentDoorPos, 
+			this.tentData.makeStructure().generateInTentDimension(prevDimID, worldServerTo, tentDoorPos, 
 					prevX, prevY, prevZ, prevYaw);
 			// also synchronize the time between Tent and Overworld dimensions
 			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(0).getWorldTime());
