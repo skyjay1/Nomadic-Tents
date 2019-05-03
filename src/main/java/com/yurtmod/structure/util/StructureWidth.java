@@ -1,7 +1,5 @@
 package com.yurtmod.structure.util;
 
-import com.yurtmod.init.TentConfig;
-
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.TextFormatting;
 
@@ -25,34 +23,24 @@ public enum StructureWidth implements IStringSerializable {
 		this.squareWidth = sq;
 		this.doorOffsetZ = this.ordinal() + 2;
 	}
-
-	public boolean isEnabledFor(StructureTent type) {
-		switch(type) {
-		case BEDOUIN: 	return this.ordinal() < TentConfig.tents.TIERS_BEDOUIN;
-		case INDLU:		return this.ordinal() < TentConfig.tents.TIERS_INDLU;
-		case TEPEE:		return this.ordinal() < TentConfig.tents.TIERS_TEPEE;
-		case YURT:		return this.ordinal() < TentConfig.tents.TIERS_YURT;
-		}
-		return false;
-	}
 	
+	/** @return the StructureWidth that is next in the upgrade tree. If it's maxed out, returns itself. **/
 	public StructureWidth getUpgrade(final StructureData data) {
 		final int index = Math.min(this.ordinal() + 1, NUM_ENTRIES - 1);
-		return this.canUpgrade(data) ? values()[index] : this;
+		return values()[index];
 	}
 	
-	protected boolean canUpgrade(final StructureData data) {
-		return this.ordinal() < NUM_ENTRIES - 1;
-	}
-
+	/** @return The square dimensions of a tent of this size **/
 	public int getSquareWidth() {
 		return this.squareWidth;
 	}
 	
+	/** @return Number of blocks AWAY from the front corners where the door is located **/
 	public int getDoorZ() {
 		return this.doorOffsetZ;
 	}
 
+	/** @return The color used to represent this size **/
 	public TextFormatting getTooltipColor() {
 		return this.textFormatting;
 	}
@@ -62,16 +50,33 @@ public enum StructureWidth implements IStringSerializable {
 		return this == HUGE || this == GIANT || this == MEGA;
 	}
 	
+	/**
+	 * Used to determine frame structure blueprints and door variant (SML or HGM)
+	 * @return MEDIUM if this size is considered XL, otherwise SMALL
+	 **/
 	public StructureWidth getOverworldSize() {
 		return this.isXL() ? MEDIUM : SMALL;
 	}
 
+	/** @return A unique identifier. For now just the ordinal value **/
 	public short getId() {
 		return (short)this.ordinal();
 	}
 	
+	/** @return The StructureWidth that uses this ID **/
 	public static StructureWidth getById(final short id) {
 		return values()[id];
+	}
+	
+	public static StructureWidth getByName(final String name) {
+		for(final StructureWidth w : values()) {
+			if(name.equals(w.getName())) {
+				return w;
+			}
+		}
+		// DEBUG TODO
+		System.out.println("NULL");
+		return SMALL;
 	}
 
 	@Override

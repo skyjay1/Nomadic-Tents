@@ -108,6 +108,16 @@ item.indlu_huge.name=Huge Indlu
 item.indlu_giant.name=Giant Indlu
 item.indlu_mega.name=Mega Indlu
 
+# Upgrades
+item.tent_upgrade_gold.name=Golden Crossbeam
+item.tent_upgrade_obsidian.name=Obsidian Crossbeam
+item.tent_upgrade_diamond.name=Diamond Crossbeam
+item.depth_upgrade_stone.name=Stone Tent Shovel
+item.depth_upgrade_iron.name=Iron Tent Shovel
+item.depth_upgrade_gold.name=Golden Tent Shovel
+item.depth_upgrade_obsidian.name=Obsidian Tent Shovel
+item.depth_upgrade_diamond.name=Diamond Tent Shovel
+
 # Other Items
 item.mallet.name=Tent Mallet
 item.super_mallet.name=Super Tent Mallet
@@ -116,9 +126,6 @@ item.yurt_wall_piece.name=Yurt Wall Section
 item.tepee_wall_piece.name=Tepee Wall Section
 item.bed_wall_piece.name=Bedouin Wall Section
 item.indlu_wall_piece.name=Indlu Wall Section
-item.tent_upgrade_gold.name=Golden Crossbeam
-item.tent_upgrade_obsidian.name=Obsidian Crossbeam
-item.tent_upgrade_diamond.name=Diamond Crossbeam
 
 # Chat / Tooltips / Waila
 tooltip.extra_dimensional_space=Extra-dimensional space!

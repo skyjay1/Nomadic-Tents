@@ -64,7 +64,7 @@ public enum StructureTent implements IStringSerializable {
 		return null;
 	}
 
-	/** @return the specific Roof block for this tent type **/
+	/** @return the specific Roof block for this tent type. May be different inside tent. **/
 	public IBlockState getRoofBlock(int dimID) {
 		switch (this) {
 		case YURT:		return Content.YURT_ROOF.getDefaultState()
@@ -76,7 +76,7 @@ public enum StructureTent implements IStringSerializable {
 		return null;
 	}
 
-	/** @return the specific Frame for this structure type. May be different for walls and roofs **/
+	/** @return the specific Frame for this structure type. May be different between walls and roofs **/
 	public IBlockState getFrameBlock(boolean isRoof) {
 		switch (this) {
 		case YURT:		return isRoof 
@@ -91,27 +91,33 @@ public enum StructureTent implements IStringSerializable {
 		return null;
 	}
 	
+	/** @return a StructureBase that will use the given StructureData **/
 	public StructureBase makeStructure(final StructureData data) {
-		return this.structure.setData(data);
+		return this.structure.withData(data);
 	}
 	
+	/** @return A unique identifier. For now just the ordinal value **/
 	public short getId() {
 		return (short)this.ordinal();
 	}
 	
+	/** @return The StructureTent that uses this ID **/
 	public static StructureTent getById(final short id) {
 		return values()[id];
+	}
+	
+	public static StructureTent getByName(final String name) {
+		for(final StructureTent t : values()) {
+			if(name.equals(t.getName())) {
+				return t;
+			}
+		}
+		return YURT;
 	}
 
 	@Override
 	public String getName() {
-		switch(this) {
-		case BEDOUIN:	return "bedouin";
-		case INDLU:		return "indlu";
-		case TEPEE:		return "tepee";
-		case YURT:		return "yurt";
-		}
-		return "null";
+		return this.toString().toLowerCase();
 	}
 }
 

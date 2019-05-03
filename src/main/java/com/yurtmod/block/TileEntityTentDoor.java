@@ -303,9 +303,10 @@ public class TileEntityTentDoor extends TileEntity {
     		// they don't, so check if the previous stored location was a valid bed
     		BlockPos oldSpawn = data.get(uuid);
         	if(oldSpawn == null || EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) == null) {
-        		// set spawn point random
+        		// set spawn point random if no bed anywhere
         		posToSet = player.getEntityWorld().provider.getRandomizedSpawnPoint();
         	} else {
+        		// previous spawnpoint is still valid
         		posToSet = oldSpawn;
         	}
     	}
@@ -321,12 +322,12 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether this player has a spawn point near the given BlockPos
 	 */
 	private static boolean isSpawnInTent(EntityPlayer player, BlockPos tentCenter, boolean andBed) {
-		World tentWorld = player.getServer().getWorld(TentDimension.DIMENSION_ID);
 		BlockPos tentSpawn = player.getBedLocation(TentDimension.DIMENSION_ID);
-		if(andBed) {
-			tentSpawn = tentSpawn != null ? EntityPlayer.getBedSpawnLocation(tentWorld, tentSpawn, false) : null;
+		if(andBed && tentSpawn != null) {
+			tentSpawn = EntityPlayer.getBedSpawnLocation(player.getServer().getWorld(TentDimension.DIMENSION_ID), tentSpawn, false);
 		}
-		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) <= Math.pow((TentDimension.TENT_SPACING / 2.0D) + 2.0D, 2.0D);
+		final double maxDistanceSq = Math.pow(TentDimension.TENT_SPACING * 0.8D, 2.0D) + 1.0D;
+		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) < maxDistanceSq;
 	}
 
 	/**

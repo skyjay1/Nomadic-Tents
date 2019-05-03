@@ -5,7 +5,8 @@ import java.util.Random;
 import com.yurtmod.block.BlockTepeeWall;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
-import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.Blueprint;
+import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.material.Material;
@@ -20,10 +21,15 @@ public class StructureTepee extends StructureBase {
 	public static final int LAYER_DEPTH = 2;
 
 	@Override
+	public StructureTent getTentType() {
+		return StructureTent.TEPEE;
+	}
+
+	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
 		boolean tentDim = TentDimension.isTentDimension(worldIn);
-		Blueprints bp = getBlueprints(size);
+		Blueprint bp = getBlueprints(size);
 		if(bp == null) {
 			return false;
 		}
@@ -49,7 +55,7 @@ public class StructureTepee extends StructureBase {
 	@Override
 	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size) {
 		// determine what blueprints to use
-		final Blueprints bp = this.getBlueprints(size);
+		final Blueprint bp = this.getBlueprints(size);
 
 		// check wall arrays
 		return validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED);
@@ -57,7 +63,7 @@ public class StructureTepee extends StructureBase {
 
 	@Override
 	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, EnumFacing facing) {
-		final Blueprints bp = this.getBlueprints(size);
+		final Blueprint bp = this.getBlueprints(size);
 		// check wall arrays
 		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
 	}
@@ -84,9 +90,9 @@ public class StructureTepee extends StructureBase {
 			}
 		}
 	}
-
-	@Override
-	public Blueprints makeBlueprints(final StructureWidth size, Blueprints bp) {
+	
+	public static Blueprint makeBlueprints(final StructureWidth size) {
+		final Blueprint bp = new Blueprint();
 		switch (size) {
 		case MEGA:
 			bp.addWallCoords(new int[][] {
@@ -322,7 +328,4 @@ public class StructureTepee extends StructureBase {
 		}
 		return bp;
 	}
-	
-	
-
 }

@@ -5,10 +5,10 @@ import java.util.List;
 
 import net.minecraft.util.math.BlockPos;
 
-public class Blueprints {
+public class Blueprint {
 	private final List<BlockPos> wallCoords, roofCoords, barrierCoords;
 
-	public Blueprints() {
+	public Blueprint() {
 		this.wallCoords = new ArrayList();
 		this.roofCoords = new ArrayList();
 		this.barrierCoords = new ArrayList();

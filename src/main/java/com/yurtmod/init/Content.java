@@ -162,12 +162,24 @@ public class Content {
 	public static Item ITEM_BEDOUIN_WALL;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":indlu_wall_piece")
 	public static Item ITEM_INDLU_WALL;
+	
+	//// UPGRADES ////
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_gold")
 	public static Item ITEM_UPGRADE_GOLD;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_obsidian")
 	public static Item ITEM_UPGRADE_OBSDIDIAN;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_diamond")
 	public static Item ITEM_UPGRADE_DIAMOND;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":depth_upgrade_stone")
+	public static Item ITEM_DEPTH_UPGRADE_STONE;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":depth_upgrade_iron")
+	public static Item ITEM_DEPTH_UPGRADE_IRON;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":depth_upgrade_gold")
+	public static Item ITEM_DEPTH_UPGRADE_GOLD;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":depth_upgrade_obsidian")
+	public static Item ITEM_DEPTH_UPGRADE_OBSIDIAN;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":depth_upgrade_diamond")
+	public static Item ITEM_DEPTH_UPGRADE_DIAMOND;
 
 	public static void mainRegistry() {
 		GameRegistry.registerTileEntity(TileEntityTentDoor.class,

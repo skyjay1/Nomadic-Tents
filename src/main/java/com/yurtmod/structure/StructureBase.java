@@ -8,9 +8,11 @@ import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
-import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.Blueprint;
+import com.yurtmod.structure.util.Blueprints2;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
@@ -26,14 +28,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class StructureBase {
-	
+		
 	protected StructureData data;
-	protected final Blueprints BP_SMALL = makeBlueprints(StructureWidth.SMALL, new Blueprints());
-	protected final Blueprints BP_MED = makeBlueprints(StructureWidth.MEDIUM, new Blueprints());
-	protected final Blueprints BP_LARGE = makeBlueprints(StructureWidth.LARGE, new Blueprints());
-	protected final Blueprints BP_HUGE = makeBlueprints(StructureWidth.HUGE, new Blueprints());
-	protected final Blueprints BP_GIANT = makeBlueprints(StructureWidth.GIANT, new Blueprints());
-	protected final Blueprints BP_MEGA = makeBlueprints(StructureWidth.MEGA, new Blueprints());
+//	protected final Blueprints BP_SMALL = makeBlueprints(StructureWidth.SMALL, new Blueprints());
+//	protected final Blueprints BP_MED = makeBlueprints(StructureWidth.MEDIUM, new Blueprints());
+//	protected final Blueprints BP_LARGE = makeBlueprints(StructureWidth.LARGE, new Blueprints());
+//	protected final Blueprints BP_HUGE = makeBlueprints(StructureWidth.HUGE, new Blueprints());
+//	protected final Blueprints BP_GIANT = makeBlueprints(StructureWidth.GIANT, new Blueprints());
+//	protected final Blueprints BP_MEGA = makeBlueprints(StructureWidth.MEGA, new Blueprints());
 	/** 
 	 * Used in {@link #isValidForFacing(World, BlockPos, StructureWidth, EnumFacing)} 
 	 * to determine if the given IBlockState is part of a specific type of tent
@@ -55,7 +57,7 @@ public abstract class StructureBase {
 		}
 	};
 
-	public StructureBase setData(StructureData structureData) {
+	public StructureBase withData(StructureData structureData) {
 		this.data = structureData;
 		this.TENT_PRED = (IBlockState b) 
 				-> this.data.getTent().getInterface().isAssignableFrom(b.getBlock().getClass());
@@ -326,7 +328,7 @@ public abstract class StructureBase {
 	 *         this location
 	 **/
 	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size) {
-		final Blueprints bp = this.getBlueprints(size);
+		final Blueprint bp = this.getBlueprints(size);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED)) {
 			return false;
@@ -343,7 +345,7 @@ public abstract class StructureBase {
 	 *         given Size and EnumFacing
 	 **/
 	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, EnumFacing facing) {
-		final Blueprints bp = this.getBlueprints(size);
+		final Blueprint bp = this.getBlueprints(size);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TENT_PRED)) {
 			return false;
@@ -355,24 +357,14 @@ public abstract class StructureBase {
 		return true;
 	}
 	
-	public Blueprints getBlueprints(final StructureWidth size) {
-		switch(size) {
-		case MEGA:		return BP_MEGA;
-		case GIANT:		return BP_GIANT;
-		case HUGE:		return BP_HUGE;
-		case LARGE:		return BP_LARGE;
-		case MEDIUM:	return BP_MED;
-		case SMALL:		return BP_SMALL;
-		}
-		return null;
+	public Blueprint getBlueprints(final StructureWidth size) {
+		return Blueprints2.get(this.getTentType(), size);
 	}
 
 	/** @return true if a structure was successfully generated **/
 	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
 			final StructureWidth size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
 
-	/**
-	 * @return the Blueprints for a structure of the given StructureWidth
-	 */
-	public abstract Blueprints makeBlueprints(final StructureWidth size, final Blueprints template);
+	/** @return the Tent Type that is associated with this Structure **/
+	public abstract StructureTent getTentType();
 }

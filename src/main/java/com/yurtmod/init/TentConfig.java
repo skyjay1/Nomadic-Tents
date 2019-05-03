@@ -1,6 +1,7 @@
 package com.yurtmod.init;
 
 import com.yurtmod.item.ItemTent;
+import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
@@ -111,24 +112,29 @@ public final class TentConfig {
 		@Config.Comment("Whether the Indlu can be built and used")
 		public boolean ALLOW_INDLU = true;
 		
-		@Config.Name("Max Tiers: Yurt")
-		@Config.Comment("Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
-		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_YURT = StructureWidth.values().length;
+//		@Config.Name("Max Tiers: Yurt")
+//		@Config.Comment("Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
+//		@Config.RangeInt(min = 1, max = 6)
+//		public int TIERS_YURT = StructureWidth.values().length;
+//		
+//		@Config.Name("Max Tiers: Tepee")
+//		@Config.Comment("Limit the size upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
+//		@Config.RangeInt(min = 1, max = 6)
+//		public int TIERS_TEPEE = StructureWidth.values().length;
+//		
+//		@Config.Name("Max Tiers: Bedouin")
+//		@Config.Comment("Limit the size upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
+//		@Config.RangeInt(min = 1, max = 6)
+//		public int TIERS_BEDOUIN = StructureWidth.values().length;
+//		
+//		@Config.Name("Max Tiers: Indlu")
+//		@Config.Comment("Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
+//		@Config.RangeInt(min = 1, max = 6)
+//		public int TIERS_INDLU = StructureWidth.values().length;
 		
-		@Config.Name("Max Tiers: Tepee")
-		@Config.Comment("Limit the size upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
-		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_TEPEE = StructureWidth.values().length;
-		
-		@Config.Name("Max Tiers: Bedouin")
-		@Config.Comment("Limit the size upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
-		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_BEDOUIN = StructureWidth.values().length;
-		
-		@Config.Name("Max Tiers: Indlu")
-		@Config.Comment("Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
-		@Config.RangeInt(min = 1, max = 6)
-		public int TIERS_INDLU = StructureWidth.values().length;
+		@Config.Name("Max Depth")
+		@Config.Comment("Limit the depth upgrades any Tent can recieve")
+		@Config.RangeInt(min = 0, max = 5)
+		public int MAX_DEPTH_UPGRADES = StructureDepth.values().length;
 	}
 }

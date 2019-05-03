@@ -1,7 +1,8 @@
 package com.yurtmod.structure;
 
 import com.yurtmod.dimension.TentDimension;
-import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.Blueprint;
+import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.material.Material;
@@ -14,10 +15,15 @@ import net.minecraft.world.World;
 public class StructureBedouin extends StructureBase {
 	
 	@Override
+	public StructureTent getTentType() {
+		return StructureTent.BEDOUIN;
+	}
+	
+	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth StructureWidth, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
 		final boolean tentDim = TentDimension.isTentDimension(worldIn);
-		final Blueprints bp = getBlueprints(StructureWidth);
+		final Blueprint bp = getBlueprints(StructureWidth);
 		if(bp == null) {
 			return false;
 		}
@@ -46,8 +52,8 @@ public class StructureBedouin extends StructureBase {
 		return !bp.isEmpty();
 	}
 
-	@Override
-	public Blueprints makeBlueprints(final StructureWidth StructureWidth, final Blueprints bp) {
+	public static Blueprint makeBlueprints(final StructureWidth StructureWidth) {
+		final Blueprint bp = new Blueprint();
 		switch (StructureWidth) {
 		case SMALL:
 			bp.addWallCoords(new int[][] {

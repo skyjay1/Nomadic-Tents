@@ -27,6 +27,11 @@ public class ClientProxy extends CommonProxy {
 		register(Content.ITEM_UPGRADE_GOLD);
 		register(Content.ITEM_UPGRADE_OBSDIDIAN);
 		register(Content.ITEM_UPGRADE_DIAMOND);
+		register(Content.ITEM_DEPTH_UPGRADE_STONE);
+		register(Content.ITEM_DEPTH_UPGRADE_IRON);
+		register(Content.ITEM_DEPTH_UPGRADE_GOLD);
+		register(Content.ITEM_DEPTH_UPGRADE_OBSIDIAN);
+		register(Content.ITEM_DEPTH_UPGRADE_DIAMOND);
 		// register blocks
 		register(Content.TENT_BARRIER);
 		register(Content.SUPER_DIRT);

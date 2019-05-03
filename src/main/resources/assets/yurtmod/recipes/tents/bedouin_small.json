@@ -1,0 +1,18 @@
+{
+  "type": "yurtmod:tent_upgrade_width",
+  "tent_type": "bedouin",
+  "result_size": "small",
+  "pattern": [
+   " W ",
+   "W W",
+   "WWW"],
+  "key": {
+    "W": {
+        "item": "yurtmod:bed_wall_piece"
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

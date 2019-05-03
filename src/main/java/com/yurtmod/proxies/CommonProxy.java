@@ -18,6 +18,7 @@ import com.yurtmod.dimension.BiomeTent;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.item.ItemDepthUpgrade;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemSuperMallet;
 import com.yurtmod.item.ItemTent;
@@ -163,6 +164,9 @@ public class CommonProxy {
 				basicItem("tent_canvas"), basicItem("yurt_wall_piece"), basicItem("tepee_wall_piece"),
 				basicItem("bed_wall_piece"), basicItem("indlu_wall_piece"), basicItem("tent_upgrade_gold"),
 				basicItem("tent_upgrade_obsidian"), basicItem("tent_upgrade_diamond"),
+				new ItemDepthUpgrade("depth_upgrade_stone"), new ItemDepthUpgrade("depth_upgrade_iron"),
+				new ItemDepthUpgrade("depth_upgrade_gold"), new ItemDepthUpgrade("depth_upgrade_obsidian"),
+				new ItemDepthUpgrade("depth_upgrade_diamond"),
 
 				// utility blocks
 				makeIB(Content.TENT_BARRIER), makeIB(Content.SUPER_DIRT), 

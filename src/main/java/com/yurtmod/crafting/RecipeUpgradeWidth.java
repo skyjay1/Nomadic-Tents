@@ -1,5 +1,8 @@
 package com.yurtmod.crafting;
 
+import java.util.Map;
+
+import com.google.gson.JsonObject;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
@@ -14,8 +17,12 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.IRecipeFactory;
+import net.minecraftforge.common.crafting.JsonContext;
 
 public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 
@@ -24,11 +31,11 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	private final StructureTent tent;
 	private final StructureWidth width;
 	
-	public RecipeUpgradeWidth(StructureTent type, StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
-		super("tentcrafting", 3, 3, ingredients, new ItemStack(Content.ITEM_TENT));
+	public RecipeUpgradeWidth(final StructureTent type, final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
+		super("tentcrafting", 3, type == StructureTent.YURT ? 2 : 3, ingredients, new ItemStack(Content.ITEM_TENT));
 		this.tent = type;
 		this.width = widthTo;
-		this.setRegistryName(NomadicTents.MODID, "tent_upgrade_width_".concat(String.valueOf(++recipes)));
+		//this.setRegistryName(NomadicTents.MODID, type.getName() + "_" + widthTo.getName());
 	}
 	
 	
@@ -87,5 +94,18 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	@Override
 	public boolean isDynamic() {
 		return true;
+	}
+	
+	public static class Factory implements IRecipeFactory {
+
+		@Override
+		public IRecipe parse(JsonContext context, JsonObject json) {
+			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
+			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
+			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
+			final String name = tentType.getName() + "_" + widthOut.getName();
+			System.out.println("\nname: " + name + "\nrecipe ingredients:  " + recipe.getIngredients().toString());
+			return new RecipeUpgradeWidth(tentType, widthOut, recipe.getIngredients());			
+		}
 	}
 }
