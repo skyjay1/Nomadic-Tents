@@ -1,0 +1,28 @@
+{
+  "type": "yurtmod:tent_upgrade_depth",
+  "result_depth": 3,
+  "pattern": [
+   "DBD",
+   "BTB",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:gold_block"
+      },
+	"X": {
+        "item": "yurtmod:depth_upgrade_gold"
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

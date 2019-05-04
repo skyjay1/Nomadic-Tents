@@ -2,6 +2,7 @@ package com.yurtmod.init;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -19,6 +20,10 @@ public class TentSaveData extends WorldSavedData {
 	private static final String KEY_BEDOUIN = "CraftCountBedouin";
 	private static final String KEY_INDLU = "CraftCountIndlu";
 	private static final String KEY_SPAWNS = "PlayerSpawnPoints";
+	private static final String _UUID = ".UUID";
+	private static final String _X = ".X";
+	private static final String _Y = ".Y";
+	private static final String _Z = ".Z";
 	
 	private int craftcountYurt;
 	private int craftcountTepee;
@@ -51,12 +56,12 @@ public class TentSaveData extends WorldSavedData {
 		final NBTTagList tagList = nbt.getTagList(KEY_SPAWNS, 9);
 		for(int i = 0, l = tagList.tagCount(); i < l; ++i) {
 			NBTTagCompound nbtCompound = tagList.getCompoundTagAt(i);
-			if(nbtCompound.hasKey(KEY_SPAWNS + ".UUID") && nbtCompound.hasKey(KEY_SPAWNS + ".X")
-					&& nbtCompound.hasKey(KEY_SPAWNS + ".Y") && nbtCompound.hasKey(KEY_SPAWNS + ".Z")) {
-				final UUID uuid = UUID.fromString(nbtCompound.getString(KEY_SPAWNS + ".UUID"));
-				final int x = nbtCompound.getInteger(KEY_SPAWNS + ".X");
-				final int y = nbtCompound.getInteger(KEY_SPAWNS + ".Y");
-				final int z = nbtCompound.getInteger(KEY_SPAWNS + ".Z");
+			if(nbtCompound.hasKey(KEY_SPAWNS + _UUID) && nbtCompound.hasKey(KEY_SPAWNS + _X)
+					&& nbtCompound.hasKey(KEY_SPAWNS + _Y) && nbtCompound.hasKey(KEY_SPAWNS + _Z)) {
+				final UUID uuid = UUID.fromString(nbtCompound.getString(KEY_SPAWNS + _UUID));
+				final int x = nbtCompound.getInteger(KEY_SPAWNS + _X);
+				final int y = nbtCompound.getInteger(KEY_SPAWNS + _Y);
+				final int z = nbtCompound.getInteger(KEY_SPAWNS + _Z);
 				prevSpawnMap.put(uuid, new BlockPos(x, y, z));
 			}
 		}
@@ -70,13 +75,13 @@ public class TentSaveData extends WorldSavedData {
 		nbt.setInteger(KEY_INDLU, craftCountIndlu);
 		// write spawn map
 		final NBTTagList tagList = new NBTTagList();
-		for(final UUID uuid : prevSpawnMap.keySet()) {
-			BlockPos prevSpawn = prevSpawnMap.get(uuid);
+		for(final Entry<UUID, BlockPos> uuid : prevSpawnMap.entrySet()) {
+			BlockPos prevSpawn = uuid.getValue();
 			final NBTTagCompound tagCompound = new NBTTagCompound();
-			tagCompound.setString(KEY_SPAWNS + ".UUID", uuid.toString());
-			tagCompound.setInteger(KEY_SPAWNS + ".X", prevSpawn.getX());
-			tagCompound.setInteger(KEY_SPAWNS + ".Y", prevSpawn.getY());
-			tagCompound.setInteger(KEY_SPAWNS + ".Z", prevSpawn.getZ());
+			tagCompound.setString(KEY_SPAWNS + _UUID, uuid.toString());
+			tagCompound.setInteger(KEY_SPAWNS + _X, prevSpawn.getX());
+			tagCompound.setInteger(KEY_SPAWNS + _Y, prevSpawn.getY());
+			tagCompound.setInteger(KEY_SPAWNS + _Z, prevSpawn.getZ());
 			tagList.appendTag(tagCompound);
 		}
 		nbt.setTag(KEY_SPAWNS, tagList);
@@ -127,9 +132,10 @@ public class TentSaveData extends WorldSavedData {
 		return this.craftCountIndlu;
 	}
 	
-	public void put(final UUID uuid, final BlockPos pos, final int dimId) {
+	public void put(final UUID uuid, final BlockPos pos) {
 		if(uuid != null) {
 			prevSpawnMap.put(uuid, pos);
+			this.markDirty();
 		}
 	}
 	
@@ -144,6 +150,7 @@ public class TentSaveData extends WorldSavedData {
 	
 	@Nullable
 	public BlockPos remove(final UUID uuid) {
+		this.markDirty();
 		return prevSpawnMap.remove(uuid);
 	}
 }

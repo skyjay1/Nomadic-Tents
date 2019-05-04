@@ -1,6 +1,7 @@
 package com.yurtmod.structure.util;
 
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 
 public enum StructureWidth implements IStringSerializable {
@@ -25,8 +26,8 @@ public enum StructureWidth implements IStringSerializable {
 	}
 	
 	/** @return the StructureWidth that is next in the upgrade tree. If it's maxed out, returns itself. **/
-	public StructureWidth getUpgrade(final StructureData data) {
-		final int index = Math.min(this.ordinal() + 1, NUM_ENTRIES - 1);
+	public static StructureWidth getUpgrade(final StructureWidth width) {
+		final int index = Math.min(width.ordinal() + 1, NUM_ENTRIES - 1);
 		return values()[index];
 	}
 	
@@ -65,7 +66,7 @@ public enum StructureWidth implements IStringSerializable {
 	
 	/** @return The StructureWidth that uses this ID **/
 	public static StructureWidth getById(final short id) {
-		return values()[id];
+		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
 	}
 	
 	public static StructureWidth getByName(final String name) {
@@ -74,8 +75,6 @@ public enum StructureWidth implements IStringSerializable {
 				return w;
 			}
 		}
-		// DEBUG TODO
-		System.out.println("NULL");
 		return SMALL;
 	}
 

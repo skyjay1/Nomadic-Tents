@@ -13,7 +13,6 @@ import com.yurtmod.block.BlockTepeeWall;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.BlockYurtRoof;
 import com.yurtmod.block.BlockYurtWall;
-import com.yurtmod.crafting.RecipeManager;
 import com.yurtmod.dimension.BiomeTent;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
@@ -29,7 +28,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -37,11 +35,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
-
-	@SubscribeEvent
-	public static void registerRecipes(final RegistryEvent.Register<IRecipe> event) {
-		RecipeManager.mainRegistry(event);
-	}
 
 	@SubscribeEvent
 	public static void registerBiome(final RegistryEvent.Register<Biome> event) {

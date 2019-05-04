@@ -265,7 +265,7 @@ public class TileEntityTentDoor extends TileEntity {
 		// if their Tent Dimension spawnpoint AND BED are inside the tent, update spawn location, as needed
 		if (isSpawnInTent(player, tentCenter, true) && !data.contains(uuid) && overworld.provider.canRespawnHere()) {
 			// First, map the player's old spawn point in case the tent is taken down
-			data.put(uuid, oldSpawn, overworldId);
+			data.put(uuid, oldSpawn);
 			// Next, set their spawn point to be this location
 			player.setSpawnChunk(prevCoords, true, overworldId);
 			return true;

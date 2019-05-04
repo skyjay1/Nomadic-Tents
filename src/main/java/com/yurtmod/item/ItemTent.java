@@ -39,10 +39,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemTent extends Item {
 	/** Tent ItemStack NBTs should have this value for x and z offsets before it's set **/
 	public static final int ERROR_TAG = Short.MIN_VALUE;
-//	public static final String StructureData.KEY_OFFSET_X = "TentOffsetX";
-//	public static final String StructureData.KEY_OFFSET_Z = "TentOffsetZ";
 	public static final String TENT_DATA = "TentData";
-	
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
 
 	public ItemTent() {
@@ -98,8 +95,6 @@ public class ItemTent extends Item {
 					// start checking to build structure
 					final EnumFacing playerFacing = player.getHorizontalFacing();
 					final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
-					// DEBUG
-					System.out.print(data.toString() + "\n");
 					final StructureWidth width = data.getWidth().getOverworldSize();
 					final StructureBase struct = data.makeStructure();
 					// make sure the tent can be built here
@@ -170,13 +165,19 @@ public class ItemTent extends Item {
 		final TextFormatting color = data.getWidth().getTooltipColor();
 		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
 		// tooltip if depth upgrades applied (or shift held)
-		final int depthCount = data.getDepth().countUpgrades(data);
-		final int maxCount = data.getDepth().maxUpgrades(data);
+		final int depthCount = StructureDepth.countUpgrades(data);
+		final int maxCount = StructureDepth.maxUpgrades(data);
 		if(depthCount > 0 || flagIn.isAdvanced() || net.minecraft.client.gui.GuiScreen.isShiftKeyDown()) {
 			tooltip.add(TextFormatting.GRAY + I18n.format("tooltip.depth_upgrades", depthCount, maxCount));
 		}
 	}
 	
+	/**
+	 * Checks the given ItemStack for NBT data to make sure this tent links to
+	 * a real location. If data is missing or incorrect, this method allots a space
+	 * for this tent in the Tent dimension and updates the ItemStack NBT with the
+	 * X/Z coordinate information.
+	 **/
 	public static void fixStructureData(final World world, final ItemStack stack) {
 		if (!world.isRemote) {
 			// make sure tag exists
@@ -189,9 +190,7 @@ public class ItemTent extends Item {
 				// update offset X and Z and the stack NBT
 				data.setOffsetX(getOffsetX(world, data.getTent()));
 				data.setOffsetZ(getOffsetZ(data.getTent()));
-				System.out.println("Updated information in ItemStack. It is now: " + data.toString());
 				stack.getTagCompound().setTag(TENT_DATA, data.serializeNBT());
-				System.out.println("Again, that's " + new StructureData(stack));
 			}
 		}
 	}

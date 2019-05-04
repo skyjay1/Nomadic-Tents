@@ -3,6 +3,7 @@ package com.yurtmod.structure.util;
 import com.yurtmod.init.TentConfig;
 
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.MathHelper;
 
 public enum StructureDepth implements IStringSerializable {
 	
@@ -15,20 +16,20 @@ public enum StructureDepth implements IStringSerializable {
 	
 	private static final int NUM_ENTRIES = values().length;
 	
-	private final int size;
+	private final int layers;
 	
 	StructureDepth(final int i) {
-		this.size = i;
+		this.layers = i;
 	}
 	
 	/** @return the number of tent floor filler layers represented by this StructureDepth **/
 	public int getLayers() {
-		return this.size;
+		return this.layers;
 	}
 	
 	/** @return the StructureDepth that is next in the upgrade tree. If it's maxed out, returns itself. **/
-	public StructureDepth getUpgrade(final StructureData data) {
-		final int index = Math.min(this.ordinal() + 1, NUM_ENTRIES - 1);
+	public static StructureDepth getUpgrade(final StructureDepth depth) {
+		final int index = Math.min(depth.ordinal() + 1, NUM_ENTRIES - 1);
 		return values()[index];
 	}
 	
@@ -36,10 +37,15 @@ public enum StructureDepth implements IStringSerializable {
 	public short getId() {
 		return (short)this.ordinal();
 	}
-	
+
+	/** @return The StructureDepth that uses this ID **/
+	public static StructureDepth getById(final short id) {
+		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
+	}
+
 	/** @return the maximum number of upgrades the given tent can hold **/
 	public static int maxUpgrades(final StructureData data) {
-		return Math.min(data.getWidth().getId(), TentConfig.tents.MAX_DEPTH_UPGRADES);
+		return Math.min(data.getWidth().getId(), TentConfig.tents.MAX_DEPTH - 1);
 	}
 	
 	/** @return the number of depth upgrades the given tent has received **/
@@ -47,11 +53,15 @@ public enum StructureDepth implements IStringSerializable {
 		return data.getDepth().ordinal();
 	}
 
-	/** @return The StructureDepth that uses this ID **/
-	public static StructureDepth getById(final short id) {
-		return values()[id];
+	public static StructureDepth getByName(final String name) {
+		for(final StructureDepth d : values()) {
+			if(name.equals(d.getName())) {
+				return d;
+			}
+		}
+		return NORMAL;
 	}
-
+	
 	@Override
 	public String getName() {
 		return this.toString().toLowerCase();

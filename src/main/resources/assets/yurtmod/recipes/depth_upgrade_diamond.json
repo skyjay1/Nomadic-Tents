@@ -1,12 +1,12 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-   " S ",
-   "CKC",
-   " E "],
+   " CS",
+   " KC",
+   "E  "],
   "key": {
     "S": {
-        "item": "minecraft:diamond_block"
+        "item": "minecraft:diamond"
       },
 	"E": {
         "item": "minecraft:emerald"
