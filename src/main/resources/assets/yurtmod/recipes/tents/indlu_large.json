@@ -1,0 +1,22 @@
+{
+  "type": "yurtmod:tent_upgrade_width",
+  "tent_type": "indlu",
+  "result_size": "large",
+  "pattern": [
+   " W ",
+   "WTW",
+   "WWW"],
+  "key": {
+    "W": {
+        "item": "yurtmod:indlu_wall_piece"
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

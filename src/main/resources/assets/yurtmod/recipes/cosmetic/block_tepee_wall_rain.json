@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "yurtmod:cos_tepee_wall_rain",
+    "count": 1,
+	"data": 0
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "yurtmod:cos_tepee_wall_dreamcatcher",
+	  "data": 0
+    }
+  ]
+}

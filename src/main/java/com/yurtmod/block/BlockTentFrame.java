@@ -2,7 +2,6 @@ package com.yurtmod.block;
 
 import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.init.Content;
-import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.item.ItemMallet;
 
@@ -39,10 +38,9 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	private final BlockToBecome TO_BECOME;
 
 	public BlockTentFrame(final BlockToBecome type, final String name) {
-		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).doesNotBlockMovement());
+		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).doesNotBlockMovement(), name);
 		this.TO_BECOME = type;
 		this.setDefaultState(this.stateContainer.getBaseState().with(PROGRESS, 0));
-		this.setRegistryName(NomadicTents.MODID, name);
 	}
 
 	@Override

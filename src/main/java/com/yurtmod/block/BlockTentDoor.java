@@ -7,16 +7,14 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.DimensionManagerTent;
-import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -42,7 +40,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class BlockTentDoor extends BlockUnbreakable
-		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, IBedouinBlock, IIndluBlock {
+		implements ITepeeBlock, IYurtBlock, IBedouinBlock, IIndluBlock {
 	
 	public static final EnumProperty<EnumFacing.Axis> AXIS = EnumProperty.<EnumFacing.Axis>create("axis",
 			EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
@@ -50,19 +48,12 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	public static final int DECONSTRUCT_DAMAGE = 5;
 	public static final VoxelShape AABB_X = Block.makeCuboidShape(6, 0, 0, 10, 16, 16);
 	public static final VoxelShape AABB_Z = Block.makeCuboidShape(0, 0, 6, 16, 16, 10);
-	public final boolean isCube;
 
-	public BlockTentDoor(boolean isFull) {
-		super(Block.Properties.create(Material.WOOD));
-		this.isCube = isFull;
+	public BlockTentDoor(final String name) {
+		super(Block.Properties.create(Material.WOOD), name);
 		this.setDefaultState(this.stateContainer.getBaseState()
 				.with(BlockDoor.HALF, DoubleBlockHalf.LOWER)
 				.with(AXIS, EnumFacing.Axis.X));
-	}
-
-	// default constructor assumes this block is NOT full cube
-	public BlockTentDoor() {
-		this(false);
 	}
 
 	@Deprecated
@@ -81,15 +72,16 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			// attempt to activate the TileEntity associated with this door
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
-				StructureType type = teyd.getStructureType();
-				StructureBase struct = type.getNewStructure();
+				StructureData data = teyd.getTentData();
+				StructureBase struct = data.makeStructure();
 				ItemStack held = player.getHeldItem(hand);
-
-				// STEP 1: check if it's the copy tool and creative-mode player
-				if ((player.isCreative() || !TentConfiguration.CONFIG.COPY_CREATIVE_ONLY.get()) && held != null
-						&& held.hasTag() && held.getTag().hasKey(ItemTent.TAG_COPY_TOOL)
+				
+				// STEP 1:  check if it's the copy tool and creative-mode player
+				if((player.isCreative() || !TentConfiguration.CONFIG.COPY_CREATIVE_ONLY) 
+						&& held != null && held.hasTag() 
+						&& held.getTag().hasKey(ItemTent.TAG_COPY_TOOL)
 						&& held.getTag().getBoolean(ItemTent.TAG_COPY_TOOL)) {
-					final ItemStack copyStack = StructureType.getDropStack(teyd);
+					final ItemStack copyStack = teyd.getTentData().getDropStack();
 					if (copyStack != null) {
 						// drop the tent item (without affecting the tent)
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, copyStack);
@@ -100,33 +92,33 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					}
 					return true;
 				}
-
-				// STEP 2: make sure there is a valid tent before doing anything else
+				// STEP 2:  make sure there is a valid tent before doing anything else
 				EnumFacing dir = DimensionManagerTent.isTentDimension(worldIn) ? DimensionManagerTent.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, base, getOverworldSize(type));
+						: struct.getValidFacing(worldIn, base, data.getWidth().getOverworldSize());
 				if (dir == null) {
 					return false;
 				}
-				// STEP 3: deconstruct the tent if the player uses a tentHammer on the door
+				// STEP 3:  deconstruct the tent if the player uses a tentHammer on the door
 				// (and in overworld and with fully built tent)
-				if (held != null && held.getItem() instanceof ItemMallet && !DimensionManagerTent.isTentDimension(worldIn)) {
+				if (held != null && held.getItem() instanceof ItemMallet
+						&& !DimensionManagerTent.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
-					if (TentConfiguration.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
+					if(TentConfiguration.CONFIG.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
-					// STEP 4: drop the tent item and damage the tool
-					ItemStack toDrop = StructureType.getDropStack(teyd);
+					// STEP 4:  drop the tent item and damage the tool
+					ItemStack toDrop = teyd.getTentData().getDropStack();
 					if (toDrop != null) {
 						// drop the tent item
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
-						if (TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
+						if(TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN) {
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
-						struct.remove(worldIn, base, dir, getOverworldSize(type));
+						struct.remove(worldIn, base, dir, data.getWidth().getOverworldSize());
 						// damage the item
 						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player);
 
@@ -158,11 +150,11 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
-				StructureType type = teDoor.getStructureType();
-				StructureBase struct = type.getNewStructure();
+				StructureData type = teDoor.getTentData();
+				StructureBase struct = type.makeStructure();
 				// make sure there is a valid tent before doing anything
 				EnumFacing dir = DimensionManagerTent.isTentDimension(worldIn) ? DimensionManagerTent.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, pos, getOverworldSize(type));
+						: struct.getValidFacing(worldIn, pos, type.getWidth().getOverworldSize());
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
 				}
@@ -182,27 +174,23 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public VoxelShape getShape(IBlockState state, IBlockReader worldIn, BlockPos pos) {
-		if (this.isCube) {
-			return VoxelShapes.fullCube();
+		EnumFacing.Axis axis = state.get(AXIS);
+		if (axis == EnumFacing.Axis.X) {
+			return AABB_X;
 		} else {
-			EnumFacing.Axis axis = state.get(AXIS);
-			if (axis == EnumFacing.Axis.X) {
-				return AABB_X;
-			} else {
-				return AABB_Z;
-			}
+			return AABB_Z;
 		}
 	}
 
 	@Override
 	public boolean isFullCube(IBlockState state) {
-		return this.isCube;
+		return false;
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getRenderLayer() {
-		return this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
+		return BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
@@ -264,11 +252,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity createTileEntity(IBlockState state, IBlockReader world) {
 		return new TileEntityTentDoor();
-	}
-	
-	public static StructureType.Size getOverworldSize(StructureType type) {
-		return type.isXL() ? StructureType.Size.MEDIUM : StructureType.Size.SMALL;
 	}
 }

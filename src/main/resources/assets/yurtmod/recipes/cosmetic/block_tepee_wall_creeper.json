@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "yurtmod:cos_tepee_wall_creeper",
+    "count": 1,
+	"data": 0
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "yurtmod:cos_tepee_wall_sun",
+	  "data": 0
+    }
+  ]
+}

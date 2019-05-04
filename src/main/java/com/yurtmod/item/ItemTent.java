@@ -4,13 +4,15 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -21,7 +23,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -38,11 +39,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ItemTent extends Item {
 	/** Tent ItemStack NBTs should have this value for x and z offsets before it's set **/
 	public static final int ERROR_TAG = Short.MIN_VALUE;
-	public static final String OFFSET_X = "TentOffsetX";
-	public static final String OFFSET_Z = "TentOffsetZ";
-	public static final String TENT_TYPE = "TentSpecs";
-	public static final String PREV_TENT_TYPE = "TentSpecsPrevious";
-	
+	public static final String TENT_DATA = "TentData";
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
 
 	public ItemTent(final String name) {
@@ -50,26 +47,20 @@ public class ItemTent extends Item {
 	//	this.setHasSubtypes(true);
 		this.setRegistryName(NomadicTents.MODID, name);
 		this.addPropertyOverride(new ResourceLocation(NomadicTents.MODID, name),  new IItemPropertyGetter() {
-            @Override
+			@Override
             public float call(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
-            	if(stack.hasTag() && stack.getTag().hasKey(TENT_TYPE)) {
-            		return (float)stack.getTag().getInt(TENT_TYPE);
+				if(stack.hasTag() && stack.getTag().hasKey(TENT_DATA)) {
+            		final StructureData data = new StructureData(stack);
+            		return (float)(data.getTent().getId() * StructureWidth.NUM_ENTRIES + data.getWidth().getId());
             	}
-                return 0;
-            }
+				return 0;
+			}
         });
 	}
 
 	@Override
 	public void onCreated(ItemStack stack, World world, EntityPlayer player) {
-		if (!world.isRemote) {
-			NBTTagCompound currentTag = stack.getOrCreateTag();
-			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInt(OFFSET_X) == ERROR_TAG) {
-				// if the nbt is missing or has been set incorrectly, fix that
-				currentTag.setInt(OFFSET_X, getOffsetX(world, stack));
-				currentTag.setInt(OFFSET_Z, getOffsetZ(stack));
-			}
-		}
+		fixStructureData(world, stack);
 	}
 
 	/**
@@ -78,14 +69,7 @@ public class ItemTent extends Item {
 	 **/
 	@Override
 	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-		if (!worldIn.isRemote) {
-			NBTTagCompound currentTag = stack.getOrCreateTag();
-			if (!currentTag.hasKey(OFFSET_X) || currentTag.getInt(OFFSET_X) == ERROR_TAG) {
-				// if the nbt is missing or has been set incorrectly, fix that
-				currentTag.setInt(OFFSET_X, getOffsetX(worldIn, stack));
-				currentTag.setInt(OFFSET_Z, getOffsetZ(stack));
-			}
-		}
+		fixStructureData(worldIn, stack);
 	}
 
 	@Override
@@ -110,17 +94,17 @@ public class ItemTent extends Item {
 				} else {
 					// start checking to build structure
 					final EnumFacing playerFacing = context.getPlayer().getHorizontalFacing();
-					final StructureType type = StructureType.get(stack);
-					final StructureType.Size size = BlockTentDoor.getOverworldSize(type);
-					final StructureBase struct = type.getNewStructure();
+					final StructureData type = new StructureData(stack);
+					final StructureWidth size = type.getWidth().getOverworldSize();
+					final StructureBase struct = type.makeStructure();
 					// make sure the tent can be built here
-					if (type.isEnabled() && struct.canSpawn(context.getWorld(), hitPos, playerFacing, size)) {
+					if (type.getTent().isEnabled() && struct.canSpawn(context.getWorld(), hitPos, playerFacing, size)) {
 						// build the frames
 						if (struct.generateFrameStructure(context.getWorld(), hitPos, playerFacing, size)) {
 							// update the TileEntity information
 							final TileEntity te = context.getWorld().getTileEntity(hitPos);
 							if (te instanceof TileEntityTentDoor) {
-								StructureType.applyToTileEntity(context.getPlayer(), stack, (TileEntityTentDoor) te);
+								StructureData.applyToTileEntity(context.getPlayer(), stack, (TileEntityTentDoor) te);
 							} else {
 								System.out.println(
 										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
@@ -140,17 +124,18 @@ public class ItemTent extends Item {
 	 */
 	@Override
 	public String getTranslationKey(ItemStack stack) {
-		return "item." + NomadicTents.MODID + "." + StructureType.getName(stack);
+		final StructureData data = new StructureData(stack);
+		return "item." + data.getTent().getName() + "_" + data.getWidth().getName();
 	}
 
 	@Override
 	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
-			for (StructureType type : StructureType.values()) {
-				//if (type.isEnabled()) {
-					ItemStack tent = StructureType.getDropStack(ERROR_TAG, ERROR_TAG, type.id(), type.id());
-					items.add(tent);
-				//}
+		if (this.isInGroup(group)) {			
+			final StructureDepth depth = StructureDepth.NORMAL;
+			for(StructureTent tent : StructureTent.values()) {
+				for(StructureWidth size : StructureWidth.values()) {
+					items.add(new StructureData().setBoth(tent, size, depth).getDropStack());
+				}
 			}
 		}
 	}
@@ -170,16 +155,44 @@ public class ItemTent extends Item {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip,
-			ITooltipFlag flagIn) {
-		TextFormatting color = StructureType.get(stack).getTooltipColor();
-		tooltip.add(new TextComponentTranslation("tooltip.extra_dimensional_space").applyTextStyle(color));
-	}
+	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+			final StructureData data = new StructureData(stack);
+			// tooltip for all tents
+			final TextFormatting color = data.getWidth().getTooltipColor();
+			tooltip.add(new TextComponentTranslation("tooltip.extra_dimensional_space").applyTextStyle(color));
+			// tooltip if depth upgrades applied (or shift held)
+			final int depthCount = StructureDepth.countUpgrades(data);
+			final int maxCount = StructureDepth.maxUpgrades(data);
+			if(depthCount > 0 || flagIn.isAdvanced() || net.minecraft.client.gui.GuiScreen.isShiftKeyDown()) {
+				tooltip.add(new TextComponentTranslation("tooltip.depth_upgrades", depthCount, maxCount).applyTextStyle(TextFormatting.GRAY));
+			}
+		}
+		
+		/**
+		 * Checks the given ItemStack for NBT data to make sure this tent links to
+		 * a real location. If data is missing or incorrect, this method allots a space
+		 * for this tent in the Tent dimension and updates the ItemStack NBT with the
+		 * X/Z coordinate information.
+		 **/
+		public static void fixStructureData(final World world, final ItemStack stack) {
+			if (!world.isRemote) {
+				// make sure tag exists
+
+				// check if data is missing or set incorrectly
+				StructureData data = new StructureData(stack);
+				if(data.getOffsetX() == ERROR_TAG) {
+					// update offset X and Z and the stack NBT
+					data.setOffsetX(getOffsetX(world, data.getTent()));
+					data.setOffsetZ(getOffsetZ(data.getTent()));
+					stack.getTag().setTag(TENT_DATA, data.serializeNBT());
+				}
+			}
+		}
 	
 	/** Calculates and returns the next available X location for a tent **/
-	public static int getOffsetX(World world, ItemStack tentStack) {
-		TentSaveData data = TentSaveData.get(world.getServer());
-		switch (StructureType.get(tentStack).getType()) {
+	public static int getOffsetX(World world, StructureTent tent) {
+		final TentSaveData data = TentSaveData.get(world.getServer());
+		switch (tent) {
 		case BEDOUIN:	return data.addCountBedouin(1);
 		case TEPEE:		return data.addCountTepee(1);
 		case YURT:		return data.addCountYurt(1);
@@ -189,7 +202,7 @@ public class ItemTent extends Item {
 	}
 
 	/** Calculates the Z location based on the tent type **/
-	public static int getOffsetZ(ItemStack tentStack) {
-		return StructureType.get(tentStack).getTagOffsetZ();
+	public static int getOffsetZ(StructureTent tent) {
+		return tent.getId();
 	}
 }

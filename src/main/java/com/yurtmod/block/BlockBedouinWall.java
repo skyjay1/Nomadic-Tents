@@ -14,8 +14,8 @@ import net.minecraft.world.IWorld;
 public class BlockBedouinWall extends BlockLayered implements IBedouinBlock {
 	public static final BooleanProperty BESIDE_SIMILAR = BooleanProperty.create("beside_similar");
 
-	public BlockBedouinWall() {
-		super(Block.Properties.create(Material.CLOTH, MaterialColor.WOOD));
+	public BlockBedouinWall(final String name) {
+		super(Block.Properties.create(Material.CLOTH, MaterialColor.WOOD), name);
 		this.setDefaultState(this.stateContainer.getBaseState().with(ABOVE_SIMILAR, false).with(BESIDE_SIMILAR, false));
 	}
 

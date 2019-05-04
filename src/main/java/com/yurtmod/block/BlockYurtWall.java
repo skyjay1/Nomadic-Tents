@@ -7,7 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 
 public class BlockYurtWall extends BlockLayered implements IYurtBlock {
-	public BlockYurtWall() {
-		super(Block.Properties.create(Material.CLOTH, MaterialColor.LIGHT_BLUE));
+	public BlockYurtWall(final String name) {
+		super(Block.Properties.create(Material.CLOTH, MaterialColor.LIGHT_BLUE), name);
 	}
 }

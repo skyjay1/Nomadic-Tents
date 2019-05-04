@@ -2,14 +2,18 @@ package com.yurtmod.structure;
 
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
-
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
-import com.yurtmod.structure.StructureType.Size;
+import com.yurtmod.init.TentConfiguration;
+import com.yurtmod.structure.util.Blueprint;
+import com.yurtmod.structure.util.Blueprints;
+import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
@@ -22,19 +26,18 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public abstract class StructureBase {
-	
-	protected final StructureType structure;
-	protected final Blueprints BP_SMALL = makeBlueprints(StructureType.Size.SMALL, new Blueprints());
-	protected final Blueprints BP_MED = makeBlueprints(StructureType.Size.MEDIUM, new Blueprints());
-	protected final Blueprints BP_LARGE = makeBlueprints(StructureType.Size.LARGE, new Blueprints());
-	protected final Blueprints BP_HUGE = makeBlueprints(StructureType.Size.HUGE, new Blueprints());
-	protected final Blueprints BP_GIANT = makeBlueprints(StructureType.Size.GIANT, new Blueprints());
-	protected final Blueprints BP_MEGA = makeBlueprints(StructureType.Size.MEGA, new Blueprints());
+		
+	protected StructureData data;
+//	protected final Blueprints BP_SMALL = makeBlueprints(StructureWidth.SMALL, new Blueprints());
+//	protected final Blueprints BP_MED = makeBlueprints(StructureWidth.MEDIUM, new Blueprints());
+//	protected final Blueprints BP_LARGE = makeBlueprints(StructureWidth.LARGE, new Blueprints());
+//	protected final Blueprints BP_HUGE = makeBlueprints(StructureWidth.HUGE, new Blueprints());
+//	protected final Blueprints BP_GIANT = makeBlueprints(StructureWidth.GIANT, new Blueprints());
+//	protected final Blueprints BP_MEGA = makeBlueprints(StructureWidth.MEGA, new Blueprints());
 	/** 
-	 * Used in {@link #isValidForFacing(World, BlockPos, Size, EnumFacing)} 
+	 * Used in {@link #isValidForFacing(World, BlockPos, StructureWidth, EnumFacing)} 
 	 * to determine if the given IBlockState is part of a specific type of tent
 	 **/
 	protected Predicate<IBlockState> TENT_PRED;
@@ -54,14 +57,15 @@ public abstract class StructureBase {
 		}
 	};
 
-	public StructureBase(StructureType type) {
-		this.structure = type;
+	public StructureBase withData(StructureData structureData) {
+		this.data = structureData;
 		this.TENT_PRED = (IBlockState b) 
-				-> this.structure.getType().getInterface().isAssignableFrom(b.getBlock().getClass());
+				-> this.data.getTent().getInterface().isAssignableFrom(b.getBlock().getClass());
+		return this;
 	}
 
-	public StructureType getType() {
-		return this.structure;
+	public StructureData getData() {
+		return this.data;
 	}
 
 	/**
@@ -78,36 +82,35 @@ public abstract class StructureBase {
 	 * @return if a new structure was successfully built in the tent dimension
 	 **/
 	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
-			final double prevX, final double prevY, final double prevZ, final float prevFacing,
-			final StructureType prevStructure) {
-		final BlockPos corner = doorPos.add(0, 0, -1 * this.structure.getDoorOffsetZ());
-		final boolean resetFlag = prevStructure != this.structure;
+			final double prevX, final double prevY, final double prevZ, final float prevFacing) {
+		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
 		// check if the structure needs to be reset
-		if (resetFlag) {
+		if (data.needsUpdate()) {
 			// remove previous structure			
-			prevStructure.getNewStructure().remove(worldIn, doorPos, DimensionManagerTent.STRUCTURE_DIR, prevStructure.getSize());
+			data.makeStructure().remove(worldIn, doorPos, DimensionManagerTent.STRUCTURE_DIR, data.getPrevWidth());
+			// should we pass data.getWidth or data.getPrevWidth ?
+			removePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getPrevDepth());
 		}
 		
 		// before building a new structure, check if it's already been made
 		if (worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor) {
 			// door already exists, simply update TileEntity and skip building a new structure
-			updateDoorInfo(worldIn, doorPos, corner, this.structure, 
+			updateDoorInfo(worldIn, doorPos, this.data, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return false;
 		}
 
 		// it's made it this far, time to build the new structure!
-		final boolean success = this.generate(worldIn, doorPos, DimensionManagerTent.STRUCTURE_DIR, this.structure.getSize(),
-				this.structure.getDoorBlock(), this.structure.getWallBlock(DimensionType.getById(DimensionManagerTent.DIMENSION_ID)),
-				this.structure.getRoofBlock());
+		final boolean success = this.generate(worldIn, doorPos, DimensionManagerTent.STRUCTURE_DIR, this.data.getWidth(),
+				this.data.getDoorBlock(), this.data.getWallBlock(worldIn), this.data.getRoofBlock(worldIn));
 
 		if (success) {
 			// make the platform AFTER generating structure
-			generatePlatform(worldIn, corner.down(1), this.structure.getSize());
+			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
 			
 			worldIn.getChunk(doorPos).generateSkylightMap();
 			// set tile entity door information
-			updateDoorInfo(worldIn, doorPos, corner, this.structure, 
+			updateDoorInfo(worldIn, doorPos, this.data, 
 					prevX, prevY, prevZ, prevFacing, prevDimension);
 			return true;
 		}
@@ -120,17 +123,16 @@ public abstract class StructureBase {
 	 * 
 	 * @return true if a TileEntityTentDoor was found and all fields were set
 	 */
-	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, final BlockPos corner, 
-			final StructureType structure, final double prevX, final double prevY,
+	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, 
+			final StructureData data, final double prevX, final double prevY,
 			final double prevZ, final float prevFacing, final int prevDimension) {
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if (te instanceof TileEntityTentDoor) {
 			TileEntityTentDoor door = (TileEntityTentDoor) te;
-			// note: the inner door will always have same structures for previous / current
-			door.setPrevStructureType(structure);
-			door.setStructureType(structure);
-			door.setOffsetX(TileEntityTentDoor.getChunkOffsetX(doorPos.getX()));
-			door.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(doorPos.getZ()));
+			data.setOffsetX(TileEntityTentDoor.getChunkOffsetX(doorPos.getX()));
+			data.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(doorPos.getZ()));
+			data.resetPrevData();
+			door.setTentData(data);
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevFacing(prevFacing);
 			door.setPrevDimension(prevDimension);
@@ -142,42 +144,79 @@ public abstract class StructureBase {
 	}
 
 	/**
-	 * Builds a 2-block-deep platform from (cornerX, cornerY - 1, cornerZ) to
-	 * (cornerX + sqWidth, cornerY, cornerZ + sqWidth), with the top layer regular
-	 * dirt and the bottom layer indestructible dirt. Automatically places
-	 * indestructible dirt if the bottom of the tent is detected, and automatically
-	 * fixes irregularities formed after a tent upgrade. Call this AFTER
+	 * Builds a variable-depth platform from (cornerX, cornerY - depth, cornerZ) to
+	 * (cornerX + sqWidth, cornerY, cornerZ + sqWidth), with the top layers regular
+	 * dirt and the bottom layer indestructible dirt. Call this AFTER
 	 * generating the structure or things will not work!
 	 * 
 	 * @return true if the platform was built successfully
 	 **/
-	private static boolean generatePlatform(final World worldIn, final BlockPos corner, final StructureType.Size size) {
-		int sqWidth = size.getSquareWidth();
-		// make a base from corner x,y,z to +x,y,+z
+	private static boolean generatePlatform(final World worldIn, final BlockPos corner, 
+			final StructureWidth size, final StructureDepth depth) {
+		final int sqWidth = size.getSquareWidth();
+		final Block bottom = Content.SUPER_DIRT;
+		final Block floor = TentConfiguration.CONFIG.getFloorBlock();
+		// make a base from corner x,y,z to +x,-y,+z
 		for (int i = 0; i < sqWidth; i++) {
 			for (int j = 0; j < sqWidth; j++) {
-				// place top block: dirt or indestructible dirt based on what's above it
-				// (this assumes that the structure already exists)
-				BlockPos at = corner.add(i, 0, j);
-				Block blockAt = worldIn.getBlockState(at).getBlock();
-				// make sure this position isn't awkwardly at the corner of a rounded structure
+				// first, find out what to do at this x,z position
+				final BlockPos at = corner.add(i, 0, j);
+				final Block blockUp = worldIn.getBlockState(at.up(1)).getBlock();
 				boolean placeFloor = false;
-				for(int f = 0; f < 20; f++) {
-					if(worldIn.getBlockState(at.up(f)).getBlock() instanceof BlockUnbreakable) {
-						placeFloor = true;
-						break;
+				Block filler = null;
+				// find out if this column needs to be indestructible, normal, or air
+				if(blockUp instanceof BlockUnbreakable) {
+					// definitely indestructible blocks underneath other indestructible
+					placeFloor = true;
+					filler = bottom;					
+				} else /* if(worldIn.isAirBlock(at.up(1))) */ {
+					// not sure, so let's check blocks above this one 
+					// to see if we need to do anything
+					for(int f = 1, maxExpectedHeight = 24; f < maxExpectedHeight; f++) {
+						if(worldIn.getBlockState(at.up(f)).getBlock() instanceof BlockUnbreakable) {
+							placeFloor = true;
+							filler = floor;
+							break;
+						}
 					}
 				}
-				if(placeFloor) {
-					// if this position is below a BlockUnbreakable, use Super Dirt, else use regular dirt
-					Block topState = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable 
-							? Content.SUPER_DIRT : Blocks.DIRT;
-					// if this position is considered replaceable, place the block, else skip this step
-					if (blockAt == Blocks.AIR || blockAt == Blocks.DIRT || blockAt == Content.SUPER_DIRT) {
-						worldIn.setBlockState(at, topState.getDefaultState(), 2);
+				// actually place the floor blocks!
+				if(placeFloor && filler != null) {
+					// for each block in this column, place filler with super dirt underneath
+					for(int k = 0, l = depth.getLayers(); k < l; k++) {
+						// only replace if this block is air
+						if(worldIn.isAirBlock(at.down(k))) {
+							worldIn.setBlockState(at.down(k), filler.getDefaultState());
+						}
 					}
-					// place bottom block: always indestructible dirt
-					worldIn.setBlockState(at.down(1), Content.SUPER_DIRT.getDefaultState(), 2);
+					// always place super dirt underneath
+					worldIn.setBlockState(at.down(depth.getLayers()), bottom.getDefaultState(), 2);
+				}
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * This should only remove blocks that the tent originally spawned with in its floor.
+	 **/
+	private static boolean removePlatform(final World worldIn, final BlockPos corner, 
+			final StructureWidth size, final StructureDepth depth) {
+		final int sqWidth = size.getSquareWidth();
+		// layers +1 to include bottom layer
+		final int layers = depth.getLayers() + 1;
+		final Block bottom = Content.SUPER_DIRT;
+		final Block floor = TentConfiguration.CONFIG.getFloorBlock();
+		// remove base from corner x,y,z to +x,-y,+z
+		for (int i = 0; i < sqWidth; i++) {
+			for (int j = 0; j < sqWidth; j++) {
+				for(int k = 0; k < layers; k++) {
+					// for each block, check if it's filler or indestructible (only those will be removed)
+					final BlockPos at = corner.add(i, -k, j);
+					final Block blockAt = worldIn.getBlockState(at).getBlock();
+					if(blockAt == bottom || blockAt == floor || blockAt instanceof BlockUnbreakable) {
+						worldIn.setBlockState(at, Blocks.AIR.getDefaultState(), 2);
+					}
 				}
 			}
 		}
@@ -228,16 +267,16 @@ public abstract class StructureBase {
 	 *         are not in Tent Dimension.
 	 **/
 	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
-			final StructureType.Size size) {
-		return generate(worldIn, doorBase, dirForward, size, this.getType().getDoorBlock(),
-				this.getType().getFrameBlock(false), this.getType().getFrameBlock(true));
+			final StructureWidth size) {
+		return generate(worldIn, doorBase, dirForward, size, this.data.getDoorBlock(),
+				this.data.getTent().getFrameBlock(false), this.data.getTent().getFrameBlock(true));
 	}
 
 	/**
 	 * @return true if the structure was successfully removed (replaced with AIR)
 	 **/
 	public boolean remove(final World worldIn, final BlockPos doorPos, final EnumFacing dirForward,
-			final StructureType.Size size) {
+			final StructureWidth size) {
 		IBlockState air = Blocks.AIR.getDefaultState();
 		boolean flag = generate(worldIn, doorPos, dirForward, size, air, air, air);
 		// delete door TileEntity if found
@@ -272,10 +311,9 @@ public abstract class StructureBase {
 	 * @return the EnumFacing direction in which it finds a valid and completed
 	 *         SMALL structure, null if none is found
 	 **/
-	@Nullable
-	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase, final StructureType.Size size) {
-		//StructureType.Size s = this.getType().getSize();
-		for (EnumFacing dir : new EnumFacing[] { EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST }) {
+	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase, final StructureWidth size) {
+		//StructureWidth s = this.getType().getSize();
+		for (final EnumFacing dir : new EnumFacing[] { EnumFacing.NORTH, EnumFacing.EAST, EnumFacing.SOUTH, EnumFacing.WEST }) {
 			boolean isValid = isValidForFacing(worldIn, doorBase, size, dir);
 
 			if (isValid) {
@@ -289,8 +327,8 @@ public abstract class StructureBase {
 	 * @return true if there is empty space to create a structure of given size at
 	 *         this location
 	 **/
-	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size) {
-		final Blueprints bp = this.getBlueprints(size);
+	public boolean canSpawn(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward, final StructureWidth size) {
+		final Blueprint bp = this.getBlueprints(size);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED)) {
 			return false;
@@ -306,8 +344,8 @@ public abstract class StructureBase {
 	 * @return true if there is a valid structure at the given location for the
 	 *         given Size and EnumFacing
 	 **/
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, Size size, EnumFacing facing) {
-		final Blueprints bp = this.getBlueprints(size);
+	public boolean isValidForFacing(final World worldIn, final BlockPos doorBase, final StructureWidth size, final EnumFacing facing) {
+		final Blueprint bp = this.getBlueprints(size);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TENT_PRED)) {
 			return false;
@@ -319,27 +357,14 @@ public abstract class StructureBase {
 		return true;
 	}
 	
-	@Nullable
-	public Blueprints getBlueprints(final StructureType.Size size) {
-		switch(size) {
-		case MEGA:		return BP_MEGA;
-		case GIANT:		return BP_GIANT;
-		case HUGE:		return BP_HUGE;
-		case LARGE:		return BP_LARGE;
-		case MEDIUM:	return BP_MED;
-		case SMALL:		return BP_SMALL;
-		}
-		return null;
+	public Blueprint getBlueprints(final StructureWidth size) {
+		return Blueprints.get(this.getTentType(), size);
 	}
 
 	/** @return true if a structure was successfully generated **/
 	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
-			final StructureType.Size size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
+			final StructureWidth size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
 
-	/**
-	 * @param size the StructureType.Size used for these blueprints
-	 * @param template the Blueprints object to add to (empty by default)
-	 * @return the Blueprints for a structure of the given StructureType.Size
-	 */
-	public abstract Blueprints makeBlueprints(final StructureType.Size size, final Blueprints template);
+	/** @return the Tent Type that is associated with this Structure **/
+	public abstract StructureTent getTentType();
 }

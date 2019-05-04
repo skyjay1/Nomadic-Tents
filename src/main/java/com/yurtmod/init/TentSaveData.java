@@ -2,6 +2,7 @@ package com.yurtmod.init;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -79,8 +80,8 @@ public class TentSaveData extends WorldSavedData {
 		nbt.setInt(KEY_INDLU, craftCountIndlu);
 		// write spawn map
 		final NBTTagList tagList = new NBTTagList();
-		for(final UUID uuid : prevSpawnMap.keySet()) {
-			BlockPos prevSpawn = prevSpawnMap.get(uuid);
+		for(final Entry<UUID, BlockPos> uuid : prevSpawnMap.entrySet()) {
+			BlockPos prevSpawn = uuid.getValue();
 			final NBTTagCompound tagCompound = new NBTTagCompound();
 			tagCompound.setString(KEY_SPAWNS + _UUID, uuid.toString());
 			tagCompound.setInt(KEY_SPAWNS + _X, prevSpawn.getX());

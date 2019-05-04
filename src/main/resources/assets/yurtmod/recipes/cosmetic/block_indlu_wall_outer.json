@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "yurtmod:cos_indlu_wall_outer",
+    "count": 4,
+	"data": 0
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "yurtmod:indlu_wall_piece",
+	  "data": 0
+    }
+  ]
+}

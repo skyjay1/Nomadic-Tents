@@ -1,0 +1,28 @@
+{
+  "type": "yurtmod:tent_upgrade_depth",
+  "result_depth": 1,
+  "pattern": [
+   "DBD",
+   "BTB",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:iron_block"
+      },
+	"X": {
+        "item": "yurtmod:depth_upgrade_stone"
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

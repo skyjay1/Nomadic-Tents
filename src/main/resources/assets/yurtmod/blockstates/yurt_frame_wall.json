@@ -1,8 +1,8 @@
 {
 	"variants": {
-		"progress=0": { "model": "yurtmod:block/frame_block_0"},
-		"progress=1": { "model": "yurtmod:block/frame_block_1"},
-		"progress=2": { "model": "yurtmod:block/frame_block_2"},
-		"progress=3": { "model": "yurtmod:block/frame_block_3"}
+		"progress=0": { "model": "yurtmod:frame_block_0"},
+		"progress=1": { "model": "yurtmod:frame_block_1"},
+		"progress=2": { "model": "yurtmod:frame_block_2"},
+		"progress=3": { "model": "yurtmod:frame_block_3"}
 	}
 }

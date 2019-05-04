@@ -1,5 +1,5 @@
 {
     "variants": {
-        "": { "model": "yurtmod:block/frame_block_0" }
+        "normal": { "model": "yurtmod:frame_block_0" }
     }
 }

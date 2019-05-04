@@ -7,6 +7,7 @@ import com.mojang.datafixers.types.Type;
 import com.yurtmod.block.BlockBarrier;
 import com.yurtmod.block.BlockBedouinRoof;
 import com.yurtmod.block.BlockBedouinWall;
+import com.yurtmod.block.BlockCosmetic;
 import com.yurtmod.block.BlockIndluWall;
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
@@ -22,11 +23,13 @@ import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.item.ItemDepthUpgrade;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemSuperMallet;
 import com.yurtmod.item.ItemTent;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Block.Properties;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -40,17 +43,10 @@ import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.TypeReferences;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 
 public class CommonProxy {
-	
-	public void registerRenders(ModelRegistryEvent event) { }
-
-//	public void registerRecipes(final RegistryEvent.Register<IRecipe> event) {
-//		TentRecipes.mainRegistry();
-//	}
 
 	public void registerBiome(final RegistryEvent.Register<Biome> event) {
 		event.getRegistry().register(
@@ -62,93 +58,125 @@ public class CommonProxy {
 	public void registerBlocks(final RegistryEvent.Register<Block> event) {
 		event.getRegistry().registerAll(
 
-			// helpful blocks
-			new BlockBarrier().setRegistryName(NomadicTents.MODID, "tentmod_barrier"),
-			new BlockUnbreakable(Block.Properties.create(Material.GROUND, MaterialColor.DIRT)
-					.sound(SoundType.GROUND)).setRegistryName(NomadicTents.MODID, "super_dirt"),
-			
-			// wall and roof blocks
-			new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_outer"),
-			new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_inner"),
-			new BlockYurtRoof().setRegistryName(NomadicTents.MODID, "yurt_roof"),
-			new BlockBedouinWall().setRegistryName(NomadicTents.MODID, "bed_wall"),
-			new BlockBedouinRoof().setRegistryName(NomadicTents.MODID, "bed_roof"),
-			new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_outer"),
-			new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_inner"),
-			
-			// tepee blocks
-			new BlockTepeeWall("tepee_wall_blank"),
-			new BlockTepeeWall("tepee_wall_black"),
-			new BlockTepeeWall("tepee_wall_red"),
-			new BlockTepeeWall("tepee_wall_yellow"),
-			new BlockTepeeWall("tepee_wall_orange"),
-			new BlockTepeeWall("tepee_wall_white"),
-			new BlockTepeeWall("tepee_wall_hope"),
-			new BlockTepeeWall("tepee_wall_sun"),
-			new BlockTepeeWall("tepee_wall_creeper"),
-			new BlockTepeeWall("tepee_wall_universe"),
-			new BlockTepeeWall("tepee_wall_eagle"),
-			new BlockTepeeWall("tepee_wall_triforce"),
-			new BlockTepeeWall("tepee_wall_dreamcatcher"),
-			new BlockTepeeWall("tepee_wall_rain"),
-			new BlockTepeeWall("tepee_wall_magic"),
-			
-			// door blocks
-			new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "yurt_door_0"),
-			new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "yurt_door_1"),
-			new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "tepee_door_0"),
-			new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "tepee_door_1"),
-			new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "bed_door_0"),
-			new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "bed_door_1"),
-			new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "indlu_door_0"),
-			new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "indlu_door_1"),
+				// helpful blocks
+				new BlockBarrier("tentmod_barrier"),
+				new BlockUnbreakable(Block.Properties.create(Material.GROUND, MaterialColor.DIRT)
+						.sound(SoundType.GROUND), "super_dirt"),
 
-			// frame blocks
-			new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER, "frame_yurt_wall"),
-			new BlockTentFrame(BlockToBecome.YURT_ROOF, "frame_yurt_roof"),
-			new BlockTentFrame(BlockToBecome.TEPEE_WALL, "frame_tepee_wall"),
-			new BlockTentFrame(BlockToBecome.BEDOUIN_WALL, "frame_bed_wall"),
-			new BlockTentFrame(BlockToBecome.BEDOUIN_ROOF, "frame_bed_roof"),
-			new BlockTentFrame(BlockToBecome.INDLU_WALL, "frame_indlu_wall"));
+				// wall and roof blocks
+				new BlockYurtWall("yurt_wall_outer"),
+				new BlockYurtWall("yurt_roof_inner"),
+				new BlockYurtRoof("yurt_roof"),
+				new BlockBedouinWall("bedouin_wall"),
+				new BlockBedouinRoof("bedouin_roof"),
+				new BlockIndluWall("indlu_wall_outer"),
+				new BlockIndluWall("indlu_wall_inner"),
+				new BlockTepeeWall("tepee_wall_blank"),
+				new BlockTepeeWall("tepee_wall_black"),
+				new BlockTepeeWall("tepee_wall_red"),
+				new BlockTepeeWall("tepee_wall_yellow"),
+				new BlockTepeeWall("tepee_wall_orange"),
+				new BlockTepeeWall("tepee_wall_white"),
+				new BlockTepeeWall("tepee_wall_hope"),
+				new BlockTepeeWall("tepee_wall_sun"),
+				new BlockTepeeWall("tepee_wall_creeper"),
+				new BlockTepeeWall("tepee_wall_universe"),
+				new BlockTepeeWall("tepee_wall_eagle"),
+				new BlockTepeeWall("tepee_wall_triforce"),
+				new BlockTepeeWall("tepee_wall_dreamcatcher"),
+				new BlockTepeeWall("tepee_wall_rain"),
+				new BlockTepeeWall("tepee_wall_magic"),
+
+				// door blocks
+				new BlockTentDoorSML("yurt_door_0"),
+				new BlockTentDoorHGM("yurt_door_1"),
+				new BlockTentDoorSML("tepee_door_0"),
+				new BlockTentDoorHGM("tepee_door_1"),
+				new BlockTentDoorSML("bed_door_0"),
+				new BlockTentDoorHGM("bed_door_1"),
+				new BlockTentDoorSML("indlu_door_0"),
+				new BlockTentDoorHGM("indlu_door_1"),
+
+				// frame blocks
+				new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER, "frame_yurt_wall"),
+				new BlockTentFrame(BlockToBecome.YURT_ROOF, "frame_yurt_roof"),
+				new BlockTentFrame(BlockToBecome.TEPEE_WALL, "frame_tepee_wall"),
+				new BlockTentFrame(BlockToBecome.BEDOUIN_WALL, "frame_bed_wall"),
+				new BlockTentFrame(BlockToBecome.BEDOUIN_ROOF, "frame_bed_roof"),
+				new BlockTentFrame(BlockToBecome.INDLU_WALL, "frame_indlu_wall"),
+				
+				// cosmetic blocks
+				new BlockCosmetic.YurtRoof("cos_yurt_roof"),
+				new BlockCosmetic.Layered(Properties.create(Material.CLOTH, MaterialColor.LIGHT_BLUE), "cos_yurt_wall_outer"),
+				new BlockCosmetic.Layered(Properties.create(Material.CLOTH, MaterialColor.LIGHT_BLUE), "cos_yurt_wall_inner"),
+				new BlockCosmetic.BedouinWall("cos_bed_wall"),
+				new BlockCosmetic(Properties.create(Material.CLOTH, MaterialColor.WOOD), "cos_bed_roof"),
+				new BlockCosmetic(Properties.create(Material.LEAVES), "cos_indlu_wall_outer"),
+				new BlockCosmetic(Properties.create(Material.LEAVES), "cos_indlu_wall_inner"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_blank"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_black"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_red"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_yellow"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_orange"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_white"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_hope"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_sun"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_creeper"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_universe"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_eagle"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_triforce"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_dreamcatcher"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_rain"),
+				new BlockCosmetic.TepeeWall("cos_tepee_wall_magic")
+				);
 	}
 
 	public void registerItems(final RegistryEvent.Register<Item> event) {
 		// Item
 		event.getRegistry().registerAll(
-			// Custom items
-			new ItemTent("tent"),
-			new ItemMallet("mallet", ItemTier.IRON),
-			new ItemSuperMallet("super_mallet", ItemTier.DIAMOND),
-			// generic items
-			basicItem("tent_canvas"), basicItem("yurt_wall_piece"), basicItem("tepee_wall_piece"),
-			basicItem("bed_wall_piece"), basicItem("indlu_wall_piece"), basicItem("tent_upgrade_gold"),
-			basicItem("tent_upgrade_obsidian"), basicItem("tent_upgrade_diamond"),
+				// items
+				new ItemTent("tent"),
+				new ItemMallet("mallet", ItemTier.IRON),
+				new ItemSuperMallet("super_mallet", ItemTier.DIAMOND),
+				// tent crafting items and upgrades
+				basicItem("tent_canvas"), basicItem("yurt_wall_piece"), basicItem("tepee_wall_piece"),
+				basicItem("bed_wall_piece"), basicItem("indlu_wall_piece"), basicItem("tent_upgrade_gold"),
+				basicItem("tent_upgrade_obsidian"), basicItem("tent_upgrade_diamond"),
+				new ItemDepthUpgrade("depth_upgrade_stone"), new ItemDepthUpgrade("depth_upgrade_iron"),
+				new ItemDepthUpgrade("depth_upgrade_gold"), new ItemDepthUpgrade("depth_upgrade_obsidian"),
+				new ItemDepthUpgrade("depth_upgrade_diamond"),
 
-			// ItemBlocks
-			makeIB(Content.TENT_BARRIER), makeIB(Content.SUPER_DIRT),
-			// tepee blocks
-			makeIB(Content.TEPEE_WALL_BLANK),
-			makeIB(Content.TEPEE_WALL_CREEPER), makeIB(Content.TEPEE_WALL_DREAMCATCHER),
-			makeIB(Content.TEPEE_WALL_EAGLE), makeIB(Content.TEPEE_WALL_HOPE),
-			makeIB(Content.TEPEE_WALL_MAGIC), makeIB(Content.TEPEE_WALL_RAIN),
-			makeIB(Content.TEPEE_WALL_SUN), makeIB(Content.TEPEE_WALL_TRIFORCE),
-			makeIB(Content.TEPEE_WALL_UNIVERSE), makeIB(Content.TEPEE_WALL_BLACK), 
-			makeIB(Content.TEPEE_WALL_ORANGE), makeIB(Content.TEPEE_WALL_RED),
-			makeIB(Content.TEPEE_WALL_WHITE), makeIB(Content.TEPEE_WALL_YELLOW),
-			// other wall blocks
-			makeIB(Content.BEDOUIN_WALL), makeIB(Content.BEDOUIN_ROOF),
-			makeIB(Content.INDLU_WALL_OUTER), makeIB(Content.INDLU_WALL_INNER),
-			makeIB(Content.YURT_WALL_INNER), makeIB(Content.YURT_WALL_OUTER), 
-			makeIB(Content.YURT_ROOF)
-			/* , makeIB(Content.BEDOUIN_DOOR_LARGE),
-			 * makeIB(Content.BEDOUIN_DOOR_MEDIUM), makeIB(Content.BEDOUIN_DOOR_SMALL),
-			 * makeIB(Content.TEPEE_DOOR_LARGE), makeIB(Content.TEPEE_DOOR_MEDIUM),
-			 * makeIB(Content.TEPEE_DOOR_SMALL), makeIB(Content.YURT_DOOR_LARGE),
-			 * makeIB(Content.YURT_DOOR_MEDIUM), makeIB(Content.YURT_DOOR_SMALL)
-			 */
+				// utility blocks
+				makeIB(Content.TENT_BARRIER), makeIB(Content.SUPER_DIRT), 
+				// functional blocks
+				makeIB(Content.YURT_WALL_OUTER), 
+				makeIB(Content.YURT_ROOF), makeIB(Content.YURT_WALL_INNER),
+				makeIB(Content.BEDOUIN_WALL), makeIB(Content.BEDOUIN_ROOF),
+				makeIB(Content.INDLU_WALL_OUTER), makeIB(Content.INDLU_WALL_INNER),
+				makeIB(Content.TEPEE_WALL_BLANK), makeIB(Content.TEPEE_WALL_BLACK), 
+				makeIB(Content.TEPEE_WALL_RED), makeIB(Content.TEPEE_WALL_YELLOW), 
+				makeIB(Content.TEPEE_WALL_ORANGE), makeIB(Content.TEPEE_WALL_WHITE), 
+				makeIB(Content.TEPEE_WALL_HOPE), makeIB(Content.TEPEE_WALL_SUN), 
+				makeIB(Content.TEPEE_WALL_CREEPER), makeIB(Content.TEPEE_WALL_UNIVERSE), 
+				makeIB(Content.TEPEE_WALL_EAGLE), makeIB(Content.TEPEE_WALL_TRIFORCE), 
+				makeIB(Content.TEPEE_WALL_DREAMCATCHER), makeIB(Content.TEPEE_WALL_RAIN), 
+				makeIB(Content.TEPEE_WALL_MAGIC),
+				// cosmetic blocks
+				makeIB(Content.COS_YURT_WALL_INNER),
+				makeIB(Content.COS_YURT_WALL_OUTER), makeIB(Content.COS_YURT_ROOF),
+				makeIB(Content.COS_BEDOUIN_WALL), makeIB(Content.COS_BEDOUIN_ROOF),
+				makeIB(Content.COS_INDLU_WALL_OUTER), makeIB(Content.COS_INDLU_WALL_INNER),
+				makeIB(Content.COS_TEPEE_WALL_BLANK), makeIB(Content.COS_TEPEE_WALL_BLACK), 
+				makeIB(Content.COS_TEPEE_WALL_RED), makeIB(Content.COS_TEPEE_WALL_YELLOW), 
+				makeIB(Content.COS_TEPEE_WALL_ORANGE), makeIB(Content.COS_TEPEE_WALL_WHITE), 
+				makeIB(Content.COS_TEPEE_WALL_HOPE), makeIB(Content.COS_TEPEE_WALL_SUN), 
+				makeIB(Content.COS_TEPEE_WALL_CREEPER), makeIB(Content.COS_TEPEE_WALL_UNIVERSE), 
+				makeIB(Content.COS_TEPEE_WALL_EAGLE), makeIB(Content.COS_TEPEE_WALL_TRIFORCE), 
+				makeIB(Content.COS_TEPEE_WALL_DREAMCATCHER), makeIB(Content.COS_TEPEE_WALL_RAIN), 
+				makeIB(Content.COS_TEPEE_WALL_MAGIC)
 		);
 	}
-	 
+	
 	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
 		event.getRegistry().register(new ModDimension() {
 			@Override

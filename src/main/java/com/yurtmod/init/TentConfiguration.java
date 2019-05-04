@@ -1,9 +1,14 @@
 package com.yurtmod.init;
 
 import com.yurtmod.item.ItemTent;
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class TentConfiguration {
 	
@@ -35,16 +40,19 @@ public final class TentConfiguration {
 		public ForgeConfigSpec.IntValue TIERS_TEPEE;
 		public ForgeConfigSpec.IntValue TIERS_BEDOUIN;
 		public ForgeConfigSpec.IntValue TIERS_INDLU;
+		public ForgeConfigSpec.IntValue MAX_DEPTH;
 		// other
 		public ForgeConfigSpec.BooleanValue IS_TENT_FIREPROOF;
 		public ForgeConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
-		
+		public ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
 		
 		public TentConfig(final ForgeConfigSpec.Builder builder) {
 			// values
-			final int tentSizes = StructureType.Size.values().length;
+			final int tentSizes = StructureTent.values().length;
+			final int tentDepth = StructureDepth.values().length;
 			// begin section 'dimension'
 			builder.push("dimension");
+			// TODO this doesn't work...?
 			TENT_DIM_ID = builder.comment("ID for the Tent Dimension")
 					.defineInRange("Dimension ID", -2, -255, 255);
 			ALLOW_SLEEP_TENT_DIM = builder
@@ -105,6 +113,9 @@ public final class TentConfiguration {
 					.defineInRange("Max Tiers: Bedouin", tentSizes, 1, tentSizes);
 			TIERS_INDLU = builder.comment("Limit the upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
 					.defineInRange("Max Tiers: Indlu", tentSizes, 1, tentSizes);
+			MAX_DEPTH = builder.comment("The maximum floor depth that can be achieved through depth upgrades.",
+					"Set to 1 to disable extra tent floor layers.")
+					.defineInRange("Max Depth", tentDepth, 1, tentDepth);	
 			builder.pop();
 			// begin section 'other'
 			builder.push("other");
@@ -114,7 +125,32 @@ public final class TentConfiguration {
 			TEPEE_DECORATED_CHANCE = builder
 					.comment("Percentage chance that a plain tepee block will randomly have a design")
 					.defineInRange("Tepee Design Chance", 35, 0, 100);
+			FLOOR_BLOCK = builder
+					.comment("Specify the block used for the harvestable layer of all tent floors",
+							"Format: [mod]:[name] ~ Example: minecraft:sand")
+					.define("Tent Floor", Blocks.DIRT.getRegistryName().toString());
 			builder.pop();
+		}
+		
+		/** @return the Block to use in a tent platform (floor) **/
+		public Block getFloorBlock() {
+			Block floor = ForgeRegistries.BLOCKS.getValue(ResourceLocation.makeResourceLocation(FLOOR_BLOCK.get()));
+			// Why do we prevent using diamond or gold for the floor? Because I said so, that's why.
+			if(floor == null || floor == Blocks.DIAMOND_BLOCK || floor == Blocks.GOLD_BLOCK) {
+				floor = Blocks.DIRT;
+			}
+			return floor;
+		}
+		
+		/** @return the maximum size of the given tent type **/
+		public int getMaxSize(final StructureTent tent) {
+			switch(tent) {
+			case BEDOUIN:	return TIERS_BEDOUIN.get();
+			case INDLU:		return TIERS_INDLU.get();
+			case TEPEE:		return TIERS_TEPEE.get();
+			case YURT:		return TIERS_YURT.get();
+			}
+			return -1;
 		}
 	}
 }

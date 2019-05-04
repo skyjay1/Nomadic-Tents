@@ -9,14 +9,20 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Particles;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BlockIndluWall extends BlockUnbreakable implements IIndluBlock {
 
-	public BlockIndluWall() {
-		super(Block.Properties.create(Material.LEAVES).variableOpacity());
+	public BlockIndluWall(final String name) {
+		super(Block.Properties.create(Material.LEAVES).variableOpacity(), name);
+	}
+	
+	@Override
+	public int getOpacity(IBlockState state, IBlockReader worldIn, BlockPos pos) {
+		return LIGHT_OPACITY;
 	}
 
 	@OnlyIn(Dist.CLIENT)

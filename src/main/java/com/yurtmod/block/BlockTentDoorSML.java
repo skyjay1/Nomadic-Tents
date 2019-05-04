@@ -1,6 +1,6 @@
 package com.yurtmod.block;
 
-import com.yurtmod.structure.StructureType;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
@@ -10,23 +10,19 @@ import net.minecraft.state.StateContainer;
 
 public class BlockTentDoorSML extends BlockTentDoor {
 	
-	public static final EnumProperty<StructureType.Size> SIZE_SML = EnumProperty.<StructureType.Size>create("size",
-			StructureType.Size.class, StructureType.Size.SMALL, StructureType.Size.MEDIUM, StructureType.Size.LARGE);
+	public static final EnumProperty<StructureWidth> SIZE_SML = EnumProperty.<StructureWidth>create("size",
+			StructureWidth.class, StructureWidth.SMALL, StructureWidth.MEDIUM, StructureWidth.LARGE);
 
-	public BlockTentDoorSML(boolean isFull) {
-		super(isFull);
-		this.setDefaultState(this.getDefaultState().with(SIZE_SML, StructureType.Size.SMALL));
-	}
-	
-	public BlockTentDoorSML() {
-		this(false);
+	public BlockTentDoorSML(final String name) {
+		super(name);
+		this.setDefaultState(this.getDefaultState().with(SIZE_SML, StructureWidth.SMALL));
 	}
 	
 //	@Override
 //	public IBlockState getStateFromMeta(int meta) {
 //		IBlockState state = super.getStateFromMeta(meta);
 //		int sizeInt = Math.floorDiv(meta, 4);
-//		StructureType.Size size = StructureType.Size.values()[sizeInt];
+//		StructureWidth size = StructureWidth.values()[sizeInt];
 //		return state.with(SIZE_SML, size);
 //	}
 //

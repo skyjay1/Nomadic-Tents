@@ -14,8 +14,8 @@ import net.minecraft.world.IBlockReader;
 public class BlockYurtRoof extends BlockUnbreakable implements IYurtBlock {
 	public static final BooleanProperty OUTSIDE = BooleanProperty.create("outside");
 	
-	public BlockYurtRoof() {
-		super(Block.Properties.create(Material.CLOTH, MaterialColor.LIGHT_BLUE).variableOpacity());
+	public BlockYurtRoof(final String name) {
+		super(Block.Properties.create(Material.CLOTH, MaterialColor.LIGHT_BLUE).variableOpacity(), name);
 		this.setDefaultState(this.stateContainer.getBaseState().with(OUTSIDE, Boolean.valueOf(false)));
 	}
 	

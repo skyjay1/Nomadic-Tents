@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "yurtmod:cos_yurt_wall_inner",
+    "count": 1,
+	"data": 0
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "yurtmod:cos_yurt_wall_outer",
+	  "data": 0
+    }
+  ]
+}

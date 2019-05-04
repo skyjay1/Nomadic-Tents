@@ -13,8 +13,8 @@ import net.minecraft.world.World;
 public class BlockLayered extends BlockUnbreakable {
 	public static final BooleanProperty ABOVE_SIMILAR = BooleanProperty.create("above_similar");
 
-	public BlockLayered(Block.Properties prop) {
-		super(prop);
+	public BlockLayered(final Block.Properties prop, final String name) {
+		super(prop, name);
 		this.setDefaultState(this.stateContainer.getBaseState().with(ABOVE_SIMILAR, false));
 	}
 

@@ -1,13 +1,13 @@
 package com.yurtmod.structure;
 
 import java.util.Random;
-import java.util.function.Predicate;
 
 import com.yurtmod.block.BlockTepeeWall;
-import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.init.Content;
-import com.yurtmod.structure.StructureType.Size;
+import com.yurtmod.structure.util.Blueprint;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -17,19 +17,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class StructureTepee extends StructureBase {
-	public static final int LAYER_DEPTH = 2;
 	
-	private static final Predicate<IBlockState> TEPEE_PRED = (IBlockState b) -> b.getBlock() instanceof ITepeeBlock;
+	public static final int LAYER_DEPTH = 2;
 
-	public StructureTepee(StructureType type) {
-		super(type);
+	@Override
+	public StructureTent getTentType() {
+		return StructureTent.TEPEE;
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size, 
+	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size, 
 			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
 		boolean tentDim = DimensionManagerTent.isTentDimension(worldIn);
-		Blueprints bp = getBlueprints(size);
+		Blueprint bp = getBlueprints(size);
 		if(bp == null) {
 			return false;
 		}
@@ -53,19 +53,19 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, Size size) {
+	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size) {
 		// determine what blueprints to use
-		final Blueprints bp = this.getBlueprints(size);
+		final Blueprint bp = this.getBlueprints(size);
 
 		// check wall arrays
 		return validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED);
 	}
 
 	@Override
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, Size size, EnumFacing facing) {
-		final Blueprints bp = this.getBlueprints(size);
+	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, EnumFacing facing) {
+		final Blueprint bp = this.getBlueprints(size);
 		// check wall arrays
-		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TEPEE_PRED);
+		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
 	}
 
 	@Override
@@ -79,10 +79,10 @@ public class StructureTepee extends StructureBase {
 				if (pos.getY() % 2 == 0) {
 					// psuedo-random seed ensures that all blocks that are same y-dis from door get
 					// the same seed
-					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.structure.id() * 321);
-					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed));
+					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.data.getWidth().getId() * 321);
+					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
 				} else {
-					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand);
+					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
 				}
 				worldIn.setBlockState(pos, tepeeState, 3);
 			} else {
@@ -90,9 +90,9 @@ public class StructureTepee extends StructureBase {
 			}
 		}
 	}
-
-	@Override
-	public Blueprints makeBlueprints(final StructureType.Size size, Blueprints bp) {
+	
+	public static Blueprint makeBlueprints(final StructureWidth size) {
+		final Blueprint bp = new Blueprint();
 		switch (size) {
 		case MEGA:
 			bp.addWallCoords(new int[][] {
@@ -141,15 +141,16 @@ public class StructureTepee extends StructureBase {
 				{ 10, 10, 1 }, { 10, 10, 0 }, { 10, 10, -1 }, { 9, 10, -2 }, { 8, 10, -3 }, { 7, 10, -3 },
 				{ 6, 10, -3 }, { 5, 10, -2 }, { 4, 11, -1 }, { 4, 11, 0 }, { 4, 11, 1 }, { 5, 11, 2 }, { 6, 11, 3 },
 				{ 7, 11, 3 }, { 8, 11, 3 }, { 9, 11, 2 }, { 10, 11, 1 }, { 10, 11, 0 }, { 10, 11, -1 },
-				{ 9, 11, -2 }, { 8, 11, -3 }, { 7, 11, -3 }, { 6, 11, -3 }, { 5, 11, -2 }, { 5, 12, -1 },
-				{ 5, 12, 0 }, { 5, 12, 1 }, { 6, 12, 2 }, { 7, 12, 2 }, { 8, 12, 2 }, { 9, 12, 1 }, { 9, 12, 0 },
-				{ 9, 12, -1 }, { 8, 12, -2 }, { 7, 12, -2 }, { 6, 12, -2 }, { 5, 12, -1 }, { 5, 12, 0 },
-				{ 5, 12, 1 }, { 6, 12, 2 }, { 7, 12, 2 }, { 8, 12, 2 }, { 9, 12, 1 }, { 9, 12, 0 }, { 9, 12, -1 },
-				{ 8, 12, -2 }, { 7, 12, -2 }, { 6, 12, -2 }, { 6, 13, -1 }, { 6, 13, 0 }, { 6, 13, 1 },
-				{ 7, 13, 1 }, { 8, 13, 1 }, { 8, 13, 0 }, { 8, 13, -1 }, { 7, 13, -1 }, { 6, 14, -1 }, { 6, 14, 0 },
-				{ 6, 14, 1 }, { 7, 14, 1 }, { 8, 14, 1 }, { 8, 14, 0 }, { 8, 14, -1 }, { 7, 14, -1 } 
+				{ 9, 11, -2 }, { 8, 11, -3 }, { 7, 11, -3 }, { 6, 11, -3 }, { 5, 11, -2 }, 
+				{ 5, 12, -1 }, { 5, 12, 0 }, { 5, 12, 1 }, { 6, 12, 2 }, { 7, 12, 2 }, { 8, 12, 2 }, { 9, 12, 1 }, 
+				{ 9, 12, 0 }, { 9, 12, -1 }, { 8, 12, -2 }, { 7, 12, -2 }, { 6, 12, -2 }, 
+				{ 5, 13, -1 }, { 5, 13, 0 }, { 5, 13, 1 }, { 6, 13, 2 }, { 7, 13, 2 }, { 8, 13, 2 }, { 9, 13, 1 }, 
+				{ 9, 13, 0 }, { 9, 13, -1 }, { 8, 13, -2 }, { 7, 13, -2 }, { 6, 13, -2 }, 
+				{ 6, 14, -1 }, { 6, 14, 0 }, { 6, 14, 1 },
+				{ 7, 14, 1 }, { 8, 14, 1 }, { 8, 14, 0 }, { 8, 14, -1 }, { 7, 14, -1 }, 
+				{ 6, 15, -1 }, { 6, 15, 0 }, { 6, 15, 1 }, { 7, 15, 1 }, { 8, 15, 1 }, { 8, 15, 0 }, { 8, 15, -1 }, { 7, 15, -1 } 
 			});
-			bp.addBarrierCoords(new int[][] { { 7, 15, 0 } });
+			bp.addBarrierCoords(new int[][] { { 7, 16, 0 } });
 			break;
 		case GIANT:
 			bp.addWallCoords(new int[][] {
@@ -189,15 +190,17 @@ public class StructureTepee extends StructureBase {
 				{ 9, 8, -1 }, { 8, 8, -2 }, { 7, 8, -3 }, { 6, 8, -3 }, { 5, 8, -3 }, { 4, 8, -2 }, { 3, 9, -1 },
 				{ 3, 9, 0 }, { 3, 9, 1 }, { 4, 9, 2 }, { 5, 9, 3 }, { 6, 9, 3 }, { 7, 9, 3 }, { 8, 9, 2 },
 				{ 9, 9, 1 }, { 9, 9, 0 }, { 9, 9, -1 }, { 8, 9, -2 }, { 7, 9, -3 }, { 6, 9, -3 }, { 5, 9, -3 },
-				{ 4, 9, -2 }, { 4, 10, -1 }, { 4, 10, 0 }, { 4, 10, 1 }, { 5, 10, 2 }, { 6, 10, 2 }, { 7, 10, 2 },
+				{ 4, 9, -2 }, 
+				{ 4, 10, -1 }, { 4, 10, 0 }, { 4, 10, 1 }, { 5, 10, 2 }, { 6, 10, 2 }, { 7, 10, 2 },
 				{ 8, 10, 1 }, { 8, 10, 0 }, { 8, 10, -1 }, { 7, 10, -2 }, { 6, 10, -2 }, { 5, 10, -2 },
-				{ 4, 10, -1 }, { 4, 10, 0 }, { 4, 10, 1 }, { 5, 10, 2 }, { 6, 10, 2 }, { 7, 10, 2 }, { 8, 10, 1 },
-				{ 8, 10, 0 }, { 8, 10, -1 }, { 7, 10, -2 }, { 6, 10, -2 }, { 5, 10, -2 }, { 5, 11, -1 },
-				{ 5, 11, 0 }, { 5, 11, 1 }, { 6, 11, 1 }, { 7, 11, 1 }, { 7, 11, 0 }, { 7, 11, -1 }, { 6, 11, -1 },
-				{ 5, 12, -1 }, { 5, 12, 0 }, { 5, 12, 1 }, { 6, 12, 1 }, { 7, 12, 1 }, { 7, 12, 0 }, { 7, 12, -1 },
-				{ 6, 12, -1 }			
+				{ 4, 11, -1 }, { 4, 11, 0 }, { 4, 11, 1 }, { 5, 11, 2 }, { 6, 11, 2 }, { 7, 11, 2 }, { 8, 11, 1 },
+				{ 8, 11, 0 }, { 8, 11, -1 }, { 7, 11, -2 }, { 6, 11, -2 }, { 5, 11, -2 }, 
+				{ 5, 12, -1 },
+				{ 5, 12, 0 }, { 5, 12, 1 }, { 6, 12, 1 }, { 7, 12, 1 }, { 7, 12, 0 }, { 7, 12, -1 }, { 6, 12, -1 },
+				{ 5, 13, -1 }, { 5, 13, 0 }, { 5, 13, 1 }, { 6, 13, 1 }, { 7, 13, 1 }, { 7, 13, 0 }, { 7, 13, -1 },
+				{ 6, 13, -1 }			
 			});
-			bp.addBarrierCoords(new int[][] { { 6, 13, 0 } });
+			bp.addBarrierCoords(new int[][] { { 6, 14, 0 } });
 			break;
 		case HUGE:
 			bp.addWallCoords(new int[][] {
@@ -236,13 +239,13 @@ public class StructureTepee extends StructureBase {
 				// layer 9 and 10
 				{ 3, 8, -1 }, { 3, 8, 0 }, { 3, 8, 1 }, { 4, 8, 2 }, { 5, 8, 2 }, { 6, 8, 2 },
 				{ 7, 8, 1 }, { 7, 8, 0 }, { 7, 8, -1 }, { 6, 8, -2 }, { 5, 8, -2 }, { 4, 8, -2 },
-				{ 3, 8, -1 }, { 3, 8, 0 }, { 3, 8, 1 }, { 4, 8, 2 }, { 5, 8, 2 }, { 6, 8, 2 },
-				{ 7, 8, 1 }, { 7, 8, 0 }, { 7, 8, -1 }, { 6, 8, -2 }, { 5, 8, -2 }, { 4, 8, -2 },
+				{ 3, 9, -1 }, { 3, 9, 0 }, { 3, 9, 1 }, { 4, 9, 2 }, { 5, 9, 2 }, { 6, 9, 2 },
+				{ 7, 9, 1 }, { 7, 9, 0 }, { 7, 9, -1 }, { 6, 9, -2 }, { 5, 9, -2 }, { 4, 9, -2 },
 				// layer 11 and 12
-				{ 4, 9, -1 }, { 4, 9, 0 }, { 4, 9, 1 }, { 5, 9, 1 }, { 6, 9, 1 }, { 6, 9, 0 }, { 6, 9, -1 }, { 5, 9, -1 },
-				{ 4, 10, -1 }, { 4, 10, 0 }, { 4, 10, 1 }, { 5, 10, 1 }, { 6, 10, 1 }, { 6, 10, 0 }, { 6, 10, -1 }, { 5, 10, -1 }
+				{ 4, 10, -1 }, { 4, 10, 0 }, { 4, 10, 1 }, { 5, 10, 1 }, { 6, 10, 1 }, { 6, 10, 0 }, { 6, 10, -1 }, { 5, 10, -1 },
+				{ 4, 11, -1 }, { 4, 11, 0 }, { 4, 11, 1 }, { 5, 11, 1 }, { 6, 11, 1 }, { 6, 11, 0 }, { 6, 11, -1 }, { 5, 11, -1 }
 			});
-			bp.addBarrierCoords(new int[][] { { 5, 11, 0 } });
+			bp.addBarrierCoords(new int[][] { { 5, 12, 0 } });
 			break;
 		case LARGE:
 			bp.addWallCoords(new int[][] {
@@ -325,7 +328,4 @@ public class StructureTepee extends StructureBase {
 		}
 		return bp;
 	}
-	
-	
-
 }

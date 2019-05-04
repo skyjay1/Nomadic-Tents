@@ -20,7 +20,7 @@ loaderVersion="[2.0,)"
     [[dependencies.yurtmod]]
         modId="forge"
         mandatory=true
-        versionRange="[25.0.107,)"
+        versionRange="[25.0.191,)"
         ordering="NONE"
         side="BOTH"
     [[dependencies.yurtmod]]

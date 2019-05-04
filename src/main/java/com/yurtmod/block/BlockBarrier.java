@@ -4,6 +4,7 @@ import com.yurtmod.block.Categories.IBedouinBlock;
 import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -21,8 +22,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BlockBarrier extends BlockUnbreakable implements IYurtBlock, ITepeeBlock, IBedouinBlock, IIndluBlock {
 
-	public BlockBarrier() {
-		super(Block.Properties.create(Material.BARRIER).variableOpacity());
+	public BlockBarrier(final String name) {
+		super(Block.Properties.create(Material.BARRIER).variableOpacity(), name);
+		this.setRegistryName(NomadicTents.MODID, name);
 	}
 
 	@Override

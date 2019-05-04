@@ -4,12 +4,13 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.yurtmod.init.NomadicTents;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.util.IItemProvider;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.Explosion;
@@ -21,19 +22,14 @@ public class BlockUnbreakable extends Block {
 
 	public static final int LIGHT_OPACITY = 7;
 
-	public BlockUnbreakable(Block.Properties prop) {
+	public BlockUnbreakable(Block.Properties prop, final String name) {
 		super(prop.hardnessAndResistance(-1.0F, 6000001.0F));
+		this.setRegistryName(NomadicTents.MODID, name);
 	}
 
 	@Override
 	public int getHarvestLevel(IBlockState state) {
 		return -1;
-	}
-
-	@Nullable
-	@Override
-	public ToolType getHarvestTool(IBlockState state) {
-		return null;
 	}
 
 	/**

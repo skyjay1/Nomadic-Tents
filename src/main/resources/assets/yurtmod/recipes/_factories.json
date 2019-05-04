@@ -1,0 +1,6 @@
+{
+   "recipes": {
+        "tent_upgrade_width": "com.yurtmod.crafting.RecipeUpgradeWidth$Serializer",
+		"tent_upgrade_depth": "com.yurtmod.crafting.RecipeUpgradeDepth$Serializer"
+    }
+}

@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.RegisterDimensionsEvent;
@@ -28,6 +29,14 @@ public class DimensionManagerTent {
 	public static void setup(RegisterDimensionsEvent event) {
 		DIMENSION_ID = TentConfiguration.CONFIG.TENT_DIM_ID.get();
 		DimensionManager.registerDimension(Content.TENT_DIMENSION.getRegistryName(), Content.TENT_DIMENSION, null);
+	}
+	
+	public static WorldServer getOverworld(final WorldServer server) {
+		return server.getServer().getWorld(DimensionType.OVERWORLD);
+	}
+	
+	public static WorldServer getTent(final WorldServer server) {
+		return server.getServer().getWorld(DimensionType.getById(DIMENSION_ID));
 	}
 
 	/** Just for convenience **/

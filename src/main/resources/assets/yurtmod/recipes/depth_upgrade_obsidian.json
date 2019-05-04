@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   " CS",
+   " KC",
+   "E  "],
+  "key": {
+    "S": {
+        "item": "minecraft:obsidian"
+      },
+	"E": {
+        "item": "minecraft:emerald"
+    },
+	"K": {
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
+	  },
+	"C": {
+		"item": "yurtmod:tent_canvas"
+	  }
+  },
+  "result": {
+    "item": "yurtmod:depth_upgrade_obsidian",
+    "count": 1
+  }
+}
