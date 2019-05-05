@@ -242,8 +242,15 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	 * @see StructureBase#generateInTentDimension(int, World, BlockPos, double, double, double, float)
 	 **/
 	public boolean needsUpdate() {
-		return  this.depth != this.prevDepth ||
-				this.width != this.prevWidth;
+		return needsUpdateDepth() && needsUpdateWidth();
+	}
+	
+	public boolean needsUpdateDepth() {
+		return depth != prevDepth;
+	}
+	
+	public boolean needsUpdateWidth() {
+		return width != prevWidth;
 	}
 	
 	/** Uses internal fields and Player location to update the given TileEntityTentDoor, including Owner if enabled */
@@ -256,9 +263,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		te.setTentData(new StructureData(stack));
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
-		if(TentConfig.general.OWNER_ENTRANCE || TentConfig.general.OWNER_PICKUP) {
-			te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
-		}
+		te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
 	}
 
 	/** @return an NBT-tagged Tent ItemStack that represents this StructureData **/

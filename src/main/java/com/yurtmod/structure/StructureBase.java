@@ -4,6 +4,7 @@ import java.util.function.Predicate;
 
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
+import com.yurtmod.block.Categories.ITentBlockBase;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
@@ -79,43 +80,38 @@ public abstract class StructureBase {
 	 * @param prevY         the players y-pos before teleporting to the structure
 	 * @param prevZ         the players z-pos before teleporting to the structure
 	 * @param prevFacing	the players rotation yaw before teleporting to the structure
-	 * @return if a new structure was successfully built in the tent dimension
+	 * @return if the structure was successfully built or updated in the tent dimension
 	 **/
 	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
 			final double prevX, final double prevY, final double prevZ, final float prevFacing) {
+		// the corner of the square area alloted to this tent
 		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
+		// whether a structure was already built here (for upgrading and door-updating purposes)
+		final boolean structureExists = worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor;
+		
 		// check if the structure needs to be reset
-		if (data.needsUpdate()) {
+		if (!structureExists || data.needsUpdateWidth()) {
 			// remove previous structure			
 			data.makeStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
+			// make new structure!
+			this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.data.getWidth(),
+					this.data.getDoorBlock(), this.data.getWallBlock(TentDimension.DIMENSION_ID),
+					this.data.getRoofBlock(TentDimension.DIMENSION_ID));
+			// make or re-make the platform
+			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
 			// should we pass data.getWidth or data.getPrevWidth ?
-			removePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getPrevDepth());
+			//removePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getPrevDepth());
 		}
 		
-		// before building a new structure, check if it's already been made
-		if (worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor) {
-			// door already exists, simply update TileEntity and skip building a new structure
-			updateDoorInfo(worldIn, doorPos, this.data, 
-					prevX, prevY, prevZ, prevFacing, prevDimension);
-			return false;
+		// check if depth upgrade is needed
+		if(structureExists && data.needsUpdateDepth()) {
+			upgradePlatformDepth(worldIn, corner.down(1), data.getWidth(), data.getPrevDepth(), data.getDepth());
 		}
-
-		// it's made it this far, time to build the new structure!
-		final boolean success = this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.data.getWidth(),
-				this.data.getDoorBlock(), this.data.getWallBlock(TentDimension.DIMENSION_ID),
-				this.data.getRoofBlock(TentDimension.DIMENSION_ID));
-
-		if (success) {
-			// make the platform AFTER generating structure
-			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
-			
-			worldIn.getChunkFromBlockCoords(doorPos).generateSkylightMap();
-			// set tile entity door information
-			updateDoorInfo(worldIn, doorPos, this.data, 
-					prevX, prevY, prevZ, prevFacing, prevDimension);
-			return true;
-		}
-		return false;
+		
+		// Door exists by this point - update TE info
+		updateDoorInfo(worldIn, doorPos, this.data, 
+				prevX, prevY, prevZ, prevFacing, prevDimension);
+		return true;
 	}
 
 	/**
@@ -166,7 +162,7 @@ public abstract class StructureBase {
 				boolean placeFloor = false;
 				Block filler = null;
 				// find out if this column needs to be indestructible, normal, or air
-				if(blockUp instanceof BlockUnbreakable) {
+				if(blockUp instanceof ITentBlockBase) {
 					// definitely indestructible blocks underneath other indestructible
 					placeFloor = true;
 					filler = bottom;					
@@ -174,7 +170,7 @@ public abstract class StructureBase {
 					// not sure, so let's check blocks above this one 
 					// to see if we need to do anything
 					for(int f = 1, maxExpectedHeight = 24; f < maxExpectedHeight; f++) {
-						if(worldIn.getBlockState(at.up(f)).getBlock() instanceof BlockUnbreakable) {
+						if(worldIn.getBlockState(at.up(f)).getBlock() instanceof ITentBlockBase) {
 							placeFloor = true;
 							filler = floor;
 							break;
@@ -185,8 +181,9 @@ public abstract class StructureBase {
 				if(placeFloor && filler != null) {
 					// for each block in this column, place filler with super dirt underneath
 					for(int k = 0, l = depth.getLayers(); k < l; k++) {
-						// only replace if this block is air
-						if(worldIn.isAirBlock(at.down(k))) {
+						// only replace if this block is air or indestructible dirt
+						final Block b = worldIn.getBlockState(at.down(k)).getBlock();
+						if(b == Blocks.AIR || b instanceof BlockUnbreakable) {
 							worldIn.setBlockState(at.down(k), filler.getDefaultState());
 						}
 					}
@@ -196,6 +193,36 @@ public abstract class StructureBase {
 		}
 		return true;
 	}
+	
+	private static boolean upgradePlatformDepth(final World worldIn, final BlockPos corner,
+			final StructureWidth size, final StructureDepth depthPrev, final StructureDepth depthCur) {
+		final int sqWidth = size.getSquareWidth();
+		final int numLayers = depthCur.getLayers() - depthPrev.getLayers();
+		final Block bottom = Content.SUPER_DIRT;
+		final Block floor = TentConfig.general.getFloorBlock();
+		
+		for (int i = 0; i < sqWidth; i++) {
+			for (int j = 0; j < sqWidth; j++) {
+				// affect this column IF there is already floor at expected location
+				final BlockPos bottomPos = corner.add(i, -depthPrev.getLayers(), j);
+				if(worldIn.getBlockState(bottomPos).getBlock() == bottom) {
+					// yep, it's solid floor that we can replace with dirt
+					// build a column (usually of size 1) affecting this spot
+					for(int k = 0; k < numLayers; k++) {
+						final BlockPos at = bottomPos.down(k);
+						// if block is directly below another indestructible, continue the pattern. Otherwise, use dirt
+						final Block filler = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable ? bottom : floor;
+						worldIn.setBlockState(at, filler.getDefaultState());
+					}
+					// always set very bottom to indestructible
+					worldIn.setBlockState(bottomPos.down(numLayers), bottom.getDefaultState());
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	
 	/**
 	 * This should only remove blocks that the tent originally spawned with in its floor.
