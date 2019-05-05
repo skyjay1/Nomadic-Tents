@@ -3,7 +3,7 @@
   "result_depth": 1,
   "pattern": [
    "DBD",
-   "BTB",
+   "DTD",
    "DXD"],
   "key": {
     "D": {
@@ -11,7 +11,7 @@
 		"data": 0
       },
     "B": {
-        "item": "minecraft:iron_block"
+        "item": "minecraft:cobblestone"
       },
 	"X": {
         "item": "yurtmod:depth_upgrade_stone"
