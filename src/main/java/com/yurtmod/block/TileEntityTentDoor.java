@@ -210,33 +210,18 @@ public class TileEntityTentDoor extends TileEntity {
 			entity.timeUntilPortal = entity.getPortalCooldown();
 			// dimension to/from info for Teleporter object and math
 			final MinecraftServer mcServer = entity.getServer();
-			final WorldServer oldServer = mcServer.getWorld(dimFrom);
-			final WorldServer newServer = mcServer.getWorld(dimTo);
+			final WorldServer worldTo = mcServer.getWorld(dimTo);
 			// make the teleporter
-			final TentTeleporter tel = new TentTeleporter(dimFrom, newServer, this);
-
-			if (entity instanceof EntityPlayerMP) {
-				EntityPlayerMP playerMP = (EntityPlayerMP) entity;
-				// use reflection to allow a certain value to be accessed and changed (required
-				// for teleporting properly)
-				try {
-					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
-							"field_184851_cj", "invulnerableDimensionChange");
-				} catch (UnableToFindFieldException e) {
-					e.printStackTrace();
-					return false;
-				}
-				// transfer player to dimension
-				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
-				// attempt to set spawnpoint, if enabled
-				if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
-					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
-							this.prevX, this.prevY, this.prevZ);
-				}
-			} else {
-				// transfer non-player entity to dimension
-				mcServer.getPlayerList().transferEntityToWorld(entity, dimFrom, oldServer, newServer, (ITeleporter)tel);
+			final TentTeleporter tel = new TentTeleporter(dimFrom, worldTo, this);
+			// if it's a player, handle spawn-point behavior (if enabled)
+			if (entity instanceof EntityPlayerMP && TentConfig.general.ALLOW_OVERWORLD_SETSPAWN 
+					&& dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
+				// attempt to set overworld spawnpoint if this is a player and the config enables it
+				attemptSetSpawn(this.getWorld(), (EntityPlayerMP)entity, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
+						this.prevX, this.prevY, this.prevZ);
 			}
+			// teleport the entity
+			entity.changeDimension(dimTo, (ITeleporter)tel);
 			this.resetPrevTentData();
 			return true;
 		}
