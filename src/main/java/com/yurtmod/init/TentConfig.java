@@ -133,11 +133,48 @@ public final class TentConfig {
 		@Config.RangeInt(min = 1, max = 6)
 		public int TIERS_INDLU = StructureWidth.values().length;
 		
-		@Config.Name("Max Depth")
-		@Config.Comment({"The maximum floor depth that can be achieved through depth upgrades.",
-			"Set to 1 to disable extra tent floor layers."})
+		@Config.Name("Max Depth: Small")
+		@Config.Comment("Limit the depth of a Small Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
-		public int MAX_DEPTH = StructureDepth.values().length;
+		public int DEPTH_SMALL = StructureDepth.NORMAL.getLayers();
+		
+		@Config.Name("Max Depth: Medium")
+		@Config.Comment("Limit the depth of a Medium Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.RangeInt(min = 1, max = 6)
+		public int DEPTH_MEDIUM = StructureDepth.DOUBLE.getLayers();
+		
+		@Config.Name("Max Depth: Large")
+		@Config.Comment("Limit the depth of a Large Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.RangeInt(min = 1, max = 6)
+		public int DEPTH_LARGE = StructureDepth.TRIPLE.getLayers();
+		
+		@Config.Name("Max Depth: Huge")
+		@Config.Comment("Limit the depth of a Huge Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.RangeInt(min = 1, max = 6)
+		public int DEPTH_HUGE = StructureDepth.QUADRUPLE.getLayers();
+		
+		@Config.Name("Max Depth: Giant")
+		@Config.Comment("Limit the depth of a Giant Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.RangeInt(min = 1, max = 6)
+		public int DEPTH_GIANT = StructureDepth.QUINTUPLE.getLayers();
+		
+		@Config.Name("Max Depth: Mega")
+		@Config.Comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.RangeInt(min = 1, max = 6)
+		public int DEPTH_MEGA = StructureDepth.SEXTUPLE.getLayers();
+		
+		/** @return the maximum depth of the given tent size **/
+		public int getMaxDepth(final StructureWidth width) {
+			switch(width) {
+			case MEGA:		return DEPTH_MEGA;
+			case GIANT:		return DEPTH_GIANT;
+			case HUGE:		return DEPTH_HUGE;
+			case LARGE:		return DEPTH_LARGE;
+			case MEDIUM:	return DEPTH_MEDIUM;
+			case SMALL:		return DEPTH_SMALL;
+			}
+			return -1;
+		}
 		
 		/** @return the maximum size of the given tent type **/
 		public int getMaxSize(final StructureTent tent) {

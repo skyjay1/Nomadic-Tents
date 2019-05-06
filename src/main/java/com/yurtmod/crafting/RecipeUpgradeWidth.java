@@ -1,5 +1,7 @@
 package com.yurtmod.crafting;
 
+import javax.annotation.Nullable;
+
 import com.google.gson.JsonObject;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
@@ -25,14 +27,16 @@ import net.minecraftforge.common.crafting.JsonContext;
 public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	
 	private final StructureTent tent;
-	private final StructureWidth width;
+	private final StructureWidth widthIn;
+	private final StructureWidth widthOut;
 	
-	public RecipeUpgradeWidth(final StructureTent type, final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
+	public RecipeUpgradeWidth(final StructureTent type, @Nullable final StructureWidth widthFrom, 
+			final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
 		super("tentcrafting", 3, type == StructureTent.YURT ? 2 : 3, ingredients, new ItemStack(Content.ITEM_TENT));
 		this.tent = type;
-		this.width = widthTo;
+		this.widthIn = widthFrom;
+		this.widthOut = widthTo;
 	}
-	
 	
 	/**
 	 * Used to check if a recipe matches current crafting inventory
@@ -42,18 +46,15 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		if(super.matches(inv, worldIn)) {
 			// find the tent item in the crafting grid
 			ItemStack tentStack = getTentStack(inv);
-			if (tentStack.isEmpty() && this.width == StructureWidth.SMALL) {
+			if (tentStack.isEmpty() && null == this.widthIn) {
 				// no tent was found, user is
 				// crafting a small tent
 				return true;
 			} else {
-				final StructureData data = new StructureData(
-						tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
-				final StructureWidth upgrade = StructureWidth.getUpgrade(data.getWidth());
+				final StructureData data = new StructureData(tentStack);
 				// return true if the tent is upgradeable to match this one
-				if (data.getTent() == this.tent 
-					&& upgrade.getId() < TentConfig.tents.getMaxSize(data.getTent())
-					&& upgrade != data.getWidth() && upgrade == this.width) {
+				if (data.getTent() == this.tent && data.getWidth() == widthIn
+					&& this.widthOut.getId() < TentConfig.tents.getMaxSize(data.getTent())) {
 					return true;
 				}
 			}
@@ -73,13 +74,12 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		
 		if (!inputTent.isEmpty() && inputTent.hasTagCompound()) {
 			final StructureData tentData = new StructureData(inputTent);
-			//tentData.setPrevWidth(tentData.getPrevWidth());
-			tentData.setWidth(StructureWidth.getUpgrade(tentData.getWidth()));
+			tentData.setWidth(this.widthOut);
 			// transfer those values to the new tent
 			resultTag.setTag(ItemTent.TENT_DATA, tentData.serializeNBT());
 		} else {
 			// no tent was found, user is making a small tent
-			final StructureData data = new StructureData().setBoth(this.tent, this.width, StructureDepth.NORMAL);
+			final StructureData data = new StructureData().setBoth(this.tent, this.widthOut, StructureDepth.NORMAL);
 			resultTag.setTag(ItemTent.TENT_DATA, data.serializeNBT());
 		}
 		result.setTagCompound(resultTag);
@@ -112,8 +112,10 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		public IRecipe parse(JsonContext context, JsonObject json) {
 			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
 			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
+			// widthIn can be null
+			final StructureWidth widthIn = StructureWidth.getByName(JsonUtils.getString(json, "tent_size"));
 			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
-			return new RecipeUpgradeWidth(tentType, widthOut, recipe.getIngredients());			
+			return new RecipeUpgradeWidth(tentType, widthIn, widthOut, recipe.getIngredients());			
 		}
 	}
 }

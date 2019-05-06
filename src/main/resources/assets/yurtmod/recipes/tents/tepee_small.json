@@ -1,6 +1,7 @@
 {
   "type": "yurtmod:tent_upgrade_width",
   "tent_type": "tepee",
+  "tent_size": "",
   "result_size": "small",
   "pattern": [
    " W ",

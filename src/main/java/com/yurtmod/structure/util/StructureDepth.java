@@ -28,10 +28,10 @@ public enum StructureDepth implements IStringSerializable {
 	}
 	
 	/** @return the StructureDepth that is next in the upgrade tree. If it's maxed out, returns itself. **/
-	public static StructureDepth getUpgrade(final StructureDepth depth) {
-		final int index = Math.min(depth.ordinal() + 1, NUM_ENTRIES - 1);
-		return values()[index];
-	}
+//	public static StructureDepth getUpgrade(final StructureDepth depth) {
+//		final int index = Math.min(depth.ordinal() + 1, NUM_ENTRIES - 1);
+//		return values()[index];
+//	}
 	
 	/** @return A unique identifier. For now just the ordinal value **/
 	public short getId() {
@@ -45,7 +45,7 @@ public enum StructureDepth implements IStringSerializable {
 
 	/** @return the maximum number of upgrades the given tent can hold **/
 	public static int maxUpgrades(final StructureData data) {
-		return Math.min(data.getWidth().getId(), TentConfig.tents.MAX_DEPTH - 1);
+		return TentConfig.tents.getMaxDepth(data.getWidth()) - 1;
 	}
 	
 	/** @return the number of depth upgrades the given tent has received **/

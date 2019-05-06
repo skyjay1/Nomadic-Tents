@@ -1,5 +1,6 @@
 {
   "type": "yurtmod:tent_upgrade_depth",
+  "input_depth": 0,
   "result_depth": 1,
   "pattern": [
    "DBD",

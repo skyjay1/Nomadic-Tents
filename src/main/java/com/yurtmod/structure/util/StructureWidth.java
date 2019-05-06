@@ -1,5 +1,7 @@
 package com.yurtmod.structure.util;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
@@ -26,10 +28,10 @@ public enum StructureWidth implements IStringSerializable {
 	}
 	
 	/** @return the StructureWidth that is next in the upgrade tree. If it's maxed out, returns itself. **/
-	public static StructureWidth getUpgrade(final StructureWidth width) {
-		final int index = Math.min(width.ordinal() + 1, NUM_ENTRIES - 1);
-		return values()[index];
-	}
+//	public static StructureWidth getUpgrade(final StructureWidth width) {
+//		final int index = Math.min(width.ordinal() + 1, NUM_ENTRIES - 1);
+//		return values()[index];
+//	}
 	
 	/** @return The square dimensions of a tent of this size **/
 	public int getSquareWidth() {
@@ -69,13 +71,16 @@ public enum StructureWidth implements IStringSerializable {
 		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
 	}
 	
+	@Nullable
 	public static StructureWidth getByName(final String name) {
-		for(final StructureWidth w : values()) {
-			if(name.equals(w.getName())) {
-				return w;
+		if(name != null && !name.isEmpty()) {
+			for(final StructureWidth w : values()) {
+				if(name.equals(w.getName())) {
+					return w;
+				}
 			}
 		}
-		return SMALL;
+		return null;
 	}
 
 	@Override
