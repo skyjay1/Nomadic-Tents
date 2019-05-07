@@ -1,19 +1,39 @@
 package com.yurtmod.init;
 
+import java.util.function.Function;
+
+import com.yurtmod.crafting.RecipeUpgradeDepth;
+import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.dimension.DimensionManagerTent;
+import com.yurtmod.dimension.TentDimension;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.RecipeSerializers;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ModDimension;
+import net.minecraftforge.common.crafting.RecipeType;
 import net.minecraftforge.registries.ObjectHolder;
 
 public class Content {
 	
+	// recipes
+	public static final RecipeType<RecipeUpgradeWidth> TYPE_WIDTH = RecipeType.get(RecipeUpgradeWidth.Serializer.NAME, RecipeUpgradeWidth.class);
+	public static final RecipeType<RecipeUpgradeDepth> TYPE_DEPTH = RecipeType.get(RecipeUpgradeDepth.Serializer.NAME, RecipeUpgradeDepth.class);
+	public static final IRecipeSerializer<RecipeUpgradeWidth> SER_WIDTH = RecipeSerializers.register(new RecipeUpgradeWidth.Serializer());
+	public static final IRecipeSerializer<RecipeUpgradeDepth> SER_DEPTH = RecipeSerializers.register(new RecipeUpgradeDepth.Serializer());
+	
 	// dimension
-	@ObjectHolder(NomadicTents.MODID + ":" + DimensionManagerTent.DIM_NAME)
-	public static ModDimension TENT_DIMENSION;
+	//ObjectHolder(NomadicTents.MODID + ":" + DimensionManagerTent.DIM_NAME)
+	public static ModDimension TENT_DIMENSION = new ModDimension() {
+		@Override
+		public Function<DimensionType, ? extends net.minecraft.world.dimension.Dimension> getFactory() {
+			return TentDimension::new;
+		}
+	}.setRegistryName(NomadicTents.MODID, DimensionManagerTent.DIM_NAME);
 	
 	// biome
 	@ObjectHolder(NomadicTents.MODID + ":" + DimensionManagerTent.BIOME_TENT_NAME)
@@ -38,9 +58,9 @@ public class Content {
 	public static Block YURT_WALL_INNER;
 	
 	//// BEDOUIN BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":bed_wall")
+	@ObjectHolder(NomadicTents.MODID + ":bedouin_wall")
 	public static Block BEDOUIN_WALL;
-	@ObjectHolder(NomadicTents.MODID + ":bed_roof")
+	@ObjectHolder(NomadicTents.MODID + ":bedouin_roof")
 	public static Block BEDOUIN_ROOF;
 	
 	//// INDLU BLOCKS ////
@@ -90,9 +110,9 @@ public class Content {
 	public static Block TEPEE_DOOR_SML;
 	@ObjectHolder(NomadicTents.MODID + ":tepee_door_1")
 	public static Block TEPEE_DOOR_HGM;
-	@ObjectHolder(NomadicTents.MODID + ":bed_door_0")
+	@ObjectHolder(NomadicTents.MODID + ":bedouin_door_0")
 	public static Block BEDOUIN_DOOR_SML;
-	@ObjectHolder(NomadicTents.MODID + ":bed_door_1")
+	@ObjectHolder(NomadicTents.MODID + ":bedouin_door_1")
 	public static Block BEDOUIN_DOOR_HGM;
 	@ObjectHolder(NomadicTents.MODID + ":indlu_door_0")
 	public static Block INDLU_DOOR_SML;
@@ -120,9 +140,9 @@ public class Content {
 	public static Block COS_YURT_WALL_OUTER;
 	@ObjectHolder(NomadicTents.MODID + ":cos_yurt_wall_inner")
 	public static Block COS_YURT_WALL_INNER;
-	@ObjectHolder(NomadicTents.MODID + ":cos_bed_wall")
+	@ObjectHolder(NomadicTents.MODID + ":cos_bedouin_wall")
 	public static Block COS_BEDOUIN_WALL;
-	@ObjectHolder(NomadicTents.MODID + ":cos_bed_roof")
+	@ObjectHolder(NomadicTents.MODID + ":cos_bedouin_roof")
 	public static Block COS_BEDOUIN_ROOF;
 	@ObjectHolder(NomadicTents.MODID + ":cos_indlu_wall_outer")
 	public static Block COS_INDLU_WALL_OUTER;

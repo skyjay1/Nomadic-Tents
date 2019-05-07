@@ -44,11 +44,12 @@ public class NomadicTents {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, TentConfiguration.SPEC);
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(NomadicTents::setup);
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
+		//MinecraftForge.EVENT_BUS.register(this);
 	}
 
 	@SubscribeEvent
 	public static void setup(final RegisterDimensionsEvent event) {
-		System.out.println("yurtmod: RegisterDimensionsEvent");
+		System.out.println("yurtmod: RegisterDimensionsEvent!");
 		DimensionManagerTent.setup(event);
 	}
 	

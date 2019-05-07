@@ -45,7 +45,9 @@ public enum StructureDepth implements IStringSerializable {
 
 	/** @return the maximum number of upgrades the given tent can hold **/
 	public static int maxUpgrades(final StructureData data) {
-		return Math.min(data.getWidth().getId(), TentConfiguration.CONFIG.MAX_DEPTH.get() - 1);
+		// TODO
+		return 5;
+		//return Math.min(data.getWidth().getId(), TentConfiguration.CONFIG.MAX_DEPTH.get() - 1);
 	}
 	
 	/** @return the number of depth upgrades the given tent has received **/

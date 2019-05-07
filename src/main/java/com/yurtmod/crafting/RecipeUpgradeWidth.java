@@ -110,7 +110,7 @@ public class RecipeUpgradeWidth extends ShapedRecipe implements IRecipe {
 	}
 	
 	public static class Serializer implements IRecipeSerializer<RecipeUpgradeWidth> {
-		private static final ResourceLocation NAME = new ResourceLocation(NomadicTents.MODID, "tent_upgrade_width");
+		public static final ResourceLocation NAME = new ResourceLocation(NomadicTents.MODID, "tent_upgrade_width");
 //		@Override
 //		public IRecipe parse(JsonContext context, JsonObject json) {
 //			final ShapedRecipe recipe = ShapedRecipe.deserializeItem(json);			

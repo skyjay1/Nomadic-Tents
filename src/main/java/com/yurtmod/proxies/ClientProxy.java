@@ -10,10 +10,9 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
 public class ClientProxy extends CommonProxy {
-
+/*
 	@SubscribeEvent
 	public static void onRenderEvent(ModelRegistryEvent event) {
-		return;
 		// register items
 		register(Content.ITEM_TENT);
 		register(Content.ITEM_TENT_CANVAS);
@@ -101,7 +100,7 @@ public class ClientProxy extends CommonProxy {
 		register(Content.FRAME_BEDOUIN_ROOF, progress);
 		register(Content.FRAME_INDLU_WALL, progress);
 	}
-
+*/
 	private static void register(Item i, String name, int... meta) {
 		if (meta.length < 1)
 			meta = new int[] { 0 };

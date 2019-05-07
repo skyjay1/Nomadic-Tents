@@ -9,9 +9,9 @@ public class Blueprint {
 	private final List<BlockPos> wallCoords, roofCoords, barrierCoords;
 
 	public Blueprint() {
-		this.wallCoords = new ArrayList();
-		this.roofCoords = new ArrayList();
-		this.barrierCoords = new ArrayList();
+		this.wallCoords = new ArrayList<>();
+		this.roofCoords = new ArrayList<>();
+		this.barrierCoords = new ArrayList<>();
 	}
 
 	/** 
@@ -105,6 +105,7 @@ public class Blueprint {
 	private static final boolean add(final List<BlockPos> l, int[] toAdd) {
 		if (toAdd != null && toAdd.length == 3) {
 			return l.add(new BlockPos(toAdd[0], toAdd[1], toAdd[2]));
-		} else return false;
+		}
+		return false;
 	}
 }

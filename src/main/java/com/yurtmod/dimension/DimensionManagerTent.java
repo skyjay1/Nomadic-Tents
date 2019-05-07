@@ -1,11 +1,13 @@
 package com.yurtmod.dimension;
 
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfiguration;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -26,9 +28,9 @@ public class DimensionManagerTent {
 	/** Default facing for all tent structures in Tent Dimension **/
 	public static final EnumFacing STRUCTURE_DIR = EnumFacing.EAST;
 
-	public static void setup(RegisterDimensionsEvent event) {
-		DIMENSION_ID = TentConfiguration.CONFIG.TENT_DIM_ID.get();
-		DimensionManager.registerDimension(Content.TENT_DIMENSION.getRegistryName(), Content.TENT_DIMENSION, null);
+	public static void setup(final RegisterDimensionsEvent event) {
+		//DIMENSION_ID = TentConfiguration.CONFIG.TENT_DIM_ID.get();
+		DimensionManager.registerDimension(new ResourceLocation(NomadicTents.MODID, DIM_NAME), Content.TENT_DIMENSION, null);
 	}
 	
 	public static WorldServer getOverworld(final WorldServer server) {

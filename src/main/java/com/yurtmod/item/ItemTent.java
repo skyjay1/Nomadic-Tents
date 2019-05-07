@@ -125,7 +125,7 @@ public class ItemTent extends Item {
 	@Override
 	public String getTranslationKey(ItemStack stack) {
 		final StructureData data = new StructureData(stack);
-		return "item." + data.getTent().getName() + "_" + data.getWidth().getName();
+		return "item." + NomadicTents.MODID + "." + data.getTent().getName() + "_" + data.getWidth().getName();
 	}
 
 	@Override

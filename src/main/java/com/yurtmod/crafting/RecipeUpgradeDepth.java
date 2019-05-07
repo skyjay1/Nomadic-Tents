@@ -119,7 +119,7 @@ public class RecipeUpgradeDepth  extends ShapedRecipe implements IRecipe {
 //	}
 	
 	public static class Serializer implements IRecipeSerializer<RecipeUpgradeDepth> {
-		private static final ResourceLocation NAME = new ResourceLocation(NomadicTents.MODID, "tent_upgrade_depth");
+		public static final ResourceLocation NAME = new ResourceLocation(NomadicTents.MODID, "tent_upgrade_depth");
 
 		@Override
 		public RecipeUpgradeDepth read(ResourceLocation recipeId, JsonObject json) {

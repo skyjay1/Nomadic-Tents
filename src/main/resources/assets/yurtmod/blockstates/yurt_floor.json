@@ -1,5 +1,5 @@
 {
 	"variants": {
-		"normal": { "model": "yurtmod:block/yurt_floor"}
+		"": { "model": "yurtmod:block/block/yurt_floor"}
 	}
 }

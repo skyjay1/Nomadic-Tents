@@ -1,17 +1,17 @@
 {
 	"variants": {
-		"axis=x,half=upper,size=huge": { "model": "yurtmod:yurt_door_upper_3"},
-		"axis=x,half=lower,size=huge": { "model": "yurtmod:yurt_door_lower_3"},
-		"axis=z,half=upper,size=huge": { "model": "yurtmod:yurt_door_upper_3", "y": 90 },
-		"axis=z,half=lower,size=huge": { "model": "yurtmod:yurt_door_lower_3", "y": 90 },
-		"axis=x,half=upper,size=giant": { "model": "yurtmod:yurt_door_upper_4"},
-		"axis=x,half=lower,size=giant": { "model": "yurtmod:yurt_door_lower_4"},
-		"axis=z,half=upper,size=giant": { "model": "yurtmod:yurt_door_upper_4", "y": 90 },
-		"axis=z,half=lower,size=giant": { "model": "yurtmod:yurt_door_lower_4", "y": 90 },
-		"axis=x,half=upper,size=mega": { "model": "yurtmod:yurt_door_upper_5"},
-		"axis=x,half=lower,size=mega": { "model": "yurtmod:yurt_door_lower_5"},
-		"axis=z,half=upper,size=mega": { "model": "yurtmod:yurt_door_upper_5", "y": 90 },
-		"axis=z,half=lower,size=mega": { "model": "yurtmod:yurt_door_lower_5", "y": 90 }
+		"axis=x,half=upper,size=huge": { "model": "yurtmod:block/yurt_door_upper_3"},
+		"axis=x,half=lower,size=huge": { "model": "yurtmod:block/yurt_door_lower_3"},
+		"axis=z,half=upper,size=huge": { "model": "yurtmod:block/yurt_door_upper_3", "y": 90 },
+		"axis=z,half=lower,size=huge": { "model": "yurtmod:block/yurt_door_lower_3", "y": 90 },
+		"axis=x,half=upper,size=giant": { "model": "yurtmod:block/yurt_door_upper_4"},
+		"axis=x,half=lower,size=giant": { "model": "yurtmod:block/yurt_door_lower_4"},
+		"axis=z,half=upper,size=giant": { "model": "yurtmod:block/yurt_door_upper_4", "y": 90 },
+		"axis=z,half=lower,size=giant": { "model": "yurtmod:block/yurt_door_lower_4", "y": 90 },
+		"axis=x,half=upper,size=mega": { "model": "yurtmod:block/yurt_door_upper_5"},
+		"axis=x,half=lower,size=mega": { "model": "yurtmod:block/yurt_door_lower_5"},
+		"axis=z,half=upper,size=mega": { "model": "yurtmod:block/yurt_door_upper_5", "y": 90 },
+		"axis=z,half=lower,size=mega": { "model": "yurtmod:block/yurt_door_lower_5", "y": 90 }
 		
 	}
 }

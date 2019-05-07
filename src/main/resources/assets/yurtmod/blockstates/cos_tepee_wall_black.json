@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "yurtmod:tepee_wall_black" }
+        "": { "model": "yurtmod:block/tepee_wall_black" }
     }
 }

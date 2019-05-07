@@ -3,7 +3,7 @@
   "result_depth": 4,
   "pattern": [
    "DBD",
-   "BTB",
+   "DTD",
    "DXD"],
   "key": {
     "D": {
@@ -11,7 +11,7 @@
 		"data": 0
       },
     "B": {
-        "item": "minecraft:gold_block"
+        "item": "minecraft:obsidian"
       },
 	"X": {
         "item": "yurtmod:depth_upgrade_obsidian"

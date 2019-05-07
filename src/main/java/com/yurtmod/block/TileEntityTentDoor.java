@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.yurtmod.dimension.DimensionManagerTent;
 import com.yurtmod.dimension.TentTeleporter;
-import com.yurtmod.init.TentConfig;
+import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfiguration;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.util.StructureData;
@@ -18,7 +18,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -27,11 +26,8 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.ITeleporter;
 
 public class TileEntityTentDoor extends TileEntity {
-	
-//	private static final String KEY_STRUCTURE_TYPE_PREV = "StructureTypePrevious";
-//	private static final String KEY_STRUCTURE_TYPE = "StructureTypeOrdinal";
+
 	private static final String S_TENT_DATA = "TentData";
-	
 	private static final String S_PLAYER_X = "PlayerPrevX";
 	private static final String S_PLAYER_Y = "PlayerPrevY";
 	private static final String S_PLAYER_Z = "PlayerPrevZ";
@@ -44,9 +40,9 @@ public class TileEntityTentDoor extends TileEntity {
 	private float prevFacing;
 	private int prevDimID;
 	private UUID owner;
-
-	public TileEntityTentDoor(final TileEntityType<?> typeIn) {
-		super(typeIn);
+	
+	public TileEntityTentDoor() {
+		super(Content.TE_TENT_DOOR);
 		if (this.tent == null) {
 			this.tent = new StructureData();
 		}
@@ -357,8 +353,9 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether the teleport was successful
 	 */
 	public boolean onEntityCollide(Entity entity, EnumFacing tentDir) {
-		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.general.ALLOW_PLAYER_COLLIDE)
-				|| (!(entity instanceof EntityPlayer) && TentConfig.general.ALLOW_NONPLAYER_COLLIDE))) {
+		if (canTeleportEntity(entity) && 
+				((entity instanceof EntityPlayer && TentConfiguration.CONFIG.ALLOW_PLAYER_COLLIDE.get())
+				|| (!(entity instanceof EntityPlayer) && TentConfiguration.CONFIG.ALLOW_NONPLAYER_COLLIDE.get()))) {
 			// remember the entity coordinates from the overworld
 			if (!DimensionManagerTent.isTentDimension(entity.getEntityWorld())) {
 				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);

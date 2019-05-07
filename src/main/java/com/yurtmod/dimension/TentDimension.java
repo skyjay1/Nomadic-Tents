@@ -19,9 +19,7 @@ public class TentDimension extends Dimension {
 	public TentDimension(final DimensionType type) {
 		this.dimensionType = type;
 	}
-	/**
-	 * creates a new world chunk manager for WorldProvider
-	 */
+	
 	@Override
 	protected void init() {
 		//this.biomeProvider = new BiomeProviderSingle(TentDimension.biomeTent);

@@ -1,6 +1,6 @@
 {
 	"variants": {
-		"outside=true": { "model": "yurtmod:yurt_roof_outside"},
-		"outside=false": { "model": "yurtmod:yurt_roof_inside"}
+		"outside=true": { "model": "yurtmod:block/yurt_roof_outside"},
+		"outside=false": { "model": "yurtmod:block/yurt_roof_inside"}
 	}
 }

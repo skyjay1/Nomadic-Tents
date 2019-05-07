@@ -24,7 +24,6 @@ public class BlockBarrier extends BlockUnbreakable implements IYurtBlock, ITepee
 
 	public BlockBarrier(final String name) {
 		super(Block.Properties.create(Material.BARRIER).variableOpacity(), name);
-		this.setRegistryName(NomadicTents.MODID, name);
 	}
 
 	@Override

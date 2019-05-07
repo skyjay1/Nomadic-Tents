@@ -1,5 +1,5 @@
 {
 	"variants": {
-		"normal": { "model": "yurtmod:indlu_wall_inner"}
+		"": { "model": "yurtmod:block/indlu_wall_inner"}
 	}
 }

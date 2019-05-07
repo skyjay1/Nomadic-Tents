@@ -9,6 +9,7 @@ import com.yurtmod.init.Content;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -33,7 +34,7 @@ import net.minecraft.world.gen.feature.structure.StructureStart;
 public class TentChunkGenerator implements IChunkGenerator<OverworldGenSettings> {
 	private World worldObj;
 	protected final Long2ObjectMap<StructureStart> structureStartCache = Long2ObjectMaps.emptyMap();
-	protected final Long2ObjectMap<StructureStart> structureReferenceCache = Long2ObjectMaps.emptyMap();
+	protected final Long2ObjectMap<LongSet> structureReferenceCache = Long2ObjectMaps.emptyMap();
 	protected OverworldGenSettings chunkGenSettings;
 
 	public TentChunkGenerator(World worldIn, Dimension dimension, OverworldGenSettings settings) {
@@ -81,22 +82,22 @@ public class TentChunkGenerator implements IChunkGenerator<OverworldGenSettings>
 	}
 
 	@Override
-	public boolean hasStructure(Biome biomeIn, Structure structureIn) {
+	public boolean hasStructure(Biome biomeIn, Structure<?> structureIn) {
 		return false;
 	}
 
 	@Override
-	public IFeatureConfig getStructureConfig(Biome biomeIn, Structure structureIn) {
+	public IFeatureConfig getStructureConfig(Biome biomeIn, Structure<?> structureIn) {
 		return null;
 	}
 
 	@Override
-	public Long2ObjectMap getStructureReferenceToStartMap(Structure structureIn) {
+	public Long2ObjectMap<StructureStart> getStructureReferenceToStartMap(Structure<?> structureIn) {
 		return this.structureStartCache;
 	}
 
 	@Override
-	public Long2ObjectMap getStructurePositionToReferenceMap(Structure structureIn) {
+	public Long2ObjectMap<LongSet> getStructurePositionToReferenceMap(Structure<?> structureIn) {
 		return this.structureReferenceCache;
 	}
 

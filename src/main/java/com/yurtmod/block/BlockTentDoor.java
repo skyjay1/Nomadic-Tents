@@ -32,7 +32,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -77,7 +76,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				ItemStack held = player.getHeldItem(hand);
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
-				if((player.isCreative() || !TentConfiguration.CONFIG.COPY_CREATIVE_ONLY) 
+				if((player.isCreative() || !TentConfiguration.CONFIG.COPY_CREATIVE_ONLY.get()) 
 						&& held != null && held.hasTag() 
 						&& held.getTag().hasKey(ItemTent.TAG_COPY_TOOL)
 						&& held.getTag().getBoolean(ItemTent.TAG_COPY_TOOL)) {
@@ -103,7 +102,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				if (held != null && held.getItem() instanceof ItemMallet
 						&& !DimensionManagerTent.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
-					if(TentConfiguration.CONFIG.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
+					if(TentConfiguration.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
 					// STEP 4:  drop the tent item and damage the tool
@@ -114,7 +113,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
-						if(TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN) {
+						if(TentConfiguration.CONFIG.ALLOW_OVERWORLD_SETSPAWN.get()) {
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
