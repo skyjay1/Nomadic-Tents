@@ -113,7 +113,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
 			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
 			// widthIn can be null
-			final StructureWidth widthIn = StructureWidth.getByName(JsonUtils.getString(json, "tent_size"));
+			final StructureWidth widthIn = StructureWidth.getByName(JsonUtils.getString(json, "input_size"));
 			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
 			return new RecipeUpgradeWidth(tentType, widthIn, widthOut, recipe.getIngredients());			
 		}

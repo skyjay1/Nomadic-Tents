@@ -1,7 +1,7 @@
 {
   "type": "yurtmod:tent_upgrade_width",
   "tent_type": "yurt",
-  "tent_size": "",
+  "input_size": "",
   "result_size": "small",
   "pattern": [
    " Y ",

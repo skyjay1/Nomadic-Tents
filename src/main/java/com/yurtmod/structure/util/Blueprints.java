@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import com.yurtmod.structure.*;
 
-public final class Blueprints2 {
+public final class Blueprints {
 
 	private static final Map<TentKey, Blueprint> map = new HashMap<>();
 	
@@ -21,7 +21,7 @@ public final class Blueprints2 {
 		}
 	}
 	
-	private Blueprints2() {
+	private Blueprints() {
 		// empty constructor
 	}
 	

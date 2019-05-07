@@ -1,7 +1,7 @@
 {
   "type": "yurtmod:tent_upgrade_width",
   "tent_type": "indlu",
-  "tent_size": "giant",
+  "input_size": "giant",
   "result_size": "mega",
   "pattern": [
    "XWX",

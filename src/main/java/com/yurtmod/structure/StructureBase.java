@@ -10,7 +10,7 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.Blueprint;
-import com.yurtmod.structure.util.Blueprints2;
+import com.yurtmod.structure.util.Blueprints;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureTent;
@@ -385,7 +385,7 @@ public abstract class StructureBase {
 	}
 	
 	public Blueprint getBlueprints(final StructureWidth size) {
-		return Blueprints2.get(this.getTentType(), size);
+		return Blueprints.get(this.getTentType(), size);
 	}
 
 	/** @return true if a structure was successfully generated **/

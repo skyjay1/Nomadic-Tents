@@ -1,7 +1,7 @@
 {
   "type": "yurtmod:tent_upgrade_width",
   "tent_type": "bedouin",
-  "tent_size": "huge",
+  "input_size": "huge",
   "result_size": "giant",
   "pattern": [
    "XWX",
