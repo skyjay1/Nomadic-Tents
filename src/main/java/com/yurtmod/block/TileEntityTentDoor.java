@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
+import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.util.StructureData;
@@ -21,14 +22,13 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 
 public class TileEntityTentDoor extends TileEntity {
-	
-//	private static final String KEY_STRUCTURE_TYPE_PREV = "StructureTypePrevious";
-//	private static final String KEY_STRUCTURE_TYPE = "StructureTypeOrdinal";
+
 	private static final String S_TENT_DATA = "TentData";
 	
 	private static final String S_PLAYER_X = "PlayerPrevX";
@@ -99,22 +99,6 @@ public class TileEntityTentDoor extends TileEntity {
 	public static final int getChunkOffsetZ(int actualZ) {
 		return actualZ / (TentDimension.TENT_SPACING);
 	}
-
-//	public void setOffsetX(int toSet) {
-//		this.offsetX = toSet;
-//	}
-//
-//	public int getOffsetX() {
-//		return this.offsetX;
-//	}
-//
-//	public void setOffsetZ(int toSet) {
-//		this.offsetZ = toSet;
-//	}
-//
-//	public int getOffsetZ() {
-//		return this.offsetZ;
-//	}
 
 	public void setOverworldXYZ(double posX, double posY, double posZ) {
 		this.prevX = posX;
@@ -200,10 +184,18 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether the teleport was successful
 	 **/
 	private boolean teleport(Entity entity) {
-		entity.setPortal(this.getPos());
+		
 		final int dimFrom = entity.getEntityWorld().provider.getDimension();
 		final int dimTo = TentDimension.isTentDimension(dimFrom) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
 
+		// inform the event bus that we're about to teleport an entity
+		if(TentDimension.isTentDimension(dimTo)) {
+			final TentEvent.PreEnter event = new TentEvent.PreEnter(this, entity);
+			MinecraftForge.EVENT_BUS.post(event);
+		}
+				
+		// continue with the teleportation code		
+		entity.setPortal(this.getPos());
 		if (entity.timeUntilPortal > 0) {
 			entity.timeUntilPortal = entity.getPortalCooldown();
 		} else {
@@ -213,15 +205,36 @@ public class TileEntityTentDoor extends TileEntity {
 			final WorldServer worldTo = mcServer.getWorld(dimTo);
 			// make the teleporter
 			final TentTeleporter tel = new TentTeleporter(dimFrom, worldTo, this);
-			// if it's a player, handle spawn-point behavior (if enabled)
-			if (entity instanceof EntityPlayerMP && TentConfig.general.ALLOW_OVERWORLD_SETSPAWN 
-					&& dimFrom == TentDimension.DIMENSION_ID && dimTo == 0) {
+			// if it's a player, handle teleportation differently
+			if (entity instanceof EntityPlayerMP) {
+				final EntityPlayerMP playerMP = (EntityPlayerMP)entity;
 				// attempt to set overworld spawnpoint if this is a player and the config enables it
-				attemptSetSpawn(this.getWorld(), (EntityPlayerMP)entity, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
+				if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID 
+						&& dimTo == TentConfig.GENERAL.RESPAWN_DIMENSION) {
+					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
 						this.prevX, this.prevY, this.prevZ);
+				}
+				//////// }
+				// ~ Alter a private field using reflection ~
+				// We could simply call Entity#changeDimension(int, ITeleporter)
+				// but the EntityPlayerMP implementation plays a portal sound
+				// and we can get around that.
+				// HOWEVER, calling changeDimension correctly updates XP.
+				// We need that too.
+				try {
+					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
+							"field_184851_cj", "invulnerableDimensionChange");
+				} catch (UnableToFindFieldException e) {
+					e.printStackTrace();
+					return false;
+				}
+				// transfer player to dimension
+				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
+			} else {
+				////////
+				// teleport the entity normally
+				entity.changeDimension(dimTo, (ITeleporter)tel);
 			}
-			// teleport the entity
-			entity.changeDimension(dimTo, (ITeleporter)tel);
 			this.resetPrevTentData();
 			return true;
 		}
@@ -237,7 +250,7 @@ public class TileEntityTentDoor extends TileEntity {
 	private static boolean attemptSetSpawn(final World worldFrom, final EntityPlayerMP player, 
 			final BlockPos tentCenter, final double prevX, final double prevY, final double prevZ) {
 		
-		final int overworldId = 0;
+		final int overworldId = TentConfig.GENERAL.RESPAWN_DIMENSION;
 		final World overworld = worldFrom.getMinecraftServer().getWorld(overworldId);
 		final BlockPos prevCoords = new BlockPos(prevX, prevY, prevZ);
 		TentSaveData data = TentSaveData.forWorld(worldFrom);
@@ -264,7 +277,7 @@ public class TileEntityTentDoor extends TileEntity {
 	public void onPlayerRemove(EntityPlayer playerIn) {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
-		if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
+		if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
 			BlockPos tentCenter = this.getTentDoorPos().add(this.getTentData().getWidth().getDoorZ(), 0, 0);
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
@@ -279,11 +292,11 @@ public class TileEntityTentDoor extends TileEntity {
 
 	private static void resetOverworldSpawn(EntityPlayer player) {
     	// reset player spawn point when the tent is taken down
-		final World overworld = player.getEntityWorld().getMinecraftServer().getWorld(0);
+		final World overworld = player.getEntityWorld().getMinecraftServer().getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION);
 		final UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
     	final TentSaveData data = TentSaveData.forWorld(overworld);
     	// first, check if the player has a bed
-    	BlockPos posToSet = player.getBedLocation(0);
+    	BlockPos posToSet = player.getBedLocation(TentConfig.GENERAL.RESPAWN_DIMENSION);
     	if(posToSet == null || EntityPlayer.getBedSpawnLocation(overworld, posToSet, false) == null) {
     		// they don't, so check if the previous stored location was a valid bed
     		BlockPos oldSpawn = data.get(uuid);
@@ -323,8 +336,8 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether the teleport was successful
 	 */
 	public boolean onEntityCollide(Entity entity, EnumFacing tentDir) {
-		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.general.ALLOW_PLAYER_COLLIDE)
-				|| (!(entity instanceof EntityPlayer) && TentConfig.general.ALLOW_NONPLAYER_COLLIDE))) {
+		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.GENERAL.ALLOW_PLAYER_COLLIDE)
+				|| (!(entity instanceof EntityPlayer) && TentConfig.GENERAL.ALLOW_NONPLAYER_COLLIDE))) {
 			// remember the entity coordinates from the overworld
 			if (!TentDimension.isTentDimension(entity.getEntityWorld())) {
 				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
@@ -366,7 +379,7 @@ public class TileEntityTentDoor extends TileEntity {
 		if(entity == null || entity.getEntityWorld().isRemote) {
 			return false;
 		}
-		if(!TentDimension.isTentDimension(entity.getEntityWorld()) && TentConfig.general.OWNER_ENTRANCE 
+		if(!TentDimension.isTentDimension(entity.getEntityWorld()) && TentConfig.GENERAL.OWNER_ENTRANCE 
 				&& entity instanceof EntityPlayer && !isOwner((EntityPlayer)entity)) {
 			return false;
 		}

@@ -282,7 +282,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** Note: the returned StructureBase only contains a COPY of this StructureData **/
-	public StructureBase makeStructure() {
+	public StructureBase getStructure() {
 		return this.tent.makeStructure(this.copy());
 	}
 

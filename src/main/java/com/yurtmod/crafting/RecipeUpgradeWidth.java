@@ -54,7 +54,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 				final StructureData data = new StructureData(tentStack);
 				// return true if the tent is upgradeable to match this one
 				if (data.getTent() == this.tent && data.getWidth() == widthIn
-					&& this.widthOut.getId() < TentConfig.tents.getMaxSize(data.getTent())) {
+					&& this.widthOut.getId() < TentConfig.TENTS.getMaxSize(data.getTent())) {
 					return true;
 				}
 			}

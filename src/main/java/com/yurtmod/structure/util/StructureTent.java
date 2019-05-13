@@ -30,10 +30,10 @@ public enum StructureTent implements IStringSerializable {
 	/** @return whether this tent type is enabled in the config **/
 	public boolean isEnabled() {
 		switch (this) {
-		case BEDOUIN:	return TentConfig.tents.ALLOW_BEDOUIN;
-		case TEPEE:		return TentConfig.tents.ALLOW_TEPEE;
-		case YURT:		return TentConfig.tents.ALLOW_YURT;
-		case INDLU:		return TentConfig.tents.ALLOW_INDLU;
+		case BEDOUIN:	return TentConfig.TENTS.ALLOW_BEDOUIN;
+		case TEPEE:		return TentConfig.TENTS.ALLOW_TEPEE;
+		case YURT:		return TentConfig.TENTS.ALLOW_YURT;
+		case INDLU:		return TentConfig.TENTS.ALLOW_INDLU;
 		}
 		return false;
 	}

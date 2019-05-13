@@ -96,7 +96,7 @@ public class ItemTent extends Item {
 					final EnumFacing playerFacing = player.getHorizontalFacing();
 					final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
 					final StructureWidth width = data.getWidth().getOverworldSize();
-					final StructureBase struct = data.makeStructure();
+					final StructureBase struct = data.getStructure();
 					// make sure the tent can be built here
 					if (struct.canSpawn(worldIn, hitPos, playerFacing, width)) {
 						// build the frames

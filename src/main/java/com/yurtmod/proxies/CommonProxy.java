@@ -17,6 +17,7 @@ import com.yurtmod.dimension.BiomeTent;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemDepthUpgrade;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemSuperMallet;
@@ -39,7 +40,8 @@ public class CommonProxy {
 	@SubscribeEvent
 	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
 		event.getRegistry()
-				.register(new BiomeTent().setRegistryName(NomadicTents.MODID, TentDimension.BIOME_TENT_NAME));
+				.register(new BiomeTent(new Biome.BiomeProperties(TentDimension.BIOME_TENT_NAME))
+						.setRegistryName(NomadicTents.MODID, TentDimension.BIOME_TENT_NAME));
 	}
 
 	@SubscribeEvent

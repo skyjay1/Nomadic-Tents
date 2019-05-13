@@ -1,11 +1,13 @@
 package com.yurtmod.dimension;
 
+import com.yurtmod.init.TentConfig;
+
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeVoidDecorator;
 
 public class BiomeTent extends Biome {
-	public BiomeTent() {
-		super(new Biome.BiomeProperties(TentDimension.BIOME_TENT_NAME));
+	public BiomeTent(final Biome.BiomeProperties prop) {
+		super(TentConfig.GENERAL.ENABLE_WEATHER ? prop : prop.setRainDisabled());
 		this.spawnableMonsterList.clear();
 		this.spawnableCreatureList.clear();
 		this.spawnableWaterCreatureList.clear();

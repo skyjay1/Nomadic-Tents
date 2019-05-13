@@ -7,6 +7,7 @@ import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.Categories.ITentBlockBase;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.Blueprint;
@@ -80,38 +81,47 @@ public abstract class StructureBase {
 	 * @param prevY         the players y-pos before teleporting to the structure
 	 * @param prevZ         the players z-pos before teleporting to the structure
 	 * @param prevFacing	the players rotation yaw before teleporting to the structure
-	 * @return if the structure was successfully built or updated in the tent dimension
+	 * @return if the structure was built or updated in the tent dimension, or already exists
+	 * @see TentEvent.TentResult
 	 **/
-	public final boolean generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
+	public final TentEvent.TentResult generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
 			final double prevX, final double prevY, final double prevZ, final float prevFacing) {
+		TentEvent.TentResult result = TentEvent.TentResult.NONE;
 		// the corner of the square area alloted to this tent
 		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
 		// whether a structure was already built here (for upgrading and door-updating purposes)
 		final boolean structureExists = worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor;
-		
-		// check if the structure needs to be reset
-		if (!structureExists || data.needsUpdateWidth()) {
+		final boolean rebuildTent = !structureExists || data.needsUpdateWidth();
+		// if there is no tent at all...
+		if(!structureExists) {
+			result = TentEvent.TentResult.BUILT_FIRST;
+		}
+		// if the tent exists but has to be changed...
+		if (rebuildTent) {
 			// remove previous structure			
-			data.makeStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
+			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
+			result = TentEvent.TentResult.UPGRADED;
+		}
+		// if the tent does not exist OR needs to be changed...
+		if(!structureExists || rebuildTent) {
 			// make new structure!
 			this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.data.getWidth(),
 					this.data.getDoorBlock(), this.data.getWallBlock(TentDimension.DIMENSION_ID),
 					this.data.getRoofBlock(TentDimension.DIMENSION_ID));
 			// make or re-make the platform
 			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
-			// should we pass data.getWidth or data.getPrevWidth ?
-			//removePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getPrevDepth());
 		}
 		
-		// check if depth upgrade is needed
+		// if the tent depth has changed...
 		if(structureExists && data.needsUpdateDepth()) {
 			upgradePlatformDepth(worldIn, corner.down(1), data.getWidth(), data.getPrevDepth(), data.getDepth());
+			result = TentEvent.TentResult.UPGRADED;
 		}
 		
-		// Door exists by this point - update TE info
+		// set or update TileEntityTentDoor information inside the tent
 		updateDoorInfo(worldIn, doorPos, this.data, 
 				prevX, prevY, prevZ, prevFacing, prevDimension);
-		return true;
+		return result;
 	}
 
 	/**
@@ -152,7 +162,7 @@ public abstract class StructureBase {
 			final StructureWidth size, final StructureDepth depth) {
 		final int sqWidth = size.getSquareWidth();
 		final Block bottom = Content.SUPER_DIRT;
-		final Block floor = TentConfig.general.getFloorBlock();
+		final Block floor = TentConfig.GENERAL.getFloorBlock();
 		// make a base from corner x,y,z to +x,-y,+z
 		for (int i = 0; i < sqWidth; i++) {
 			for (int j = 0; j < sqWidth; j++) {
@@ -199,7 +209,7 @@ public abstract class StructureBase {
 		final int sqWidth = size.getSquareWidth();
 		final int numLayers = depthCur.getLayers() - depthPrev.getLayers();
 		final Block bottom = Content.SUPER_DIRT;
-		final Block floor = TentConfig.general.getFloorBlock();
+		final Block floor = TentConfig.GENERAL.getFloorBlock();
 		
 		for (int i = 0; i < sqWidth; i++) {
 			for (int j = 0; j < sqWidth; j++) {
@@ -233,7 +243,7 @@ public abstract class StructureBase {
 		// layers +1 to include bottom layer
 		final int layers = depth.getLayers() + 1;
 		final Block bottom = Content.SUPER_DIRT;
-		final Block floor = TentConfig.general.getFloorBlock();
+		final Block floor = TentConfig.GENERAL.getFloorBlock();
 		// remove base from corner x,y,z to +x,-y,+z
 		for (int i = 0; i < sqWidth; i++) {
 			for (int j = 0; j < sqWidth; j++) {

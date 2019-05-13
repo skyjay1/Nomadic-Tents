@@ -32,7 +32,7 @@ public class TentDimension {
 	public static final EnumFacing STRUCTURE_DIR = EnumFacing.EAST;
 
 	public static void preInit() {
-		DIMENSION_ID = TentConfig.general.TENT_DIM_ID;
+		DIMENSION_ID = TentConfig.GENERAL.TENT_DIM_ID;
 		TENT_DIMENSION = DimensionType.register(DIM_NAME, "_tent", DIMENSION_ID, WorldProviderTent.class, false);
 		DimensionManager.registerDimension(DIMENSION_ID, TentDimension.TENT_DIMENSION);
 	}

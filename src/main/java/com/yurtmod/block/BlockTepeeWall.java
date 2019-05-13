@@ -82,7 +82,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	 * if it fails the Config-defined percentage chance
 	 **/
 	public static IBlockState getStateForRandomDesignWithChance(final Random rand, final boolean indestructible) {
-		return rand.nextInt(100) < TentConfig.general.TEPEE_DECORATED_CHANCE 
+		return rand.nextInt(100) < TentConfig.GENERAL.TEPEE_DECORATED_CHANCE 
 				? getStateForRandomDesign(rand, indestructible) : getStateForBase(indestructible);
 	}
 

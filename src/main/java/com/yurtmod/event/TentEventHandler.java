@@ -38,13 +38,13 @@ public class TentEventHandler {
 		if(!event.getEntityPlayer().getEntityWorld().isRemote 
 				&& event.getEntityPlayer().getEntityWorld().getGameRules().getBoolean("doDaylightCycle")) {
 			final MinecraftServer server = event.getEntityPlayer().getServer();
-			final WorldServer overworld = server.getWorld(0);
+			final WorldServer overworld = server.getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION);
 			final WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
 			// only run this code for players waking up in a Tent
 			if(TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
-				boolean shouldChangeTime = TentConfig.general.ALLOW_SLEEP_TENT_DIM;
+				boolean shouldChangeTime = TentConfig.GENERAL.ALLOW_SLEEP_TENT_DIM;
 				// if config requires, check both overworld and tent players
-				if(TentConfig.general.IS_SLEEPING_STRICT) {
+				if(TentConfig.GENERAL.IS_SLEEPING_STRICT) {
 					// find out if ALL players in BOTH dimensions are sleeping
 					for(EntityPlayer p : overworld.playerEntities) {
 						// (except for the one who just woke up, of course)
@@ -78,7 +78,7 @@ public class TentEventHandler {
 	/** Makes Tent items fireproof if enabled **/
 	@SubscribeEvent
 	public void onSpawnEntity(EntityJoinWorldEvent event) {
-		if (TentConfig.general.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem) {
+		if (TentConfig.GENERAL.IS_TENT_FIREPROOF && event.getEntity() instanceof EntityItem) {
 			ItemStack stack = ((EntityItem) event.getEntity()).getItem();
 			if (stack != null && stack.getItem() instanceof ItemTent) {
 				event.getEntity().setEntityInvulnerable(true);
@@ -117,7 +117,7 @@ public class TentEventHandler {
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
 	private static boolean canCancelTeleport(EntityPlayer player) {
-		return TentConfig.general.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
+		return TentConfig.GENERAL.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
 				&& !player.isCreative();
 	}
 
@@ -129,14 +129,14 @@ public class TentEventHandler {
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if (event.player instanceof EntityPlayerMP && !event.player.getEntityWorld().isRemote) {
 			final int TENTDIM = TentDimension.DIMENSION_ID;
-			final int RESPAWN = 0;
+			final int RESPAWN = TentConfig.GENERAL.RESPAWN_DIMENSION;
 			final int CUR_DIM = event.player.getEntityWorld().provider.getDimension();
 			EntityPlayerMP playerMP = (EntityPlayerMP) event.player;
 			final MinecraftServer mcServer = playerMP.getServer();
 			final WorldServer tentServer = mcServer.getWorld(TENTDIM);
 			final WorldServer overworld = mcServer.getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
-			if (TentConfig.general.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
+			if (TentConfig.GENERAL.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
 				BlockPos respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(tentServer, bedPos, false) : null;
 				if (null == respawnPos) {
@@ -163,7 +163,7 @@ public class TentEventHandler {
 	
 	@SubscribeEvent
 	public void onNameFormat(final PlayerEvent.NameFormat event) {
-		String PREFIX = "[Nomadic Tents] ";
+		String PREFIX = "[TentMaster] ";
 		String GOLD = "";
 		String RESET = "";
 		// attempt to avoid crashing on dedicated server

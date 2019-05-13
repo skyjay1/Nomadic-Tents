@@ -48,7 +48,7 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 				final StructureData data = new StructureData(tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
 				// return true if tent depth matches that of this recipe and not fully upgraded already
 				if (data.getDepth() == this.depthIn
-						&& this.depthOut.getId() < TentConfig.tents.getMaxDepth(data.getWidth())) {
+						&& this.depthOut.getId() < TentConfig.TENTS.getMaxDepth(data.getWidth())) {
 						return true;
 					}
 			}

@@ -5,6 +5,7 @@ import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.block.Categories.ITepeeBlock;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
+import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemTent;
@@ -31,6 +32,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -76,11 +78,11 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
 				StructureData data = teyd.getTentData();
-				StructureBase struct = data.makeStructure();
+				StructureBase struct = data.getStructure();
 				ItemStack held = player.getHeldItem(hand);
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
-				if((player.capabilities.isCreativeMode || !TentConfig.general.COPY_CREATIVE_ONLY) 
+				if((player.capabilities.isCreativeMode || !TentConfig.GENERAL.COPY_CREATIVE_ONLY) 
 						&& held != null && held.hasTagCompound() 
 						&& held.getTagCompound().hasKey(ItemTent.TAG_COPY_TOOL)
 						&& held.getTagCompound().getBoolean(ItemTent.TAG_COPY_TOOL)) {
@@ -106,18 +108,20 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				if (held != null && held.getItem() instanceof ItemMallet
 						&& !TentDimension.isTentDimension(worldIn)) {
 					// cancel deconstruction if player is not owner
-					if(TentConfig.general.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
+					if(TentConfig.GENERAL.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
 					// STEP 4:  drop the tent item and damage the tool
-					ItemStack toDrop = teyd.getTentData().getDropStack();
+					final TentEvent.Deconstruct event = new TentEvent.Deconstruct(teyd, player);
+					MinecraftForge.EVENT_BUS.post(event);
+					ItemStack toDrop = event.getTentStack();
 					if (toDrop != null) {
 						// drop the tent item
 						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.setPickupDelay(0);
 						worldIn.spawnEntity(dropItem);
 						// alert the TileEntity
-						if(TentConfig.general.ALLOW_OVERWORLD_SETSPAWN) {
+						if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
 							teyd.onPlayerRemove(player);
 						}
 						// remove the yurt structure
@@ -155,7 +159,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
 				StructureData type = teDoor.getTentData();
-				StructureBase struct = type.makeStructure();
+				StructureBase struct = type.getStructure();
 				// make sure there is a valid tent before doing anything
 				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, pos, type.getWidth().getOverworldSize());

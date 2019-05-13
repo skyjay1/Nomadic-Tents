@@ -157,7 +157,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	public boolean onSuperMalletUsed(World worldIn, BlockPos pos, IBlockState state, ItemStack mallet,
 			EntityPlayer player) {
-		if (TentConfig.general.SUPER_MALLET_CREATIVE_ONLY && !player.isCreative()) {
+		if (TentConfig.GENERAL.SUPER_MALLET_CREATIVE_ONLY && !player.isCreative()) {
 			return false;
 		}
 

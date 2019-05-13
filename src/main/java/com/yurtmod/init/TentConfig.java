@@ -13,16 +13,20 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = NomadicTents.MODID, name = "NomadicTents", category = "config")
 public final class TentConfig {
 	
-	public static final TentConfig.GENERAL general = new GENERAL();
-	public static final TentConfig.TENTS tents = new TENTS();
+	public static final TentConfig.ConfigGeneral GENERAL = new ConfigGeneral();
+	public static final TentConfig.ConfigTents TENTS = new ConfigTents();
 	
-	public static class GENERAL {
+	public static class ConfigGeneral {
 		
 		@Config.Name("Dimension ID")
 		@Config.Comment({"ID for the Tent Dimension.", 
 			"Remove this field to automatically find an available ID"})
 		@Config.RangeInt(min = -255, max = 255)
 		public int TENT_DIM_ID = DimensionManager.getNextFreeDimId();
+		
+		@Config.Name("Home Dimension ID")
+		@Config.Comment("The dimension in which players will respawn from the tent dimension as needed")
+		public int RESPAWN_DIMENSION = 0;
 		
 		@Config.Name("Allow Sleep in Tent")
 		@Config.Comment("When false, beds used in the Tent Dimension will explode")
@@ -33,7 +37,7 @@ public final class TentConfig {
 		public boolean RESTRICT_TELEPORT_TENT_DIM = true;
 		
 		@Config.Name("Allow Respawn Logic")
-		@Config.Comment(value = {"When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy"})
+		@Config.Comment("When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy")
 		public boolean ALLOW_RESPAWN_INTERCEPT = true;
 		
 		@Config.Name("Allow Overworld spawnpoint")
@@ -79,6 +83,10 @@ public final class TentConfig {
 			+ ItemTent.TAG_COPY_TOOL + "' set to true)"})
 		public boolean COPY_CREATIVE_ONLY = true;
 		
+		@Config.Name("Enable Weather")
+		@Config.Comment("Set to false to disable weather in Tent dimension")
+		public boolean ENABLE_WEATHER = true;
+		
 		@Config.Name("Tent Floor")
 		@Config.Comment({"Specify the block used for the harvestable layer of all tent floors",
 				"Format: [mod]:[name] ~ Example: minecraft:sand"})
@@ -95,7 +103,7 @@ public final class TentConfig {
 		}
 	}
 	
-	public static class TENTS {
+	public static class ConfigTents {
 		
 		@Config.Name("Enable Yurt")
 		@Config.Comment("Whether the Yurt can be built and used")
@@ -134,32 +142,32 @@ public final class TentConfig {
 		public int TIERS_INDLU = StructureWidth.values().length;
 		
 		@Config.Name("Max Depth: Small")
-		@Config.Comment("Limit the depth of a Small Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.Comment("Limit the depth of a Small Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_SMALL = StructureDepth.NORMAL.getLayers();
 		
 		@Config.Name("Max Depth: Medium")
-		@Config.Comment("Limit the depth of a Medium Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.Comment("Limit the depth of a Medium Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_MEDIUM = StructureDepth.DOUBLE.getLayers();
 		
 		@Config.Name("Max Depth: Large")
-		@Config.Comment("Limit the depth of a Large Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.Comment("Limit the depth of a Large Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_LARGE = StructureDepth.TRIPLE.getLayers();
 		
 		@Config.Name("Max Depth: Huge")
-		@Config.Comment("Limit the depth of a Huge Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.Comment("Limit the depth of a Huge Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_HUGE = StructureDepth.QUADRUPLE.getLayers();
 		
 		@Config.Name("Max Depth: Giant")
-		@Config.Comment("Limit the depth of a Giant Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.Comment("Limit the depth of a Giant Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_GIANT = StructureDepth.QUINTUPLE.getLayers();
 		
 		@Config.Name("Max Depth: Mega")
-		@Config.Comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Allows 5 Upgrades")
+		@Config.Comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_MEGA = StructureDepth.SEXTUPLE.getLayers();
 		

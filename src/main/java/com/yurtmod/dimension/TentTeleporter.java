@@ -1,6 +1,8 @@
 package com.yurtmod.dimension;
 
 import com.yurtmod.block.TileEntityTentDoor;
+import com.yurtmod.event.TentEvent;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
@@ -9,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
 
 public class TentTeleporter extends Teleporter {
 	private final StructureData tentData;
@@ -44,20 +47,29 @@ public class TentTeleporter extends Teleporter {
 		float yaw = getYaw();
 		float pitch = entity.rotationPitch;
 		entity.motionX = entity.motionY = entity.motionZ = 0.0D;
-
+		TentEvent.TentResult result = TentEvent.TentResult.NONE;
+		
+		// build a structure inside the tent dimension, if needed
 		if (TentDimension.isTentDimension(worldServerTo)) {
 			entityX += entity.width;
 			// try to build a tent in that location (tent should check if it already exists)
-			this.tentData.makeStructure().generateInTentDimension(prevDimID, worldServerTo, tentDoorPos, 
-					prevX, prevY, prevZ, prevYaw);
+			result = this.tentData.getStructure().generateInTentDimension(prevDimID, worldServerTo, 
+					tentDoorPos, prevX, prevY, prevZ, prevYaw);
 			// also synchronize the time between Tent and Overworld dimensions
-			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(0).getWorldTime());
+			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION).getWorldTime());
 		}
-		
+				
+		// move the entity to the correct position
 		if (entity instanceof EntityPlayerMP) {
-			 ((EntityPlayerMP)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);
+			((EntityPlayerMP)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);			 
 		} else {
 			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
+		}
+
+		// inform the event bus of the result of this teleportation
+		if (TentDimension.isTentDimension(worldServerTo) && worldServerTo.getTileEntity(tentDoorPos) instanceof TileEntityTentDoor) {
+			final TentEvent.PostEnter event = new TentEvent.PostEnter((TileEntityTentDoor)worldServerTo.getTileEntity(tentDoorPos), entity, result);
+			MinecraftForge.EVENT_BUS.post(event);
 		}
 	}
 
