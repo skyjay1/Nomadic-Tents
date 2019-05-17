@@ -163,7 +163,7 @@ public class TentEventHandler {
 	
 	@SubscribeEvent
 	public void onNameFormat(final PlayerEvent.NameFormat event) {
-		String PREFIX = "[TentMaster] ";
+		String PREFIX = "[Nomad King] ";
 		String GOLD = "";
 		String RESET = "";
 		// attempt to avoid crashing on dedicated server

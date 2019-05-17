@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 /**
@@ -99,7 +100,9 @@ public class TentEvent extends Event {
 	 * verified that they are able to teleport and will
 	 * do so immediately after this event. Called before
 	 * any code is run in {@link TileEntityTentDoor#teleport(Entity)}.
+	 * <br> This event is {@link Cancelable}
 	 **/
+	@Cancelable
 	public static class PreEnter extends TentEvent {
 		
 		private final Entity entity;
@@ -166,8 +169,8 @@ public class TentEvent extends Event {
 	 * <br>NONE = an existing tent was entered
 	 * <br>BUILT_FIRST = an entirely new tent was built and entered
 	 * <br>UPGRADED = an existing tent was modified and entered
-	 * @see TentEvent#getData() to get information about the tent
-	 * and any changes that have taken place.
+	 * @see TentEvent#getData()
+	 * @see TentEvent.PostEnter#getTentResult()
 	 **/
 	public static enum TentResult {
 		NONE,

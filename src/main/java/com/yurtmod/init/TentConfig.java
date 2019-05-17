@@ -87,6 +87,11 @@ public final class TentConfig {
 		@Config.Comment("Set to false to disable weather in Tent dimension")
 		public boolean ENABLE_WEATHER = true;
 		
+		@Config.Name("Safe Teleporting")
+		@Config.Comment({"Use different teleportation code. Does two things:",
+			"1) Updates XP and 2) Plays Nether sound"})
+		public boolean SAFE_TELEPORT = false;
+		
 		@Config.Name("Tent Floor")
 		@Config.Comment({"Specify the block used for the harvestable layer of all tent floors",
 				"Format: [mod]:[name] ~ Example: minecraft:sand"})

@@ -187,11 +187,13 @@ public class TileEntityTentDoor extends TileEntity {
 		
 		final int dimFrom = entity.getEntityWorld().provider.getDimension();
 		final int dimTo = TentDimension.isTentDimension(dimFrom) ? this.getPrevDimension() : TentDimension.DIMENSION_ID;
+		final EntityPlayerMP player = entity instanceof EntityPlayerMP ? (EntityPlayerMP)entity : null;
 
-		// inform the event bus that we're about to teleport an entity
+		// inform the event bus that we're about to teleport an entity.
+		// this event is cancelable and can prevent teleportation
 		if(TentDimension.isTentDimension(dimTo)) {
 			final TentEvent.PreEnter event = new TentEvent.PreEnter(this, entity);
-			MinecraftForge.EVENT_BUS.post(event);
+			if(MinecraftForge.EVENT_BUS.post(event)) return false;
 		}
 				
 		// continue with the teleportation code		
@@ -205,16 +207,14 @@ public class TileEntityTentDoor extends TileEntity {
 			final WorldServer worldTo = mcServer.getWorld(dimTo);
 			// make the teleporter
 			final TentTeleporter tel = new TentTeleporter(dimFrom, worldTo, this);
-			// if it's a player, handle teleportation differently
-			if (entity instanceof EntityPlayerMP) {
-				final EntityPlayerMP playerMP = (EntityPlayerMP)entity;
-				// attempt to set overworld spawnpoint if this is a player and the config enables it
-				if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID 
-						&& dimTo == TentConfig.GENERAL.RESPAWN_DIMENSION) {
-					attemptSetSpawn(this.getWorld(), playerMP, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
-						this.prevX, this.prevY, this.prevZ);
-				}
-				//////// }
+			// if it's a player, set spawnpoint if possible
+			if(player != null && TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN && dimFrom == TentDimension.DIMENSION_ID && dimTo == TentConfig.GENERAL.RESPAWN_DIMENSION) {
+				attemptSetSpawn(this.getWorld(), player, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
+					this.prevX, this.prevY, this.prevZ);
+			}
+			
+			// depending on config, may use alternate form of teleportation
+			if (player != null && !TentConfig.GENERAL.SAFE_TELEPORT) {
 				// ~ Alter a private field using reflection ~
 				// We could simply call Entity#changeDimension(int, ITeleporter)
 				// but the EntityPlayerMP implementation plays a portal sound
@@ -222,16 +222,15 @@ public class TileEntityTentDoor extends TileEntity {
 				// HOWEVER, calling changeDimension correctly updates XP.
 				// We need that too.
 				try {
-					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, playerMP, Boolean.valueOf(true),
+					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, player, Boolean.valueOf(true),
 							"field_184851_cj", "invulnerableDimensionChange");
+					// transfer player to dimension
+					mcServer.getPlayerList().transferPlayerToDimension(player, dimTo, tel);
 				} catch (UnableToFindFieldException e) {
 					e.printStackTrace();
 					return false;
 				}
-				// transfer player to dimension
-				mcServer.getPlayerList().transferPlayerToDimension(playerMP, dimTo, tel);
 			} else {
-				////////
 				// teleport the entity normally
 				entity.changeDimension(dimTo, (ITeleporter)tel);
 			}
