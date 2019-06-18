@@ -27,12 +27,6 @@ public enum StructureWidth implements IStringSerializable {
 		this.doorOffsetZ = this.ordinal() + 2;
 	}
 	
-	/** @return the StructureWidth that is next in the upgrade tree. If it's maxed out, returns itself. **/
-//	public static StructureWidth getUpgrade(final StructureWidth width) {
-//		final int index = Math.min(width.ordinal() + 1, NUM_ENTRIES - 1);
-//		return values()[index];
-//	}
-	
 	/** @return The square dimensions of a tent of this size **/
 	public int getSquareWidth() {
 		return this.squareWidth;
@@ -62,12 +56,12 @@ public enum StructureWidth implements IStringSerializable {
 	}
 
 	/** @return A unique identifier. For now just the ordinal value **/
-	public short getId() {
-		return (short)this.ordinal();
+	public byte getId() {
+		return (byte)this.ordinal();
 	}
 	
 	/** @return The StructureWidth that uses this ID **/
-	public static StructureWidth getById(final short id) {
+	public static StructureWidth getById(final byte id) {
 		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
 	}
 	

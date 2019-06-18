@@ -26,20 +26,14 @@ public enum StructureDepth implements IStringSerializable {
 	public int getLayers() {
 		return this.layers;
 	}
-	
-	/** @return the StructureDepth that is next in the upgrade tree. If it's maxed out, returns itself. **/
-//	public static StructureDepth getUpgrade(final StructureDepth depth) {
-//		final int index = Math.min(depth.ordinal() + 1, NUM_ENTRIES - 1);
-//		return values()[index];
-//	}
-	
+
 	/** @return A unique identifier. For now just the ordinal value **/
-	public short getId() {
-		return (short)this.ordinal();
+	public byte getId() {
+		return (byte)this.ordinal();
 	}
 
 	/** @return The StructureDepth that uses this ID **/
-	public static StructureDepth getById(final short id) {
+	public static StructureDepth getById(final byte id) {
 		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
 	}
 

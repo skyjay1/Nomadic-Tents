@@ -127,8 +127,10 @@ item.tepee_wall_piece.name=Tepee Wall Section
 item.bed_wall_piece.name=Bedouin Wall Section
 item.indlu_wall_piece.name=Indlu Wall Section
 
-# Chat / Tooltips / Waila
+# Other
 tooltip.extra_dimensional_space=Extra-dimensional space!
 tooltip.depth_upgrades=Depth Upgrades: %s / %s
 chat.no_teleport=Teleporting is not allowed inside your tent.
 waila.progress=Progress: %s
+jei.upgrade_width=Upgrade Tent Size
+jei.upgrade_depth=Upgrade Tent Depth

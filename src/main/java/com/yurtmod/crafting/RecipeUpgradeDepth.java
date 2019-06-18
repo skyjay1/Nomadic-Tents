@@ -22,12 +22,14 @@ import net.minecraftforge.common.crafting.JsonContext;
 
 public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 	
+	public static final String CATEGORY = "tentcraftingdepth";
+	
 	private final StructureDepth depthIn;
 	private final StructureDepth depthOut;
 
 	public RecipeUpgradeDepth(final StructureDepth depthFrom, final StructureDepth depthTo, 
 			final NonNullList<Ingredient> ingredients) {
-		super("tentcrafting", 3, 3, ingredients, new ItemStack(Content.ITEM_TENT));
+		super(CATEGORY, 3, 3, ingredients, new ItemStack(Content.ITEM_TENT));
 		this.depthIn = depthFrom;
 		this.depthOut = depthTo;
 	}
@@ -87,8 +89,8 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 		@Override
 		public IRecipe parse(JsonContext context, JsonObject json) {
 			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);
-			final StructureDepth depthIn = StructureDepth.getById((short)JsonUtils.getInt(json, "input_depth"));
-			final StructureDepth depthOut = StructureDepth.getById((short)JsonUtils.getInt(json, "result_depth"));
+			final StructureDepth depthIn = StructureDepth.getById((byte)JsonUtils.getInt(json, "input_depth"));
+			final StructureDepth depthOut = StructureDepth.getById((byte)JsonUtils.getInt(json, "result_depth"));
 			return new RecipeUpgradeDepth(depthIn, depthOut, recipe.getIngredients());			
 		}
 	}

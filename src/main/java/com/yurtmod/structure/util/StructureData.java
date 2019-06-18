@@ -27,11 +27,11 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	public static final String KEY_OFFSET_Z = "StructureOffsetZ";
 	
 	////// Important fields with their default values //////
-	private StructureTent tent = StructureTent.getById((short)0);
-	private StructureWidth width = StructureWidth.getById((short)0);
-	private StructureDepth depth = StructureDepth.getById((short)0);
-	private StructureWidth prevWidth = StructureWidth.getById((short)0);
-	private StructureDepth prevDepth = StructureDepth.getById((short)0);
+	private StructureTent tent = StructureTent.getById((byte)0);
+	private StructureWidth width = StructureWidth.getById((byte)0);
+	private StructureDepth depth = StructureDepth.getById((byte)0);
+	private StructureWidth prevWidth = StructureWidth.getById((byte)0);
+	private StructureDepth prevDepth = StructureDepth.getById((byte)0);
 	private int offsetX = ItemTent.ERROR_TAG;
 	private int offsetZ = ItemTent.ERROR_TAG;
 	
@@ -55,7 +55,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** @return the same StructureData object with the given values applied to both "Current" and "Previous" Values **/
-	public StructureData setBoth(final StructureTent tentIn, final StructureWidth widthIn, final StructureDepth depthIn) {
+	public StructureData setAll(final StructureTent tentIn, final StructureWidth widthIn, final StructureDepth depthIn) {
 		this.setCurrent(tentIn, widthIn, depthIn);
 		this.setPrev(widthIn, depthIn);
 		return this;
@@ -99,6 +99,11 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 				.setOffsets(offsetX, offsetZ);
 	}
 	
+	/** @return true if this object has valid X and Z coordinates **/
+	public boolean isValid() {
+		return this.offsetX != ItemTent.ERROR_TAG && this.offsetZ != ItemTent.ERROR_TAG;
+	}
+ 	
 	//////////////////////////////////
 	////// GETTERS AND SETTERS ///////
 	//////////////////////////////////
@@ -292,12 +297,12 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		// only write if non-null
 		if(this.tent != null) {
 			// 'Current' values
-			nbt.setShort(KEY_TENT_CUR, this.tent.getId());
-			nbt.setShort(KEY_WIDTH_CUR, this.width.getId());
-			nbt.setShort(KEY_DEPTH_CUR, this.depth.getId());
+			nbt.setByte(KEY_TENT_CUR, this.tent.getId());
+			nbt.setByte(KEY_WIDTH_CUR, this.width.getId());
+			nbt.setByte(KEY_DEPTH_CUR, this.depth.getId());
 			// 'Previous' values
-			nbt.setShort(KEY_WIDTH_PREV, this.prevWidth.getId());
-			nbt.setShort(KEY_DEPTH_PREV, this.prevDepth.getId());
+			nbt.setByte(KEY_WIDTH_PREV, this.prevWidth.getId());
+			nbt.setByte(KEY_DEPTH_PREV, this.prevDepth.getId());
 			// Offsets (tent location)
 			nbt.setInteger(KEY_OFFSET_X, this.offsetX);
 			nbt.setInteger(KEY_OFFSET_Z, this.offsetZ);
@@ -308,11 +313,11 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 
 	@Override
 	public void deserializeNBT(final NBTTagCompound nbt) {
-		this.tent = StructureTent.getById(nbt.getShort(KEY_TENT_CUR));
-		this.width = StructureWidth.getById(nbt.getShort(KEY_WIDTH_CUR));
-		this.depth = StructureDepth.getById(nbt.getShort(KEY_DEPTH_CUR));
-		this.prevWidth = StructureWidth.getById(nbt.getShort(KEY_WIDTH_PREV));
-		this.prevDepth = StructureDepth.getById(nbt.getShort(KEY_DEPTH_PREV));
+		this.tent = StructureTent.getById(nbt.getByte(KEY_TENT_CUR));
+		this.width = StructureWidth.getById(nbt.getByte(KEY_WIDTH_CUR));
+		this.depth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_CUR));
+		this.prevWidth = StructureWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
+		this.prevDepth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
 		this.offsetX = nbt.getInteger(KEY_OFFSET_X);
 		this.offsetZ = nbt.getInteger(KEY_OFFSET_Z);
 	}

@@ -26,13 +26,15 @@ import net.minecraftforge.common.crafting.JsonContext;
 
 public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	
+	public static final String CATEGORY = "tentcraftingwidth";
+	
 	private final StructureTent tent;
 	private final StructureWidth widthIn;
 	private final StructureWidth widthOut;
 	
 	public RecipeUpgradeWidth(final StructureTent type, @Nullable final StructureWidth widthFrom, 
 			final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
-		super("tentcrafting", 3, type == StructureTent.YURT ? 2 : 3, ingredients, new ItemStack(Content.ITEM_TENT));
+		super(CATEGORY, 3, type == StructureTent.YURT ? 2 : 3, ingredients, new ItemStack(Content.ITEM_TENT));
 		this.tent = type;
 		this.widthIn = widthFrom;
 		this.widthOut = widthTo;
@@ -79,7 +81,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 			resultTag.setTag(ItemTent.TENT_DATA, tentData.serializeNBT());
 		} else {
 			// no tent was found, user is making a small tent
-			final StructureData data = new StructureData().setBoth(this.tent, this.widthOut, StructureDepth.NORMAL);
+			final StructureData data = new StructureData().setAll(this.tent, this.widthOut, StructureDepth.NORMAL);
 			resultTag.setTag(ItemTent.TENT_DATA, data.serializeNBT());
 		}
 		result.setTagCompound(resultTag);

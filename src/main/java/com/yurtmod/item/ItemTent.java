@@ -139,7 +139,7 @@ public class ItemTent extends Item {
 		final StructureDepth depth = StructureDepth.NORMAL;
 		for(StructureTent tent : StructureTent.values()) {
 			for(StructureWidth size : StructureWidth.values()) {
-				items.add(new StructureData().setBoth(tent, size, depth).getDropStack());
+				items.add(new StructureData().setAll(tent, size, depth).getDropStack());
 			}
 		}
 	}

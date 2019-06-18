@@ -16,79 +16,47 @@ import net.minecraft.util.IStringSerializable;
 
 public enum StructureTent implements IStringSerializable {
 	
-	YURT(new StructureYurt()),
-	TEPEE(new StructureTepee()),
-	BEDOUIN(new StructureBedouin()),
-	INDLU(new StructureIndlu());
+	YURT(new StructureYurt()) {
+		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_YURT; }
+		public Class<? extends ITentBlockBase> getInterface() {	return IYurtBlock.class; }
+		public IBlockState getRoofBlock(int dimID) { return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, !TentDimension.isTentDimension(dimID) ); }
+		public IBlockState getFrameBlock(boolean isRoof) { return isRoof ? Content.FRAME_YURT_ROOF.getDefaultState() : Content.FRAME_YURT_WALL.getDefaultState(); }
+		public IBlockState getWallBlock(int dimID) { 
+			return TentDimension.isTentDimension(dimID) 
+				? Content.YURT_WALL_INNER.getDefaultState() 
+				: Content.YURT_WALL_OUTER.getDefaultState(); 
+		}
+	},
+	TEPEE(new StructureTepee()) {
+		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_TEPEE; }
+		public Class<? extends ITentBlockBase> getInterface() {	return ITepeeBlock.class; }
+		public IBlockState getWallBlock(int dimID) { return Content.TEPEE_WALL_BLANK.getDefaultState();	}
+		public IBlockState getRoofBlock(int dimID) { return Content.TEPEE_WALL_BLANK.getDefaultState(); }
+		public IBlockState getFrameBlock(boolean isRoof) { return Content.FRAME_TEPEE_WALL.getDefaultState(); }
+	},
+	BEDOUIN(new StructureBedouin()) {
+		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_BEDOUIN; }
+		public Class<? extends ITentBlockBase> getInterface() {	return IBedouinBlock.class; }
+		public IBlockState getWallBlock(int dimID) { return Content.BEDOUIN_WALL.getDefaultState(); }
+		public IBlockState getRoofBlock(int dimID) { return Content.BEDOUIN_ROOF.getDefaultState(); }
+		public IBlockState getFrameBlock(boolean isRoof) { return isRoof ? Content.FRAME_BEDOUIN_ROOF.getDefaultState() : Content.FRAME_BEDOUIN_WALL.getDefaultState(); }
+	},
+	INDLU(new StructureIndlu()) {
+		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_INDLU; }
+		public Class<? extends ITentBlockBase> getInterface() {	return IIndluBlock.class; }
+		public IBlockState getRoofBlock(int dimID) { return Content.INDLU_WALL_OUTER.getDefaultState(); }
+		public IBlockState getFrameBlock(boolean isRoof) { return isRoof ? Content.FRAME_BEDOUIN_ROOF.getDefaultState() : Content.FRAME_BEDOUIN_WALL.getDefaultState(); }
+		public IBlockState getWallBlock(int dimID) { 
+			return TentDimension.isTentDimension(dimID) 
+				? Content.INDLU_WALL_INNER.getDefaultState() 
+				: Content.INDLU_WALL_OUTER.getDefaultState(); 
+		}
+	};
 	
 	private final StructureBase structure;
 	
 	StructureTent(final StructureBase struct) {
 		this.structure = struct;
-	}
-	
-	/** @return whether this tent type is enabled in the config **/
-	public boolean isEnabled() {
-		switch (this) {
-		case BEDOUIN:	return TentConfig.TENTS.ALLOW_BEDOUIN;
-		case TEPEE:		return TentConfig.TENTS.ALLOW_TEPEE;
-		case YURT:		return TentConfig.TENTS.ALLOW_YURT;
-		case INDLU:		return TentConfig.TENTS.ALLOW_INDLU;
-		}
-		return false;
-	}
-	
-	/** @return the block interface expected by this structure type **/
-	public Class<? extends ITentBlockBase> getInterface() {
-		switch (this) {
-		case BEDOUIN:	return IBedouinBlock.class;
-		case TEPEE:		return ITepeeBlock.class;
-		case YURT:		return IYurtBlock.class;
-		case INDLU:		return IIndluBlock.class;
-		}
-		return ITentBlockBase.class;
-	}
-
-	/** @return the main building block for this tent type. May be different inside tent. **/
-	public IBlockState getWallBlock(int dimID) {
-		switch (this) {
-		case YURT:		return TentDimension.isTentDimension(dimID) 
-							? Content.YURT_WALL_INNER.getDefaultState() 
-							: Content.YURT_WALL_OUTER.getDefaultState();
-		case TEPEE:		return Content.TEPEE_WALL_BLANK.getDefaultState();
-		case BEDOUIN:	return Content.BEDOUIN_WALL.getDefaultState();
-		case INDLU:		return TentDimension.isTentDimension(dimID) 
-							? Content.INDLU_WALL_INNER.getDefaultState() 
-							: Content.INDLU_WALL_OUTER.getDefaultState();
-		}
-		return null;
-	}
-
-	/** @return the specific Roof block for this tent type. May be different inside tent. **/
-	public IBlockState getRoofBlock(int dimID) {
-		switch (this) {
-		case YURT:		return Content.YURT_ROOF.getDefaultState()
-								.withProperty(BlockYurtRoof.OUTSIDE, !TentDimension.isTentDimension(dimID) );
-		case TEPEE:		return Content.TEPEE_WALL_BLANK.getDefaultState();
-		case BEDOUIN:	return Content.BEDOUIN_ROOF.getDefaultState();
-		case INDLU:		return Content.INDLU_WALL_OUTER.getDefaultState();
-		}
-		return null;
-	}
-
-	/** @return the specific Frame for this structure type. May be different between walls and roofs **/
-	public IBlockState getFrameBlock(boolean isRoof) {
-		switch (this) {
-		case YURT:		return isRoof 
-							? Content.FRAME_YURT_ROOF.getDefaultState() 
-							: Content.FRAME_YURT_WALL.getDefaultState();
-		case TEPEE:		return Content.FRAME_TEPEE_WALL.getDefaultState();
-		case BEDOUIN:	return isRoof 
-							? Content.FRAME_BEDOUIN_ROOF.getDefaultState() 
-							: Content.FRAME_BEDOUIN_WALL.getDefaultState();
-		case INDLU:		return Content.FRAME_INDLU_WALL.getDefaultState();
-		}
-		return null;
 	}
 	
 	/** @return a StructureBase that will use the given StructureData **/
@@ -97,12 +65,12 @@ public enum StructureTent implements IStringSerializable {
 	}
 	
 	/** @return A unique identifier. For now just the ordinal value **/
-	public short getId() {
-		return (short)this.ordinal();
+	public byte getId() {
+		return (byte)this.ordinal();
 	}
 	
 	/** @return The StructureTent that uses this ID **/
-	public static StructureTent getById(final short id) {
+	public static StructureTent getById(final byte id) {
 		return values()[id];
 	}
 	
@@ -119,5 +87,22 @@ public enum StructureTent implements IStringSerializable {
 	public String getName() {
 		return this.toString().toLowerCase();
 	}
+	
+	/////////// ABSTRACT METHODS ///////////
+	
+	/** @return whether this tent type is enabled in the config **/
+	public abstract boolean isEnabled();
+
+	/** @return the block interface expected by this structure type **/
+	public abstract Class<? extends ITentBlockBase> getInterface();
+
+	/** @return the main building block for this tent type. May be different inside tent. **/
+	public abstract IBlockState getWallBlock(int dimID);
+
+	/** @return the specific Roof block for this tent type. May be different inside tent. **/
+	public abstract IBlockState getRoofBlock(int dimID);
+
+	/** @return the specific Frame for this structure type. May be different between walls and roofs **/
+	public abstract IBlockState getFrameBlock(boolean isRoof);
 }
 
