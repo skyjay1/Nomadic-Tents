@@ -29,7 +29,8 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 
 	public RecipeUpgradeDepth(final StructureDepth depthFrom, final StructureDepth depthTo, 
 			final NonNullList<Ingredient> ingredients) {
-		super(CATEGORY, 3, 3, ingredients, new ItemStack(Content.ITEM_TENT));
+		super(CATEGORY, 3, 3, ingredients, 
+				new StructureData().setDepth(depthTo).writeTo(new ItemStack(Content.ITEM_TENT)));
 		this.depthIn = depthFrom;
 		this.depthOut = depthTo;
 	}

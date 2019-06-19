@@ -152,28 +152,33 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** Set the StructureTent type used by this StructureData. Not really needed outside of constructor. **/
-	protected void setTent(final StructureTent tentIn) {
+	protected StructureData setTent(final StructureTent tentIn) {
 		this.tent = tentIn;
+		return this;
 	}
 
 	/** Set or update the current Width used by this StructureData **/
-	public void setWidth(final StructureWidth widthIn) {
+	public StructureData setWidth(final StructureWidth widthIn) {
 		this.width = widthIn;
+		return this;
 	}
 	
 	/** Set or update the current Depth used by this StructureData **/
-	public void setDepth(final StructureDepth depthIn) {
+	public StructureData setDepth(final StructureDepth depthIn) {
 		this.depth = depthIn;
+		return this;
 	}
 
 	/** Set or update the previous Width used by this StructureData **/
-	public void setPrevWidth(final StructureWidth widthIn) {
+	public StructureData setPrevWidth(final StructureWidth widthIn) {
 		this.prevWidth = widthIn;
+		return this;
 	}
 	
 	/** Set or update the previous Depth used by this StructureData **/
-	public void setPrevDepth(final StructureDepth depthIn) {
+	public StructureData setPrevDepth(final StructureDepth depthIn) {
 		this.prevDepth = depthIn;
+		return this;
 	}
 	
 	/** 
@@ -181,8 +186,9 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	 * @see TileEntityTentDoor#getChunkOffsetX(int)
 	 * @see TileEntityTentDoor#getTentDoorPos()
 	 **/
-	public void setOffsetX(final int toSet) {
+	public StructureData setOffsetX(final int toSet) {
 		this.offsetX = toSet;
+		return this;
 	}
 	
 	/** 
@@ -190,8 +196,9 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	 * @see TileEntityTentDoor#getChunkOffsetZ(int)
 	 * @see TileEntityTentDoor#getTentDoorPos()
 	 **/
-	public void setOffsetZ(final int toSet) {
+	public StructureData setOffsetZ(final int toSet) {
 		this.offsetZ = toSet;
+		return this;
 	}
 	
 	//////////////////////////////////

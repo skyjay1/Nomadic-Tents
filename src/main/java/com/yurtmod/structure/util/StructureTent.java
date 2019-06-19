@@ -17,6 +17,7 @@ import net.minecraft.util.IStringSerializable;
 public enum StructureTent implements IStringSerializable {
 	
 	YURT(new StructureYurt()) {
+		////////// YURT IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_YURT; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IYurtBlock.class; }
 		public IBlockState getRoofBlock(int dimID) { return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, !TentDimension.isTentDimension(dimID) ); }
@@ -28,6 +29,7 @@ public enum StructureTent implements IStringSerializable {
 		}
 	},
 	TEPEE(new StructureTepee()) {
+		////////// TEPEE IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_TEPEE; }
 		public Class<? extends ITentBlockBase> getInterface() {	return ITepeeBlock.class; }
 		public IBlockState getWallBlock(int dimID) { return Content.TEPEE_WALL_BLANK.getDefaultState();	}
@@ -35,6 +37,7 @@ public enum StructureTent implements IStringSerializable {
 		public IBlockState getFrameBlock(boolean isRoof) { return Content.FRAME_TEPEE_WALL.getDefaultState(); }
 	},
 	BEDOUIN(new StructureBedouin()) {
+		////////// BEDOUIN IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_BEDOUIN; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IBedouinBlock.class; }
 		public IBlockState getWallBlock(int dimID) { return Content.BEDOUIN_WALL.getDefaultState(); }
@@ -42,6 +45,7 @@ public enum StructureTent implements IStringSerializable {
 		public IBlockState getFrameBlock(boolean isRoof) { return isRoof ? Content.FRAME_BEDOUIN_ROOF.getDefaultState() : Content.FRAME_BEDOUIN_WALL.getDefaultState(); }
 	},
 	INDLU(new StructureIndlu()) {
+		////////// INDLU IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_INDLU; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IIndluBlock.class; }
 		public IBlockState getRoofBlock(int dimID) { return Content.INDLU_WALL_OUTER.getDefaultState(); }
@@ -74,6 +78,7 @@ public enum StructureTent implements IStringSerializable {
 		return values()[id];
 	}
 	
+	/** @return the corresponding StructureTent, or YURT for invalid name **/
 	public static StructureTent getByName(final String name) {
 		for(final StructureTent t : values()) {
 			if(name.equals(t.getName())) {
