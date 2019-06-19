@@ -37,6 +37,7 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 	/**
 	 * Used to check if a recipe matches current crafting inventory
 	 */
+	@Override
 	public boolean matches(InventoryCrafting inv, World worldIn) {
 		// check super conditions first
 		if(super.matches(inv, worldIn)) {
@@ -82,6 +83,14 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 	@Override
 	public boolean isDynamic() {
 		return true;
+	}
+	
+	public StructureDepth getDepthIn() {
+		return this.depthIn;
+	}
+	
+	public StructureDepth getDepthOut() {
+		return this.depthOut;
 	}
 	
 	public static class Factory implements IRecipeFactory {

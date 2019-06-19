@@ -14,12 +14,15 @@ import net.minecraft.item.ItemStack;
 
 @JEIPlugin
 public class JEIProvider implements mezz.jei.api.IModPlugin {
+	
+	public JEIProvider() { }
 
 	/**
 	 * If your item has subtypes that depend on NBT or capabilities, use this to help JEI identify those subtypes correctly.
 	 */
 	@Override
 	public void registerItemSubtypes(final ISubtypeRegistry subtypeRegistry) {
+		System.out.println("REGISTERING ITEM SUBTYPES");
 		subtypeRegistry.registerSubtypeInterpreter(Content.ITEM_TENT, i -> {
 			final StructureData data = new StructureData(i);
 			// build a unique name based on StructureTent and StructureWidth
@@ -33,6 +36,7 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	 */
 	@Override
 	public void register(final IModRegistry registry) {
+		System.out.println("REGISTERING JEI RECIPE HANDLERS");
 		registry.handleRecipes(RecipeUpgradeWidth.class, JEIWidthRecipe.Wrapper::new, JEIWidthRecipe.Category.UID);
 		registry.addRecipeCatalyst(new ItemStack(Blocks.CRAFTING_TABLE), JEIWidthRecipe.Category.UID);
 	}
@@ -43,6 +47,7 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	 */
 	@Override
 	public void registerCategories(final IRecipeCategoryRegistration registry) {
+		System.out.println("REGISTERING JEI CATEGORY");
 		final IGuiHelper helper = registry.getJeiHelpers().getGuiHelper();
 		registry.addRecipeCategories(new JEIWidthRecipe.Category(helper));
 	}

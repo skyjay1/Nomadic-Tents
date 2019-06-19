@@ -43,6 +43,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	/**
 	 * Used to check if a recipe matches current crafting inventory
 	 */
+	@Override
 	public boolean matches(InventoryCrafting inv, World worldIn) {
 		// check super conditions first
 		if(super.matches(inv, worldIn)) {
@@ -93,10 +94,27 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		return true;
 	}
 	
+	public StructureTent getTent() {
+		return this.tent;
+	}
+	
+	public StructureWidth getWidthIn() {
+		return this.widthIn;
+	}
+	
+	public StructureWidth getWidthOut() {
+		return this.widthOut;
+	}
+	
+	/**
+	 * Search the given inventory for a specific item
+	 * @param inv the inventory to searchy
+	 * @param itemClass the target type of item to find
+	 * @return an ItemStack containing an item of type {@code itemClass}, or EMPTY if none is found
+	 **/
 	public static ItemStack getStackMatching(final InventoryCrafting inv, final Class<? extends Item> itemClass) {
 		for (int i = 0, l = inv.getSizeInventory(); i < l; ++i) {
 			final ItemStack stack = inv.getStackInSlot(i);
-			// find out if it's a tent
 			if (!stack.isEmpty() && stack.getItem() != null && itemClass.isAssignableFrom(stack.getItem().getClass())) {
 				return stack;
 			}
@@ -104,6 +122,9 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		return ItemStack.EMPTY;
 	}
 	
+	/**
+	 * @see #getStackMatching(InventoryCrafting, Class)
+	 **/
 	public static ItemStack getTentStack(final InventoryCrafting inv) {
 		return getStackMatching(inv, ItemTent.class);
 	}

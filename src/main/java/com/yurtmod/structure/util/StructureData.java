@@ -273,14 +273,18 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 
 	/** @return an NBT-tagged Tent ItemStack that represents this StructureData **/
 	public ItemStack getDropStack() {
-		ItemStack stack = new ItemStack(Content.ITEM_TENT, 1);
+		return writeTo(new ItemStack(Content.ITEM_TENT, 1));
+	}
+	
+	/** @return the same ItemStack with this object's info in its NBT data **/
+	public ItemStack writeTo(final ItemStack stack) {
 		if (stack.getTagCompound() == null) {
 			stack.setTagCompound(new NBTTagCompound());
 		}
 		stack.getTagCompound().setTag(ItemTent.TENT_DATA, this.serializeNBT());
 		return stack;
 	}
-
+	
 	/** Note: the returned StructureBase only contains a COPY of this StructureData **/
 	public StructureBase makePrevStructure() {
 		return this.tent.makeStructure(this.prevData().copy());
