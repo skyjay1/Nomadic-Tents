@@ -1,18 +1,25 @@
 package com.yurtmod.integration;
 
-import com.yurtmod.crafting.RecipeUpgradeDepth;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
+import mezz.jei.api.ingredients.IIngredientBlacklist;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 
 @JEIPlugin
 public class JEIProvider implements mezz.jei.api.IModPlugin {
@@ -38,12 +45,32 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	@Override
 	public void register(final IModRegistry registry) {
 		registry.handleRecipes(RecipeUpgradeWidth.class, JEIWidthRecipe.Wrapper::new, VanillaRecipeCategoryUid.CRAFTING);
+		registry.addRecipes(JEITentRecipeChecker.getWidthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
+		
+		// failed attempts below
+		
 		//registry.handleRecipes(RecipeUpgradeDepth.class, JEIDepthRecipe.Wrapper::new, JEIDepthRecipe.Category.UID);
 		
 		//registry.addRecipeCatalyst(new ItemStack(Blocks.CRAFTING_TABLE), JEIDepthRecipe.Category.UID);
 		
-		registry.addRecipes(JEITentRecipeChecker.getWidthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
+		
 		//registry.addRecipes(JEITentRecipeChecker.getDepthRecipes(), JEIDepthRecipe.Category.UID);
+		
+//		final List<ItemStack> blacklisted = new ArrayList<>();
+//		for(StructureTent tent : StructureTent.values()) {
+//			for(StructureWidth size : StructureWidth.values()) {
+//				for(StructureDepth depth : StructureDepth.values()) {
+//					if(depth.getId() + 1 > TentConfig.TENTS.getMaxDepth(size)) {
+//						blacklisted.add(new StructureData().setAll(tent, size, depth).getDropStack());
+//					}
+//				}
+//			}
+//		}
+//		
+//		IIngredientBlacklist blacklist = registry.getJeiHelpers().getIngredientBlacklist();
+//		
+//		final Ingredient tentDepthUpgraded = Ingredient.fromStacks(blacklisted.toArray(new ItemStack[0]));
+//		blacklist.addIngredientToBlacklist(tentDepthUpgraded);
 	}
 	
 	/**
@@ -52,7 +79,7 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	 */
 	@Override
 	public void registerCategories(final IRecipeCategoryRegistration registry) {
-		final IGuiHelper helper = registry.getJeiHelpers().getGuiHelper();
+		//final IGuiHelper helper = registry.getJeiHelpers().getGuiHelper();
 		//registry.addRecipeCategories(new JEIDepthRecipe.Category(helper));
 	}
 }
