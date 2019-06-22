@@ -2,18 +2,38 @@ package com.yurtmod.structure.util;
 
 import javax.annotation.Nullable;
 
+import com.yurtmod.init.TentConfig;
+
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 
 public enum StructureWidth implements IStringSerializable {
 	
-	SMALL(5, TextFormatting.RED), 
-	MEDIUM(7, TextFormatting.BLUE), 
-	LARGE(9, TextFormatting.GREEN),
-	HUGE(11, TextFormatting.YELLOW),
-	GIANT(13, TextFormatting.DARK_PURPLE),
-	MEGA(15, TextFormatting.AQUA);
+	SMALL(5, TextFormatting.RED) {
+		@Override
+		public int getMaxDepth() { return TentConfig.TENTS.DEPTH_SMALL; }
+	}, 
+	MEDIUM(7, TextFormatting.BLUE){
+		@Override
+		public int getMaxDepth() { return TentConfig.TENTS.DEPTH_MEDIUM; }
+	}, 
+	LARGE(9, TextFormatting.GREEN){
+		@Override
+		public int getMaxDepth() { return TentConfig.TENTS.DEPTH_LARGE; }
+	}, 
+	HUGE(11, TextFormatting.YELLOW){
+		@Override
+		public int getMaxDepth() { return TentConfig.TENTS.DEPTH_HUGE; }
+	}, 
+	GIANT(13, TextFormatting.DARK_PURPLE){
+		@Override
+		public int getMaxDepth() { return TentConfig.TENTS.DEPTH_GIANT; }
+	}, 
+	MEGA(15, TextFormatting.AQUA){
+		@Override
+		public int getMaxDepth() { return TentConfig.TENTS.DEPTH_MEGA; }
+	};
 	
 	public static final int NUM_ENTRIES = values().length;
 	
@@ -54,6 +74,16 @@ public enum StructureWidth implements IStringSerializable {
 	public StructureWidth getOverworldSize() {
 		return this.isXL() ? MEDIUM : SMALL;
 	}
+	
+	/** @return the first element of this enum **/
+	public static StructureWidth getSmallest() {
+		return values()[0];
+	}
+	
+	/** @return the last element of this enum **/
+	public static StructureWidth getLargest() {
+		return values()[NUM_ENTRIES - 1];
+	}
 
 	/** @return A unique identifier. For now just the ordinal value **/
 	public byte getId() {
@@ -81,4 +111,13 @@ public enum StructureWidth implements IStringSerializable {
 	public String getName() {
 		return this.toString().toLowerCase();
 	}
+	
+	////////// ABSTRACT //////////
+	
+	/** 
+	 * @return the maximum depth of the given tent size.
+	 * 1 = NORMAL, 6 = SEXTUPLE.
+	 * (Does NOT correspond with IDs)
+	 **/
+	public abstract int getMaxDepth();
 }

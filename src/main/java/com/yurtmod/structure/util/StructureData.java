@@ -1,5 +1,7 @@
 package com.yurtmod.structure.util;
 
+import java.util.Random;
+
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.TileEntityTentDoor;
@@ -252,6 +254,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	/** 
 	 * @return whether the StructureBase should re-generate based on changed values.
 	 * @see StructureBase#generateInTentDimension(int, World, BlockPos, double, double, double, float)
+	 * @see #needsUpdateDepth()
+	 * @see #needsUpdateWidth()
 	 **/
 	public boolean needsUpdate() {
 		return needsUpdateDepth() && needsUpdateWidth();
@@ -300,6 +304,14 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	/** Note: the returned StructureBase only contains a COPY of this StructureData **/
 	public StructureBase getStructure() {
 		return this.tent.makeStructure(this.copy());
+	}
+	
+	/** Unused **/
+	public static StructureData getRandom(final Random rand) {
+		final StructureTent t = StructureTent.values()[rand.nextInt(StructureTent.values().length)];
+		final StructureWidth w = StructureWidth.values()[rand.nextInt(StructureWidth.values().length)];
+		final StructureDepth d = StructureDepth.values()[rand.nextInt(StructureDepth.values().length)];
+		return new StructureData().setAll(t, w, d);
 	}
 
 	@Override

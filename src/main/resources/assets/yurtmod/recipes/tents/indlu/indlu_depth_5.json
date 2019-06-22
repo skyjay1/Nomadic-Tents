@@ -1,7 +1,9 @@
 {
   "type": "yurtmod:tent_upgrade_depth",
-  "input_depth": 2,
-  "result_depth": 3,
+  "tent_type": "indlu",
+  "min_size": "mega",
+  "input_depth": 4,
+  "result_depth": 5,
   "pattern": [
    "DBD",
    "DTD",
@@ -12,10 +14,10 @@
 		"data": 0
       },
     "B": {
-        "item": "minecraft:gold_block"
+        "item": "minecraft:diamond_block"
       },
 	"X": {
-        "item": "yurtmod:depth_upgrade_gold"
+        "item": "yurtmod:depth_upgrade_diamond"
       },
 	"T": {
         "item": "yurtmod:tent",

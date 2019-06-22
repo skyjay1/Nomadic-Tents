@@ -1,5 +1,7 @@
 {
   "type": "yurtmod:tent_upgrade_depth",
+  "tent_type": "yurt",
+  "min_size": "medium",
   "input_depth": 0,
   "result_depth": 1,
   "pattern": [

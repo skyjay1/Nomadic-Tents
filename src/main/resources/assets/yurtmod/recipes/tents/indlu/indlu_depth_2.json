@@ -1,7 +1,9 @@
 {
   "type": "yurtmod:tent_upgrade_depth",
-  "input_depth": 3,
-  "result_depth": 4,
+  "tent_type": "indlu",
+  "min_size": "large",
+  "input_depth": 1,
+  "result_depth": 2,
   "pattern": [
    "DBD",
    "DTD",
@@ -12,10 +14,10 @@
 		"data": 0
       },
     "B": {
-        "item": "minecraft:obsidian"
+        "item": "minecraft:iron_block"
       },
 	"X": {
-        "item": "yurtmod:depth_upgrade_obsidian"
+        "item": "yurtmod:depth_upgrade_iron"
       },
 	"T": {
         "item": "yurtmod:tent",

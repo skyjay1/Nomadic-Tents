@@ -1,7 +1,9 @@
 {
   "type": "yurtmod:tent_upgrade_depth",
-  "input_depth": 4,
-  "result_depth": 5,
+  "tent_type": "bedouin",
+  "min_size": "medium",
+  "input_depth": 0,
+  "result_depth": 1,
   "pattern": [
    "DBD",
    "DTD",
@@ -12,10 +14,10 @@
 		"data": 0
       },
     "B": {
-        "item": "minecraft:diamond_block"
+        "item": "minecraft:cobblestone"
       },
 	"X": {
-        "item": "yurtmod:depth_upgrade_diamond"
+        "item": "yurtmod:depth_upgrade_stone"
       },
 	"T": {
         "item": "yurtmod:tent",

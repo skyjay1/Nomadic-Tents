@@ -1,25 +1,15 @@
 package com.yurtmod.integration;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.yurtmod.crafting.RecipeUpgradeDepth;
 import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.init.Content;
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.StructureData;
-import com.yurtmod.structure.util.StructureDepth;
-import com.yurtmod.structure.util.StructureTent;
-import com.yurtmod.structure.util.StructureWidth;
 
-import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.JEIPlugin;
-import mezz.jei.api.ingredients.IIngredientBlacklist;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
 
 @JEIPlugin
 public class JEIProvider implements mezz.jei.api.IModPlugin {
@@ -34,8 +24,8 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 		subtypeRegistry.registerSubtypeInterpreter(Content.ITEM_TENT, i -> {
 			final StructureData data = new StructureData(i);
 			// build a unique name based on StructureTent and StructureWidth
-			return data.getTent().getName().concat("_").concat(data.getWidth().getName())
-					.concat("_").concat(String.valueOf(data.getDepth()));
+			return data.getTent().getName().concat("_").concat(data.getWidth().getName()) ;
+//					.concat("_").concat(String.valueOf(data.getDepth()));
 		});
 	}
 	
@@ -45,16 +35,12 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	@Override
 	public void register(final IModRegistry registry) {
 		registry.handleRecipes(RecipeUpgradeWidth.class, JEIWidthRecipe.Wrapper::new, VanillaRecipeCategoryUid.CRAFTING);
-		registry.addRecipes(JEITentRecipeChecker.getWidthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
+		//registry.addRecipes(JEITentRecipeChecker.getWidthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
+		
+		registry.handleRecipes(RecipeUpgradeDepth.class, JEIDepthRecipe.Wrapper::new, VanillaRecipeCategoryUid.CRAFTING);
+		//registry.addRecipes(JEITentRecipeChecker.getDepthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
 		
 		// failed attempts below
-		
-		//registry.handleRecipes(RecipeUpgradeDepth.class, JEIDepthRecipe.Wrapper::new, JEIDepthRecipe.Category.UID);
-		
-		//registry.addRecipeCatalyst(new ItemStack(Blocks.CRAFTING_TABLE), JEIDepthRecipe.Category.UID);
-		
-		
-		//registry.addRecipes(JEITentRecipeChecker.getDepthRecipes(), JEIDepthRecipe.Category.UID);
 		
 //		final List<ItemStack> blacklisted = new ArrayList<>();
 //		for(StructureTent tent : StructureTent.values()) {

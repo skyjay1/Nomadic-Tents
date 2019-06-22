@@ -2,7 +2,6 @@ package com.yurtmod.init;
 
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureDepth;
-import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
@@ -175,29 +174,5 @@ public final class TentConfig {
 		@Config.Comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades")
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_MEGA = StructureDepth.SEXTUPLE.getLayers();
-		
-		/** @return the maximum depth of the given tent size **/
-		public int getMaxDepth(final StructureWidth width) {
-			switch(width) {
-			case MEGA:		return DEPTH_MEGA;
-			case GIANT:		return DEPTH_GIANT;
-			case HUGE:		return DEPTH_HUGE;
-			case LARGE:		return DEPTH_LARGE;
-			case MEDIUM:	return DEPTH_MEDIUM;
-			case SMALL:		return DEPTH_SMALL;
-			}
-			return -1;
-		}
-		
-		/** @return the maximum size of the given tent type **/
-		public int getMaxSize(final StructureTent tent) {
-			switch(tent) {
-			case BEDOUIN:	return TIERS_BEDOUIN;
-			case INDLU:		return TIERS_INDLU;
-			case TEPEE:		return TIERS_TEPEE;
-			case YURT:		return TIERS_YURT;
-			}
-			return -1;
-		}
 	}
 }

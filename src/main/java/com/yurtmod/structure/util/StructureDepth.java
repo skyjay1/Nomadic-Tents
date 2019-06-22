@@ -1,7 +1,5 @@
 package com.yurtmod.structure.util;
 
-import com.yurtmod.init.TentConfig;
-
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 
@@ -39,7 +37,7 @@ public enum StructureDepth implements IStringSerializable {
 
 	/** @return the maximum number of upgrades the given tent can hold **/
 	public static int maxUpgrades(final StructureData data) {
-		return TentConfig.TENTS.getMaxDepth(data.getWidth()) - 1;
+		return data.getWidth().getMaxDepth() - 1;
 	}
 	
 	/** @return the number of depth upgrades the given tent has received **/

@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.yurtmod.crafting.RecipeUpgradeDepth;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureDepth;
+import com.yurtmod.structure.util.StructureTent;
+import com.yurtmod.structure.util.StructureWidth;
 
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.ICraftingGridHelper;
@@ -46,26 +50,26 @@ public final class JEIDepthRecipe {
 
 		@Override
 		public void getIngredients(final IIngredients ingredients) {
-			final List<List<ItemStack>> list = new ArrayList<>();
+			final List<List<ItemStack>> inputList = new ArrayList<>();
 			// go through each ingredient, adding it to the list
 			for (final Ingredient ingredient : recipe.getIngredients()) {
 				// before adding to the list, check if its the TENT
 				for(final ItemStack stack : ingredient.getMatchingStacks()) {
-					// if this ingredient is the TENT, we need to set NBT data
+					// if this ingredient is the TENT, we need to set NBT data and add subtypes
 					if(stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemTent) {
-						final StructureData data = new StructureData(stack);
-						data.setDepth(recipe.getDepthIn());
-						// we changed some values, so we re-save to NBT
+						// correct NBT values for input tent
+						StructureData data = new StructureData(stack)
+								.setAll(recipe.getTentType(), recipe.getMinSize(), recipe.getDepthIn());
 						data.writeTo(stack);
 					}
 				}
 				// actually add the ingredient to the list
-				list.add(Arrays.asList(ingredient.getMatchingStacks()));
+				inputList.add(Arrays.asList(ingredient.getMatchingStacks()));
 			}
 			// add all the INPUT ingredients
-			ingredients.setInputLists(VanillaTypes.ITEM, list);
-			// add OUTPUT ingredient (recipe should already have default NBT data)
-			ingredients.setOutput(VanillaTypes.ITEM, this.recipe.getRecipeOutput());
+			ingredients.setInputLists(VanillaTypes.ITEM, inputList);
+			// add the OUTPUT ingredient
+			ingredients.setOutputs(VanillaTypes.ITEM, Arrays.asList(recipe.getRecipeOutput()));
 		}
 		
 		public RecipeUpgradeDepth getRecipe() {

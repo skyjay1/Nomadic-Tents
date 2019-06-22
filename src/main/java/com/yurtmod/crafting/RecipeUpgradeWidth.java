@@ -27,6 +27,7 @@ import net.minecraftforge.common.crafting.JsonContext;
 public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	
 	public static final String CATEGORY = "tentcraftingwidth";
+	public static final RecipeUpgradeWidth EMPTY = new RecipeUpgradeWidth();
 	
 	private final StructureTent tent;
 	private final StructureWidth widthIn;
@@ -41,24 +42,31 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		this.widthOut = widthTo;
 	}
 	
+	private RecipeUpgradeWidth() {
+		super(CATEGORY, 3, 3, NonNullList.create(), ItemStack.EMPTY);
+		tent = StructureTent.YURT;
+		widthIn = StructureWidth.SMALL;
+		widthOut = StructureWidth.SMALL;
+	}
+	
 	/**
 	 * Used to check if a recipe matches current crafting inventory
 	 */
 	@Override
 	public boolean matches(InventoryCrafting inv, World worldIn) {
 		// check super conditions first
-		if(super.matches(inv, worldIn)) {
+		if(this != EMPTY && super.matches(inv, worldIn)) {
 			// find the tent item in the crafting grid
 			ItemStack tentStack = getTentStack(inv);
 			if (tentStack.isEmpty() && null == this.widthIn) {
-				// no tent was found, user is
+				// no tent was found, user must be
 				// crafting a small tent
 				return true;
 			} else {
 				final StructureData data = new StructureData(tentStack);
 				// return true if the tent is upgradeable to match this one
 				if (data.getTent() == this.tent && data.getWidth() == widthIn
-					&& this.widthOut.getId() < TentConfig.TENTS.getMaxSize(data.getTent())) {
+					&& this.widthOut.getId() < data.getTent().getMaxSize()) {
 					return true;
 				}
 			}
@@ -71,6 +79,10 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	 */
 	@Override
 	public ItemStack getCraftingResult(InventoryCrafting inv) {
+		if(this == EMPTY) {
+			return ItemStack.EMPTY;
+		}
+		
 		final ItemStack result = super.getCraftingResult(inv);
 		final NBTTagCompound resultTag = result.hasTagCompound() ? result.getTagCompound() : new NBTTagCompound();
 		// find the tent in the input
@@ -109,7 +121,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	
 	/**
 	 * Search the given inventory for a specific item
-	 * @param inv the inventory to searchy
+	 * @param inv the inventory to search
 	 * @param itemClass the target type of item to find
 	 * @return an ItemStack containing an item of type {@code itemClass}, or EMPTY if none is found
 	 **/
@@ -134,6 +146,9 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 
 		@Override
 		public IRecipe parse(JsonContext context, JsonObject json) {
+			if(json.has("disabled")) {
+				return RecipeUpgradeWidth.EMPTY;
+			}
 			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
 			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
 			// widthIn can be null

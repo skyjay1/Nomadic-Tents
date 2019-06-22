@@ -1,0 +1,31 @@
+{
+  "type": "yurtmod:tent_upgrade_depth",
+  "tent_type": "tepee",
+  "min_size": "medium",
+  "input_depth": 0,
+  "result_depth": 1,
+  "pattern": [
+   "DBD",
+   "DTD",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:cobblestone"
+      },
+	"X": {
+        "item": "yurtmod:depth_upgrade_stone"
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

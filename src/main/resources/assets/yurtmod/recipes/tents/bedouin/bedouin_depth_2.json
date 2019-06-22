@@ -1,5 +1,7 @@
 {
   "type": "yurtmod:tent_upgrade_depth",
+  "tent_type": "bedouin",
+  "min_size": "large",
   "input_depth": 1,
   "result_depth": 2,
   "pattern": [
