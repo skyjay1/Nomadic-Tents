@@ -24,7 +24,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	public static final String KEY_WIDTH_CUR = "WidthCur";
 	public static final String KEY_DEPTH_PREV = "DepthPrev";
 	public static final String KEY_DEPTH_CUR = "DepthCur";
-	public static final String KEY_ID = "Location";	
+	public static final String KEY_ID = "ID";	
 	
 	////// Important fields with their default values //////
 	private StructureTent tent = StructureTent.getById((byte)0);
