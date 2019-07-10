@@ -32,12 +32,7 @@ import net.minecraft.world.World;
 public abstract class StructureBase {
 		
 	protected StructureData data;
-//	protected final Blueprints BP_SMALL = makeBlueprints(StructureWidth.SMALL, new Blueprints());
-//	protected final Blueprints BP_MED = makeBlueprints(StructureWidth.MEDIUM, new Blueprints());
-//	protected final Blueprints BP_LARGE = makeBlueprints(StructureWidth.LARGE, new Blueprints());
-//	protected final Blueprints BP_HUGE = makeBlueprints(StructureWidth.HUGE, new Blueprints());
-//	protected final Blueprints BP_GIANT = makeBlueprints(StructureWidth.GIANT, new Blueprints());
-//	protected final Blueprints BP_MEGA = makeBlueprints(StructureWidth.MEGA, new Blueprints());
+	
 	/** 
 	 * Used in {@link #isValidForFacing(World, BlockPos, StructureWidth, EnumFacing)} 
 	 * to determine if the given IBlockState is part of a specific type of tent
@@ -136,8 +131,7 @@ public abstract class StructureBase {
 		TileEntity te = worldIn.getTileEntity(doorPos);
 		if (te instanceof TileEntityTentDoor) {
 			TileEntityTentDoor door = (TileEntityTentDoor) te;
-			data.setOffsetX(TileEntityTentDoor.getChunkOffsetX(doorPos.getX()));
-			data.setOffsetZ(TileEntityTentDoor.getChunkOffsetZ(doorPos.getZ()));
+			data.setID(TileEntityTentDoor.getTentID(doorPos));
 			data.resetPrevData();
 			door.setTentData(data);
 			door.setOverworldXYZ(prevX, prevY, prevZ);

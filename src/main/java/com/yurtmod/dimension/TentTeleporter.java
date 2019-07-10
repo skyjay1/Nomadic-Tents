@@ -16,13 +16,15 @@ import net.minecraftforge.common.MinecraftForge;
 public class TentTeleporter extends Teleporter {
 	private final StructureData tentData;
 	private final BlockPos tentDoorPos;
-	private final double prevX, prevY, prevZ;
+	private final double prevX;
+	private final double prevY;
+	private final double prevZ;
 	private final float prevYaw;
 	private final int prevDimID;
 	private final WorldServer worldServerTo;
 
-	public TentTeleporter(int dimensionFrom, WorldServer worldTo, BlockPos doorPos, double oldX, double oldY,
-			double oldZ, float oldYaw, StructureData data) {
+	public TentTeleporter(final int dimensionFrom, final WorldServer worldTo, final BlockPos doorPos, 
+			final double oldX, final double oldY, final double oldZ, final float oldYaw, final StructureData data) {
 		super(worldTo);
 		this.prevDimID = dimensionFrom;
 		this.worldServerTo = worldTo;
@@ -35,7 +37,7 @@ public class TentTeleporter extends Teleporter {
 	}
 	
 	public TentTeleporter(final int worldFrom, final WorldServer worldTo, final TileEntityTentDoor te) {
-		this(worldFrom, worldTo, te.getTentDoorPos(), te.getPrevX(), te.getPrevY(), te.getPrevZ(),
+		this(worldFrom, worldTo, te.getDoorPos(), te.getPrevX(), te.getPrevY(), te.getPrevZ(),
 				te.getPrevFacing(), te.getTentData());
 	}
 

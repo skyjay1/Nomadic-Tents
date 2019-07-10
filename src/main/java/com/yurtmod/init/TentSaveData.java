@@ -15,21 +15,16 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 
 public class TentSaveData extends WorldSavedData {
-	private static final String KEY_YURT = "CraftCountYurt";
-	private static final String KEY_TEPEE = "CraftCountTepee";
-	private static final String KEY_BEDOUIN = "CraftCountBedouin";
-	private static final String KEY_INDLU = "CraftCountIndlu";
+	
+	private static final String ID_COUNT = "IDCount";
 	private static final String KEY_SPAWNS = "PlayerSpawnPoints";
 	private static final String _UUID = ".UUID";
 	private static final String _X = ".X";
 	private static final String _Y = ".Y";
 	private static final String _Z = ".Z";
 	
-	private int craftcountYurt;
-	private int craftcountTepee;
-	private int craftcountBedouin;
-	private int craftCountIndlu;
-	
+	private long idCount = 0;
+
 	private Map<UUID, BlockPos> prevSpawnMap = new HashMap();
 
 	public TentSaveData(String s) {
@@ -48,10 +43,7 @@ public class TentSaveData extends WorldSavedData {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
-		craftcountYurt = nbt.getInteger(KEY_YURT);
-		craftcountTepee = nbt.getInteger(KEY_TEPEE);
-		craftcountBedouin = nbt.getInteger(KEY_BEDOUIN);
-		craftCountIndlu = nbt.getInteger(KEY_INDLU);
+		idCount = nbt.getLong(ID_COUNT);
 		// read spawn map
 		final NBTTagList tagList = nbt.getTagList(KEY_SPAWNS, 9);
 		for(int i = 0, l = tagList.tagCount(); i < l; ++i) {
@@ -69,10 +61,7 @@ public class TentSaveData extends WorldSavedData {
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-		nbt.setInteger(KEY_YURT, craftcountYurt);
-		nbt.setInteger(KEY_TEPEE, craftcountTepee);
-		nbt.setInteger(KEY_BEDOUIN, craftcountBedouin);
-		nbt.setInteger(KEY_INDLU, craftCountIndlu);
+		nbt.setLong(ID_COUNT, idCount);
 		// write spawn map
 		final NBTTagList tagList = new NBTTagList();
 		for(final Entry<UUID, BlockPos> uuid : prevSpawnMap.entrySet()) {
@@ -87,69 +76,36 @@ public class TentSaveData extends WorldSavedData {
 		nbt.setTag(KEY_SPAWNS, tagList);
 		return nbt;
 	}
-
-	/** @return the updated value of CraftCountYurt **/
-	public int addCountYurt(int toAdd) {
-		this.craftcountYurt += toAdd;
+	
+	/** @return the next available ID **/
+	public long getNextID() {
 		this.markDirty();
-		return this.craftcountYurt;
+		return ++idCount;
 	}
 
-	/** @return the updated value of CraftCountTepee **/
-	public int addCountTepee(int toAdd) {
-		this.craftcountTepee += toAdd;
-		this.markDirty();
-		return this.craftcountTepee;
-	}
-
-	/** @return the updated value of CraftCountBedouin **/
-	public int addCountBedouin(int toAdd) {
-		this.craftcountBedouin += toAdd;
-		this.markDirty();
-		return this.craftcountBedouin;
+	/** @return the current number of used IDs **/
+	public long getCurrentID() {
+		return idCount;
 	}
 	
-	/** @return the updated value of CraftCountIndlu **/
-	public int addCountIndlu(int toAdd) {
-		this.craftCountIndlu += toAdd;
-		this.markDirty();
-		return this.craftCountIndlu;
-	}
-
-	public int getCountYurt() {
-		return this.craftcountYurt;
-	}
-
-	public int getCountTepee() {
-		return this.craftcountTepee;
-	}
-
-	public int getCountBedouin() {
-		return this.craftcountBedouin;
-	}
-	
-	public int getCountIndlu() {
-		return this.craftCountIndlu;
-	}
-	
-	public void put(final UUID uuid, final BlockPos pos) {
+	public void putSpawn(final UUID uuid, final BlockPos pos) {
 		if(uuid != null) {
-			prevSpawnMap.put(uuid, pos);
 			this.markDirty();
+			prevSpawnMap.put(uuid, pos);
 		}
 	}
 	
-	public boolean contains(final UUID uuid) {
+	public boolean containsSpawn(final UUID uuid) {
 		return prevSpawnMap.containsKey(uuid);
 	}
 	
 	@Nullable
-	public BlockPos get(final UUID uuid) {
+	public BlockPos getSpawn(final UUID uuid) {
 		return prevSpawnMap.get(uuid);
 	}
 	
 	@Nullable
-	public BlockPos remove(final UUID uuid) {
+	public BlockPos removeSpawn(final UUID uuid) {
 		this.markDirty();
 		return prevSpawnMap.remove(uuid);
 	}

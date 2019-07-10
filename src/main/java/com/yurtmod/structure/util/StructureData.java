@@ -6,7 +6,6 @@ import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.init.Content;
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
 
@@ -20,13 +19,12 @@ import net.minecraft.nbt.NBTTagCompound;
 public class StructureData implements net.minecraftforge.common.util.INBTSerializable<NBTTagCompound> {
 	
 	////// String keys for NBT //////
-	public static final String KEY_TENT_CUR = "StructureTentType";
-	public static final String KEY_WIDTH_PREV = "StructureWidthPrevious";
-	public static final String KEY_WIDTH_CUR = "StructureWidthCurrent";
-	public static final String KEY_DEPTH_PREV = "StructureDepthPrevious";
-	public static final String KEY_DEPTH_CUR = "StructureDepthCurrent";
-	public static final String KEY_OFFSET_X = "StructureOffsetX";
-	public static final String KEY_OFFSET_Z = "StructureOffsetZ";
+	public static final String KEY_TENT_CUR = "TentType";
+	public static final String KEY_WIDTH_PREV = "WidthPrev";
+	public static final String KEY_WIDTH_CUR = "WidthCur";
+	public static final String KEY_DEPTH_PREV = "DepthPrev";
+	public static final String KEY_DEPTH_CUR = "DepthCur";
+	public static final String KEY_ID = "Location";	
 	
 	////// Important fields with their default values //////
 	private StructureTent tent = StructureTent.getById((byte)0);
@@ -34,8 +32,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	private StructureDepth depth = StructureDepth.getById((byte)0);
 	private StructureWidth prevWidth = StructureWidth.getById((byte)0);
 	private StructureDepth prevDepth = StructureDepth.getById((byte)0);
-	private int offsetX = ItemTent.ERROR_TAG;
-	private int offsetZ = ItemTent.ERROR_TAG;
+	private long locationID = ItemTent.ERROR_TAG;
 	
 	public StructureData() {
 		// empty constructor (uses defaults)
@@ -77,20 +74,13 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		this.prevDepth = depthPrev;
 		return this;
 	}
-
-	/** @return the same StructureData with the given values used to set OffsetX and OffsetZ **/
-	public StructureData setOffsets(final int x, final int z) {
-		this.offsetX = x;
-		this.offsetZ = z;
-		return this;
-	}
 	
 	/** @return a StructureData object that uses this object's "Previous" values for its "Current" ones **/
 	public StructureData prevData() {
 		return new StructureData()
 				.setCurrent(tent, prevWidth, prevDepth)
 				.setPrev(prevWidth, prevDepth)
-				.setOffsets(offsetX, offsetZ);
+				.setID(locationID);
 	}
 	
 	/** @return an exact copy of this StructureData that is NOT the original **/
@@ -98,12 +88,12 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return new StructureData()
 				.setCurrent(tent, width, depth)
 				.setPrev(prevWidth, prevDepth)
-				.setOffsets(offsetX, offsetZ);
+				.setID(locationID);
 	}
 	
 	/** @return true if this object has valid X and Z coordinates **/
 	public boolean isValid() {
-		return this.offsetX != ItemTent.ERROR_TAG && this.offsetZ != ItemTent.ERROR_TAG;
+		return locationID != ItemTent.ERROR_TAG;
 	}
  	
 	//////////////////////////////////
@@ -135,24 +125,13 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return this.prevDepth;
 	}
 	
-	/** 
-	 * @return the Chunk X value of this tent's location
-	 * @see TileEntityTentDoor#getChunkOffsetX(int)
-	 * @see TileEntityTentDoor#getTentDoorPos()
+	/**
+	 * @return the Location ID of this tent
 	 **/
-	public int getOffsetX() {
-		return this.offsetX;
+	public long getID() {
+		return locationID;
 	}
-	
-	/** 
-	 * @return the Chunk Z value of this tent's location
-	 * @see TileEntityTentDoor#getChunkOffsetZ(int)
-	 * @see TileEntityTentDoor#getTentDoorPos()
-	 **/
-	public int getOffsetZ() {
-		return this.offsetZ;
-	}
-	
+
 	/** Set the StructureTent type used by this StructureData. Not really needed outside of constructor. **/
 	protected StructureData setTent(final StructureTent tentIn) {
 		this.tent = tentIn;
@@ -183,23 +162,9 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return this;
 	}
 	
-	/** 
-	 * Set the Chunk X location used by this StructureData
-	 * @see TileEntityTentDoor#getChunkOffsetX(int)
-	 * @see TileEntityTentDoor#getTentDoorPos()
-	 **/
-	public StructureData setOffsetX(final int toSet) {
-		this.offsetX = toSet;
-		return this;
-	}
-	
-	/** 
-	 * Set the Chunk Z location used by this StructureData
-	 * @see TileEntityTentDoor#getChunkOffsetZ(int)
-	 * @see TileEntityTentDoor#getTentDoorPos()
-	 **/
-	public StructureData setOffsetZ(final int toSet) {
-		this.offsetZ = toSet;
+	/** Set or update the location ID of this StructureData **/
+	public StructureData setID(final long id) {
+		this.locationID = id;
 		return this;
 	}
 	
@@ -326,9 +291,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 			// 'Previous' values
 			nbt.setByte(KEY_WIDTH_PREV, this.prevWidth.getId());
 			nbt.setByte(KEY_DEPTH_PREV, this.prevDepth.getId());
-			// Offsets (tent location)
-			nbt.setInteger(KEY_OFFSET_X, this.offsetX);
-			nbt.setInteger(KEY_OFFSET_Z, this.offsetZ);
+			// Location ID
+			nbt.setLong(KEY_ID, locationID);
 		}
 		
 		return nbt;
@@ -341,16 +305,14 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		this.depth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_CUR));
 		this.prevWidth = StructureWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
 		this.prevDepth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
-		this.offsetX = nbt.getInteger(KEY_OFFSET_X);
-		this.offsetZ = nbt.getInteger(KEY_OFFSET_Z);
+		this.locationID = nbt.getLong(KEY_ID);
 	}
 	
 	@Override
 	public String toString() {
-		return "StructureData: [TENT = " + tent.getName() + "; WIDTH = " 
+		return "\nStructureData: [TENT = " + tent.getName() + "; WIDTH = " 
 				+ width.getName() + "; DEPTH = " + depth.getName() + 
-				"; PREV_WIDTH = " + prevWidth.getName() + "; PREV_DEPTH = " 
-				+ prevDepth.getName() + "; OFFSET_X = " + offsetX
-				+ "; OFFSET_Z = " + offsetZ + "]";
+				";\nPREV_WIDTH = " + prevWidth.getName() + "; PREV_DEPTH = " 
+				+ prevDepth.getName() + "; ID = " + locationID + "]";
 	}
 }

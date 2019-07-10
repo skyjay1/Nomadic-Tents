@@ -60,7 +60,8 @@ public class ItemTent extends Item {
 
 	@Override
 	public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
-		fixStructureData(world, stack);
+		// fixStructureData(world, stack);
+		super.onCreated(stack, world, player);
 	}
 
 	/**
@@ -69,7 +70,8 @@ public class ItemTent extends Item {
 	 **/
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-		fixStructureData(world, stack);
+		// fixStructureData(world, stack);
+		super.onUpdate(stack, world, entity, itemSlot, isSelected);
 	}
 
 	@Override
@@ -81,9 +83,11 @@ public class ItemTent extends Item {
 			ItemStack stack = player.getHeldItem(hand);
 			EnumFacing hitSide = side;
 
-			if (worldIn.getBlockState(pos) == null || stack == null || stack.isEmpty() || !stack.hasTagCompound()) {
+			if (worldIn.getBlockState(pos) == null || stack == null || stack.isEmpty()) {
 				return EnumActionResult.FAIL;
 			} else {
+				// make sure this tent has useable data
+				fixStructureData(worldIn, stack);
 				// offset the BlockPos to build on if it's not replaceable
 				if (!StructureBase.REPLACE_BLOCK_PRED.test(worldIn.getBlockState(hitPos))) {
 					hitPos = hitPos.up(1);
@@ -186,29 +190,18 @@ public class ItemTent extends Item {
 			}
 			// check if data is missing or set incorrectly
 			StructureData data = new StructureData(stack);
-			if(data.getOffsetX() == ERROR_TAG) {
-				// update offset X and Z and the stack NBT
-				data.setOffsetX(getOffsetX(world, data.getTent()));
-				data.setOffsetZ(getOffsetZ(data.getTent()));
+			if(data.getID() == ERROR_TAG) {
+				// update location ID and the stack NBT
+				data.setID(getNextID(world));
 				stack.getTagCompound().setTag(TENT_DATA, data.serializeNBT());
 			}
 		}
 	}
 	
 	/** Calculates and returns the next available X location for a tent **/
-	public static int getOffsetX(World world, StructureTent tent) {
+	public static long getNextID(World world) {
 		final TentSaveData data = TentSaveData.forWorld(world);
-		switch (tent) {
-		case BEDOUIN:	return data.addCountBedouin(1);
-		case TEPEE:		return data.addCountTepee(1);
-		case YURT:		return data.addCountYurt(1);
-		case INDLU:		return data.addCountIndlu(1);
-		}
-		return -1;
+		return data.getNextID();
 	}
 
-	/** Calculates the Z location based on the tent type **/
-	public static int getOffsetZ(StructureTent tent) {
-		return tent.getId();
-	}
 }

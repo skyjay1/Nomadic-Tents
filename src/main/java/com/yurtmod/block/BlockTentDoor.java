@@ -1,9 +1,6 @@
 package com.yurtmod.block;
 
-import com.yurtmod.block.Categories.IBedouinBlock;
-import com.yurtmod.block.Categories.IIndluBlock;
-import com.yurtmod.block.Categories.ITepeeBlock;
-import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.block.Categories.*;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.TentConfig;
@@ -16,7 +13,6 @@ import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockDoor.EnumDoorHalf;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -124,7 +120,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
 							teyd.onPlayerRemove(player);
 						}
-						// remove the yurt structure
+						// remove the structure
 						struct.remove(worldIn, base, dir, data.getWidth().getOverworldSize());
 						// damage the item
 						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player);
@@ -221,7 +217,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { BlockDoor.HALF, AXIS });
+		return new BlockStateContainer(this, BlockDoor.HALF, AXIS);
 	}
 
 	@Override

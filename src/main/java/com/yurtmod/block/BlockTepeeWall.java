@@ -42,10 +42,9 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 				TileEntityTentDoor te = (TileEntityTentDoor) worldIn.getTileEntity(doorPos);
 				// psuedo-random seed guarantees all blocks that are same y-dis from door
 				// are given a random instance with same seed
-				final int offsetX = te.getTentData().getOffsetX();
-				final int offsetZ = te.getTentData().getOffsetZ();
-				int randSeed = pos.getY() + doorPos.getX() + doorPos.getZ() + offsetX * 123
-						+ offsetZ * 321 + te.getTentData().getWidth().getId() * 101;
+				final int id = (int)te.getTentData().getID();
+				int randSeed = pos.getY() + doorPos.getX() + doorPos.getZ() + id * 123
+						+ te.getTentData().getWidth().getId() * 101;
 				state = getStateForRandomPattern(new Random(randSeed), true);
 			} else {
 				state = getStateForRandomDesignWithChance(worldIn.rand, true);

@@ -109,6 +109,8 @@ public final class TentConfig {
 	
 	public static class ConfigTents {
 		
+		private final String NOTE = "Note: Disable recipe by inserting ' \"disabled\":true ' in the JSON file";
+		
 		@Config.Name("Enable Yurt")
 		@Config.Comment("Whether the Yurt can be built and used")
 		public boolean ALLOW_YURT = true;
@@ -126,52 +128,52 @@ public final class TentConfig {
 		public boolean ALLOW_INDLU = true;
 		
 		@Config.Name("Max Tiers: Yurt")
-		@Config.Comment("Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment({"Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int TIERS_YURT = StructureWidth.values().length;
 		
 		@Config.Name("Max Tiers: Tepee")
-		@Config.Comment("Limit the size upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment({"Limit the size upgrades a Tepee can recieve. 1=SMALL, 6=MEGA", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int TIERS_TEPEE = StructureWidth.values().length;
 		
 		@Config.Name("Max Tiers: Bedouin")
-		@Config.Comment("Limit the size upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment({"Limit the size upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int TIERS_BEDOUIN = StructureWidth.values().length;
 		
 		@Config.Name("Max Tiers: Indlu")
-		@Config.Comment("Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
+		@Config.Comment({"Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int TIERS_INDLU = StructureWidth.values().length;
 		
 		@Config.Name("Max Depth: Small")
-		@Config.Comment("Limit the depth of a Small Tent. 1=No Upgrades, 6=Full Upgrades")
+		@Config.Comment({"Limit the depth of a Small Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_SMALL = StructureDepth.NORMAL.getLayers();
 		
 		@Config.Name("Max Depth: Medium")
-		@Config.Comment("Limit the depth of a Medium Tent. 1=No Upgrades, 6=Full Upgrades")
+		@Config.Comment({"Limit the depth of a Medium Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_MEDIUM = StructureDepth.DOUBLE.getLayers();
 		
 		@Config.Name("Max Depth: Large")
-		@Config.Comment("Limit the depth of a Large Tent. 1=No Upgrades, 6=Full Upgrades")
+		@Config.Comment({"Limit the depth of a Large Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_LARGE = StructureDepth.TRIPLE.getLayers();
 		
 		@Config.Name("Max Depth: Huge")
-		@Config.Comment("Limit the depth of a Huge Tent. 1=No Upgrades, 6=Full Upgrades")
+		@Config.Comment({"Limit the depth of a Huge Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_HUGE = StructureDepth.QUADRUPLE.getLayers();
 		
 		@Config.Name("Max Depth: Giant")
-		@Config.Comment("Limit the depth of a Giant Tent. 1=No Upgrades, 6=Full Upgrades")
+		@Config.Comment({"Limit the depth of a Giant Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_GIANT = StructureDepth.QUINTUPLE.getLayers();
 		
 		@Config.Name("Max Depth: Mega")
-		@Config.Comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades")
+		@Config.Comment({"Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_MEGA = StructureDepth.SEXTUPLE.getLayers();
 	}

@@ -39,7 +39,9 @@ public class TileEntityTentDoor extends TileEntity {
 	private static final String S_PLAYER_DIM = "PreviousPlayerDimension";
 
 	private StructureData tent;
-	private double prevX, prevY, prevZ;
+	private double prevX;
+	private double prevY;
+	private double prevZ;
 	private float prevFacing;
 	private int prevDimID;
 	private UUID owner;
@@ -49,6 +51,31 @@ public class TileEntityTentDoor extends TileEntity {
 		if (this.tent == null) {
 			this.tent = new StructureData();
 		}
+	}
+	
+	/** 
+	 * Calculates a usable BlockPos from a Tent Location ID
+	 * using a strict mathematical formula.
+	 * @return the Tent Dimension location of the tent's door
+	 * @see #getTentID(BlockPos)
+	 * @see StructureData#getID()
+	 **/
+	public static BlockPos getTentDoorPos(final long tentID) {
+		int x = (int)(tentID % 64) * (TentDimension.TENT_SPACING);
+		int y = TentDimension.FLOOR_Y;
+		int z = (int)(tentID / 64) * (TentDimension.TENT_SPACING);
+		return new BlockPos(x, y, z);
+	}
+	
+	/**
+	 * Calculates the ID of a tent based on its door's location
+	 * @param pos the location of a Tent Door
+	 * @return the Tent Location ID corresponding to the
+	 * given location.
+	 * @see #getTentDoorPos(long)
+	 **/
+	public static long getTentID(final BlockPos pos) {
+		return (pos.getX() / TentDimension.TENT_SPACING) + (pos.getZ() / TentDimension.TENT_SPACING) * 64L;
 	}
 	
 	public void setTentData(final StructureData tentData) {
@@ -89,15 +116,13 @@ public class TileEntityTentDoor extends TileEntity {
 		}
 		return nbt;
 	}
-
-	/** Calculates what chunk offset x to give a door or item **/
-	public static final int getChunkOffsetX(int actualX) {
-		return actualX / (TentDimension.TENT_SPACING);
-	}
-
-	/** Calculates what chunk offset x to give a door or item **/
-	public static final int getChunkOffsetZ(int actualZ) {
-		return actualZ / (TentDimension.TENT_SPACING);
+	
+	/**
+	 * @return the location of the Tent Dimension door
+	 * corresponding to this door's StructureData
+	 **/
+	public BlockPos getDoorPos() {
+		return getTentDoorPos(this.getTentData().getID());
 	}
 
 	public void setOverworldXYZ(double posX, double posY, double posZ) {
@@ -132,14 +157,6 @@ public class TileEntityTentDoor extends TileEntity {
 	
 	public float getPrevFacing() {
 		return this.prevFacing;
-	}
-
-	/** @return the Tent Dimension location of the tent's door **/
-	public BlockPos getTentDoorPos() {
-		int x = this.tent.getOffsetX() * (TentDimension.TENT_SPACING);
-		int y = TentDimension.FLOOR_Y;
-		int z = this.tent.getOffsetZ() * (TentDimension.TENT_SPACING);
-		return new BlockPos(x, y, z);
 	}
 	
 	public void setOwner(@Nullable final UUID uuid) {
@@ -216,11 +233,9 @@ public class TileEntityTentDoor extends TileEntity {
 			// depending on config, may use alternate form of teleportation
 			if (player != null && !TentConfig.GENERAL.SAFE_TELEPORT) {
 				// ~ Alter a private field using reflection ~
-				// We could simply call Entity#changeDimension(int, ITeleporter)
-				// but the EntityPlayerMP implementation plays a portal sound
-				// and we can get around that.
-				// HOWEVER, calling changeDimension correctly updates XP.
-				// We need that too.
+				// If we call Entity#changeDimension(int, ITeleporter)
+				// then XP is updated correctly, but a Nether Portal sound plays.
+				// So we leave it to the user to decide which one to use.
 				try {
 					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, player, Boolean.valueOf(true),
 							"field_184851_cj", "invulnerableDimensionChange");
@@ -260,9 +275,9 @@ public class TileEntityTentDoor extends TileEntity {
 			oldSpawn = overworld.provider.getRandomizedSpawnPoint();
 		}
 		// if their Tent Dimension spawnpoint AND BED are inside the tent, update spawn location, as needed
-		if (isSpawnInTent(player, tentCenter, true) && !data.contains(uuid) && overworld.provider.canRespawnHere()) {
+		if (isSpawnInTent(player, tentCenter, true) && !data.containsSpawn(uuid) && overworld.provider.canRespawnHere()) {
 			// First, map the player's old spawn point in case the tent is taken down
-			data.put(uuid, oldSpawn);
+			data.putSpawn(uuid, oldSpawn);
 			// Next, set their spawn point to be this location
 			player.setSpawnChunk(prevCoords, true, overworldId);
 			return true;
@@ -277,7 +292,7 @@ public class TileEntityTentDoor extends TileEntity {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent and reset their spawn points
 		if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
-			BlockPos tentCenter = this.getTentDoorPos().add(this.getTentData().getWidth().getDoorZ(), 0, 0);
+			BlockPos tentCenter = this.getDoorPos().add(this.getTentData().getWidth().getDoorZ(), 0, 0);
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
 			// for each player, attempt to reset their spawn if it's inside this tent
 			for(EntityPlayerMP player : mcServer.getPlayerList().getPlayers()) {
@@ -298,7 +313,7 @@ public class TileEntityTentDoor extends TileEntity {
     	BlockPos posToSet = player.getBedLocation(TentConfig.GENERAL.RESPAWN_DIMENSION);
     	if(posToSet == null || EntityPlayer.getBedSpawnLocation(overworld, posToSet, false) == null) {
     		// they don't, so check if the previous stored location was a valid bed
-    		BlockPos oldSpawn = data.get(uuid);
+    		BlockPos oldSpawn = data.getSpawn(uuid);
         	if(oldSpawn == null || EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) == null) {
         		// set spawn point random if no bed anywhere
         		posToSet = player.getEntityWorld().provider.getRandomizedSpawnPoint();
@@ -309,7 +324,7 @@ public class TileEntityTentDoor extends TileEntity {
     	}
     	// finally set the player's spawn point to whatever it was before tent was set up
     	player.setSpawnPoint(posToSet, false);
-    	data.remove(uuid);
+    	data.removeSpawn(uuid);
     }
 	
 	/**
