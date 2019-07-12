@@ -94,7 +94,7 @@ public final class TentConfig {
 		@Config.Name("Tent Floor")
 		@Config.Comment({"Specify the block used for the harvestable layer of all tent floors",
 				"Format: [mod]:[name] ~ Example: minecraft:sand"})
-		public String FLOOR_BLOCK = Blocks.DIRT.getRegistryName().toString();
+		public String FLOOR_BLOCK = "minecraft:dirt";
 		
 		/** @return the Block to use in a tent platform (floor) **/
 		public Block getFloorBlock() {

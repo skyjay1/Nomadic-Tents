@@ -77,7 +77,10 @@ public class TentSaveData extends WorldSavedData {
 		return nbt;
 	}
 	
-	/** @return the next available ID **/
+	/**
+	 * Increments the number of used IDs
+	 * @return the next available ID 
+	 **/
 	public long getNextID() {
 		this.markDirty();
 		return ++idCount;

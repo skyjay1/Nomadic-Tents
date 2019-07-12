@@ -60,17 +60,15 @@ public class ItemTent extends Item {
 
 	@Override
 	public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
-		// fixStructureData(world, stack);
 		super.onCreated(stack, world, player);
 	}
 
 	/**
-	 * Called each tick as long the item is on a player inventory. Uses by maps to
-	 * check if is on a player hand and update it's contents.
+	 * Called each tick as long the item is on a player inventory.
+	 * Only reliably called Client-Side
 	 **/
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-		// fixStructureData(world, stack);
 		super.onUpdate(stack, world, entity, itemSlot, isSelected);
 	}
 
@@ -87,7 +85,14 @@ public class ItemTent extends Item {
 				return EnumActionResult.FAIL;
 			} else {
 				// make sure this tent has useable data
-				fixStructureData(worldIn, stack);
+				if(stack.getOrCreateSubCompound(TENT_DATA).hasKey("StructureOffsetX")) {
+					// tent has old information that needs to be transferred over
+					fixOldStructureData(worldIn, stack);
+				} else if(stack.getOrCreateSubCompound(TENT_DATA).hasKey(StructureData.KEY_ID) 
+						&& stack.getOrCreateSubCompound(TENT_DATA).getLong(StructureData.KEY_ID) == ERROR_TAG){
+					// tent has invalid ID and needs to be assigned
+					makeNewStructureData(worldIn, stack);
+				}
 				// offset the BlockPos to build on if it's not replaceable
 				if (!StructureBase.REPLACE_BLOCK_PRED.test(worldIn.getBlockState(hitPos))) {
 					hitPos = hitPos.up(1);
@@ -182,12 +187,8 @@ public class ItemTent extends Item {
 	 * for this tent in the Tent dimension and updates the ItemStack NBT with the
 	 * X/Z coordinate information.
 	 **/
-	public static void fixStructureData(final World world, final ItemStack stack) {
+	public static void makeNewStructureData(final World world, final ItemStack stack) {
 		if (!world.isRemote) {
-			// make sure tag exists
-			if(!stack.hasTagCompound()) {
-				stack.setTagCompound(new NBTTagCompound());
-			}
 			// check if data is missing or set incorrectly
 			StructureData data = new StructureData(stack);
 			if(data.getID() == ERROR_TAG) {
@@ -200,8 +201,32 @@ public class ItemTent extends Item {
 	
 	/** Calculates and returns the next available X location for a tent **/
 	public static long getNextID(World world) {
-		final TentSaveData data = TentSaveData.forWorld(world);
-		return data.getNextID();
+		return world.isRemote ? -1 : TentSaveData.forWorld(world).getNextID();
+	}
+	
+	public static void fixOldStructureData(final World world, final ItemStack stack) {
+		if(!world.isRemote) {
+			// Make a new NBTTagCompound using old keys to get values from old NBT
+			final NBTTagCompound oldTag = stack.getTagCompound().getCompoundTag(TENT_DATA);
+			final NBTTagCompound dataTag = new NBTTagCompound();
+			dataTag.setByte(StructureData.KEY_TENT_CUR, (byte)oldTag.getShort("StructureTentType"));
+			dataTag.setByte(StructureData.KEY_WIDTH_CUR, (byte)oldTag.getShort("StructureWidthCurrent"));
+			dataTag.setByte(StructureData.KEY_WIDTH_PREV, (byte)oldTag.getShort("StructureWidthPrevious"));
+			dataTag.setByte(StructureData.KEY_DEPTH_CUR, (byte)oldTag.getShort("StructureDepthCurrent"));
+			dataTag.setByte(StructureData.KEY_DEPTH_PREV, (byte)oldTag.getShort("StructureDepthPrevious"));
+			final int offsetX = oldTag.getInteger("StructureOffsetX");
+			final int offsetZ = oldTag.getInteger("StructureOffsetZ");
+			final long ID = TileEntityTentDoor.getTentID(new BlockPos(
+					offsetX * TentDimension.TENT_SPACING, TentDimension.FLOOR_Y, offsetZ * TentDimension.TENT_SPACING));
+			dataTag.setLong(StructureData.KEY_ID, ID);
+			// make sure this ID isn't going to be used by updating WorldSaveData
+			final TentSaveData worldData = TentSaveData.forWorld(world);
+			while(worldData.getCurrentID() < ID) {
+				worldData.getNextID();
+			}
+			// write the tag to the ItemStack
+			stack.getTagCompound().setTag(TENT_DATA, dataTag);
+		}
 	}
 
 }
