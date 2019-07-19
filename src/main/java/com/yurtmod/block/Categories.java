@@ -26,6 +26,9 @@ public final class Categories  {
 	public static interface IBedouinBlock extends ITentBlockBase {}
 	/** Blocks with this interface are formally used in Indlu Structures **/
 	public static interface IIndluBlock extends ITentBlockBase {}
+	/** Blocks with this interface are formally used in Shamiana Structures **/
+	public static interface IShamianaBlock extends ITentBlockBase {}
 	/** Blocks with this interface are formally used as tent frame blocks **/
 	public static interface IFrameBlock extends ITentBlockBase {}
+	
 }

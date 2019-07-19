@@ -59,6 +59,20 @@ public enum StructureTent implements IStringSerializable {
 				? Content.INDLU_WALL_INNER.getDefaultState() 
 				: Content.INDLU_WALL_OUTER.getDefaultState(); 
 		}
+	},
+	// TODO correct values below
+	SHAMIANA(new StructureIndlu()) {
+	////////// SHAMIANA IMPLEMENTATIONS OF ABSTRACT METHODS //////////
+	public boolean isEnabled() { return TentConfig.TENTS.ALLOW_INDLU; }
+	public int getMaxSize() { return TentConfig.TENTS.TIERS_INDLU; }
+	public Class<? extends ITentBlockBase> getInterface() {	return IIndluBlock.class; }
+	public IBlockState getRoofBlock(int dimID) { return Content.INDLU_WALL_OUTER.getDefaultState(); }
+	public IBlockState getFrameBlock(boolean isRoof) { return Content.FRAME_INDLU_WALL.getDefaultState(); }
+	public IBlockState getWallBlock(int dimID) { 
+		return TentDimension.isTentDimension(dimID) 
+			? Content.INDLU_WALL_INNER.getDefaultState() 
+			: Content.INDLU_WALL_OUTER.getDefaultState(); 
+		}
 	};
 	
 	private final StructureBase structure;

@@ -33,7 +33,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class BlockTentDoor extends BlockUnbreakable
-		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, IBedouinBlock, IIndluBlock {
+		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, 
+		IBedouinBlock, IIndluBlock, IShamianaBlock {
 	
 	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis",
 			EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);

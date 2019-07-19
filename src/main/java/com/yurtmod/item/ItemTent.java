@@ -85,11 +85,10 @@ public class ItemTent extends Item {
 				return EnumActionResult.FAIL;
 			} else {
 				// make sure this tent has useable data
-				if(stack.getOrCreateSubCompound(TENT_DATA).hasKey("StructureOffsetX")) {
+				if(shouldFixStructureData(stack)) {
 					// tent has old information that needs to be transferred over
 					fixOldStructureData(worldIn, stack);
-				} else if(stack.getOrCreateSubCompound(TENT_DATA).hasKey(StructureData.KEY_ID) 
-						&& stack.getOrCreateSubCompound(TENT_DATA).getLong(StructureData.KEY_ID) == ERROR_TAG){
+				} else if(shouldMakeNewStructureData(stack)){
 					// tent has invalid ID and needs to be assigned
 					makeNewStructureData(worldIn, stack);
 				}
@@ -181,6 +180,11 @@ public class ItemTent extends Item {
 		}
 	}
 	
+	public static boolean shouldMakeNewStructureData(final ItemStack stack) {
+		return stack.getOrCreateSubCompound(TENT_DATA).hasKey(StructureData.KEY_ID) 
+				&& stack.getOrCreateSubCompound(TENT_DATA).getLong(StructureData.KEY_ID) == ERROR_TAG;
+	}
+	
 	/**
 	 * Checks the given ItemStack for NBT data to make sure this tent links to
 	 * a real location. If data is missing or incorrect, this method allots a space
@@ -202,6 +206,10 @@ public class ItemTent extends Item {
 	/** Calculates and returns the next available X location for a tent **/
 	public static long getNextID(World world) {
 		return world.isRemote ? -1 : TentSaveData.forWorld(world).getNextID();
+	}
+	
+	public static boolean shouldFixStructureData(final ItemStack stack) {
+		return stack.getOrCreateSubCompound(TENT_DATA).hasKey("StructureOffsetX");
 	}
 	
 	public static void fixOldStructureData(final World world, final ItemStack stack) {
