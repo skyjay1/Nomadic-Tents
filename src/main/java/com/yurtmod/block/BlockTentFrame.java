@@ -114,17 +114,17 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { PROGRESS });
+		return new BlockStateContainer(this, PROGRESS);
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(this.PROGRESS, Math.min(meta, MAX_META));
+		return getDefaultState().withProperty(PROGRESS, Math.min(meta, MAX_META));
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(this.PROGRESS).intValue();
+		return state.getValue(PROGRESS).intValue();
 	}
 
 	@Override
@@ -185,46 +185,49 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		BEDOUIN_WALL() { public IBlockState getBlock() { return Content.BEDOUIN_WALL.getDefaultState(); } },
 		BEDOUIN_ROOF() { public IBlockState getBlock() { return Content.BEDOUIN_ROOF.getDefaultState(); } }, 
 		INDLU_WALL() { public IBlockState getBlock() { return Content.INDLU_WALL_OUTER.getDefaultState(); } },
-		SHAMIANA_WALL_BLACK() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BLACK.getDefaultState(); } },
-		SHAMIANA_WALL_BLUE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BLUE.getDefaultState(); } },
-		SHAMIANA_WALL_BROWN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BROWN.getDefaultState(); } },
-		SHAMIANA_WALL_CYAN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_CYAN.getDefaultState(); } },
-		SHAMIANA_WALL_GRAY() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_GRAY.getDefaultState(); } },
-		SHAMIANA_WALL_GREEN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_GREEN.getDefaultState(); } },
-		SHAMIANA_WALL_LIGHT_BLUE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_LIGHT_BLUE.getDefaultState(); } },
-		SHAMIANA_WALL_LIME() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_LIME.getDefaultState(); } },
-		SHAMIANA_WALL_MAGENTA() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_MAGENTA.getDefaultState(); } },
-		SHAMIANA_WALL_ORANGE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_ORANGE.getDefaultState(); } },
-		SHAMIANA_WALL_PINK() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_PINK.getDefaultState(); } },
-		SHAMIANA_WALL_PURPLE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_PURPLE.getDefaultState(); } },
-		SHAMIANA_WALL_RED() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_RED.getDefaultState(); } },
-		SHAMIANA_WALL_SILVER() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_SILVER.getDefaultState(); } },
-		SHAMIANA_WALL_WHITE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } },
-		SHAMIANA_WALL_YELLOW() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_YELLOW.getDefaultState(); } };
-
+		SHAMIANA_WALL() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } },
+		SHAMIANA_ROOF() { public IBlockState getBlock() { return Content.SHAMIANA_ROOF.getDefaultState(); } };
+		
 		public abstract IBlockState getBlock();
 		
-		public static BlockToBecome getShamianaBlockEnum(final EnumDyeColor color) {
-			switch(color) {
-			case BLACK:		return SHAMIANA_WALL_BLACK;
-			case BLUE:		return SHAMIANA_WALL_BLUE;
-			case BROWN:		return SHAMIANA_WALL_BROWN;
-			case CYAN:		return SHAMIANA_WALL_CYAN;
-			case GRAY:		return SHAMIANA_WALL_GRAY;
-			case GREEN:		return SHAMIANA_WALL_GREEN;
-			case LIGHT_BLUE:return SHAMIANA_WALL_LIGHT_BLUE;
-			case LIME:		return SHAMIANA_WALL_LIME;
-			case MAGENTA:	return SHAMIANA_WALL_MAGENTA;
-			case ORANGE:	return SHAMIANA_WALL_ORANGE;
-			case PINK:		return SHAMIANA_WALL_PINK;
-			case PURPLE:	return SHAMIANA_WALL_PURPLE;
-			case RED:		return SHAMIANA_WALL_RED;
-			case SILVER:	return SHAMIANA_WALL_SILVER;
-			case WHITE:		return SHAMIANA_WALL_WHITE;
-			case YELLOW:	return SHAMIANA_WALL_YELLOW;
-			
-			default:		return SHAMIANA_WALL_WHITE;	
-			}
-		}
+//		SHAMIANA_WALL_BLACK() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BLACK.getDefaultState(); } },
+//		SHAMIANA_WALL_BLUE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BLUE.getDefaultState(); } },
+//		SHAMIANA_WALL_BROWN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BROWN.getDefaultState(); } },
+//		SHAMIANA_WALL_CYAN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_CYAN.getDefaultState(); } },
+//		SHAMIANA_WALL_GRAY() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_GRAY.getDefaultState(); } },
+//		SHAMIANA_WALL_GREEN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_GREEN.getDefaultState(); } },
+//		SHAMIANA_WALL_LIGHT_BLUE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_LIGHT_BLUE.getDefaultState(); } },
+//		SHAMIANA_WALL_LIME() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_LIME.getDefaultState(); } },
+//		SHAMIANA_WALL_MAGENTA() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_MAGENTA.getDefaultState(); } },
+//		SHAMIANA_WALL_ORANGE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_ORANGE.getDefaultState(); } },
+//		SHAMIANA_WALL_PINK() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_PINK.getDefaultState(); } },
+//		SHAMIANA_WALL_PURPLE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_PURPLE.getDefaultState(); } },
+//		SHAMIANA_WALL_RED() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_RED.getDefaultState(); } },
+//		SHAMIANA_WALL_SILVER() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_SILVER.getDefaultState(); } },
+//		SHAMIANA_WALL_WHITE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } },
+//		SHAMIANA_WALL_YELLOW() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_YELLOW.getDefaultState(); } };
+//		
+//		public static BlockToBecome getShamianaBlockEnum(final EnumDyeColor color) {
+//			switch(color) {
+//			case BLACK:		return SHAMIANA_WALL_BLACK;
+//			case BLUE:		return SHAMIANA_WALL_BLUE;
+//			case BROWN:		return SHAMIANA_WALL_BROWN;
+//			case CYAN:		return SHAMIANA_WALL_CYAN;
+//			case GRAY:		return SHAMIANA_WALL_GRAY;
+//			case GREEN:		return SHAMIANA_WALL_GREEN;
+//			case LIGHT_BLUE:return SHAMIANA_WALL_LIGHT_BLUE;
+//			case LIME:		return SHAMIANA_WALL_LIME;
+//			case MAGENTA:	return SHAMIANA_WALL_MAGENTA;
+//			case ORANGE:	return SHAMIANA_WALL_ORANGE;
+//			case PINK:		return SHAMIANA_WALL_PINK;
+//			case PURPLE:	return SHAMIANA_WALL_PURPLE;
+//			case RED:		return SHAMIANA_WALL_RED;
+//			case SILVER:	return SHAMIANA_WALL_SILVER;
+//			case WHITE:		return SHAMIANA_WALL_WHITE;
+//			case YELLOW:	return SHAMIANA_WALL_YELLOW;
+//			
+//			default:		return SHAMIANA_WALL_WHITE;	
+//			}
+//		}
 	}
 }

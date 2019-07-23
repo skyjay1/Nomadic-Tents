@@ -1,9 +1,6 @@
 package com.yurtmod.block;
 
-import com.yurtmod.block.Categories.IBedouinBlock;
-import com.yurtmod.block.Categories.IIndluBlock;
-import com.yurtmod.block.Categories.ITepeeBlock;
-import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.block.Categories.*;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
@@ -20,7 +17,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockBarrier extends BlockUnbreakable implements IYurtBlock, ITepeeBlock, IBedouinBlock, IIndluBlock {
+public class BlockBarrier extends BlockUnbreakable implements 
+		IYurtBlock, ITepeeBlock, IBedouinBlock, IIndluBlock, IShamianaBlock {
 
 	public BlockBarrier() {
 		super(Material.BARRIER);

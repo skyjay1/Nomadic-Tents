@@ -58,7 +58,7 @@ public class BlockLayered extends BlockUnbreakable {
 		return state.getValue(ABOVE_SIMILAR).booleanValue() ? 1 : 0;
 	}
 
-	private void updateState(World worldIn, BlockPos myPos, IBlockState state) {
+	protected void updateState(World worldIn, BlockPos myPos, IBlockState state) {
 		boolean above = worldIn.getBlockState(myPos.down(1)).getBlock() == this
 				&& worldIn.getBlockState(myPos.down(2)).getBlock() != this;
 		IBlockState toSet = this.getDefaultState().withProperty(ABOVE_SIMILAR, above);

@@ -97,7 +97,7 @@ public class Content {
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":shamiana_red")
 	public static Block SHAMIANA_WALL_RED;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":shamiana_silver")
-	public static Block SHAMIANA_WALL_SILVER;
+	public static Block SHAMIANA_WALL_LIGHT_GRAY;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":shamiana_white")
 	public static Block SHAMIANA_WALL_WHITE;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":shamiana_yellow")
@@ -140,38 +140,10 @@ public class Content {
 	public static Block FRAME_INDLU_WALL;
 	
 	//// SHAMIANA FRAME BLOCKS ////
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_black")
-	public static Block FRAME_SHAMIANA_WALL_BLACK;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_blue")
-	public static Block FRAME_SHAMIANA_WALL_BLUE;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_brown")
-	public static Block FRAME_SHAMIANA_WALL_BROWN;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_cyan")
-	public static Block FRAME_SHAMIANA_WALL_CYAN;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_gray")
-	public static Block FRAME_SHAMIANA_WALL_GRAY;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_green")
-	public static Block FRAME_SHAMIANA_WALL_GREEN;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_light_blue")
-	public static Block FRAME_SHAMIANA_WALL_LIGHT_BLUE;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_lime")
-	public static Block FRAME_SHAMIANA_WALL_LIME;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_magenta")
-	public static Block FRAME_SHAMIANA_WALL_MAGENTA;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_orange")
-	public static Block FRAME_SHAMIANA_WALL_ORANGE;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_pink")
-	public static Block FRAME_SHAMIANA_WALL_PINK;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_purple")
-	public static Block FRAME_SHAMIANA_WALL_PURPLE;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_red")
-	public static Block FRAME_SHAMIANA_WALL_RED;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_silver")
-	public static Block FRAME_SHAMIANA_WALL_SILVER;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_white")
-	public static Block FRAME_SHAMIANA_WALL_WHITE;
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_yellow")
-	public static Block FRAME_SHAMIANA_WALL_YELLOW;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_wall")
+	public static Block FRAME_SHAMIANA_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":frame_shamiana_roof")
+	public static Block FRAME_SHAMIANA_ROOF;
 	
 	//// COSMETIC (breakable + craftable) BLOCKS ////
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":cos_yurt_roof")
@@ -236,6 +208,8 @@ public class Content {
 	public static Item ITEM_BEDOUIN_WALL;
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":indlu_wall_piece")
 	public static Item ITEM_INDLU_WALL;
+	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":shamiana_wall_piece")
+	public static Item ITEM_SHAMIANA_WALL;
 	
 	//// UPGRADES ////
 	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":tent_upgrade_gold")

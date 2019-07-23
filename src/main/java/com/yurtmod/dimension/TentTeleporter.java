@@ -7,6 +7,7 @@ import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
@@ -16,6 +17,7 @@ import net.minecraftforge.common.MinecraftForge;
 public class TentTeleporter extends Teleporter {
 	private final StructureData tentData;
 	private final BlockPos tentDoorPos;
+	private final EnumDyeColor color;
 	private final double prevX;
 	private final double prevY;
 	private final double prevZ;
@@ -23,12 +25,13 @@ public class TentTeleporter extends Teleporter {
 	private final int prevDimID;
 	private final WorldServer worldServerTo;
 
-	public TentTeleporter(final int dimensionFrom, final WorldServer worldTo, final BlockPos doorPos, 
+	public TentTeleporter(final int dimensionFrom, final WorldServer worldTo, final BlockPos doorPos, final EnumDyeColor colorIn,
 			final double oldX, final double oldY, final double oldZ, final float oldYaw, final StructureData data) {
 		super(worldTo);
 		this.prevDimID = dimensionFrom;
 		this.worldServerTo = worldTo;
 		this.tentDoorPos = doorPos;
+		this.color = colorIn;
 		this.prevX = oldX;
 		this.prevY = oldY;
 		this.prevZ = oldZ;
@@ -37,8 +40,8 @@ public class TentTeleporter extends Teleporter {
 	}
 	
 	public TentTeleporter(final int worldFrom, final WorldServer worldTo, final TileEntityTentDoor te) {
-		this(worldFrom, worldTo, te.getDoorPos(), te.getPrevX(), te.getPrevY(), te.getPrevZ(),
-				te.getPrevFacing(), te.getTentData());
+		this(worldFrom, worldTo, te.getDoorPos(), te.getTentData().getColor(), 
+				te.getPrevX(), te.getPrevY(), te.getPrevZ(), te.getPrevFacing(), te.getTentData());
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public class TentTeleporter extends Teleporter {
 			entityX += entity.width;
 			// try to build a tent in that location (tent should check if it already exists)
 			result = this.tentData.getStructure().generateInTentDimension(prevDimID, worldServerTo, 
-					tentDoorPos, prevX, prevY, prevZ, prevYaw);
+					tentDoorPos, prevX, prevY, prevZ, prevYaw, color);
 			// also synchronize the time between Tent and Overworld dimensions
 			worldServerTo.getWorldInfo().setWorldTime(entity.getServer().getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION).getWorldTime());
 		}
@@ -73,6 +76,9 @@ public class TentTeleporter extends Teleporter {
 			final TentEvent.PostEnter event = new TentEvent.PostEnter((TileEntityTentDoor)worldServerTo.getTileEntity(tentDoorPos), entity, result);
 			MinecraftForge.EVENT_BUS.post(event);
 		}
+		
+		// DEBUG
+		// System.out.println(this.toString());
 	}
 
 	@Override

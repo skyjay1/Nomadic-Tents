@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+   "textures": {
+		"north": "yurtmod:blocks/shamiana_magenta_pattern",
+		"south": "yurtmod:blocks/shamiana_magenta_pattern",
+		"east": "yurtmod:blocks/shamiana_magenta_pattern",
+		"west": "yurtmod:blocks/shamiana_magenta_pattern",
+		"up": "yurtmod:blocks/shamiana_magenta",
+		"down": "yurtmod:blocks/shamiana_magenta",
+		"particle": "yurtmod:blocks/shamiana_magenta"
+    }
+}

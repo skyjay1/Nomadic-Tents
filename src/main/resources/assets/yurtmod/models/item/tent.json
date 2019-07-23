@@ -27,7 +27,13 @@
 		{ "predicate": { "yurtmod:tent": 20 }, "model": "yurtmod:item/indlu_large" },
 		{ "predicate": { "yurtmod:tent": 21 }, "model": "yurtmod:item/indlu_huge" },
 		{ "predicate": { "yurtmod:tent": 22 }, "model": "yurtmod:item/indlu_giant" },
-		{ "predicate": { "yurtmod:tent": 23 }, "model": "yurtmod:item/indlu_mega" }
+		{ "predicate": { "yurtmod:tent": 23 }, "model": "yurtmod:item/indlu_mega" },
+		{ "predicate": { "yurtmod:tent": 24 }, "model": "yurtmod:item/shamiana_small" },
+		{ "predicate": { "yurtmod:tent": 25 }, "model": "yurtmod:item/shamiana_medium" },
+		{ "predicate": { "yurtmod:tent": 26 }, "model": "yurtmod:item/shamiana_large" },
+		{ "predicate": { "yurtmod:tent": 27 }, "model": "yurtmod:item/shamiana_huge" },
+		{ "predicate": { "yurtmod:tent": 28 }, "model": "yurtmod:item/shamiana_giant" },
+		{ "predicate": { "yurtmod:tent": 29 }, "model": "yurtmod:item/shamiana_mega" }
 		
 	]
 }

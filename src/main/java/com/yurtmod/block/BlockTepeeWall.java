@@ -21,6 +21,42 @@ import net.minecraft.world.World;
 
 public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	
+	/** Indestructible versions of tepee pattern blocks 
+	 * @see #getStateForRandomPattern(Random, boolean) 
+	 **/
+	private static final Block[] PATTERNS_INDEST = new Block[] {
+			Content.TEPEE_WALL_BLACK, Content.TEPEE_WALL_ORANGE, Content.TEPEE_WALL_RED,
+			Content.TEPEE_WALL_WHITE, Content.TEPEE_WALL_YELLOW
+		};
+	/** Cosmetic versions of tepee pattern blocks 
+	 * @see #getStateForRandomPattern(Random, boolean) 
+	 **/
+	private static final Block[] PATTERNS_COSM = new Block[] {
+			Content.COS_TEPEE_WALL_BLACK, Content.COS_TEPEE_WALL_ORANGE, Content.COS_TEPEE_WALL_RED,
+			Content.COS_TEPEE_WALL_WHITE, Content.COS_TEPEE_WALL_YELLOW
+		};
+	
+	/** Indestructible versions of tepee designs 
+	 * @see #getStateForRandomDesign(Random, boolean)
+	 **/
+	private static final Block[] TEXTURES_INDEST = new Block[] {
+			Content.TEPEE_WALL_CREEPER, Content.TEPEE_WALL_DREAMCATCHER,
+			Content.TEPEE_WALL_EAGLE, Content.TEPEE_WALL_HOPE,
+			Content.TEPEE_WALL_MAGIC, Content.TEPEE_WALL_RAIN,
+			Content.TEPEE_WALL_SUN, Content.TEPEE_WALL_TRIFORCE,
+			Content.TEPEE_WALL_UNIVERSE
+		};
+	/** Cosmetic versions of tepee designs 
+	 * @see #getStateForRandomDesign(Random, boolean)
+	 **/
+	private static final Block[] TEXTURES_COSM = new Block[] {
+			Content.COS_TEPEE_WALL_CREEPER, Content.COS_TEPEE_WALL_DREAMCATCHER,
+			Content.COS_TEPEE_WALL_EAGLE, Content.COS_TEPEE_WALL_HOPE,
+			Content.COS_TEPEE_WALL_MAGIC, Content.COS_TEPEE_WALL_RAIN,
+			Content.COS_TEPEE_WALL_SUN, Content.COS_TEPEE_WALL_TRIFORCE,
+			Content.COS_TEPEE_WALL_UNIVERSE
+		};
+	
 	public BlockTepeeWall(final String name) {
 		super(Material.CLOTH, MapColor.SAND);
 		this.setCreativeTab(NomadicTents.TAB);
@@ -64,14 +100,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 
 	/** @return an IBlockState with a random pattern on it **/
 	public static IBlockState getStateForRandomPattern(final Random rand, final boolean indestructible) {
-		final Block[] PATTERNS_INDEST = new Block[] {
-				Content.TEPEE_WALL_BLACK, Content.TEPEE_WALL_ORANGE, Content.TEPEE_WALL_RED,
-				Content.TEPEE_WALL_WHITE, Content.TEPEE_WALL_YELLOW
-			};
-		final Block[] PATTERNS_COSM = new Block[] {
-				Content.COS_TEPEE_WALL_BLACK, Content.COS_TEPEE_WALL_ORANGE, Content.COS_TEPEE_WALL_RED,
-				Content.COS_TEPEE_WALL_WHITE, Content.COS_TEPEE_WALL_YELLOW
-			};
+		
 		final int index = rand.nextInt(PATTERNS_INDEST.length);		
 		return indestructible ? PATTERNS_INDEST[index].getDefaultState() : PATTERNS_COSM[index].getDefaultState();
 	}
@@ -87,20 +116,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 
 	/** @return an IBlockState with a randomly decorated tepee block **/
 	public static IBlockState getStateForRandomDesign(final Random rand, final boolean indestructible) {
-		final Block[] TEXTURES_INDEST = new Block[] {
-				Content.TEPEE_WALL_CREEPER, Content.TEPEE_WALL_DREAMCATCHER,
-				Content.TEPEE_WALL_EAGLE, Content.TEPEE_WALL_HOPE,
-				Content.TEPEE_WALL_MAGIC, Content.TEPEE_WALL_RAIN,
-				Content.TEPEE_WALL_SUN, Content.TEPEE_WALL_TRIFORCE,
-				Content.TEPEE_WALL_UNIVERSE
-			};
-		final Block[] TEXTURES_COSM = new Block[] {
-				Content.COS_TEPEE_WALL_CREEPER, Content.COS_TEPEE_WALL_DREAMCATCHER,
-				Content.COS_TEPEE_WALL_EAGLE, Content.COS_TEPEE_WALL_HOPE,
-				Content.COS_TEPEE_WALL_MAGIC, Content.COS_TEPEE_WALL_RAIN,
-				Content.COS_TEPEE_WALL_SUN, Content.COS_TEPEE_WALL_TRIFORCE,
-				Content.COS_TEPEE_WALL_UNIVERSE
-			};
+		
 		final int index = rand.nextInt(TEXTURES_INDEST.length);
 		return indestructible ? TEXTURES_INDEST[index].getDefaultState() : TEXTURES_COSM[index].getDefaultState();
 	}

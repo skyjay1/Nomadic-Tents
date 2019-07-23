@@ -1,0 +1,22 @@
+{
+  "type": "yurtmod:tent_upgrade_color",
+  "result_color": "purple",
+  "pattern": [
+   "DDD",
+   "DTD",
+   "DDD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dye",
+		"data": 5
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "yurtmod:tent_upgrade_color",
+  "result_color": "white",
+  "pattern": [
+   " D ",
+   "DTD",
+   " D "],
+  "key": {
+    "D": {
+        "item": "minecraft:water_bucket",
+		"data": 0
+      },
+	"T": {
+        "item": "yurtmod:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

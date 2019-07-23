@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+   "textures": {
+		"north": "yurtmod:blocks/shamiana_lime_pattern",
+		"south": "yurtmod:blocks/shamiana_lime_pattern",
+		"east": "yurtmod:blocks/shamiana_lime_pattern",
+		"west": "yurtmod:blocks/shamiana_lime_pattern",
+		"up": "yurtmod:blocks/shamiana_lime",
+		"down": "yurtmod:blocks/shamiana_lime",
+		"particle": "yurtmod:blocks/shamiana_lime"
+    }
+}

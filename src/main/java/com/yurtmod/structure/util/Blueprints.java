@@ -18,6 +18,7 @@ public final class Blueprints {
 			put(StructureTent.TEPEE, width, StructureTepee.makeBlueprints(width));
 			put(StructureTent.BEDOUIN, width, StructureBedouin.makeBlueprints(width));
 			put(StructureTent.INDLU, width, StructureIndlu.makeBlueprints(width));
+			put(StructureTent.SHAMIANA, width, StructureShamiana.makeBlueprints(width));
 		}
 	}
 	
@@ -70,12 +71,5 @@ public final class Blueprints {
 			}
 			return false;
 		}
-		
-//		@Override
-//		public int hashCode() {
-//			final int tentId = this.tent != null ? (int) this.tent.getId() : 0;
-//			final int widthId = this.width != null ? (int) this.width.getId() : 0;
-//			return 37 + (tentId + widthId * 31);
-//		}
 	}
 }

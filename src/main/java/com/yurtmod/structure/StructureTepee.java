@@ -71,24 +71,31 @@ public class StructureTepee extends StructureBase {
 	@Override
 	public void buildLayer(World worldIn, BlockPos doorPos, EnumFacing dirForward, IBlockState state,
 			BlockPos[] coordinates) {
-		for (BlockPos coord : coordinates) {
-			BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
-			// if it's a tepee block, calculate what kind of design it should have
-			if (state.getBlock() instanceof BlockTepeeWall) {
-				IBlockState tepeeState;
-				if (pos.getY() % 2 == 0) {
-					// psuedo-random seed ensures that all blocks that are same y-dis from door get
-					// the same seed
-					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.data.getWidth().getId() * 321);
-					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
+		boolean isTepeeWall = state.getBlock() instanceof BlockTepeeWall;
+		if(isTepeeWall) {
+			// custom block-placement math for each position
+			for (BlockPos coord : coordinates) {
+				BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
+				// if it's a tepee block, calculate what kind of design it should have
+				if (isTepeeWall) {
+					IBlockState tepeeState;
+					if (pos.getY() % 2 == 0) {
+						// psuedo-random seed ensures that all blocks that are same y-dis from door get
+						// the same seed
+						int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.data.getWidth().getId() * 321);
+						tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
+					} else {
+						tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
+					}
+					worldIn.setBlockState(pos, tepeeState, 3);
 				} else {
-					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
+					worldIn.setBlockState(pos, state, 3);
 				}
-				worldIn.setBlockState(pos, tepeeState, 3);
-			} else {
-				worldIn.setBlockState(pos, state, 3);
 			}
-		}
+		} else {
+			// if it's not a tepee block, default to super method
+			super.buildLayer(worldIn, doorPos, dirForward, state, coordinates);
+		}	
 	}
 	
 	public static Blueprint makeBlueprints(final StructureWidth size) {

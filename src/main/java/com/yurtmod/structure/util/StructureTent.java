@@ -1,11 +1,7 @@
 package com.yurtmod.structure.util;
 
 import com.yurtmod.block.BlockYurtRoof;
-import com.yurtmod.block.Categories.IBedouinBlock;
-import com.yurtmod.block.Categories.IIndluBlock;
-import com.yurtmod.block.Categories.ITentBlockBase;
-import com.yurtmod.block.Categories.ITepeeBlock;
-import com.yurtmod.block.Categories.IYurtBlock;
+import com.yurtmod.block.Categories.*;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.TentConfig;
@@ -60,18 +56,16 @@ public enum StructureTent implements IStringSerializable {
 				: Content.INDLU_WALL_OUTER.getDefaultState(); 
 		}
 	},
-	// TODO correct values below
-	SHAMIANA(new StructureIndlu()) {
-	////////// SHAMIANA IMPLEMENTATIONS OF ABSTRACT METHODS //////////
-	public boolean isEnabled() { return TentConfig.TENTS.ALLOW_INDLU; }
-	public int getMaxSize() { return TentConfig.TENTS.TIERS_INDLU; }
-	public Class<? extends ITentBlockBase> getInterface() {	return IIndluBlock.class; }
-	public IBlockState getRoofBlock(int dimID) { return Content.INDLU_WALL_OUTER.getDefaultState(); }
-	public IBlockState getFrameBlock(boolean isRoof) { return Content.FRAME_INDLU_WALL.getDefaultState(); }
-	public IBlockState getWallBlock(int dimID) { 
-		return TentDimension.isTentDimension(dimID) 
-			? Content.INDLU_WALL_INNER.getDefaultState() 
-			: Content.INDLU_WALL_OUTER.getDefaultState(); 
+	SHAMIANA(new StructureShamiana()) {
+		////////// SHAMIANA IMPLEMENTATIONS OF ABSTRACT METHODS //////////
+		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_SHAMIANA; }
+		public int getMaxSize() { return TentConfig.TENTS.TIERS_SHAMIANA; }
+		public Class<? extends ITentBlockBase> getInterface() {	return IShamianaBlock.class; }
+		public IBlockState getRoofBlock(int dimID) { return Content.SHAMIANA_ROOF.getDefaultState(); }
+		public IBlockState getWallBlock(int dimID) { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); }
+		public IBlockState getFrameBlock(boolean isRoof) { 
+			return isRoof ? Content.FRAME_SHAMIANA_ROOF.getDefaultState() 
+					: Content.FRAME_SHAMIANA_WALL.getDefaultState(); 
 		}
 	};
 	

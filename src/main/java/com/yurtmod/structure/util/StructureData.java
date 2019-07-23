@@ -2,6 +2,8 @@ package com.yurtmod.structure.util;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.TileEntityTentDoor;
@@ -13,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -25,6 +28,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	public static final String KEY_DEPTH_PREV = "DepthPrev";
 	public static final String KEY_DEPTH_CUR = "DepthCur";
 	public static final String KEY_ID = "ID";	
+	// this one is only really used for Shamiana tent
+	public static final String KEY_COLOR = "TentColor";
 	
 	////// Important fields with their default values //////
 	private StructureTent tent = StructureTent.getById((byte)0);
@@ -32,6 +37,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	private StructureDepth depth = StructureDepth.getById((byte)0);
 	private StructureWidth prevWidth = StructureWidth.getById((byte)0);
 	private StructureDepth prevDepth = StructureDepth.getById((byte)0);
+	private EnumDyeColor color = null;
 	private long locationID = ItemTent.ERROR_TAG;
 	
 	public StructureData() {
@@ -80,7 +86,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return new StructureData()
 				.setCurrent(tent, prevWidth, prevDepth)
 				.setPrev(prevWidth, prevDepth)
-				.setID(locationID);
+				.setID(locationID)
+				.setColor(color);
 	}
 	
 	/** @return an exact copy of this StructureData that is NOT the original **/
@@ -88,7 +95,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return new StructureData()
 				.setCurrent(tent, width, depth)
 				.setPrev(prevWidth, prevDepth)
-				.setID(locationID);
+				.setID(locationID)
+				.setColor(color);
 	}
 	
 	/** @return true if this object has valid X and Z coordinates **/
@@ -168,6 +176,18 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return this;
 	}
 	
+	/** Set the color of this tent. May be null **/
+	public StructureData setColor(@Nullable final EnumDyeColor colorIn) {
+		this.color = colorIn;
+		return this;
+	}
+	
+	/** @return the color data stored by this door, if any **/
+	@Nullable
+	public EnumDyeColor getColor() {
+		return this.color;
+	}
+	
 	//////////////////////////////////
 	//////// STRUCTURE BLOCKS ////////
 	//////////////////////////////////
@@ -187,6 +207,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		case TEPEE:		return isXL ? Content.TEPEE_DOOR_HGM : Content.TEPEE_DOOR_SML;
 		case BEDOUIN:	return isXL ? Content.BEDOUIN_DOOR_HGM : Content.BEDOUIN_DOOR_SML;
 		case INDLU:		return isXL ? Content.INDLU_DOOR_HGM : Content.INDLU_DOOR_SML;
+		case SHAMIANA:	return isXL ? Content.SHAMIANA_DOOR_HGM : Content.SHAMIANA_DOOR_SML;
 		}
 		return Content.YURT_DOOR_SML;
 	}
@@ -232,6 +253,10 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	
 	public boolean needsUpdateWidth() {
 		return width != prevWidth;
+	}
+	
+	public boolean needsUpdateColor(final EnumDyeColor oldColor) {
+		return color != oldColor;
 	}
 	
 	/** Uses internal fields and Player location to update the given TileEntityTentDoor, including Owner if enabled */
@@ -293,6 +318,10 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 			nbt.setByte(KEY_DEPTH_PREV, this.prevDepth.getId());
 			// Location ID
 			nbt.setLong(KEY_ID, locationID);
+			// Color (optional)
+			if(this.color != null) {
+				nbt.setInteger(KEY_COLOR, this.color.getMetadata());
+			}
 		}
 		
 		return nbt;
@@ -306,6 +335,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		this.prevWidth = StructureWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
 		this.prevDepth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
 		this.locationID = nbt.getLong(KEY_ID);
+		this.color = nbt.hasKey(KEY_COLOR) ? EnumDyeColor.byMetadata(nbt.getInteger(KEY_COLOR)) : null;
 	}
 	
 	@Override
@@ -313,6 +343,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return "\nStructureData: [TENT = " + tent.getName() + "; WIDTH = " 
 				+ width.getName() + "; DEPTH = " + depth.getName() + 
 				";\nPREV_WIDTH = " + prevWidth.getName() + "; PREV_DEPTH = " 
-				+ prevDepth.getName() + "; ID = " + locationID + "]";
+				+ prevDepth.getName() + "; ID = " + locationID 
+				+ "; COLOR = " + (color != null ? color.getName() : "null") + "]";
 	}
 }

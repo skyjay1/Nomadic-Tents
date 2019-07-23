@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "above_similar=true": { "model": "yurtmod:shamiana_lime"},
+		"above_similar=false": { "model": "yurtmod:shamiana_lime_pattern"}
+    }
+}

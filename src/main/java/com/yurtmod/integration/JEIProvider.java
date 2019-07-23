@@ -1,5 +1,6 @@
 package com.yurtmod.integration;
 
+import com.yurtmod.crafting.RecipeUpgradeColor;
 import com.yurtmod.crafting.RecipeUpgradeDepth;
 import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.init.Content;
@@ -24,7 +25,8 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 		subtypeRegistry.registerSubtypeInterpreter(Content.ITEM_TENT, i -> {
 			final StructureData data = new StructureData(i);
 			// build a unique name based on StructureTent and StructureWidth
-			return data.getTent().getName().concat("_").concat(data.getWidth().getName()) ;
+			return data.getTent().getName().concat("_").concat(data.getWidth().getName())
+					.concat(data.getColor() != null ? "_".concat(data.getColor().getName()) : "") ;
 //					.concat("_").concat(String.valueOf(data.getDepth()));
 		});
 	}
@@ -35,10 +37,8 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	@Override
 	public void register(final IModRegistry registry) {
 		registry.handleRecipes(RecipeUpgradeWidth.class, JEIWidthRecipe.Wrapper::new, VanillaRecipeCategoryUid.CRAFTING);
-		//registry.addRecipes(JEITentRecipeChecker.getWidthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
-		
 		registry.handleRecipes(RecipeUpgradeDepth.class, JEIDepthRecipe.Wrapper::new, VanillaRecipeCategoryUid.CRAFTING);
-		//registry.addRecipes(JEITentRecipeChecker.getDepthRecipes(), VanillaRecipeCategoryUid.CRAFTING);
+		registry.handleRecipes(RecipeUpgradeColor.class, JEIColorRecipe.Wrapper::new, VanillaRecipeCategoryUid.CRAFTING);
 		
 		// failed attempts below
 		

@@ -1,0 +1,18 @@
+{
+  "type": "yurtmod:tent_upgrade_width",
+  "tent_type": "shamiana",
+  "input_size": "",
+  "result_size": "small",
+  "pattern": [
+   "YYY",
+   "Y Y"],
+  "key": {
+    "Y": {
+        "item": "yurtmod:shamiana_wall_piece"
+      }
+  },
+  "result": {
+    "item": "yurtmod:tent",
+	 "data": 0
+  }
+}

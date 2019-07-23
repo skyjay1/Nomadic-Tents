@@ -20,6 +20,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -57,7 +58,7 @@ public class ItemTent extends Item {
 			}
         });
 	}
-
+	
 	@Override
 	public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
 		super.onCreated(stack, world, player);
@@ -146,8 +147,10 @@ public class ItemTent extends Item {
 		
 		final StructureDepth depth = StructureDepth.NORMAL;
 		for(StructureTent tent : StructureTent.values()) {
+			final EnumDyeColor color = tent == StructureTent.SHAMIANA ? EnumDyeColor.WHITE : null;
 			for(StructureWidth size : StructureWidth.values()) {
-				items.add(new StructureData().setAll(tent, size, depth).getDropStack());
+				final StructureData data = new StructureData().setAll(tent, size, depth).setColor(color);
+				items.add(data.getDropStack());
 			}
 		}
 	}
@@ -172,6 +175,11 @@ public class ItemTent extends Item {
 		// tooltip for all tents
 		final TextFormatting color = data.getWidth().getTooltipColor();
 		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
+		// tooltip for color (if applicable)
+		if(data.getColor() != null) {
+			String s = I18n.format(data.getColor().getUnlocalizedName());
+			tooltip.add(TextFormatting.WHITE + s.substring(0, 1).toUpperCase() + s.substring(1, s.length()));
+		}
 		// tooltip if depth upgrades applied (or shift held)
 		final int depthCount = StructureDepth.countUpgrades(data);
 		final int maxCount = StructureDepth.maxUpgrades(data);
@@ -236,5 +244,4 @@ public class ItemTent extends Item {
 			stack.getTagCompound().setTag(TENT_DATA, dataTag);
 		}
 	}
-
 }

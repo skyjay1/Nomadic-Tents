@@ -127,6 +127,10 @@ public final class TentConfig {
 		@Config.Comment("Whether the Indlu can be built and used")
 		public boolean ALLOW_INDLU = true;
 		
+		@Config.Name("Enable Shamiana")
+		@Config.Comment("Whether the Shamiana can be built and used")
+		public boolean ALLOW_SHAMIANA = true;
+		
 		@Config.Name("Max Tiers: Yurt")
 		@Config.Comment({"Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
@@ -146,6 +150,11 @@ public final class TentConfig {
 		@Config.Comment({"Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int TIERS_INDLU = StructureWidth.values().length;
+		
+		@Config.Name("Max Tiers: Shamiana")
+		@Config.Comment({"Limit the size upgrades a Shamiana can recieve. 1=SMALL, 6=MEGA", NOTE})
+		@Config.RangeInt(min = 1, max = 6)
+		public int TIERS_SHAMIANA = StructureWidth.values().length;
 		
 		@Config.Name("Max Depth: Small")
 		@Config.Comment({"Limit the depth of a Small Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})

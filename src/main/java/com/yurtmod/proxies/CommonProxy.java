@@ -106,6 +106,10 @@ public class CommonProxy {
 						.setUnlocalizedName("frame_bed_roof"),
 				new BlockTentFrame(BlockToBecome.INDLU_WALL).setRegistryName(NomadicTents.MODID, "frame_indlu_wall")
 						.setUnlocalizedName("frame_indlu_wall"),
+				new BlockTentFrame(BlockToBecome.SHAMIANA_ROOF).setRegistryName(NomadicTents.MODID, "frame_shamiana_roof")
+						.setUnlocalizedName("frame_shamiana_roof"),
+				new BlockTentFrame(BlockToBecome.SHAMIANA_WALL).setRegistryName(NomadicTents.MODID, "frame_shamiana_wall")
+						.setUnlocalizedName("frame_shamiana_wall"),
 				
 				// cosmetic blocks
 				new BlockCosmetic.YurtRoof("cos_yurt_roof"),
@@ -137,14 +141,7 @@ public class CommonProxy {
 		
 		// register shamiana blocks
 		for(final EnumDyeColor color : EnumDyeColor.values()) {
-			final String name = color.getUnlocalizedName().replaceAll("B", "_b");
-			event.getRegistry().registerAll(
-				new BlockShamianaWall(color).setRegistryName(NomadicTents.MODID, "shamiana_" + name)
-					.setUnlocalizedName("shamiana_" + name),
-				new BlockTentFrame(BlockToBecome.getShamianaBlockEnum(color))
-					.setRegistryName(NomadicTents.MODID, "frame_shamiana_" + name)
-					.setUnlocalizedName("frame_shamiana_" + name)
-			);
+			event.getRegistry().register(new BlockShamianaWall(color));
 		}
 	}
 
@@ -200,7 +197,7 @@ public class CommonProxy {
 		
 		// Shamiana ItemBlock
 		for(final EnumDyeColor color : EnumDyeColor.values()) {
-			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaState(color).getBlock()));
+			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color)));
 		}
 	}
 

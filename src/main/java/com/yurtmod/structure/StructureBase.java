@@ -24,6 +24,7 @@ import net.minecraft.block.BlockSnow;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -76,47 +77,72 @@ public abstract class StructureBase {
 	 * @param prevY         the players y-pos before teleporting to the structure
 	 * @param prevZ         the players z-pos before teleporting to the structure
 	 * @param prevFacing	the players rotation yaw before teleporting to the structure
+	 * @param color 
 	 * @return if the structure was built or updated in the tent dimension, or already exists
 	 * @see TentEvent.TentResult
 	 **/
 	public final TentEvent.TentResult generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
-			final double prevX, final double prevY, final double prevZ, final float prevFacing) {
+			final double prevX, final double prevY, final double prevZ, final float prevFacing, final EnumDyeColor color) {
 		TentEvent.TentResult result = TentEvent.TentResult.NONE;
 		// the corner of the square area alloted to this tent
 		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
 		// whether a structure was already built here (for upgrading and door-updating purposes)
 		final boolean structureExists = worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor;
+		// if the tent exists but SIZE needs to be upgraded...
 		final boolean rebuildTent = !structureExists || data.needsUpdateWidth();
-		// if there is no tent at all...
+		// if the tent does not exist OR needs to be upgraded...
+		final boolean buildPlatform = !structureExists || rebuildTent;
+		// if the tent exists but PLATFORM needs to be upgraded...
+		final boolean upgradePlatform = structureExists && data.needsUpdateDepth();
+		// if the tent exists but COLOR needs to be updated...
+		final boolean recolorTent = structureExists && getDoorAt(worldIn, doorPos).getTentData().getColor() != color;
+		
+		// IF THERE IS NO TENT AT ALL...
 		if(!structureExists) {
 			result = TentEvent.TentResult.BUILT_FIRST;
-		}
-		// if the tent exists but has to be changed...
-		if (rebuildTent) {
+		} else if (rebuildTent) {
 			// remove previous structure			
 			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
+			result = TentEvent.TentResult.UPGRADED;			
+		}
+		
+		// IF THE TENT EXISTS BUT NEEDS TO BE RECOLORED...
+		if(recolorTent) {
 			result = TentEvent.TentResult.UPGRADED;
 		}
-		// if the tent does not exist OR needs to be changed...
-		if(!structureExists || rebuildTent) {
-			// make new structure!
+		
+		// if the tent does not exist OR needs to be upgraded/re-colored...
+		if(!structureExists || rebuildTent || recolorTent) {
+			// make a new structure!
 			this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.data.getWidth(),
 					this.data.getDoorBlock(), this.data.getWallBlock(TentDimension.DIMENSION_ID),
 					this.data.getRoofBlock(TentDimension.DIMENSION_ID));
-			// make or re-make the platform
-			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
 		}
-		
-		// if the tent depth has changed...
-		if(structureExists && data.needsUpdateDepth()) {
+
+		if(upgradePlatform) {
+			// if the tent depth has changed...
 			upgradePlatformDepth(worldIn, corner.down(1), data.getWidth(), data.getPrevDepth(), data.getDepth());
 			result = TentEvent.TentResult.UPGRADED;
-		}
+		} else if(buildPlatform) {
+			// make or re-make the platform
+			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
+		} 
 		
 		// set or update TileEntityTentDoor information inside the tent
 		updateDoorInfo(worldIn, doorPos, this.data, 
 				prevX, prevY, prevZ, prevFacing, prevDimension);
 		return result;
+	}
+	
+	/** Attempts to retrieve a TileEntityTentDoor at the given location. May return null **/
+	public static final TileEntityTentDoor getDoorAt(final World worldIn, final BlockPos doorPos) {
+		TileEntity te = worldIn.getTileEntity(doorPos);
+		if(te instanceof TileEntityTentDoor) {
+			return (TileEntityTentDoor) te;
+		} else {
+			System.out.println("[StructureBase] Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
+			return null;
+		}
 	}
 
 	/**
@@ -128,9 +154,8 @@ public abstract class StructureBase {
 	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, 
 			final StructureData data, final double prevX, final double prevY,
 			final double prevZ, final float prevFacing, final int prevDimension) {
-		TileEntity te = worldIn.getTileEntity(doorPos);
-		if (te instanceof TileEntityTentDoor) {
-			TileEntityTentDoor door = (TileEntityTentDoor) te;
+		TileEntityTentDoor door = getDoorAt(worldIn, doorPos);
+		if (door != null) {
 			data.setID(TileEntityTentDoor.getTentID(doorPos));
 			data.resetPrevData();
 			door.setTentData(data);
@@ -138,8 +163,6 @@ public abstract class StructureBase {
 			door.setPrevFacing(prevFacing);
 			door.setPrevDimension(prevDimension);
 			return true;
-		} else {
-			System.out.println("[StructureBase] Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
 		}
 		return false;
 	}

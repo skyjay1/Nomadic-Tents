@@ -8,6 +8,8 @@ tile.frame_tepee_wall.name=Tepee Frame Block
 tile.frame_bed_wall.name=Bedouin Frame Block
 tile.frame_bed_roof.name=Bedouin Frame Block
 tile.frame_indlu_wall.name=Indlu Frame Block
+tile.frame_shamiana_roof.name=Shamiana Frame Block
+tile.frame_shamiana_wall.name=Shamiana Frame Block
 
 # Yurt Blocks
 tile.yurt_wall_outer.name=Yurt Wall
@@ -48,6 +50,27 @@ tile.indlu_door_1.name=Indlu Door
 tile.indlu_wall_inner.name=Indlu Wall
 tile.indlu_wall_outer.name=Indlu Wall
 
+# Shamiana Blocks
+tile.shamiana_door_0.name=Shamiana Door
+tile.shamiana_door_1.name=Shamiana Door
+tile.shamiana_roof.name=Shamiana Roof
+tile.shamiana_black.name=Black Shamiana Wall
+tile.shamiana_blue.name=Blue Shamiana Wall
+tile.shamiana_brown.name=Brown Shamiana Wall
+tile.shamiana_cyan.name=Cyan Shamiana Wall
+tile.shamiana_gray.name=Gray Shamiana Wall
+tile.shamiana_green.name=Green Shamiana Wall
+tile.shamiana_light_blue.name=Light Blue Shamiana Wall
+tile.shamiana_lime.name=Lime Shamiana Wall
+tile.shamiana_magenta.name=Magenta Shamiana Wall
+tile.shamiana_orange.name=Orange Shamiana Wall
+tile.shamiana_pink.name=Pink Shamiana Wall
+tile.shamiana_purple.name=Purple Shamiana Wall
+tile.shamiana_red.name=Red Shamiana Wall
+tile.shamiana_silver.name=Silver Shamiana Wall
+tile.shamiana_white.name=White Shamiana Wall
+tile.shamiana_yellow.name=Yellow Shamiana Wall
+
 # Tepee Cosmetic Blocks
 tile.cos_tepee_wall.name=Tepee Design (Cosmetic)
 tile.cos_tepee_wall_blank.name=Blank Tepee Design (Cosmetic)
@@ -65,6 +88,25 @@ tile.cos_tepee_wall_triforce.name=Tri-Force Tepee Design (Cosmetic)
 tile.cos_tepee_wall_dreamcatcher.name=Dreamcatcher Tepee Design (Cosmetic)
 tile.cos_tepee_wall_rain.name=Rain Tepee Design (Cosmetic)
 tile.cos_tepee_wall_magic.name=Magic Tepee Design (Cosmetic)
+
+# Shamiana Cosmetic Blocks
+tile.cos_shamiana_roof.name=Shamiana Roof (Cosmetic)
+tile.cos_shamiana_black.name=Black Shamiana Wall (Cosmetic)
+tile.cos_shamiana_blue.name=Blue Shamiana Wall (Cosmetic)
+tile.cos_shamiana_brown.name=Brown Shamiana Wall (Cosmetic)
+tile.cos_shamiana_cyan.name=Cyan Shamiana Wall (Cosmetic)
+tile.cos_shamiana_gray.name=Gray Shamiana Wall (Cosmetic)
+tile.cos_shamiana_green.name=Green Shamiana Wall (Cosmetic)
+tile.cos_shamiana_light_blue.name=Light Blue Shamiana Wall (Cosmetic)
+tile.cos_shamiana_lime.name=Lime Shamiana Wall (Cosmetic)
+tile.cos_shamiana_magenta.name=Magenta Shamiana Wall (Cosmetic)
+tile.cos_shamiana_orange.name=Orange Shamiana Wall (Cosmetic)
+tile.cos_shamiana_pink.name=Pink Shamiana Wall (Cosmetic)
+tile.cos_shamiana_purple.name=Purple Shamiana Wall (Cosmetic)
+tile.cos_shamiana_red.name=Red Shamiana Wall (Cosmetic)
+tile.cos_shamiana_silver.name=Silver Shamiana Wall (Cosmetic)
+tile.cos_shamiana_white.name=White Shamiana Wall (Cosmetic)
+tile.cos_shamiana_yellow.name=Yellow Shamiana Wall (Cosmetic)
 
 # Other Cosmetic Blocks
 tile.cos_yurt_wall_outer.name=Yurt Wall (Cosmetic)
@@ -107,6 +149,13 @@ item.indlu_large.name=Large Indlu
 item.indlu_huge.name=Huge Indlu
 item.indlu_giant.name=Giant Indlu
 item.indlu_mega.name=Mega Indlu
+# Shamiana
+item.shamiana_small.name=Small Shamiana
+item.shamiana_medium.name=Medium Shamiana
+item.shamiana_large.name=Large Shamiana
+item.shamiana_huge.name=Huge Shamiana
+item.shamiana_giant.name=Giant Shamiana
+item.shamiana_mega.name=Mega Shamiana
 
 # Upgrades
 item.tent_upgrade_gold.name=Golden Crossbeam
@@ -126,6 +175,7 @@ item.yurt_wall_piece.name=Yurt Wall Section
 item.tepee_wall_piece.name=Tepee Wall Section
 item.bed_wall_piece.name=Bedouin Wall Section
 item.indlu_wall_piece.name=Indlu Wall Section
+item.shamiana_wall_piece.name=Shamiana Wall Section
 
 # Other
 tooltip.extra_dimensional_space=Extra-dimensional space!

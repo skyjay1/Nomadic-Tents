@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "above_similar=true": { "model": "yurtmod:shamiana_pink"},
+		"above_similar=false": [
+			{ "model": "yurtmod:shamiana_pink_pattern1", "weight":3 },
+			{ "model": "yurtmod:shamiana_pink_pattern2", "weight":1 } ]
+    }
+}
