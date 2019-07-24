@@ -1,6 +1,5 @@
 package com.yurtmod.structure;
 
-import com.yurtmod.block.BlockLayered;
 import com.yurtmod.block.BlockShamianaWall;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
@@ -43,7 +42,7 @@ public class StructureShamiana extends StructureBase {
 			final Block pole = Blocks.OAK_FENCE;
 			// place a pole in the middle
 			BlockPos pos = getPosFromDoor(doorBase, structureWidthNum, 0, 0, TentDimension.STRUCTURE_DIR);
-			final int height = structureWidthNum + 2; // TODO fix formula
+			final int height = structureWidthNum + 2;
 			for(int i = 0; i < height; i++) {
 				final BlockPos p = pos.up(i);
 				if(isRemoving && worldIn.getBlockState(p).getBlock() == pole) {
@@ -65,10 +64,10 @@ public class StructureShamiana extends StructureBase {
 		if(isWall) {
 			state = BlockShamianaWall.getShamianaState(this.data.getColor());
 		}
-		for (BlockPos coord : coordinates) {
-			BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
-			if(isWall && pos.getY() == coord.getY()) {
-				state = state.withProperty(BlockLayered.ABOVE_SIMILAR, false);
+		for (final BlockPos coord : coordinates) {
+			final BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
+			if(isWall) {
+				state = state.withProperty(BlockShamianaWall.IS_PLAIN, !BlockShamianaWall.shouldBePattern(pos, doorPos));
 			}
 			worldIn.setBlockState(pos, state, 3);
 		}
@@ -89,10 +88,6 @@ public class StructureShamiana extends StructureBase {
 					{ 0, 2, 1 }, { 0, 2, 0 }, { 0, 2, -1 }, { 1, 2, -2 }, { 2, 2, -2 }, { 3, 2, -2 }, { 4, 2, -1 },
 					{ 4, 2, 0 }, { 4, 2, 1 }, { 3, 2, 2 }, { 2, 2, 2 }, { 1, 2, 2 } });
 			bp.addRoofCoords(new int[][] {
-//				// layer 4
-//				{ 1, 3, -2 }, { 1, 3, -1 }, { 1, 3, 0 }, { 1, 3, 1 }, { 1, 3, 2 }, { 2, 3, 2 }, { 3, 3, 2 }, { 4, 3, 2 }, { 5, 3, 2 },
-//				{ 5, 3, 1 }, { 5, 3, 0 }, { 5, 3, -1 }, { 5, 3, -2 }, { 4, 3, -2 }, { 3, 3, -2 }, { 2, 3, -2 }, { 1, 3, -2 },
-				// layer 4
 				{ 1, 3, -1 }, { 1, 3, 0 }, { 1, 3, 1 }, { 2, 3, 1 }, { 3, 3, 1 }, { 3, 3, 0 }, { 3, 3, -1 }, { 2, 3, -1 }
 			});
 			bp.addBarrierCoords(new int[][] { { 2, 4, 0 } });

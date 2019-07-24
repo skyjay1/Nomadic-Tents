@@ -61,10 +61,11 @@ public enum StructureTent implements IStringSerializable {
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_SHAMIANA; }
 		public int getMaxSize() { return TentConfig.TENTS.TIERS_SHAMIANA; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IShamianaBlock.class; }
-		public IBlockState getRoofBlock(int dimID) { return Content.SHAMIANA_ROOF.getDefaultState(); }
+		public IBlockState getRoofBlock(int dimID) { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); }
 		public IBlockState getWallBlock(int dimID) { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); }
 		public IBlockState getFrameBlock(boolean isRoof) { 
-			return isRoof ? Content.FRAME_SHAMIANA_ROOF.getDefaultState() 
+			// TODO we might re-enable the roof
+			return isRoof ? Content.FRAME_SHAMIANA_WALL.getDefaultState() 
 					: Content.FRAME_SHAMIANA_WALL.getDefaultState(); 
 		}
 	};

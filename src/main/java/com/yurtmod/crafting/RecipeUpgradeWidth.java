@@ -35,7 +35,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	
 	public RecipeUpgradeWidth(final StructureTent type, @Nullable final StructureWidth widthFrom, 
 			final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
-		super(CATEGORY, 3, type == StructureTent.YURT ? 2 : 3, ingredients, 
+		super(CATEGORY, 3, calcRecipeHeight(type, widthTo), ingredients, 
 				new StructureData().setAll(type, widthTo, StructureDepth.NORMAL).writeTo(new ItemStack(Content.ITEM_TENT)));
 		this.tent = type;
 		this.widthIn = widthFrom;
@@ -47,6 +47,13 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 		tent = StructureTent.YURT;
 		widthIn = StructureWidth.SMALL;
 		widthOut = StructureWidth.SMALL;
+	}
+	
+	private static int calcRecipeHeight(final StructureTent type, final StructureWidth widthTo) {
+		if(type == StructureTent.YURT || (type == StructureTent.SHAMIANA && widthTo.getId() <= StructureWidth.HUGE.getId())) {
+			return 2;
+		}
+		return 3;
 	}
 	
 	/**

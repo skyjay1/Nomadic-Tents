@@ -71,6 +71,7 @@ public class ItemTent extends Item {
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, world, entity, itemSlot, isSelected);
+		
 	}
 
 	@Override

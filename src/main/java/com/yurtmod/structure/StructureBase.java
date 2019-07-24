@@ -71,13 +71,12 @@ public abstract class StructureBase {
 	 * 
 	 * @param prevDimension the dimension id the player is leaving
 	 * @param worldIn       the world (in Tent Dimension) to build in
-	 * @param cornerX       calculated by TileEntityTentDoor
-	 * @param cornerZ       calculated by TileEntityTentDoor
+	 * @param doorPos       the BlockPos of the lower half of the tent door
 	 * @param prevX         the players x-pos before teleporting to the structure
 	 * @param prevY         the players y-pos before teleporting to the structure
 	 * @param prevZ         the players z-pos before teleporting to the structure
 	 * @param prevFacing	the players rotation yaw before teleporting to the structure
-	 * @param color 
+	 * @param color 		the current color of the tent, may be null
 	 * @return if the structure was built or updated in the tent dimension, or already exists
 	 * @see TentEvent.TentResult
 	 **/

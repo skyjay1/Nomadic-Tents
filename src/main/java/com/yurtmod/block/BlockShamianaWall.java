@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.block.Categories.IShamianaBlock;
+import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 
@@ -12,12 +13,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BlockShamianaWall extends BlockLayered implements IShamianaBlock {
+public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBlock {
+	
+	public static final PropertyBool IS_PLAIN = PropertyBool.create("plain");
 	
 	private final EnumDyeColor color;
 	private static final Block[] blockColors = new Block[16];
@@ -34,7 +39,7 @@ public class BlockShamianaWall extends BlockLayered implements IShamianaBlock {
 		this.setCreativeTab(NomadicTents.TAB);
 		// when property is TRUE, texture will be PLAIN. 
 		// when property is FALSE, texture will be PATTERN.
-		this.setDefaultState(this.blockState.getBaseState().withProperty(ABOVE_SIMILAR, true));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(IS_PLAIN, true));
 	}
 	
 	/** @return the EnumDyeColor of this block **/
@@ -43,24 +48,42 @@ public class BlockShamianaWall extends BlockLayered implements IShamianaBlock {
 	}
 	
 	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, IS_PLAIN);
+	}
+
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return getDefaultState().withProperty(IS_PLAIN, meta > 0);
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		return state.getValue(IS_PLAIN).booleanValue() ? 1 : 0;
+	}
+	
+	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState stateIn) {
 		super.onBlockAdded(worldIn, pos, stateIn);
-		if (stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
+		// only do the complicated math when it's OVERWORLD and generic WHITE block
+		if (!TentDimension.isTentDimension(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
 			IBlockState state = null;
 			// determine what color to use based on TileEntity color data
 			if (doorPos != null && worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
-				state = getShamianaState(((TileEntityTentDoor) worldIn.getTileEntity(doorPos)).getTentData().getColor());
-				// use pattern variant if it's on the same Y-level as the door we found
-				// TODO if we get rid of Shamiana roof, we should use border for lowest part of roof
-				if(doorPos.getY() == pos.getY()) {
-					state = state.withProperty(BlockLayered.ABOVE_SIMILAR, false);
-				}
+				final EnumDyeColor colorCur = ((TileEntityTentDoor) worldIn.getTileEntity(doorPos)).getTentData().getColor();
+				state = getShamianaState(colorCur, shouldBePattern(pos, doorPos));
 			}
 			if(state != null) {
 				worldIn.setBlockState(pos, state, 2);
 			}
 		}
+	}
+	
+	/** @return True if this block is in a "layer" relative to door that should be patterned **/
+	public static boolean shouldBePattern(final BlockPos myPos, final BlockPos doorPos) {
+		// use pattern variant if it's on the same Y-level as the door we found OR first layer of roof
+		return myPos.getY() == doorPos.getY() || myPos.getY() - 3 == doorPos.getY();
 	}
 	
 	/**
@@ -129,12 +152,13 @@ public class BlockShamianaWall extends BlockLayered implements IShamianaBlock {
 		return getShamianaBlock(color).getDefaultState();
 	}
 	
-	@Override
-	protected void updateState(final World worldIn, final BlockPos myPos, final IBlockState state) {
-		// Block will have pattern ONLY if it is on top of indestructible dirt
-		boolean isPlain = worldIn.getBlockState(myPos.down(1)).getBlock() != Content.SUPER_DIRT;
-		IBlockState toSet = state.withProperty(ABOVE_SIMILAR, isPlain);
-		worldIn.setBlockState(myPos, toSet, 3);
+	/**
+	 * @param color the expected color of the block
+	 * @param pattern TRUE if this block should be the patterned variant
+	 * @return the correct Shamiana Block's IBlockState corresponding to this EnumDyeColor
+	 * @see #getShamianaBlock(EnumDyeColor)
+	 **/
+	public static IBlockState getShamianaState(final EnumDyeColor color, final boolean pattern) {
+		return getShamianaState(color).withProperty(IS_PLAIN, !pattern);
 	}
-
 }

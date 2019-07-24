@@ -1,6 +1,6 @@
 {
     "variants": {
-        "above_similar=true": { "model": "yurtmod:shamiana_magenta"},
-		"above_similar=false": { "model": "yurtmod:shamiana_magenta_pattern"}
+        "plain=true": { "model": "yurtmod:shamiana_magenta"},
+		"plain=false": { "model": "yurtmod:shamiana_magenta_pattern"}
     }
 }

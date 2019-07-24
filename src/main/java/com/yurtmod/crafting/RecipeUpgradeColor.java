@@ -56,9 +56,11 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 				return false;
 			} else {
 				final StructureData data = new StructureData(tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
-				// return true if it's a white shamiana
-				if (data.getTent() == StructureTent.SHAMIANA 
-						&& (this.colorOut == EnumDyeColor.WHITE || data.getColor() == EnumDyeColor.WHITE)) {
+				// return true if it's a Shamiana tent and the current color is either null or white 
+				// or if this recipe produces white
+				if (data.getTent() == StructureTent.SHAMIANA && 
+						(this.colorOut == EnumDyeColor.WHITE || data.getColor() == null 
+						|| data.getColor() == EnumDyeColor.WHITE)) {
 					return true;
 				}
 			}
