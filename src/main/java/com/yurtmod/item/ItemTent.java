@@ -148,9 +148,8 @@ public class ItemTent extends Item {
 		
 		final StructureDepth depth = StructureDepth.NORMAL;
 		for(StructureTent tent : StructureTent.values()) {
-			final EnumDyeColor color = tent == StructureTent.SHAMIANA ? EnumDyeColor.WHITE : null;
 			for(StructureWidth size : StructureWidth.values()) {
-				final StructureData data = new StructureData().setAll(tent, size, depth).setColor(color);
+				final StructureData data = new StructureData().setAll(tent, size, depth);
 				items.add(data.getDropStack());
 			}
 		}
@@ -177,9 +176,10 @@ public class ItemTent extends Item {
 		final TextFormatting color = data.getWidth().getTooltipColor();
 		tooltip.add(color + I18n.format("tooltip.extra_dimensional_space"));
 		// tooltip for color (if applicable)
-		if(data.getColor() != null) {
+		if(data.getTent() == StructureTent.SHAMIANA) {
 			String s = I18n.format(data.getColor().getUnlocalizedName());
-			tooltip.add(TextFormatting.WHITE + s.substring(0, 1).toUpperCase() + s.substring(1, s.length()));
+			tooltip.add(TextFormatting.WHITE.toString() + TextFormatting.ITALIC.toString() 
+						+ s.substring(0, 1).toUpperCase() + s.substring(1, s.length()));
 		}
 		// tooltip if depth upgrades applied (or shift held)
 		final int depthCount = StructureDepth.countUpgrades(data);

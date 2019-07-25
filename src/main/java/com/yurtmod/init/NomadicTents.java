@@ -45,6 +45,7 @@ public class NomadicTents {
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
 		TentDimension.init();
+		proxy.registerItemColors();
 		if (Loader.isModLoaded(HWYLA)) {
 			FMLInterModComms.sendMessage(HWYLA, "register",
 				"com.yurtmod.integration.WailaProvider.callbackRegister");

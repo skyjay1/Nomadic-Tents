@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "yurtmod:cos_shamiana_white",
+    "count": 4,
+	"data": 0
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "yurtmod:shamiana_wall_piece",
+	  "data": 0
+    }
+  ]
+}

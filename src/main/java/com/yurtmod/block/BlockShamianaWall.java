@@ -22,24 +22,33 @@ import net.minecraft.world.World;
 
 public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBlock {
 	
-	public static final PropertyBool IS_PLAIN = PropertyBool.create("plain");
+	public static final PropertyBool PATTERN = PropertyBool.create("pattern");
 	
 	private final EnumDyeColor color;
 	private static final Block[] blockColors = new Block[16];
+	private static final Block[] blockColorsCosmetic = new Block[16];
 		
-	public BlockShamianaWall(final EnumDyeColor colorIn) {
+	public BlockShamianaWall(final EnumDyeColor colorIn, final String name) {
 		super(Material.CLOTH, MapColor.BLOCK_COLORS[colorIn.ordinal()]);
 		// add this color-block combination to the array
-		blockColors[colorIn.ordinal()] = this;
+		if(name.contains("cos_")) {
+			blockColorsCosmetic[colorIn.ordinal()] = this;
+		} else {
+			blockColors[colorIn.ordinal()] = this;
+		}
 		// set local values and names based on color
 		this.color = colorIn;
-		final String name = color.getName();
-		this.setRegistryName(NomadicTents.MODID, "shamiana_" + name);
-		this.setUnlocalizedName("shamiana_" + name);
+		this.setRegistryName(NomadicTents.MODID, name);
+		this.setUnlocalizedName(name);
 		this.setCreativeTab(NomadicTents.TAB);
-		// when property is TRUE, texture will be PLAIN. 
-		// when property is FALSE, texture will be PATTERN.
-		this.setDefaultState(this.blockState.getBaseState().withProperty(IS_PLAIN, true));
+		this.setLightOpacity(LIGHT_OPACITY);
+		// when property is TRUE, texture will be PATTERN. 
+		// when property is FALSE, texture will be PLAIN.
+		this.setDefaultState(this.blockState.getBaseState().withProperty(PATTERN, true));
+	}
+	
+	public BlockShamianaWall(final EnumDyeColor colorIn) {
+		this(colorIn, "shamiana_".concat(colorIn.getName()));
 	}
 	
 	/** @return the EnumDyeColor of this block **/
@@ -49,17 +58,17 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, IS_PLAIN);
+		return new BlockStateContainer(this, PATTERN);
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(IS_PLAIN, meta > 0);
+		return getDefaultState().withProperty(PATTERN, meta > 0);
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(IS_PLAIN).booleanValue() ? 1 : 0;
+		return state.getValue(PATTERN).booleanValue() ? 1 : 0;
 	}
 	
 	@Override
@@ -72,7 +81,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 			// determine what color to use based on TileEntity color data
 			if (doorPos != null && worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
 				final EnumDyeColor colorCur = ((TileEntityTentDoor) worldIn.getTileEntity(doorPos)).getTentData().getColor();
-				state = getShamianaState(colorCur, shouldBePattern(pos, doorPos));
+				state = getShamianaState(colorCur, shouldBePattern(pos, doorPos), true);
 			}
 			if(state != null) {
 				worldIn.setBlockState(pos, state, 2);
@@ -138,27 +147,28 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	 * @param color
 	 * @return the correct Shamiana Block corresponding to this EnumDyeColor
 	 **/
-	public static Block getShamianaBlock(final EnumDyeColor color) {
-		return color != null && blockColors[color.ordinal()] != null 
+	public static Block getShamianaBlock(final EnumDyeColor color, final boolean indestructible) {
+		if(color == null) {
+			return Content.SHAMIANA_WALL_WHITE;
+		}
+		
+		if(indestructible) {
+			return  blockColors[color.ordinal()] != null 
 					? blockColors[color.ordinal()] : Content.SHAMIANA_WALL_WHITE;
-	}
-	
-	/**
-	 * @param color
-	 * @return the correct Shamiana Block's IBlockState corresponding to this EnumDyeColor
-	 * @see #getShamianaBlock(EnumDyeColor)
-	 **/
-	public static IBlockState getShamianaState(final EnumDyeColor color) {
-		return getShamianaBlock(color).getDefaultState();
+		} else {
+			return  blockColorsCosmetic[color.ordinal()] != null 
+					? blockColorsCosmetic[color.ordinal()] : Content.COS_SHAMIANA_WALL_WHITE;
+		}
 	}
 	
 	/**
 	 * @param color the expected color of the block
 	 * @param pattern TRUE if this block should be the patterned variant
+	 * @param indestructible TRUE for regular block, FALSE for cosmetic one
 	 * @return the correct Shamiana Block's IBlockState corresponding to this EnumDyeColor
 	 * @see #getShamianaBlock(EnumDyeColor)
 	 **/
-	public static IBlockState getShamianaState(final EnumDyeColor color, final boolean pattern) {
-		return getShamianaState(color).withProperty(IS_PLAIN, !pattern);
+	public static IBlockState getShamianaState(final EnumDyeColor color, final boolean pattern, final boolean indestructible) {
+		return getShamianaBlock(color, indestructible).getDefaultState().withProperty(PATTERN, pattern);
 	}
 }

@@ -17,6 +17,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class ClientProxy extends CommonProxy {
+	
+	@Override
+	public void registerItemColors() {
+		//// Shamiana Tent Colorization
+		ItemColors colors = Minecraft.getMinecraft().getItemColors();		
+		if (colors != null) {
+			colors.registerItemColorHandler((ItemStack stack, int tintIndex) -> {
+				final StructureData data = new StructureData(stack);
+				return data.getTent() == StructureTent.SHAMIANA	? data.getColor().getColorValue() : -1;
+			}, Content.ITEM_TENT);
+		}
+	}
 
 	@SubscribeEvent
 	public static void onRenderEvent(ModelRegistryEvent event) {
@@ -50,7 +62,7 @@ public class ClientProxy extends CommonProxy {
 				Content.TEPEE_WALL_UNIVERSE, Content.TEPEE_WALL_EAGLE, Content.TEPEE_WALL_TRIFORCE, 
 				Content.TEPEE_WALL_DREAMCATCHER, Content.TEPEE_WALL_RAIN, Content.TEPEE_WALL_MAGIC);
 		//// shamiana blocks
-		registerAll(Content.SHAMIANA_ROOF, Content.SHAMIANA_WALL_BLACK, Content.SHAMIANA_WALL_BLUE,
+		registerAll(Content.SHAMIANA_WALL_BLACK, Content.SHAMIANA_WALL_BLUE,
 				Content.SHAMIANA_WALL_BROWN, Content.SHAMIANA_WALL_CYAN, Content.SHAMIANA_WALL_GRAY,
 				Content.SHAMIANA_WALL_GREEN, Content.SHAMIANA_WALL_LIGHT_BLUE, Content.SHAMIANA_WALL_LIME,
 				Content.SHAMIANA_WALL_MAGENTA, Content.SHAMIANA_WALL_ORANGE, Content.SHAMIANA_WALL_PINK,
@@ -63,12 +75,23 @@ public class ClientProxy extends CommonProxy {
 		//// cosmetic blocks
 		registerAll(Content.COS_BEDOUIN_ROOF, Content.COS_BEDOUIN_WALL, Content.COS_INDLU_WALL_OUTER,
 				Content.COS_INDLU_WALL_INNER, Content.COS_YURT_ROOF, Content.COS_YURT_WALL_OUTER,
-				Content.COS_YURT_WALL_INNER, Content.COS_TEPEE_WALL_BLANK, Content.COS_TEPEE_WALL_BLACK,
+				Content.COS_YURT_WALL_INNER, 
+				// tepee
+				Content.COS_TEPEE_WALL_BLANK, Content.COS_TEPEE_WALL_BLACK,
 				Content.COS_TEPEE_WALL_RED, Content.COS_TEPEE_WALL_YELLOW, Content.COS_TEPEE_WALL_ORANGE,
 				Content.COS_TEPEE_WALL_WHITE, Content.COS_TEPEE_WALL_HOPE, Content.COS_TEPEE_WALL_SUN,
 				Content.COS_TEPEE_WALL_CREEPER, Content.COS_TEPEE_WALL_UNIVERSE, Content.COS_TEPEE_WALL_EAGLE,
 				Content.COS_TEPEE_WALL_TRIFORCE, Content.COS_TEPEE_WALL_DREAMCATCHER, Content.COS_TEPEE_WALL_RAIN,
-				Content.COS_TEPEE_WALL_MAGIC);
+				Content.COS_TEPEE_WALL_MAGIC,
+				// shamiana
+				Content.COS_SHAMIANA_WALL_BLACK, Content.COS_SHAMIANA_WALL_BLUE,
+				Content.COS_SHAMIANA_WALL_BROWN, Content.COS_SHAMIANA_WALL_CYAN, Content.COS_SHAMIANA_WALL_GRAY,
+				Content.COS_SHAMIANA_WALL_GREEN, Content.COS_SHAMIANA_WALL_LIGHT_BLUE, Content.COS_SHAMIANA_WALL_LIME,
+				Content.COS_SHAMIANA_WALL_MAGENTA, Content.COS_SHAMIANA_WALL_ORANGE, Content.COS_SHAMIANA_WALL_PINK,
+				Content.COS_SHAMIANA_WALL_PURPLE, Content.COS_SHAMIANA_WALL_RED, Content.COS_SHAMIANA_WALL_LIGHT_GRAY,
+				Content.COS_SHAMIANA_WALL_WHITE, Content.COS_SHAMIANA_WALL_YELLOW
+				
+				);
 		//// frame blocks
 		int[] progress = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
 		register(Content.FRAME_YURT_WALL, progress);
@@ -77,22 +100,7 @@ public class ClientProxy extends CommonProxy {
 		register(Content.FRAME_BEDOUIN_WALL, progress);
 		register(Content.FRAME_BEDOUIN_ROOF, progress);
 		register(Content.FRAME_INDLU_WALL, progress);
-		register(Content.FRAME_SHAMIANA_ROOF, progress);
 		register(Content.FRAME_SHAMIANA_WALL, progress);
-		
-		//// Shamiana Tent Colorization (not working)
-		ItemColors colors = Minecraft.getMinecraft().getItemColors();
-		if (colors != null) {
-			colors.registerItemColorHandler((ItemStack stack, int tintIndex) -> {
-				final StructureData data = new StructureData(stack);
-				return data.getColor() != null && data.getTent() == StructureTent.SHAMIANA
-						? data.getColor().getColorValue()
-						: 0;
-			}, Content.ITEM_TENT);
-
-			// DEBUG (not firing... ItemColors is null here?)
-			// System.out.println("REGISTERED COLORS");
-		}
 	}
 
 	/** Worker method to register an Item with its given registry name and (optional) metadata **/
@@ -113,7 +121,7 @@ public class ClientProxy extends CommonProxy {
 	private static void register(Block b, int... meta) {
 		Item i = Item.getItemFromBlock(b);
 		if (i != null) {
-			register(i, meta);
+			register(i, i.getRegistryName().toString().replace("cos_", ""), meta);
 		} else {
 			System.out.println("[NomadicTents.ClientProxy] Tried to register render for a null ItemBlock. Skipping.");
 		}

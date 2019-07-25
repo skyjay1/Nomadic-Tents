@@ -8,6 +8,7 @@ import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
+import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
@@ -29,8 +30,8 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 
 	private final EnumDyeColor colorOut;
 
-	public RecipeUpgradeColor(final EnumDyeColor color,	final NonNullList<Ingredient> ingredients) {
-		super(CATEGORY, 3, 3, ingredients, 
+	public RecipeUpgradeColor(final EnumDyeColor color,	final NonNullList<Ingredient> ingredients, final boolean hasWater) {
+		super(CATEGORY, hasWater ? 1 : 3, hasWater ? 2 : 3, ingredients, 
 				new StructureData().setColor(color)
 					.setAll(StructureTent.SHAMIANA, StructureWidth.SMALL, StructureDepth.NORMAL)
 					.getDropStack());
@@ -40,6 +41,17 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 	private RecipeUpgradeColor() {
 		super(CATEGORY, 3, 3, NonNullList.create(), ItemStack.EMPTY);
 		this.colorOut = EnumDyeColor.WHITE;
+	}
+	
+	public static boolean hasWaterBucket(final NonNullList<Ingredient> ingredients) {
+		for(final Ingredient i : ingredients) {
+			for(final ItemStack s : i.getMatchingStacks()) {
+				if(!s.isEmpty() && s.getItem() == Items.WATER_BUCKET) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -52,15 +64,14 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 			// find the tent item in the crafting grid
 			ItemStack tentStack = RecipeUpgradeWidth.getTentStack(inv);
 			if (tentStack.isEmpty()) {
-				// no tent was found, cannot upgrade depth
+				// no tent was found, cannot upgrade color
 				return false;
 			} else {
 				final StructureData data = new StructureData(tentStack.getOrCreateSubCompound(ItemTent.TENT_DATA));
-				// return true if it's a Shamiana tent and the current color is either null or white 
-				// or if this recipe produces white
+				// return true for Shamiana tents where EITHER the current color is white 
+				// OR this recipe produces white
 				if (data.getTent() == StructureTent.SHAMIANA && 
-						(this.colorOut == EnumDyeColor.WHITE || data.getColor() == null 
-						|| data.getColor() == EnumDyeColor.WHITE)) {
+						(this.colorOut == EnumDyeColor.WHITE || data.getColor() == EnumDyeColor.WHITE)) {
 					return true;
 				}
 			}
@@ -118,7 +129,7 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 				}
 			}
 			
-			return new RecipeUpgradeColor(color, recipe.getIngredients());			
+			return new RecipeUpgradeColor(color, recipe.getIngredients(), hasWaterBucket(recipe.getIngredients()));			
 		}
 	}
 }

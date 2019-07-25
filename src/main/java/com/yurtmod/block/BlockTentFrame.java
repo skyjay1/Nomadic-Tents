@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import com.yurtmod.block.Categories.IFrameBlock;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
 
@@ -39,9 +40,11 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	private final BlockToBecome TO_BECOME;
 
-	public BlockTentFrame(BlockToBecome type) {
+	public BlockTentFrame(final BlockToBecome type, final String name) {
 		super(Material.WOOD);
 		this.TO_BECOME = type;
+		this.setRegistryName(NomadicTents.MODID, name);
+		this.setUnlocalizedName(name);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(PROGRESS, 0));
 	}
 
@@ -185,8 +188,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		BEDOUIN_WALL() { public IBlockState getBlock() { return Content.BEDOUIN_WALL.getDefaultState(); } },
 		BEDOUIN_ROOF() { public IBlockState getBlock() { return Content.BEDOUIN_ROOF.getDefaultState(); } }, 
 		INDLU_WALL() { public IBlockState getBlock() { return Content.INDLU_WALL_OUTER.getDefaultState(); } },
-		SHAMIANA_WALL() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } },
-		SHAMIANA_ROOF() { public IBlockState getBlock() { return Content.SHAMIANA_ROOF.getDefaultState(); } };
+		SHAMIANA_WALL() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } };
 		
 		public abstract IBlockState getBlock();
 		

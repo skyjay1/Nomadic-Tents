@@ -37,7 +37,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	private StructureDepth depth = StructureDepth.getById((byte)0);
 	private StructureWidth prevWidth = StructureWidth.getById((byte)0);
 	private StructureDepth prevDepth = StructureDepth.getById((byte)0);
-	private EnumDyeColor color = null;
+	private EnumDyeColor color = EnumDyeColor.WHITE;
 	private long locationID = ItemTent.ERROR_TAG;
 	
 	public StructureData() {
@@ -176,14 +176,13 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return this;
 	}
 	
-	/** Set the color of this tent. May be null **/
-	public StructureData setColor(@Nullable final EnumDyeColor colorIn) {
+	/** Set the color of this tent. **/
+	public StructureData setColor(final EnumDyeColor colorIn) {
 		this.color = colorIn;
 		return this;
 	}
 	
-	/** @return the color data stored by this door, if any **/
-	@Nullable
+	/** @return the color data stored by this door. Defaults to WHITE **/
 	public EnumDyeColor getColor() {
 		return this.color;
 	}
@@ -319,9 +318,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 			// Location ID
 			nbt.setLong(KEY_ID, locationID);
 			// Color (optional)
-			if(this.color != null) {
-				nbt.setInteger(KEY_COLOR, this.color.getMetadata());
-			}
+			nbt.setInteger(KEY_COLOR, this.color.getMetadata());
 		}
 		
 		return nbt;
@@ -335,7 +332,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		this.prevWidth = StructureWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
 		this.prevDepth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
 		this.locationID = nbt.getLong(KEY_ID);
-		this.color = nbt.hasKey(KEY_COLOR) ? EnumDyeColor.byMetadata(nbt.getInteger(KEY_COLOR)) : null;
+		this.color = nbt.hasKey(KEY_COLOR) ? EnumDyeColor.byMetadata(nbt.getInteger(KEY_COLOR)) : EnumDyeColor.WHITE;
 	}
 	
 	@Override

@@ -78,7 +78,7 @@ public class TentSaveData extends WorldSavedData {
 	}
 	
 	/**
-	 * Increments the number of used IDs
+	 * Increments and returns the number of used IDs
 	 * @return the next available ID 
 	 **/
 	public long getNextID() {

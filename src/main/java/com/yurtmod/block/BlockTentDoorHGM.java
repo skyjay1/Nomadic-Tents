@@ -13,13 +13,13 @@ public class BlockTentDoorHGM extends BlockTentDoor {
 	public static final PropertyEnum<StructureWidth> SIZE = PropertyEnum.<StructureWidth>create("size",
 			StructureWidth.class, StructureWidth.HUGE, StructureWidth.GIANT, StructureWidth.MEGA);
 
-	public BlockTentDoorHGM(boolean isFull) {
-		super(isFull);
+	public BlockTentDoorHGM(final String name, boolean isFull) {
+		super(name, isFull);
 		this.setDefaultState(this.getDefaultState().withProperty(SIZE, StructureWidth.HUGE));
 	}
 	
-	public BlockTentDoorHGM() {
-		this(false);
+	public BlockTentDoorHGM(final String name) {
+		this(name, false);
 	}
 	
 	@Override

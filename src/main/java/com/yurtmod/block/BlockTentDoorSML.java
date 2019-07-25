@@ -13,13 +13,13 @@ public class BlockTentDoorSML extends BlockTentDoor {
 	public static final PropertyEnum<StructureWidth> SIZE = PropertyEnum.<StructureWidth>create("size",
 			StructureWidth.class, StructureWidth.SMALL, StructureWidth.MEDIUM, StructureWidth.LARGE);
 
-	public BlockTentDoorSML(boolean isFull) {
-		super(isFull);
+	public BlockTentDoorSML(final String name, final boolean isFull) {
+		super(name, isFull);
 		this.setDefaultState(this.getDefaultState().withProperty(SIZE, StructureWidth.SMALL));
 	}
 	
-	public BlockTentDoorSML() {
-		this(false);
+	public BlockTentDoorSML(final String name) {
+		this(name, false);
 	}
 	
 	@Override

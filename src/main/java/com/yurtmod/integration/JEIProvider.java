@@ -5,6 +5,7 @@ import com.yurtmod.crafting.RecipeUpgradeDepth;
 import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.util.StructureData;
+import com.yurtmod.structure.util.StructureTent;
 
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;
@@ -24,10 +25,9 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 	public void registerItemSubtypes(final ISubtypeRegistry subtypeRegistry) {
 		subtypeRegistry.registerSubtypeInterpreter(Content.ITEM_TENT, i -> {
 			final StructureData data = new StructureData(i);
-			// build a unique name based on StructureTent and StructureWidth
+			// build a unique name based on StructureTent and StructureWidth and Color
 			return data.getTent().getName().concat("_").concat(data.getWidth().getName())
-					.concat(data.getColor() != null ? "_".concat(data.getColor().getName()) : "") ;
-//					.concat("_").concat(String.valueOf(data.getDepth()));
+					.concat("_").concat(data.getColor().getName());
 		});
 	}
 	

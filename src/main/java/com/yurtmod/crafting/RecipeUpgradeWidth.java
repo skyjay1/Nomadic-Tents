@@ -50,7 +50,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	}
 	
 	private static int calcRecipeHeight(final StructureTent type, final StructureWidth widthTo) {
-		if(type == StructureTent.YURT || (type == StructureTent.SHAMIANA && widthTo.getId() <= StructureWidth.HUGE.getId())) {
+		if(type == StructureTent.YURT || (type == StructureTent.SHAMIANA && widthTo.getId() < StructureWidth.HUGE.getId())) {
 			return 2;
 		}
 		return 3;

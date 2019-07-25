@@ -3,6 +3,7 @@ package com.yurtmod.block;
 import com.yurtmod.block.Categories.*;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEvent;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
 import com.yurtmod.item.ItemTent;
@@ -45,17 +46,14 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	public static final AxisAlignedBB AABB_Z = new AxisAlignedBB(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
 	public final boolean isCube;
 
-	public BlockTentDoor(boolean isFull) {
+	public BlockTentDoor(final String name, final boolean isFull) {
 		super(Material.WOOD);
+		this.setRegistryName(NomadicTents.MODID, name);
+		this.setUnlocalizedName(name);
 		this.isCube = isFull;
 		this.setDefaultState(this.blockState.getBaseState()
 				.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER)
 				.withProperty(AXIS, EnumFacing.Axis.X));
-	}
-
-	// default constructor assumes this block is NOT full cube
-	public BlockTentDoor() {
-		this(false);
 	}
 
 	@Override

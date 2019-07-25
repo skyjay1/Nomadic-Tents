@@ -5,7 +5,6 @@ import com.yurtmod.block.BlockBedouinRoof;
 import com.yurtmod.block.BlockBedouinWall;
 import com.yurtmod.block.BlockCosmetic;
 import com.yurtmod.block.BlockIndluWall;
-import com.yurtmod.block.BlockShamianaRoof;
 import com.yurtmod.block.BlockShamianaWall;
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
@@ -38,6 +37,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
+	
+	public void registerItemColors() {
+		// nothing
+	}
 
 	@SubscribeEvent
 	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
@@ -48,100 +51,89 @@ public class CommonProxy {
 
 	@SubscribeEvent
 	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
+		// helpful blocks
 		event.getRegistry().registerAll(
-				// helpful blocks
-				new BlockBarrier().setRegistryName(NomadicTents.MODID, "tentmod_barrier")
-						.setUnlocalizedName("tentmod_barrier").setCreativeTab(NomadicTents.TAB),
-				new BlockUnbreakable(Material.GROUND).setRegistryName(NomadicTents.MODID, "super_dirt")
-						.setUnlocalizedName("super_dirt").setCreativeTab(NomadicTents.TAB),
-
-				// wall and roof blocks
-				new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_outer")
-						.setUnlocalizedName("yurt_wall_outer").setCreativeTab(NomadicTents.TAB),
-				new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_inner")
-						.setUnlocalizedName("yurt_wall_inner").setCreativeTab(NomadicTents.TAB),
-				new BlockYurtRoof().setRegistryName(NomadicTents.MODID, "yurt_roof").setUnlocalizedName("yurt_roof")
-						.setCreativeTab(NomadicTents.TAB),
-				new BlockBedouinWall().setRegistryName(NomadicTents.MODID, "bed_wall").setUnlocalizedName("bed_wall")
-						.setCreativeTab(NomadicTents.TAB),
-				new BlockBedouinRoof().setRegistryName(NomadicTents.MODID, "bed_roof").setUnlocalizedName("bed_roof")
-						.setCreativeTab(NomadicTents.TAB),
-				new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_outer").setUnlocalizedName("indlu_wall_outer")
-						.setCreativeTab(NomadicTents.TAB),
-				new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_inner").setUnlocalizedName("indlu_wall_inner")
-						.setCreativeTab(NomadicTents.TAB),
-				new BlockShamianaRoof().setRegistryName(NomadicTents.MODID, "shamiana_roof").setUnlocalizedName("shamiana_roof")
-						.setCreativeTab(NomadicTents.TAB),
-				new BlockTepeeWall("tepee_wall_blank"), new BlockTepeeWall("tepee_wall_black"),
-				new BlockTepeeWall("tepee_wall_red"), new BlockTepeeWall("tepee_wall_yellow"),
-				new BlockTepeeWall("tepee_wall_orange"), new BlockTepeeWall("tepee_wall_white"),
-				new BlockTepeeWall("tepee_wall_hope"), new BlockTepeeWall("tepee_wall_sun"),
-				new BlockTepeeWall("tepee_wall_creeper"), new BlockTepeeWall("tepee_wall_universe"),
-				new BlockTepeeWall("tepee_wall_eagle"), new BlockTepeeWall("tepee_wall_triforce"),
-				new BlockTepeeWall("tepee_wall_dreamcatcher"), new BlockTepeeWall("tepee_wall_rain"),
-				new BlockTepeeWall("tepee_wall_magic"),
-
-				// door blocks
-				new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "yurt_door_0").setUnlocalizedName("yurt_door_0"),
-				new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "yurt_door_1").setUnlocalizedName("yurt_door_1"),
-				new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "tepee_door_0").setUnlocalizedName("tepee_door_0"),
-				new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "tepee_door_1").setUnlocalizedName("tepee_door_1"),
-				new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "bed_door_0").setUnlocalizedName("bed_door_0"),
-				new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "bed_door_1").setUnlocalizedName("bed_door_1"),
-				new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "indlu_door_0").setUnlocalizedName("indlu_door_0"),
-				new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "indlu_door_1").setUnlocalizedName("indlu_door_1"),
-				new BlockTentDoorSML().setRegistryName(NomadicTents.MODID, "shamiana_door_0").setUnlocalizedName("shamiana_door_0"),
-				new BlockTentDoorHGM().setRegistryName(NomadicTents.MODID, "shamiana_door_1").setUnlocalizedName("shamiana_door_1"),
-
-				// frame blocks
-				new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER).setRegistryName(NomadicTents.MODID, "frame_yurt_wall")
-						.setUnlocalizedName("frame_yurt_wall"),
-				new BlockTentFrame(BlockToBecome.YURT_ROOF).setRegistryName(NomadicTents.MODID, "frame_yurt_roof")
-						.setUnlocalizedName("frame_yurt_roof"),
-				new BlockTentFrame(BlockToBecome.TEPEE_WALL).setRegistryName(NomadicTents.MODID, "frame_tepee_wall")
-						.setUnlocalizedName("frame_tepee_wall"),
-				new BlockTentFrame(BlockToBecome.BEDOUIN_WALL).setRegistryName(NomadicTents.MODID, "frame_bed_wall")
-						.setUnlocalizedName("frame_bed_wall"),
-				new BlockTentFrame(BlockToBecome.BEDOUIN_ROOF).setRegistryName(NomadicTents.MODID, "frame_bed_roof")
-						.setUnlocalizedName("frame_bed_roof"),
-				new BlockTentFrame(BlockToBecome.INDLU_WALL).setRegistryName(NomadicTents.MODID, "frame_indlu_wall")
-						.setUnlocalizedName("frame_indlu_wall"),
-				new BlockTentFrame(BlockToBecome.SHAMIANA_ROOF).setRegistryName(NomadicTents.MODID, "frame_shamiana_roof")
-						.setUnlocalizedName("frame_shamiana_roof"),
-				new BlockTentFrame(BlockToBecome.SHAMIANA_WALL).setRegistryName(NomadicTents.MODID, "frame_shamiana_wall")
-						.setUnlocalizedName("frame_shamiana_wall"),
-				
-				// cosmetic blocks
-				new BlockCosmetic.YurtRoof("cos_yurt_roof"),
-				new BlockCosmetic.Layered(Material.CLOTH, MapColor.LIGHT_BLUE)
-					.setRegistryName(NomadicTents.MODID, "cos_yurt_wall_outer")
-					.setUnlocalizedName("cos_yurt_wall_outer"),
-				new BlockCosmetic.Layered(Material.CLOTH, MapColor.LIGHT_BLUE)
-					.setRegistryName(NomadicTents.MODID, "cos_yurt_wall_inner")
-					.setUnlocalizedName("cos_yurt_wall_inner"),
-				new BlockCosmetic.BedouinWall("cos_bed_wall"),
-				new BlockCosmetic(Material.CLOTH, MapColor.WOOD)
-					.setRegistryName(NomadicTents.MODID, "cos_bed_roof")
-					.setUnlocalizedName("cos_bed_roof"),
-				new BlockCosmetic(Material.LEAVES)
-					.setRegistryName(NomadicTents.MODID, "cos_indlu_wall_outer")
-					.setUnlocalizedName("cos_indlu_wall_outer"),
-				new BlockCosmetic(Material.LEAVES)
-					.setRegistryName(NomadicTents.MODID, "cos_indlu_wall_inner")
-					.setUnlocalizedName("cos_indlu_wall_inner"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_blank"), new BlockCosmetic.TepeeWall("cos_tepee_wall_black"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_red"), new BlockCosmetic.TepeeWall("cos_tepee_wall_yellow"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_orange"), new BlockCosmetic.TepeeWall("cos_tepee_wall_white"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_hope"), new BlockCosmetic.TepeeWall("cos_tepee_wall_sun"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_creeper"), new BlockCosmetic.TepeeWall("cos_tepee_wall_universe"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_eagle"), new BlockCosmetic.TepeeWall("cos_tepee_wall_triforce"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_dreamcatcher"), new BlockCosmetic.TepeeWall("cos_tepee_wall_rain"),
-				new BlockCosmetic.TepeeWall("cos_tepee_wall_magic")
-			);
+			new BlockBarrier().setRegistryName(NomadicTents.MODID, "tentmod_barrier")
+					.setUnlocalizedName("tentmod_barrier").setCreativeTab(NomadicTents.TAB),
+			new BlockUnbreakable(Material.GROUND).setRegistryName(NomadicTents.MODID, "super_dirt")
+					.setUnlocalizedName("super_dirt").setCreativeTab(NomadicTents.TAB)
+		);
 		
+		// wall and roof blocks
+		event.getRegistry().registerAll(
+			new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_outer")
+					.setUnlocalizedName("yurt_wall_outer").setCreativeTab(NomadicTents.TAB),
+			new BlockYurtWall().setRegistryName(NomadicTents.MODID, "yurt_wall_inner")
+					.setUnlocalizedName("yurt_wall_inner").setCreativeTab(NomadicTents.TAB),
+			new BlockYurtRoof().setRegistryName(NomadicTents.MODID, "yurt_roof").setUnlocalizedName("yurt_roof")
+					.setCreativeTab(NomadicTents.TAB),
+			new BlockBedouinWall().setRegistryName(NomadicTents.MODID, "bed_wall").setUnlocalizedName("bed_wall")
+					.setCreativeTab(NomadicTents.TAB),
+			new BlockBedouinRoof().setRegistryName(NomadicTents.MODID, "bed_roof").setUnlocalizedName("bed_roof")
+					.setCreativeTab(NomadicTents.TAB),
+			new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_outer").setUnlocalizedName("indlu_wall_outer")
+					.setCreativeTab(NomadicTents.TAB),
+			new BlockIndluWall().setRegistryName(NomadicTents.MODID, "indlu_wall_inner").setUnlocalizedName("indlu_wall_inner")
+					.setCreativeTab(NomadicTents.TAB),
+			new BlockTepeeWall("tepee_wall_blank"), new BlockTepeeWall("tepee_wall_black"),
+			new BlockTepeeWall("tepee_wall_red"), new BlockTepeeWall("tepee_wall_yellow"),
+			new BlockTepeeWall("tepee_wall_orange"), new BlockTepeeWall("tepee_wall_white"),
+			new BlockTepeeWall("tepee_wall_hope"), new BlockTepeeWall("tepee_wall_sun"),
+			new BlockTepeeWall("tepee_wall_creeper"), new BlockTepeeWall("tepee_wall_universe"),
+			new BlockTepeeWall("tepee_wall_eagle"), new BlockTepeeWall("tepee_wall_triforce"),
+			new BlockTepeeWall("tepee_wall_dreamcatcher"), new BlockTepeeWall("tepee_wall_rain"),
+			new BlockTepeeWall("tepee_wall_magic")
+		);
 		// register shamiana blocks
 		for(final EnumDyeColor color : EnumDyeColor.values()) {
 			event.getRegistry().register(new BlockShamianaWall(color));
+		}
+		
+		// door blocks
+		event.getRegistry().registerAll(
+			new BlockTentDoorSML("yurt_door_0"),
+			new BlockTentDoorHGM("yurt_door_1"),
+			new BlockTentDoorSML("tepee_door_0"),
+			new BlockTentDoorHGM("tepee_door_1"),
+			new BlockTentDoorSML("bed_door_0"),
+			new BlockTentDoorHGM("bed_door_1"),
+			new BlockTentDoorSML("indlu_door_0"),
+			new BlockTentDoorHGM("indlu_door_1"),
+			new BlockTentDoorSML("shamiana_door_0"),
+			new BlockTentDoorHGM("shamiana_door_1")
+		);
+		// frame blocks
+		event.getRegistry().registerAll(
+			new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER, "frame_yurt_wall"),
+			new BlockTentFrame(BlockToBecome.YURT_ROOF, "frame_yurt_roof"),
+			new BlockTentFrame(BlockToBecome.TEPEE_WALL, "frame_tepee_wall"),
+			new BlockTentFrame(BlockToBecome.BEDOUIN_WALL, "frame_bed_wall"),
+			new BlockTentFrame(BlockToBecome.BEDOUIN_ROOF, "frame_bed_roof"),
+			new BlockTentFrame(BlockToBecome.INDLU_WALL, "frame_indlu_wall"),
+			new BlockTentFrame(BlockToBecome.SHAMIANA_WALL, "frame_shamiana_wall")				
+		);
+		
+		// cosmetic blocks
+		event.getRegistry().registerAll(
+			new BlockCosmetic.YurtRoof("cos_yurt_roof"),
+			new BlockCosmetic.Layered(Material.CLOTH, MapColor.LIGHT_BLUE, "cos_yurt_wall_outer"),
+			new BlockCosmetic.Layered(Material.CLOTH, MapColor.LIGHT_BLUE, "cos_yurt_wall_inner"),
+			new BlockCosmetic.BedouinWall("cos_bed_wall"),
+			new BlockCosmetic(Material.CLOTH, MapColor.WOOD, "cos_bed_roof"),
+			new BlockCosmetic(Material.LEAVES, "cos_indlu_wall_outer"),
+			new BlockCosmetic(Material.LEAVES, "cos_indlu_wall_inner"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_blank"), new BlockCosmetic.TepeeWall("cos_tepee_wall_black"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_red"), new BlockCosmetic.TepeeWall("cos_tepee_wall_yellow"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_orange"), new BlockCosmetic.TepeeWall("cos_tepee_wall_white"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_hope"), new BlockCosmetic.TepeeWall("cos_tepee_wall_sun"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_creeper"), new BlockCosmetic.TepeeWall("cos_tepee_wall_universe"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_eagle"), new BlockCosmetic.TepeeWall("cos_tepee_wall_triforce"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_dreamcatcher"), new BlockCosmetic.TepeeWall("cos_tepee_wall_rain"),
+			new BlockCosmetic.TepeeWall("cos_tepee_wall_magic")
+		);
+		// cosmetic shamiana blocks
+		for(final EnumDyeColor color : EnumDyeColor.values()) {
+			event.getRegistry().register(new BlockCosmetic.ShamianaWall(color));
 		}
 	}
 
@@ -170,7 +162,6 @@ public class CommonProxy {
 				makeIB(Content.YURT_WALL_OUTER), 
 				makeIB(Content.YURT_ROOF), makeIB(Content.YURT_WALL_INNER),
 				makeIB(Content.BEDOUIN_WALL), makeIB(Content.BEDOUIN_ROOF),
-				makeIB(Content.SHAMIANA_ROOF),
 				makeIB(Content.INDLU_WALL_OUTER), makeIB(Content.INDLU_WALL_INNER),
 				makeIB(Content.TEPEE_WALL_BLANK), makeIB(Content.TEPEE_WALL_BLACK), 
 				makeIB(Content.TEPEE_WALL_RED), makeIB(Content.TEPEE_WALL_YELLOW), 
@@ -179,8 +170,15 @@ public class CommonProxy {
 				makeIB(Content.TEPEE_WALL_CREEPER), makeIB(Content.TEPEE_WALL_UNIVERSE), 
 				makeIB(Content.TEPEE_WALL_EAGLE), makeIB(Content.TEPEE_WALL_TRIFORCE), 
 				makeIB(Content.TEPEE_WALL_DREAMCATCHER), makeIB(Content.TEPEE_WALL_RAIN), 
-				makeIB(Content.TEPEE_WALL_MAGIC),
-				// cosmetic blocks
+				makeIB(Content.TEPEE_WALL_MAGIC)
+		);
+		// Shamiana ItemBlocks
+		for(final EnumDyeColor color : EnumDyeColor.values()) {
+			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color, true)));
+		}	
+		
+		// cosmetic blocks		
+		event.getRegistry().registerAll(
 				makeIB(Content.COS_YURT_WALL_INNER),
 				makeIB(Content.COS_YURT_WALL_OUTER), makeIB(Content.COS_YURT_ROOF),
 				makeIB(Content.COS_BEDOUIN_WALL), makeIB(Content.COS_BEDOUIN_ROOF),
@@ -194,10 +192,9 @@ public class CommonProxy {
 				makeIB(Content.COS_TEPEE_WALL_DREAMCATCHER), makeIB(Content.COS_TEPEE_WALL_RAIN), 
 				makeIB(Content.COS_TEPEE_WALL_MAGIC)
 		);
-		
-		// Shamiana ItemBlock
+		// shamiana cosmetic ItemBlocks
 		for(final EnumDyeColor color : EnumDyeColor.values()) {
-			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color)));
+			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color, false)));
 		}
 	}
 
