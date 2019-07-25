@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.ItemColors;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -25,7 +26,12 @@ public class ClientProxy extends CommonProxy {
 		if (colors != null) {
 			colors.registerItemColorHandler((ItemStack stack, int tintIndex) -> {
 				final StructureData data = new StructureData(stack);
-				return data.getTent() == StructureTent.SHAMIANA	? data.getColor().getColorValue() : -1;
+				if(data.getTent() == StructureTent.SHAMIANA) {
+					// check if it's black and recolor slightly lighter than actual black
+					return data.getColor() == EnumDyeColor.BLACK ? 0x303030 : data.getColor().getColorValue();
+				}
+				return -1;
+				
 			}, Content.ITEM_TENT);
 		}
 	}
@@ -121,6 +127,7 @@ public class ClientProxy extends CommonProxy {
 	private static void register(Block b, int... meta) {
 		Item i = Item.getItemFromBlock(b);
 		if (i != null) {
+			// register cosmetic blocks under the model name of their non-cosmetic equivalent
 			register(i, i.getRegistryName().toString().replace("cos_", ""), meta);
 		} else {
 			System.out.println("[NomadicTents.ClientProxy] Tried to register render for a null ItemBlock. Skipping.");

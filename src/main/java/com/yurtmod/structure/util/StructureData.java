@@ -140,8 +140,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return locationID;
 	}
 
-	/** Set the StructureTent type used by this StructureData. Not really needed outside of constructor. **/
-	protected StructureData setTent(final StructureTent tentIn) {
+	/** Set the StructureTent type used by this StructureData **/
+	public StructureData setTent(final StructureTent tentIn) {
 		this.tent = tentIn;
 		return this;
 	}
