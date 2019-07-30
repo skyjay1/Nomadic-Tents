@@ -1,6 +1,6 @@
 {
     "parent": "yurtmod:block/door_nonfull",
     "textures": {
-        "t": "yurtmod:blocks/shamiana_door_lower"
+        "t": "yurtmod:blocks/shamiana_door_lower_5"
     }
 }

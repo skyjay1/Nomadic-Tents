@@ -166,7 +166,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockAdded(final World worldIn, final BlockPos pos, final IBlockState state) {
 		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER) {
 			worldIn.setBlockState(pos.up(),
 					state.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER), 3);
@@ -174,7 +174,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source, final BlockPos pos) {
 		if (this.isCube) {
 			return FULL_BLOCK_AABB;
 		} else {
@@ -188,12 +188,12 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(final IBlockState state) {
 		return this.isCube;
 	}
 
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(final IBlockState state) {
 		return this.isCube;
 	}
 
@@ -204,7 +204,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
+	public void onBlockDestroyedByPlayer(final World worldIn, final BlockPos pos, final IBlockState state) {
 		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER) {
 			// if it's on the bottom
 			worldIn.setBlockToAir(pos.up(1));
@@ -220,7 +220,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public IBlockState getStateFromMeta(final int meta) {
 		EnumDoorHalf half = meta % 2 == 0 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER;
 		int metaDiv2 = Math.floorDiv(meta, 2);
 		EnumFacing.Axis axis = metaDiv2 < 8 && metaDiv2 % 2 == 1
@@ -231,7 +231,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(final IBlockState state) {
 		int meta = 0;
 		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER) {
 			meta += 1;
@@ -243,12 +243,12 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public boolean hasTileEntity(IBlockState state) {
+	public boolean hasTileEntity(final IBlockState state) {
 		return true;
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
+	public TileEntity createNewTileEntity(final World worldIn, final int meta) {
 		TileEntityTentDoor ret = new TileEntityTentDoor();
 		ret.setWorld(worldIn);
 		return ret;

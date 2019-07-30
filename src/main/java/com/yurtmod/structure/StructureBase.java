@@ -2,6 +2,7 @@ package com.yurtmod.structure;
 
 import java.util.function.Predicate;
 
+import com.yurtmod.block.BlockCosmetic;
 import com.yurtmod.block.BlockTentDoor;
 import com.yurtmod.block.BlockUnbreakable;
 import com.yurtmod.block.Categories.ITentBlockBase;
@@ -87,21 +88,24 @@ public abstract class StructureBase {
 		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
 		// whether a structure was already built here (for upgrading and door-updating purposes)
 		final boolean structureExists = worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor;
+		// the old data stored by the tent door if it exists, or a copy of the new data if not
+		final StructureData prevData = structureExists ? getDoorAt(worldIn, doorPos).getTentData() : this.data.copy();
 		// if the tent exists but SIZE needs to be upgraded...
-		final boolean rebuildTent = !structureExists || data.needsUpdateWidth();
+		final boolean rebuildTent = !structureExists || data.getWidth() != prevData.getWidth();
 		// if the tent does not exist OR needs to be upgraded...
 		final boolean buildPlatform = !structureExists || rebuildTent;
 		// if the tent exists but PLATFORM needs to be upgraded...
-		final boolean upgradePlatform = structureExists && data.needsUpdateDepth();
+		final boolean upgradePlatform = structureExists && data.getDepth() != prevData.getDepth();
 		// if the tent exists but COLOR needs to be updated...
-		final boolean recolorTent = structureExists && getDoorAt(worldIn, doorPos).getTentData().getColor() != color;
+		final boolean recolorTent = structureExists && prevData.getColor() != color;
 		
 		// IF THERE IS NO TENT AT ALL...
 		if(!structureExists) {
 			result = TentEvent.TentResult.BUILT_FIRST;
-		} else if (rebuildTent) {
+		} // IF THERE IS A TENT BUT IT NEEDS TO BE REBUILT...
+		else if (rebuildTent) {
 			// remove previous structure			
-			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, data.getPrevWidth());
+			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, prevData.getWidth());
 			result = TentEvent.TentResult.UPGRADED;			
 		}
 		
@@ -120,7 +124,7 @@ public abstract class StructureBase {
 
 		if(upgradePlatform) {
 			// if the tent depth has changed...
-			upgradePlatformDepth(worldIn, corner.down(1), data.getWidth(), data.getPrevDepth(), data.getDepth());
+			upgradePlatformDepth(worldIn, corner.down(1), data.getWidth(), prevData.getDepth(), data.getDepth());
 			result = TentEvent.TentResult.UPGRADED;
 		} else if(buildPlatform) {
 			// make or re-make the platform
@@ -156,7 +160,7 @@ public abstract class StructureBase {
 		TileEntityTentDoor door = getDoorAt(worldIn, doorPos);
 		if (door != null) {
 			data.setID(TileEntityTentDoor.getTentID(doorPos));
-			data.resetPrevData();
+			//data.resetPrevData();
 			door.setTentData(data);
 			door.setOverworldXYZ(prevX, prevY, prevZ);
 			door.setPrevFacing(prevFacing);
@@ -237,7 +241,8 @@ public abstract class StructureBase {
 					for(int k = 0; k < numLayers; k++) {
 						final BlockPos at = bottomPos.down(k);
 						// if block is directly below another indestructible, continue the pattern. Otherwise, use dirt
-						final Block filler = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable ? bottom : floor;
+						final Block filler = worldIn.getBlockState(at.up(1)).getBlock() instanceof BlockUnbreakable 
+								&& !BlockCosmetic.isCosmetic(worldIn.getBlockState(at.up(1)).getBlock()) ? bottom : floor;
 						worldIn.setBlockState(at, filler.getDefaultState());
 					}
 					// always set very bottom to indestructible

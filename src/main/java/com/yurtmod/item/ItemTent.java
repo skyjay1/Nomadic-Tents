@@ -71,7 +71,12 @@ public class ItemTent extends Item {
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
 		super.onUpdate(stack, world, entity, itemSlot, isSelected);
-		
+		// make sure this tent has useable data
+		if(shouldFixOldStructureData(stack.getOrCreateSubCompound(TENT_DATA))) {
+			// tent has old information that needs to be transferred over
+			final NBTTagCompound tag = makeStructureDataFromOld(world, stack.getSubCompound(TENT_DATA));
+			stack.getTagCompound().setTag(TENT_DATA, tag);
+		} 
 	}
 
 	@Override
@@ -87,12 +92,14 @@ public class ItemTent extends Item {
 				return EnumActionResult.FAIL;
 			} else {
 				// make sure this tent has useable data
-				if(shouldFixStructureData(stack)) {
+				if(shouldFixOldStructureData(stack.getOrCreateSubCompound(TENT_DATA))) {
 					// tent has old information that needs to be transferred over
-					fixOldStructureData(worldIn, stack);
-				} else if(shouldMakeNewStructureData(stack)){
+					final NBTTagCompound tag = makeStructureDataFromOld(worldIn, stack.getSubCompound(TENT_DATA));
+					stack.getTagCompound().setTag(TENT_DATA, tag);
+				} else if(shouldMakeNewStructureData(stack.getOrCreateSubCompound(TENT_DATA))){
 					// tent has invalid ID and needs to be assigned
-					makeNewStructureData(worldIn, stack);
+					final NBTTagCompound tag = makeStructureData(worldIn, stack);
+					stack.getTagCompound().setTag(TENT_DATA, tag);
 				}
 				// offset the BlockPos to build on if it's not replaceable
 				if (!StructureBase.REPLACE_BLOCK_PRED.test(worldIn.getBlockState(hitPos))) {
@@ -189,60 +196,71 @@ public class ItemTent extends Item {
 		}
 	}
 	
-	public static boolean shouldMakeNewStructureData(final ItemStack stack) {
-		return stack.getOrCreateSubCompound(TENT_DATA).hasKey(StructureData.KEY_ID) 
-				&& stack.getOrCreateSubCompound(TENT_DATA).getLong(StructureData.KEY_ID) == ERROR_TAG;
+	/** @return TRUE if the given ItemStack contains tent NBT data in an outdated format **/
+	public static boolean shouldMakeNewStructureData(final NBTTagCompound tentData) {
+		return tentData.hasKey(StructureData.KEY_ID) && tentData.getLong(StructureData.KEY_ID) == ERROR_TAG;
 	}
 	
 	/**
 	 * Checks the given ItemStack for NBT data to make sure this tent links to
 	 * a real location. If data is missing or incorrect, this method allots a space
-	 * for this tent in the Tent dimension and updates the ItemStack NBT with the
-	 * X/Z coordinate information.
+	 * for this tent in the Tent dimension and updates the ItemStack NBT by giving it
+	 * a location ID
+	 * @return a new NBTTagCompound with correct value for ID
 	 **/
-	public static void makeNewStructureData(final World world, final ItemStack stack) {
+	public static NBTTagCompound makeStructureData(final World world, final ItemStack stack) {
 		if (!world.isRemote) {
 			// check if data is missing or set incorrectly
 			StructureData data = new StructureData(stack);
 			if(data.getID() == ERROR_TAG) {
 				// update location ID and the stack NBT
 				data.setID(getNextID(world));
-				stack.getTagCompound().setTag(TENT_DATA, data.serializeNBT());
 			}
+			return data.serializeNBT();
 		}
+		return new NBTTagCompound();
 	}
 	
-	/** Calculates and returns the next available X location for a tent **/
+	/** Calculates and returns the next available ID for a tent, or -1 if this is the client **/
 	public static long getNextID(World world) {
 		return world.isRemote ? -1 : TentSaveData.forWorld(world).getNextID();
 	}
 	
-	public static boolean shouldFixStructureData(final ItemStack stack) {
-		return stack.getOrCreateSubCompound(TENT_DATA).hasKey("StructureOffsetX");
+	/** @return TRUE if the given ItemStack contains tent NBT data in an outdated format **/
+	public static boolean shouldFixOldStructureData(final NBTTagCompound tentData) {
+		return tentData.hasKey("StructureOffsetX");
 	}
 	
-	public static void fixOldStructureData(final World world, final ItemStack stack) {
+	/**
+	 * Parses the Tent Data from the given ItemStack under the assumption that
+	 * the NBT data is stored in the old format. Uses that information to re-write
+	 * correctly formatted NBT data and updates the TentSaveData ID as needed
+	 * @param world the world
+	 * @param stack the old NBTTagCompound with old values
+	 * @return a new NBTTagCompound with correct keys and values as parsed from the old one.
+	 **/
+	public static NBTTagCompound makeStructureDataFromOld(final World world, final NBTTagCompound oldTag) {
 		if(!world.isRemote) {
 			// Make a new NBTTagCompound using old keys to get values from old NBT
-			final NBTTagCompound oldTag = stack.getTagCompound().getCompoundTag(TENT_DATA);
 			final NBTTagCompound dataTag = new NBTTagCompound();
 			dataTag.setByte(StructureData.KEY_TENT_CUR, (byte)oldTag.getShort("StructureTentType"));
 			dataTag.setByte(StructureData.KEY_WIDTH_CUR, (byte)oldTag.getShort("StructureWidthCurrent"));
-			dataTag.setByte(StructureData.KEY_WIDTH_PREV, (byte)oldTag.getShort("StructureWidthPrevious"));
+			//dataTag.setByte(StructureData.KEY_WIDTH_PREV, (byte)oldTag.getShort("StructureWidthPrevious"));
 			dataTag.setByte(StructureData.KEY_DEPTH_CUR, (byte)oldTag.getShort("StructureDepthCurrent"));
-			dataTag.setByte(StructureData.KEY_DEPTH_PREV, (byte)oldTag.getShort("StructureDepthPrevious"));
+			//dataTag.setByte(StructureData.KEY_DEPTH_PREV, (byte)oldTag.getShort("StructureDepthPrevious"));
 			final int offsetX = oldTag.getInteger("StructureOffsetX");
 			final int offsetZ = oldTag.getInteger("StructureOffsetZ");
 			final long ID = TileEntityTentDoor.getTentID(new BlockPos(
 					offsetX * TentDimension.TENT_SPACING, TentDimension.FLOOR_Y, offsetZ * TentDimension.TENT_SPACING));
 			dataTag.setLong(StructureData.KEY_ID, ID);
-			// make sure this ID isn't going to be used by updating WorldSaveData
+			// update WorldSaveData to make sure this ID isn't going to be used
 			final TentSaveData worldData = TentSaveData.forWorld(world);
-			while(worldData.getCurrentID() < ID) {
+			while(worldData.getCurrentID() <= ID) {
 				worldData.getNextID();
 			}
-			// write the tag to the ItemStack
-			stack.getTagCompound().setTag(TENT_DATA, dataTag);
+			// return the new tag
+			return dataTag;
 		}
+		return new NBTTagCompound();
 	}
 }

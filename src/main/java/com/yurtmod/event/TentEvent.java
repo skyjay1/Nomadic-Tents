@@ -1,5 +1,7 @@
 package com.yurtmod.event;
 
+import javax.annotation.Nullable;
+
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.structure.util.StructureData;
@@ -32,12 +34,20 @@ public class TentEvent extends Event {
 		return this.teDoor;
 	}
 	
-	/** @return the StructureData object contained in this event **/
+	/** 
+	 * @return the StructureData object contained in this event.
+	 * @see StructureData#getTent()
+	 * @see StructureData#getWidth()
+	 * @see StructureData#getDepth()
+	 * @see StructureData#getColor()
+	 **/
+	@Nullable
 	public StructureData getData() {
 		return this.teDoor != null ? teDoor.getTentData() : null;
 	}
 	
 	/** @return the BlockPos of the lower half of the door **/
+	@Nullable
 	public BlockPos getDoorPos() {
 		return this.teDoor != null ? this.teDoor.getPos() : null;
 	}
@@ -47,13 +57,14 @@ public class TentEvent extends Event {
 	 * @see TentEvent#getDimensionId()
 	 **/
 	public boolean isInsideTent() {
-		return this.teDoor != null ? TentDimension.isTentDimension(this.teDoor.getWorld()) : null;
+		return this.teDoor != null ? TentDimension.isTentDimension(this.teDoor.getWorld()) : false;
 	}
 	
 	/** 
 	 * @return the dimension in which this event is taking place.
 	 * @see TentEvent#isInsideTent()
 	 **/
+	@Nullable
 	public int getDimensionId() {
 		return this.teDoor != null ? this.teDoor.getWorld().provider.getDimension() : null;
 	}
@@ -95,12 +106,13 @@ public class TentEvent extends Event {
 	
 	/**
 	 * Fired after the tent door is activated and
-	 * a constructed tent is detected. The player here
-	 * has not yet been teleported but it has been
+	 * a constructed tent is detected. The player or entity
+	 * has not yet been teleported, but it has been
 	 * verified that they are able to teleport and will
 	 * do so immediately after this event. Called before
 	 * any code is run in {@link TileEntityTentDoor#teleport(Entity)}.
-	 * <br> This event is {@link Cancelable}
+	 * <br> This event is {@link Cancelable}. Canceling the event
+	 * will result in the Entity not teleporting.
 	 **/
 	@Cancelable
 	public static class PreEnter extends TentEvent {
@@ -129,6 +141,7 @@ public class TentEvent extends Event {
 	 * or upgraded as needed. This event is fired after all
 	 * tent-handling code has finished and includes an enum
 	 * representation of what happened with the tent.
+	 * @see TentEvent.TentResult
 	 **/
 	public static class PostEnter extends TentEvent {
 		
@@ -169,7 +182,6 @@ public class TentEvent extends Event {
 	 * <br>NONE = an existing tent was entered
 	 * <br>BUILT_FIRST = an entirely new tent was built and entered
 	 * <br>UPGRADED = an existing tent was modified and entered
-	 * @see TentEvent#getData()
 	 * @see TentEvent.PostEnter#getTentResult()
 	 **/
 	public static enum TentResult {

@@ -9,6 +9,7 @@ import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
+import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
@@ -86,15 +87,20 @@ public class TileEntityTentDoor extends TileEntity {
 	public StructureData getTentData() {
 		return this.tent;
 	}
-	
-	public void resetPrevTentData() {
-		this.tent.resetPrevData();
-	}
+//	
+//	public void resetPrevTentData() {
+//		this.tent.resetPrevData();
+//	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(final NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
-		this.tent = new StructureData(nbt.getCompoundTag(S_TENT_DATA));
+		// attempt to fix old data if possible
+		NBTTagCompound tentData = nbt.getCompoundTag(S_TENT_DATA);
+		if(ItemTent.shouldFixOldStructureData(tentData)) {
+			tentData = ItemTent.makeStructureDataFromOld(this.getWorld(), tentData);
+		}
+		this.tent = new StructureData(tentData);
 		this.prevX = nbt.getDouble(S_PLAYER_X);
 		this.prevY = nbt.getDouble(S_PLAYER_Y);
 		this.prevZ = nbt.getDouble(S_PLAYER_Z);
@@ -104,7 +110,7 @@ public class TileEntityTentDoor extends TileEntity {
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public NBTTagCompound writeToNBT(final NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
 		nbt.setTag(S_TENT_DATA, this.tent.serializeNBT());
 		nbt.setDouble(S_PLAYER_X, prevX);
@@ -174,7 +180,7 @@ public class TileEntityTentDoor extends TileEntity {
 	 * <br>1) there is no owner of this tent,
 	 * <br>2) the player's UUID matches, or
 	 * <br>3) the player is in creative-mode **/
-	public boolean isOwner(EntityPlayer player) {
+	public boolean isOwner(final EntityPlayer player) {
 		return !this.hasOwner() || EntityPlayer.getOfflineUUID(player.getName()).equals(this.owner) 
 				|| player.capabilities.isCreativeMode;
 	}
@@ -250,7 +256,7 @@ public class TileEntityTentDoor extends TileEntity {
 				// teleport the entity normally
 				entity.changeDimension(dimTo, (ITeleporter)tel);
 			}
-			this.resetPrevTentData();
+			//this.resetPrevTentData();
 			return true;
 		}
 		return false;
@@ -289,9 +295,16 @@ public class TileEntityTentDoor extends TileEntity {
 		return false;
 	}
 	
+	/**
+	 * Called when the tent is removed and checks the inside of the tent for player
+	 * spawnpoints. If any are found, those players have their original spawnpoints
+	 * restored until the tent is re-constructed and re-entered
+	 * @param playerIn the Player who deconstructed this tent
+	 * @see #resetOverworldSpawn(EntityPlayer)
+	 **/
 	public void onPlayerRemove(EntityPlayer playerIn) {
 		// get a list of Players and find which ones have spawn points
-		// inside this tent and reset their spawn points
+		// inside this tent, then reset their spawn points
 		if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
 			BlockPos tentCenter = this.getDoorPos().add(this.getTentData().getWidth().getDoorZ(), 0, 0);
 			final MinecraftServer mcServer = playerIn.getEntityWorld().getMinecraftServer();
@@ -305,6 +318,14 @@ public class TileEntityTentDoor extends TileEntity {
 		}
 	}
 
+	/**
+	 * Finds the given player's overworld spawnpoint based on data
+	 * stored in TentSaveData. Verifies that the spawnpoint is still
+	 * valid, then sets that location as the player's current spawnpoint.
+	 * If the location is not valid, their spawnpoint is a random location
+	 * according to {@link net.minecraft.world.WorldProvider#getRandomizedSpawnPoint()}
+	 * @param player the Player whose spawnpoint should be restored
+	 **/
 	private static void resetOverworldSpawn(EntityPlayer player) {
     	// reset player spawn point when the tent is taken down
 		final World overworld = player.getEntityWorld().getMinecraftServer().getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION);
@@ -390,6 +411,13 @@ public class TileEntityTentDoor extends TileEntity {
 		return false;
 	}
 
+	/**
+	 * @param entity the Entity to teleport
+	 * @return True if this entity is non-null, not riding
+	 * or being ridden, not an enderman, and not a boss.
+	 * If it's a player in the overworld, we also check if 
+	 * Owner is enabled and check UUID
+	 **/
 	public boolean canTeleportEntity(Entity entity) {
 		if(entity == null || entity.getEntityWorld().isRemote) {
 			return false;

@@ -49,8 +49,8 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
-			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final EntityPlayer playerIn,
+			final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
 		ItemStack heldItem = hand != null && playerIn != null ? playerIn.getHeldItem(hand) : null;
 		if (!worldIn.isRemote && heldItem != null && heldItem.getItem() instanceof ItemMallet) {
 			if (heldItem.getItem() == Content.ITEM_SUPER_MALLET) {
@@ -64,7 +64,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	@Override
 	@Deprecated // because super method is
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source, final BlockPos pos) {
 		int meta = state.getValue(PROGRESS).intValue();
 		if (meta <= 1) {
 			return AABB_PROGRESS_0;
@@ -78,17 +78,17 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	@Override
 	@Deprecated // because super method is
 	@Nullable
-	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState, final IBlockAccess worldIn, final BlockPos pos) {
 		return NULL_AABB;
 	}
 
 	@Override
-	public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
+	public void onFallenUpon(final World worldIn, final BlockPos pos, final Entity entityIn, final float fallDistance) {
 		return;
 	}
 
 	@Override
-	public void onLanded(World worldIn, Entity entityIn) {
+	public void onLanded(final World worldIn, final Entity entityIn) {
 		return;
 	}
 
@@ -106,12 +106,12 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	@Override
-	public boolean isFullCube(IBlockState state) {
+	public boolean isFullCube(final IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+	public boolean isPassable(final IBlockAccess worldIn, final BlockPos pos) {
 		return true;
 	}
 
@@ -121,26 +121,26 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
+	public IBlockState getStateFromMeta(final int meta) {
 		return getDefaultState().withProperty(PROGRESS, Math.min(meta, MAX_META));
 	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(final IBlockState state) {
 		return state.getValue(PROGRESS).intValue();
 	}
 
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
+	public boolean isOpaqueCube(final IBlockState state) {
 		return false;
 	}
 
 	/** @return the number by which to increment PROGRESS **/
-	public int getEffectiveness(World worldIn, BlockPos pos, ItemStack mallet, EntityPlayer player) {
+	public int getEffectiveness(final World worldIn, final BlockPos pos, final ItemStack mallet, final EntityPlayer player) {
 		return BASE_EFFECTIVENESS;
 	}
 
-	public boolean becomeReal(World worldIn, BlockPos pos, ItemStack mallet, EntityPlayer player) {
+	public boolean becomeReal(final World worldIn, final BlockPos pos, final ItemStack mallet, final EntityPlayer player) {
 		mallet.damageItem(CONSTRUCT_DAMAGE, player);
 		return !worldIn.isRemote && worldIn.setBlockState(pos, this.TO_BECOME.getBlock(), 3);
 	}
@@ -149,7 +149,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		return this.TO_BECOME;
 	}
 
-	public boolean onMalletUsed(World worldIn, BlockPos pos, IBlockState state, ItemStack mallet, EntityPlayer player) {
+	public boolean onMalletUsed(final World worldIn, final BlockPos pos, final IBlockState state, final ItemStack mallet, final EntityPlayer player) {
 		int meta = this.getMetaFromState(state);
 		int nextMeta = meta + getEffectiveness(worldIn, pos, mallet, player);
 		worldIn.setBlockState(pos, this.getDefaultState().withProperty(PROGRESS, Math.min(nextMeta, MAX_META)), 3);
@@ -159,13 +159,15 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		return true;
 	}
 
-	public boolean onSuperMalletUsed(World worldIn, BlockPos pos, IBlockState state, ItemStack mallet,
-			EntityPlayer player) {
+	public boolean onSuperMalletUsed(final World worldIn, final BlockPos pos, final IBlockState state, final ItemStack mallet,
+			final EntityPlayer player) {
+		// only continue if the config enables it
 		if (TentConfig.GENERAL.SUPER_MALLET_CREATIVE_ONLY && !player.isCreative()) {
 			return false;
 		}
-
+		// change this block into its non-frame counterpart
 		this.becomeReal(worldIn, pos, mallet, player);
+		// scan nearby area (including diagonals) and call this method for each frame found
 		for (int i = -1; i < 2; i++) {
 			for (int j = -1; j < 2; j++) {
 				for (int k = -1; k < 2; k++) {
@@ -191,45 +193,5 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		SHAMIANA_WALL() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } };
 		
 		public abstract IBlockState getBlock();
-		
-//		SHAMIANA_WALL_BLACK() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BLACK.getDefaultState(); } },
-//		SHAMIANA_WALL_BLUE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BLUE.getDefaultState(); } },
-//		SHAMIANA_WALL_BROWN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_BROWN.getDefaultState(); } },
-//		SHAMIANA_WALL_CYAN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_CYAN.getDefaultState(); } },
-//		SHAMIANA_WALL_GRAY() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_GRAY.getDefaultState(); } },
-//		SHAMIANA_WALL_GREEN() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_GREEN.getDefaultState(); } },
-//		SHAMIANA_WALL_LIGHT_BLUE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_LIGHT_BLUE.getDefaultState(); } },
-//		SHAMIANA_WALL_LIME() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_LIME.getDefaultState(); } },
-//		SHAMIANA_WALL_MAGENTA() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_MAGENTA.getDefaultState(); } },
-//		SHAMIANA_WALL_ORANGE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_ORANGE.getDefaultState(); } },
-//		SHAMIANA_WALL_PINK() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_PINK.getDefaultState(); } },
-//		SHAMIANA_WALL_PURPLE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_PURPLE.getDefaultState(); } },
-//		SHAMIANA_WALL_RED() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_RED.getDefaultState(); } },
-//		SHAMIANA_WALL_SILVER() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_SILVER.getDefaultState(); } },
-//		SHAMIANA_WALL_WHITE() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } },
-//		SHAMIANA_WALL_YELLOW() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_YELLOW.getDefaultState(); } };
-//		
-//		public static BlockToBecome getShamianaBlockEnum(final EnumDyeColor color) {
-//			switch(color) {
-//			case BLACK:		return SHAMIANA_WALL_BLACK;
-//			case BLUE:		return SHAMIANA_WALL_BLUE;
-//			case BROWN:		return SHAMIANA_WALL_BROWN;
-//			case CYAN:		return SHAMIANA_WALL_CYAN;
-//			case GRAY:		return SHAMIANA_WALL_GRAY;
-//			case GREEN:		return SHAMIANA_WALL_GREEN;
-//			case LIGHT_BLUE:return SHAMIANA_WALL_LIGHT_BLUE;
-//			case LIME:		return SHAMIANA_WALL_LIME;
-//			case MAGENTA:	return SHAMIANA_WALL_MAGENTA;
-//			case ORANGE:	return SHAMIANA_WALL_ORANGE;
-//			case PINK:		return SHAMIANA_WALL_PINK;
-//			case PURPLE:	return SHAMIANA_WALL_PURPLE;
-//			case RED:		return SHAMIANA_WALL_RED;
-//			case SILVER:	return SHAMIANA_WALL_SILVER;
-//			case WHITE:		return SHAMIANA_WALL_WHITE;
-//			case YELLOW:	return SHAMIANA_WALL_YELLOW;
-//			
-//			default:		return SHAMIANA_WALL_WHITE;	
-//			}
-//		}
 	}
 }

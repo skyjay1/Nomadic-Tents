@@ -11,8 +11,12 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -37,9 +41,15 @@ public class BlockCosmetic extends Block {
 		blockIn.setHardness(0.6F);
 		return blockIn;
 	}
+	
+	public static boolean isCosmetic(final Block block) {
+		return (block.getRegistryName() != null && block.getRegistryName().toString().contains("cos_")) ||
+				block instanceof Layered || block instanceof BedouinWall ||
+				block instanceof TepeeWall || block instanceof YurtRoof ||
+				block instanceof BlockCosmetic;
+	}
 
 	public static class Layered extends BlockLayered {
-
 		
 		public Layered(final Material m, final MapColor c, final String name) {
 			super(m, c);
@@ -145,5 +155,16 @@ public class BlockCosmetic extends Block {
 		public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) { return true; }
 		@Override
 		public EnumPushReaction getMobilityFlag(IBlockState state) { return this.blockMaterial.getMobilityFlag(); }
+		// this allows player to place PATTERN versions instead of PLAIN blocks
+		@Override
+		public IBlockState getStateForPlacement(final World world, final BlockPos pos, final EnumFacing facing,
+				final float hitX, final float hitY, final float hitZ, final int meta, final EntityLivingBase placer,
+				final EnumHand hand) {
+			// if the player is sneaking, place cosmetic PATTERN instead
+			if(placer != null && placer.isSneaking()) {
+				return getShamianaState(this.getColor(), true, false);
+			}
+			return getShamianaState(this.getColor(), false, false);
+		}
 	}
 }

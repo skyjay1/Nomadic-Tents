@@ -18,6 +18,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBlock {
@@ -30,12 +31,6 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 		
 	public BlockShamianaWall(final EnumDyeColor colorIn, final String name) {
 		super(Material.CLOTH, MapColor.BLOCK_COLORS[colorIn.ordinal()]);
-		// add this color-block combination to the array
-		if(name.contains("cos_")) {
-			blockColorsCosmetic[colorIn.ordinal()] = this;
-		} else {
-			blockColors[colorIn.ordinal()] = this;
-		}
 		// set local values and names based on color
 		this.color = colorIn;
 		this.setRegistryName(NomadicTents.MODID, name);
@@ -44,7 +39,13 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 		this.setLightOpacity(LIGHT_OPACITY);
 		// when property is TRUE, texture will be PATTERN. 
 		// when property is FALSE, texture will be PLAIN.
-		this.setDefaultState(this.blockState.getBaseState().withProperty(PATTERN, true));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(PATTERN, false));
+		// add this color-block combination to the array
+		if(BlockCosmetic.isCosmetic(this)) {
+			blockColorsCosmetic[colorIn.ordinal()] = this;
+		} else {
+			blockColors[colorIn.ordinal()] = this;
+		}
 	}
 	
 	public BlockShamianaWall(final EnumDyeColor colorIn) {
@@ -72,9 +73,9 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	}
 	
 	@Override
-	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState stateIn) {
+	public void onBlockAdded(final World worldIn, final BlockPos pos, final IBlockState stateIn) {
 		super.onBlockAdded(worldIn, pos, stateIn);
-		// only do the complicated math when it's OVERWORLD and generic WHITE block
+		// only do the complicated math when it's OVERWORLD and INDESTRUCTIBLE WHITE block
 		if (!TentDimension.isTentDimension(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
 			IBlockState state = null;
@@ -92,7 +93,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	/** @return True if this block is in a "layer" relative to door that should be patterned **/
 	public static boolean shouldBePattern(final BlockPos myPos, final BlockPos doorPos) {
 		// use pattern variant if it's on the same Y-level as the door we found OR first layer of roof
-		return myPos.getY() == doorPos.getY() || myPos.getY() - 3 == doorPos.getY();
+		return (myPos.getY() - doorPos.getY()) % 3 == 0;
 	}
 	
 	/**
