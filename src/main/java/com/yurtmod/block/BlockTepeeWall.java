@@ -12,10 +12,10 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -30,11 +30,11 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	}
 
 	@Override
-	public void onBlockAdded(final World worldIn, final BlockPos pos, final IBlockState stateIn) {
+	public void onBlockAdded(final World worldIn, final BlockPos pos, final BlockState stateIn) {
 		super.onBlockAdded(worldIn, pos, stateIn);
 		if (stateIn.getBlock() == Content.TEPEE_WALL_BLANK) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
-			IBlockState state = getStateForRandomDesignWithChance(worldIn.rand, true);
+			BlockState state = getStateForRandomDesignWithChance(worldIn.rand, true);
 			// this determines what pattern overworld tepees should have for each layer
 			if (!TentDimension.isTentDimension(worldIn) && doorPos != null
 					&& (Math.abs(pos.getY() - doorPos.getY()) % 2 == 0)
@@ -53,15 +53,15 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 		}
 	}
 
-	/** @return an IBlockState with a blank tepee block **/
-	public static IBlockState getStateForBase(final boolean indestructible) {
+	/** @return an BlockState with a blank tepee block **/
+	public static BlockState getStateForBase(final boolean indestructible) {
 		return indestructible 
 				? Content.TEPEE_WALL_BLANK.getDefaultState()
 				: Content.COS_TEPEE_WALL_BLANK.getDefaultState();
 	}
 
-	/** @return an IBlockState with a random pattern on it **/
-	public static IBlockState getStateForRandomPattern(final Random rand, final boolean indestructible) {
+	/** @return an BlockState with a random pattern on it **/
+	public static BlockState getStateForRandomPattern(final Random rand, final boolean indestructible) {
 		final Block[] PATTERNS_INDEST = new Block[] {
 				Content.TEPEE_WALL_BLACK, Content.TEPEE_WALL_ORANGE, Content.TEPEE_WALL_RED,
 				Content.TEPEE_WALL_WHITE, Content.TEPEE_WALL_YELLOW
@@ -78,13 +78,13 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 	 * Same as {@link #getStateForRandomDesign(Random, boolean)} but returns a blank design
 	 * if it fails the Config-defined percentage chance
 	 **/
-	public static IBlockState getStateForRandomDesignWithChance(final Random rand, final boolean indestructible) {
+	public static BlockState getStateForRandomDesignWithChance(final Random rand, final boolean indestructible) {
 		return rand.nextInt(100) < TentConfig.GENERAL.TEPEE_DECORATED_CHANCE 
 				? getStateForRandomDesign(rand, indestructible) : getStateForBase(indestructible);
 	}
 
-	/** @return an IBlockState with a randomly decorated tepee block **/
-	public static IBlockState getStateForRandomDesign(final Random rand, final boolean indestructible) {
+	/** @return an BlockState with a randomly decorated tepee block **/
+	public static BlockState getStateForRandomDesign(final Random rand, final boolean indestructible) {
 		final Block[] TEXTURES_INDEST = new Block[] {
 				Content.TEPEE_WALL_CREEPER, Content.TEPEE_WALL_DREAMCATCHER,
 				Content.TEPEE_WALL_EAGLE, Content.TEPEE_WALL_HOPE,
@@ -119,7 +119,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 		if (pos == null) {
 			return null;
 		}
-		boolean isLower = world.getBlockState(pos).getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER;
+		boolean isLower = world.getBlockState(pos).get(DoorBlock.HALF) == DoorBlock.DoubleBlockHalf.LOWER;
 		return isLower ? pos : pos.down(1);
 	}
 
@@ -139,7 +139,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 			for (int x = -radius; x <= radius; x++) {
 				for (int z = -radius; z <= radius; z++) {
 					BlockPos checkPos = pos.add(x, y, z);
-					IBlockState stateAt = worldIn.getBlockState(checkPos);
+					BlockState stateAt = worldIn.getBlockState(checkPos);
 					if (!exclude.contains(checkPos)) {
 						if (stateAt.getBlock() instanceof ITepeeBlock || stateAt.getBlock() instanceof IFrameBlock) {
 							exclude.add(checkPos);

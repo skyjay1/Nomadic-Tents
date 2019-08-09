@@ -1,8 +1,6 @@
 package com.yurtmod.crafting;
 
 import com.google.gson.JsonObject;
-import com.yurtmod.init.Content;
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemDepthUpgrade;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
@@ -16,7 +14,6 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IRecipeFactory;

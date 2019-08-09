@@ -5,7 +5,11 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.yurtmod.structure.*;
+import com.yurtmod.structure.StructureBedouin;
+import com.yurtmod.structure.StructureIndlu;
+import com.yurtmod.structure.StructureShamiana;
+import com.yurtmod.structure.StructureTepee;
+import com.yurtmod.structure.StructureYurt;
 
 public final class Blueprints {
 

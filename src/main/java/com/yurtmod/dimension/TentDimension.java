@@ -3,9 +3,9 @@ package com.yurtmod.dimension;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;
@@ -29,7 +29,7 @@ public class TentDimension {
 	/** Y-level for the floor of all tent structures in Tent Dimension **/
 	public static final int FLOOR_Y = 70;
 	/** Default facing for all tent structures in Tent Dimension **/
-	public static final EnumFacing STRUCTURE_DIR = EnumFacing.EAST;
+	public static final Direction STRUCTURE_DIR = Direction.EAST;
 
 	public static void preInit() {
 		DIMENSION_ID = TentConfig.GENERAL.TENT_DIM_ID;

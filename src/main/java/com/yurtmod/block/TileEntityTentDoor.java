@@ -14,20 +14,19 @@ import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper.UnableToFindFieldException;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 
 public class TileEntityTentDoor extends TileEntity {
 
@@ -175,13 +174,13 @@ public class TileEntityTentDoor extends TileEntity {
 	}
 	
 	/** 
-	 * @param player the EntityPlayer to verify as owner
+	 * @param player the PlayerEntity to verify as owner
 	 * @return TRUE if one of the following is true: 
 	 * <br>1) there is no owner of this tent,
 	 * <br>2) the player's UUID matches, or
 	 * <br>3) the player is in creative-mode **/
-	public boolean isOwner(final EntityPlayer player) {
-		return !this.hasOwner() || EntityPlayer.getOfflineUUID(player.getName()).equals(this.owner) 
+	public boolean isOwner(final PlayerEntity player) {
+		return !this.hasOwner() || PlayerEntity.getOfflineUUID(player.getName()).equals(this.owner) 
 				|| player.capabilities.isCreativeMode;
 	}
 	
@@ -191,7 +190,7 @@ public class TileEntityTentDoor extends TileEntity {
 	}
 	
 	@Nullable
-	public EntityPlayer getOwner() {
+	public PlayerEntity getOwner() {
 		if(hasOwner() && !this.world.isRemote) {
 			return this.world.getMinecraftServer().getPlayerList().getPlayerByUUID(this.owner);
 		}
@@ -275,9 +274,9 @@ public class TileEntityTentDoor extends TileEntity {
 		final World overworld = worldFrom.getMinecraftServer().getWorld(overworldId);
 		final BlockPos prevCoords = new BlockPos(prevX, prevY, prevZ);
 		TentSaveData data = TentSaveData.forWorld(worldFrom);
-		UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
+		UUID uuid = PlayerEntity.getOfflineUUID(player.getName());
 		BlockPos oldSpawn = player.getBedLocation(overworldId);
-		BlockPos bedSpawn = oldSpawn != null ? EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) : null;
+		BlockPos bedSpawn = oldSpawn != null ? PlayerEntity.getBedSpawnLocation(overworld, oldSpawn, false) : null;
 		if(bedSpawn == null) {
 			oldSpawn = overworld.provider.getRandomizedSpawnPoint();
 		}
@@ -300,9 +299,9 @@ public class TileEntityTentDoor extends TileEntity {
 	 * spawnpoints. If any are found, those players have their original spawnpoints
 	 * restored until the tent is re-constructed and re-entered
 	 * @param playerIn the Player who deconstructed this tent
-	 * @see #resetOverworldSpawn(EntityPlayer)
+	 * @see #resetOverworldSpawn(PlayerEntity)
 	 **/
-	public void onPlayerRemove(EntityPlayer playerIn) {
+	public void onPlayerRemove(PlayerEntity playerIn) {
 		// get a list of Players and find which ones have spawn points
 		// inside this tent, then reset their spawn points
 		if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
@@ -326,17 +325,17 @@ public class TileEntityTentDoor extends TileEntity {
 	 * according to {@link net.minecraft.world.WorldProvider#getRandomizedSpawnPoint()}
 	 * @param player the Player whose spawnpoint should be restored
 	 **/
-	private static void resetOverworldSpawn(EntityPlayer player) {
+	private static void resetOverworldSpawn(PlayerEntity player) {
     	// reset player spawn point when the tent is taken down
 		final World overworld = player.getEntityWorld().getMinecraftServer().getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION);
-		final UUID uuid = EntityPlayer.getOfflineUUID(player.getName());
+		final UUID uuid = PlayerEntity.getOfflineUUID(player.getName());
     	final TentSaveData data = TentSaveData.forWorld(overworld);
     	// first, check if the player has a bed
     	BlockPos posToSet = player.getBedLocation(TentConfig.GENERAL.RESPAWN_DIMENSION);
-    	if(posToSet == null || EntityPlayer.getBedSpawnLocation(overworld, posToSet, false) == null) {
+    	if(posToSet == null || PlayerEntity.getBedSpawnLocation(overworld, posToSet, false) == null) {
     		// they don't, so check if the previous stored location was a valid bed
     		BlockPos oldSpawn = data.getSpawn(uuid);
-        	if(oldSpawn == null || EntityPlayer.getBedSpawnLocation(overworld, oldSpawn, false) == null) {
+        	if(oldSpawn == null || PlayerEntity.getBedSpawnLocation(overworld, oldSpawn, false) == null) {
         		// set spawn point random if no bed anywhere
         		posToSet = player.getEntityWorld().provider.getRandomizedSpawnPoint();
         	} else {
@@ -350,15 +349,15 @@ public class TileEntityTentDoor extends TileEntity {
     }
 	
 	/**
-	 * @param player the EntityPlayer
+	 * @param player the PlayerEntity
 	 * @param tentCenter the center of the tent in Tent Dimension
 	 * @param andBed whether a bed must be at the player's Tent spawn point
 	 * @return whether this player has a spawn point near the given BlockPos
 	 */
-	private static boolean isSpawnInTent(EntityPlayer player, BlockPos tentCenter, boolean andBed) {
+	private static boolean isSpawnInTent(PlayerEntity player, BlockPos tentCenter, boolean andBed) {
 		BlockPos tentSpawn = player.getBedLocation(TentDimension.DIMENSION_ID);
 		if(andBed && tentSpawn != null) {
-			tentSpawn = EntityPlayer.getBedSpawnLocation(player.getServer().getWorld(TentDimension.DIMENSION_ID), tentSpawn, false);
+			tentSpawn = PlayerEntity.getBedSpawnLocation(player.getServer().getWorld(TentDimension.DIMENSION_ID), tentSpawn, false);
 		}
 		final double maxDistanceSq = Math.pow(TentDimension.TENT_SPACING * 0.8D, 2.0D) + 1.0D;
 		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) < maxDistanceSq;
@@ -368,12 +367,12 @@ public class TileEntityTentDoor extends TileEntity {
 	 * Attempts to teleport the entity and use its XYZ to update TileEntity fields.
 	 * 
 	 * @param entity  the Entity that collided with the tent door block
-	 * @param tentDir the EnumFacing direction for which the tent was valid
+	 * @param tentDir the Direction direction for which the tent was valid
 	 * @return whether the teleport was successful
 	 */
-	public boolean onEntityCollide(Entity entity, EnumFacing tentDir) {
-		if (canTeleportEntity(entity) && ((entity instanceof EntityPlayer && TentConfig.GENERAL.ALLOW_PLAYER_COLLIDE)
-				|| (!(entity instanceof EntityPlayer) && TentConfig.GENERAL.ALLOW_NONPLAYER_COLLIDE))) {
+	public boolean onEntityCollide(Entity entity, Direction tentDir) {
+		if (canTeleportEntity(entity) && ((entity instanceof PlayerEntity && TentConfig.GENERAL.ALLOW_PLAYER_COLLIDE)
+				|| (!(entity instanceof PlayerEntity) && TentConfig.GENERAL.ALLOW_NONPLAYER_COLLIDE))) {
 			// remember the entity coordinates from the overworld
 			if (!TentDimension.isTentDimension(entity.getEntityWorld())) {
 				BlockPos respawn = this.getPos().offset(tentDir.getOpposite(), 1);
@@ -395,7 +394,7 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @param player the player who clicked on the tent door
 	 * @return whether the teleport was successful
 	 */
-	public boolean onPlayerActivate(EntityPlayer player) {
+	public boolean onPlayerActivate(PlayerEntity player) {
 		if (canTeleportEntity(player)) {
 			// remember the entity coordinates from the overworld
 			if (!TentDimension.isTentDimension(player.getEntityWorld())) {
@@ -423,7 +422,7 @@ public class TileEntityTentDoor extends TileEntity {
 			return false;
 		}
 		if(!TentDimension.isTentDimension(entity.getEntityWorld()) && TentConfig.GENERAL.OWNER_ENTRANCE 
-				&& entity instanceof EntityPlayer && !isOwner((EntityPlayer)entity)) {
+				&& entity instanceof PlayerEntity && !isOwner((PlayerEntity)entity)) {
 			return false;
 		}
 		boolean ridingFlag = entity.isRiding() || entity.isBeingRidden();

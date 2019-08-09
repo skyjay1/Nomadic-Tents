@@ -19,15 +19,14 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -60,7 +59,7 @@ public class ItemTent extends Item {
 	}
 	
 	@Override
-	public void onCreated(final ItemStack stack, final World world, final EntityPlayer player) {
+	public void onCreated(final ItemStack stack, final World world, final PlayerEntity player) {
 		super.onCreated(stack, world, player);
 	}
 
@@ -80,13 +79,13 @@ public class ItemTent extends Item {
 	}
 
 	@Override
-	public EnumActionResult onItemUseFirst(final EntityPlayer player, final World worldIn, final BlockPos pos,
-			final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
+	public EnumActionResult onItemUseFirst(final PlayerEntity player, final World worldIn, final BlockPos pos,
+			final Direction side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
 		// looks at the item info and spawns the correct tent in the correct form
 		if (!TentDimension.isTentDimension(worldIn) && !worldIn.isRemote) {
 			BlockPos hitPos = pos;
 			ItemStack stack = player.getHeldItem(hand);
-			EnumFacing hitSide = side;
+			Direction hitSide = side;
 
 			if (worldIn.getBlockState(pos) == null || stack == null || stack.isEmpty()) {
 				return EnumActionResult.FAIL;
@@ -110,7 +109,7 @@ public class ItemTent extends Item {
 					return EnumActionResult.FAIL;
 				} else {
 					// start checking to build structure
-					final EnumFacing playerFacing = player.getHorizontalFacing();
+					final Direction playerFacing = player.getHorizontalFacing();
 					final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
 					final StructureWidth width = data.getWidth().getOverworldSize();
 					final StructureBase struct = data.getStructure();

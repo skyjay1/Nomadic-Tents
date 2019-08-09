@@ -2,8 +2,6 @@ package com.yurtmod.structure.util;
 
 import java.util.Random;
 
-import javax.annotation.Nullable;
-
 import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.TileEntityTentDoor;
@@ -12,12 +10,13 @@ import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 
 public class StructureData implements net.minecraftforge.common.util.INBTSerializable<NBTTagCompound> {
 	
@@ -37,7 +36,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	private StructureDepth depth = StructureDepth.getById((byte)0);
 	//private StructureWidth prevWidth = StructureWidth.getById((byte)0);
 	//private StructureDepth prevDepth = StructureDepth.getById((byte)0);
-	private EnumDyeColor color = EnumDyeColor.WHITE;
+	private DyeColor color = DyeColor.WHITE;
 	private long locationID = ItemTent.ERROR_TAG;
 	
 	public StructureData() {
@@ -145,7 +144,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** Set the color of this tent. **/
-	public StructureData setColor(final EnumDyeColor colorIn) {
+	public StructureData setColor(final DyeColor colorIn) {
 		this.color = colorIn;
 		return this;
 	}
@@ -183,7 +182,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** @return the color data stored by this door. Defaults to WHITE **/
-	public EnumDyeColor getColor() {
+	public DyeColor getColor() {
 		return this.color;
 	}
 	
@@ -192,10 +191,10 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	//////////////////////////////////
 	
 	/** @return the Tent Door instance used for this structure **/
-	public IBlockState getDoorBlock() {
+	public BlockState getDoorBlock() {
 		final boolean xl = this.getWidth().isXL();
 		final Block block = getDoorBlockRaw(xl);
-		final PropertyEnum sizeEnum = xl ? BlockTentDoorHGM.SIZE :  BlockTentDoorSML.SIZE;
+		final PropertyEnum sizeEnum = xl ? BlockTentDoorHGM.SIZE_HGM :  BlockTentDoorSML.SIZE_SML;
 		return block.getDefaultState().withProperty(sizeEnum, this.getWidth());
 	}
 	
@@ -212,17 +211,17 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** @return the specific Roof block for this tent type **/
-	public IBlockState getRoofBlock(final int dimID) {
+	public BlockState getRoofBlock(final int dimID) {
 		return this.tent.getRoofBlock(dimID);
 	}
 
 	/** @return the specific Frame for this structure type. May be different for walls and roofs **/
-	public IBlockState getFrameBlock(final boolean isRoof) {
+	public BlockState getFrameBlock(final boolean isRoof) {
 		return this.tent.getFrameBlock(isRoof);
 	}
 	
 	/** @return the main building block for this tent type. May be different inside tent. **/
-	public IBlockState getWallBlock(final int dimID) {
+	public BlockState getWallBlock(final int dimID) {
 		return this.tent.getWallBlock(dimID);
 	}
 
@@ -265,7 +264,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** Uses internal fields and Player location to update the given TileEntityTentDoor, including Owner if enabled */
-	public static void applyToTileEntity(final EntityPlayer player, final ItemStack stack, final TileEntityTentDoor te) {
+	public static void applyToTileEntity(final PlayerEntity player, final ItemStack stack, final TileEntityTentDoor te) {
 		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.TENT_DATA)) {
 			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
@@ -274,7 +273,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		te.setTentData(new StructureData(stack));
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
-		te.setOwner(EntityPlayer.getOfflineUUID(player.getName()));
+		te.setOwner(PlayerEntity.getOfflineUUID(player.getName()));
 	}
 
 	/** @return an NBT-tagged Tent ItemStack that represents this StructureData **/
@@ -338,7 +337,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		//this.prevWidth = StructureWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
 		//this.prevDepth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
 		this.locationID = nbt.getLong(KEY_ID);
-		this.color = nbt.hasKey(KEY_COLOR) ? EnumDyeColor.byMetadata(nbt.getInteger(KEY_COLOR)) : EnumDyeColor.WHITE;
+		this.color = nbt.hasKey(KEY_COLOR) ? DyeColor.byMetadata(nbt.getInteger(KEY_COLOR)) : DyeColor.WHITE;
 	}
 	
 	@Override

@@ -26,14 +26,14 @@ import com.yurtmod.item.ItemTent;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
@@ -85,7 +85,7 @@ public class CommonProxy {
 			new BlockTepeeWall("tepee_wall_magic")
 		);
 		// register shamiana blocks
-		for(final EnumDyeColor color : EnumDyeColor.values()) {
+		for(final DyeColor color : DyeColor.values()) {
 			event.getRegistry().register(new BlockShamianaWall(color));
 		}
 		
@@ -132,7 +132,7 @@ public class CommonProxy {
 			new BlockCosmetic.TepeeWall("cos_tepee_wall_magic")
 		);
 		// cosmetic shamiana blocks
-		for(final EnumDyeColor color : EnumDyeColor.values()) {
+		for(final DyeColor color : DyeColor.values()) {
 			event.getRegistry().register(new BlockCosmetic.ShamianaWall(color));
 		}
 	}
@@ -173,7 +173,7 @@ public class CommonProxy {
 				makeIB(Content.TEPEE_WALL_MAGIC)
 		);
 		// Shamiana ItemBlocks
-		for(final EnumDyeColor color : EnumDyeColor.values()) {
+		for(final DyeColor color : DyeColor.values()) {
 			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color, true)));
 		}	
 		
@@ -193,7 +193,7 @@ public class CommonProxy {
 				makeIB(Content.COS_TEPEE_WALL_MAGIC)
 		);
 		// shamiana cosmetic ItemBlocks
-		for(final EnumDyeColor color : EnumDyeColor.values()) {
+		for(final DyeColor color : DyeColor.values()) {
 			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color, false)));
 		}
 	}

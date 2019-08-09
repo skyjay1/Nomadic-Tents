@@ -7,7 +7,7 @@ import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
@@ -17,7 +17,7 @@ import net.minecraftforge.common.MinecraftForge;
 public class TentTeleporter extends Teleporter {
 	private final StructureData tentData;
 	private final BlockPos tentDoorPos;
-	private final EnumDyeColor color;
+	private final DyeColor color;
 	private final double prevX;
 	private final double prevY;
 	private final double prevZ;
@@ -25,7 +25,7 @@ public class TentTeleporter extends Teleporter {
 	private final int prevDimID;
 	private final WorldServer worldServerTo;
 
-	public TentTeleporter(final int dimensionFrom, final WorldServer worldTo, final BlockPos doorPos, final EnumDyeColor colorIn,
+	public TentTeleporter(final int dimensionFrom, final WorldServer worldTo, final BlockPos doorPos, final DyeColor colorIn,
 			final double oldX, final double oldY, final double oldZ, final float oldYaw, final StructureData data) {
 		super(worldTo);
 		this.prevDimID = dimensionFrom;

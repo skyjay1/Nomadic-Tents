@@ -2,44 +2,28 @@ package com.yurtmod.block;
 
 import com.yurtmod.structure.util.StructureWidth;
 
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.StateContainer;
 
 public class BlockTentDoorHGM extends BlockTentDoor {
 	
-	public static final PropertyEnum<StructureWidth> SIZE = PropertyEnum.<StructureWidth>create("size",
+	public static final EnumProperty<StructureWidth> SIZE_HGM = EnumProperty.<StructureWidth>create("size",
 			StructureWidth.class, StructureWidth.HUGE, StructureWidth.GIANT, StructureWidth.MEGA);
 
 	public BlockTentDoorHGM(final String name, boolean isFull) {
 		super(name, isFull);
-		this.setDefaultState(this.getDefaultState().withProperty(SIZE, StructureWidth.HUGE));
+		this.setDefaultState(this.getDefaultState().with(SIZE_HGM, StructureWidth.HUGE));
 	}
 	
 	public BlockTentDoorHGM(final String name) {
 		this(name, false);
 	}
-	
-	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		IBlockState state = super.getStateFromMeta(meta);
-		int sizeInt = Math.floorDiv(meta, 4);
-		StructureWidth size = StructureWidth.values()[sizeInt + 3];
-		return state.withProperty(SIZE, size);
-	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
-		int meta = super.getMetaFromState(state);
-		int size = state.getValue(SIZE).ordinal() - 3;
-		meta += size * 4;
-		return meta;
-	}
-
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { BlockDoor.HALF, AXIS, SIZE });
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(DoorBlock.HALF, AXIS, SIZE_HGM);
 	}
 }

@@ -8,7 +8,7 @@ import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemChorusFruit;
 import net.minecraft.item.ItemStack;
@@ -21,9 +21,9 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TentEventHandler {
 	
@@ -46,7 +46,7 @@ public class TentEventHandler {
 				// if config requires, check both overworld and tent players
 				if(TentConfig.GENERAL.IS_SLEEPING_STRICT) {
 					// find out if ALL players in BOTH dimensions are sleeping
-					for(EntityPlayer p : overworld.playerEntities) {
+					for(PlayerEntity p : overworld.playerEntities) {
 						// (except for the one who just woke up, of course)
 						if(p != event.getEntityPlayer()) {
 							shouldChangeTime &= p.isPlayerSleeping();
@@ -91,9 +91,9 @@ public class TentEventHandler {
 	 **/
 	@SubscribeEvent
 	public void onItemUse(LivingEntityUseItemEvent.Start event) {
-		if(event.getEntityLiving() instanceof EntityPlayer && !event.getItem().isEmpty() 
+		if(event.getEntityLiving() instanceof PlayerEntity && !event.getItem().isEmpty() 
 				&& event.getItem().getItem() instanceof ItemChorusFruit) {
-			EntityPlayer player = (EntityPlayer)event.getEntityLiving();
+			PlayerEntity player = (PlayerEntity)event.getEntityLiving();
 			if(canCancelTeleport(player)) {
 				event.setDuration(-100);
 				player.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")), true);
@@ -106,8 +106,8 @@ public class TentEventHandler {
 	 **/
 	@SubscribeEvent
 	public void onTeleport(final EnderTeleportEvent event) {
-		if(event.getEntityLiving() instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer)event.getEntityLiving();
+		if(event.getEntityLiving() instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity)event.getEntityLiving();
 			if(canCancelTeleport(player)) {
 				event.setCanceled(true);
 				player.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")), true);
@@ -116,7 +116,7 @@ public class TentEventHandler {
 	}
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
-	private static boolean canCancelTeleport(EntityPlayer player) {
+	private static boolean canCancelTeleport(PlayerEntity player) {
 		return TentConfig.GENERAL.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
 				&& !player.isCreative();
 	}
@@ -138,14 +138,14 @@ public class TentEventHandler {
 			// do all kind of checks to make sure you need to run this code...
 			if (TentConfig.GENERAL.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
-				BlockPos respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(tentServer, bedPos, false) : null;
+				BlockPos respawnPos = bedPos != null ? PlayerEntity.getBedSpawnLocation(tentServer, bedPos, false) : null;
 				if (null == respawnPos) {
 					// player respawned in tent dimension without a bed here
 					// this likely means they're falling to their death in the void
 					// let's do something about that
 					// first:  try to find their overworld bed
 					bedPos = playerMP.getBedLocation(RESPAWN);
-					respawnPos = bedPos != null ? EntityPlayer.getBedSpawnLocation(overworld, bedPos, false) : null;
+					respawnPos = bedPos != null ? PlayerEntity.getBedSpawnLocation(overworld, bedPos, false) : null;
 					if (respawnPos == null) {
 						// they have no bed at all, send them to world spawn
 						respawnPos = overworld.provider.getRandomizedSpawnPoint();

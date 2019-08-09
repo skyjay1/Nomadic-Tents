@@ -10,36 +10,35 @@ import com.yurtmod.init.Content;
 import com.yurtmod.init.NomadicTents;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.DoorBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBlock {
 	
-	public static final PropertyBool PATTERN = PropertyBool.create("pattern");
+	public static final BooleanProperty PATTERN = BooleanProperty.create("pattern");
 	
-	private final EnumDyeColor color;
+	private final DyeColor color;
 	private static final Block[] blockColors = new Block[16];
 	private static final Block[] blockColorsCosmetic = new Block[16];
 		
-	public BlockShamianaWall(final EnumDyeColor colorIn, final String name) {
-		super(Material.CLOTH, MapColor.BLOCK_COLORS[colorIn.ordinal()]);
+	public BlockShamianaWall(final DyeColor colorIn, final String name) {
+		super(Block.Properties.create(Material.WOOL, colorIn));
 		// set local values and names based on color
 		this.color = colorIn;
 		this.setRegistryName(NomadicTents.MODID, name);
-		this.setUnlocalizedName(name);
-		this.setCreativeTab(NomadicTents.TAB);
-		this.setLightOpacity(LIGHT_OPACITY);
+		//this.setUnlocalizedName(name);
+		//this.setCreativeTab(NomadicTents.TAB);
+		//this.setLightOpacity(LIGHT_OPACITY);
 		// when property is TRUE, texture will be PATTERN. 
 		// when property is FALSE, texture will be PLAIN.
-		this.setDefaultState(this.blockState.getBaseState().withProperty(PATTERN, false));
+		this.setDefaultState(this.stateContainer.getBaseState().with(PATTERN, false));
 		// add this color-block combination to the array
 		if(BlockCosmetic.isCosmetic(this)) {
 			blockColorsCosmetic[colorIn.ordinal()] = this;
@@ -48,40 +47,30 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 		}
 	}
 	
-	public BlockShamianaWall(final EnumDyeColor colorIn) {
+	public BlockShamianaWall(final DyeColor colorIn) {
 		this(colorIn, "shamiana_".concat(colorIn.getName()));
 	}
 	
-	/** @return the EnumDyeColor of this block **/
-	public EnumDyeColor getColor() {
+	/** @return the DyeColor of this block **/
+	public DyeColor getColor() {
 		return this.color;
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, PATTERN);
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(PATTERN);
 	}
 
 	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(PATTERN, meta > 0);
-	}
-
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return state.getValue(PATTERN).booleanValue() ? 1 : 0;
-	}
-	
-	@Override
-	public void onBlockAdded(final World worldIn, final BlockPos pos, final IBlockState stateIn) {
-		super.onBlockAdded(worldIn, pos, stateIn);
+	public void onBlockAdded(BlockState stateIn, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		super.onBlockAdded(stateIn, worldIn, pos, oldState, isMoving);
 		// only do the complicated math when it's OVERWORLD and INDESTRUCTIBLE WHITE block
 		if (!TentDimension.isTentDimension(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
-			IBlockState state = null;
+			BlockState state = null;
 			// determine what color to use based on TileEntity color data
 			if (doorPos != null && worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
-				final EnumDyeColor colorCur = ((TileEntityTentDoor) worldIn.getTileEntity(doorPos)).getTentData().getColor();
+				final DyeColor colorCur = ((TileEntityTentDoor) worldIn.getTileEntity(doorPos)).getTentData().getColor();
 				state = getShamianaState(colorCur, shouldBePattern(pos, doorPos), true);
 			}
 			if(state != null) {
@@ -113,7 +102,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 		if (pos == null) {
 			return null;
 		}
-		boolean isLower = world.getBlockState(pos).getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER;
+		boolean isLower = world.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
 		return isLower ? pos : pos.down(1);
 	}
 
@@ -131,7 +120,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 			for (int x = -radius; x <= radius; x++) {
 				for (int z = -radius; z <= radius; z++) {
 					BlockPos checkPos = pos.add(x, y, z);
-					IBlockState stateAt = worldIn.getBlockState(checkPos);
+					BlockState stateAt = worldIn.getBlockState(checkPos);
 					if (!exclude.contains(checkPos)) {
 						if (stateAt.getBlock() instanceof IShamianaBlock || stateAt.getBlock() instanceof IFrameBlock) {
 							exclude.add(checkPos);
@@ -146,9 +135,9 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	
 	/**
 	 * @param color
-	 * @return the correct Shamiana Block corresponding to this EnumDyeColor
+	 * @return the correct Shamiana Block corresponding to this DyeColor
 	 **/
-	public static Block getShamianaBlock(final EnumDyeColor color, final boolean indestructible) {
+	public static Block getShamianaBlock(final DyeColor color, final boolean indestructible) {
 		if(color == null) {
 			return Content.SHAMIANA_WALL_WHITE;
 		}
@@ -166,10 +155,10 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	 * @param color the expected color of the block
 	 * @param pattern TRUE if this block should be the patterned variant
 	 * @param indestructible TRUE for regular block, FALSE for cosmetic one
-	 * @return the correct Shamiana Block's IBlockState corresponding to this EnumDyeColor
-	 * @see #getShamianaBlock(EnumDyeColor)
+	 * @return the correct Shamiana Block's BlockState corresponding to this DyeColor
+	 * @see #getShamianaBlock(DyeColor)
 	 **/
-	public static IBlockState getShamianaState(final EnumDyeColor color, final boolean pattern, final boolean indestructible) {
-		return getShamianaBlock(color, indestructible).getDefaultState().withProperty(PATTERN, pattern);
+	public static BlockState getShamianaState(final DyeColor color, final boolean pattern, final boolean indestructible) {
+		return getShamianaBlock(color, indestructible).getDefaultState().with(PATTERN, pattern);
 	}
 }

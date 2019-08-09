@@ -1,15 +1,15 @@
 package com.yurtmod.block;
 
 import com.yurtmod.block.Categories.IBedouinBlock;
-import com.yurtmod.init.NomadicTents;
 
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.DyeColor;
 
 public class BlockBedouinRoof extends BlockUnbreakable implements IBedouinBlock {
 	public BlockBedouinRoof() {
-		super(Material.CLOTH, MapColor.WOOD);
-		this.setLightOpacity(LIGHT_OPACITY);
-		this.setCreativeTab(NomadicTents.TAB);
+		super(Block.Properties.create(Material.WOOL, DyeColor.BROWN));
+		//this.setLightOpacity(LIGHT_OPACITY);
+		//this.setGroup(NomadicTents.TAB);
 	}
 }

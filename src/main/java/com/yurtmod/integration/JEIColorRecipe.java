@@ -1,12 +1,9 @@
 package com.yurtmod.integration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.collect.Lists;
 import com.yurtmod.crafting.RecipeUpgradeColor;
-import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureDepth;
@@ -16,10 +13,9 @@ import com.yurtmod.structure.util.StructureWidth;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
 
 public final class JEIColorRecipe {
 	
@@ -53,9 +49,9 @@ public final class JEIColorRecipe {
 					// if this ingredient is the TENT, we add multiple inputs as ingredients
 					if(stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemTent) {
 						// if the output is white, we should allow any color and any size combination as input
-						if(this.recipe.getColorOut() == EnumDyeColor.WHITE) {
+						if(this.recipe.getColorOut() == DyeColor.WHITE) {
 							for(final StructureWidth size : StructureWidth.values()) {
-								for(final EnumDyeColor color : EnumDyeColor.values()) {
+								for(final DyeColor color : DyeColor.values()) {
 									// add similar tents with different colors as ingredient inputs
 									matchingStacks.add(new StructureData()
 											.setAll(StructureTent.SHAMIANA, size, StructureDepth.NORMAL)

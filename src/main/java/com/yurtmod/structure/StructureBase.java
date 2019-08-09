@@ -19,15 +19,14 @@ import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDoor.EnumDoorHalf;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.block.DoorBlock.EnumDoorHalf;
 import net.minecraft.block.BlockSnow;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -36,18 +35,18 @@ public abstract class StructureBase {
 	protected StructureData data;
 	
 	/** 
-	 * Used in {@link #isValidForFacing(World, BlockPos, StructureWidth, EnumFacing)} 
-	 * to determine if the given IBlockState is part of a specific type of tent
+	 * Used in {@link #isValidForFacing(World, BlockPos, StructureWidth, Direction)} 
+	 * to determine if the given BlockState is part of a specific type of tent
 	 **/
-	protected Predicate<IBlockState> TENT_PRED;
+	protected Predicate<BlockState> TENT_PRED;
 
 	/**
 	 * Predicate to test if a block can be replaced by frame blocks when setting up
 	 * a tent
 	 **/
-	public static final Predicate<IBlockState> REPLACE_BLOCK_PRED = new Predicate<IBlockState>() {
+	public static final Predicate<BlockState> REPLACE_BLOCK_PRED = new Predicate<BlockState>() {
 		@Override
-		public boolean test(IBlockState b) {
+		public boolean test(BlockState b) {
 			// Test the material to see if that kind of block is expendable
 			Material m = b.getMaterial();
 			return m.isReplaceable() || m == Material.AIR || m == Material.PLANTS || m == Material.LAVA
@@ -58,7 +57,7 @@ public abstract class StructureBase {
 
 	public StructureBase withData(StructureData structureData) {
 		this.data = structureData;
-		this.TENT_PRED = (IBlockState b) 
+		this.TENT_PRED = (BlockState b) 
 				-> this.data.getTent().getInterface().isAssignableFrom(b.getBlock().getClass());
 		return this;
 	}
@@ -82,7 +81,7 @@ public abstract class StructureBase {
 	 * @see TentEvent.TentResult
 	 **/
 	public final TentEvent.TentResult generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
-			final double prevX, final double prevY, final double prevZ, final float prevFacing, final EnumDyeColor color) {
+			final double prevX, final double prevY, final double prevZ, final float prevFacing, final DyeColor color) {
 		TentEvent.TentResult result = TentEvent.TentResult.NONE;
 		// the corner of the square area alloted to this tent
 		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
@@ -282,14 +281,14 @@ public abstract class StructureBase {
 	}
 
 	public static final BlockPos getPosFromDoor(final BlockPos doorPos, final BlockPos offset,
-			final EnumFacing forward) {
+			final Direction forward) {
 		return getPosFromDoor(doorPos, offset.getX(), offset.getY(), offset.getZ(), forward);
 	}
 
 	/** dirForward 0=SOUTH=z++; 1=WEST=x--; 2=NORTH=z--; 3=EAST=x++ */
 	public static final BlockPos getPosFromDoor(final BlockPos doorPos, final int disForward, final int disUp,
-			final int disRight, final EnumFacing forward) {
-		EnumFacing right = forward.rotateY();
+			final int disRight, final Direction forward) {
+		Direction right = forward.rotateY();
 		return doorPos.offset(forward, disForward).offset(right, disRight).up(disUp);
 	}
 
@@ -297,12 +296,12 @@ public abstract class StructureBase {
 	 * Builds a door at given position. If that door is actually a BlockTentDoor,
 	 * use correct IProperty
 	 **/
-	public static void buildDoor(final World world, final BlockPos doorBase, final IBlockState door, final EnumFacing dir) {
-		IBlockState doorL, doorU;
+	public static void buildDoor(final World world, final BlockPos doorBase, final BlockState door, final Direction dir) {
+		BlockState doorL, doorU;
 		if (door.getBlock() instanceof BlockTentDoor) {
-			EnumFacing.Axis axis = dir.getAxis() == EnumFacing.Axis.Z ? EnumFacing.Axis.Z : EnumFacing.Axis.X;
-			doorL = door.withProperty(BlockDoor.HALF, EnumDoorHalf.LOWER).withProperty(BlockTentDoor.AXIS, axis);
-			doorU = door.withProperty(BlockDoor.HALF, EnumDoorHalf.UPPER).withProperty(BlockTentDoor.AXIS, axis);
+			Direction.Axis axis = dir.getAxis() == Direction.Axis.Z ? Direction.Axis.Z : Direction.Axis.X;
+			doorL = door.withProperty(DoorBlock.HALF, DoubleBlockHalf.LOWER).withProperty(BlockTentDoor.AXIS, axis);
+			doorU = door.withProperty(DoorBlock.HALF, EnumDoorHalf.UPPER).withProperty(BlockTentDoor.AXIS, axis);
 			world.setBlockState(doorBase, doorL, 3);
 			world.setBlockState(doorBase.up(1), doorU, 3);
 		}
@@ -312,8 +311,8 @@ public abstract class StructureBase {
 	 * Fill the locations given by an array of BlockPos with given
 	 * block and given metadata
 	 **/
-	public void buildLayer(final World worldIn, final BlockPos door, final EnumFacing dirForward,
-			final IBlockState state, final BlockPos[] coordinates) {
+	public void buildLayer(final World worldIn, final BlockPos door, final Direction dirForward,
+			final BlockState state, final BlockPos[] coordinates) {
 		for (BlockPos coord : coordinates) {
 			BlockPos pos = getPosFromDoor(door, coord, dirForward);
 			worldIn.setBlockState(pos, state, 3);
@@ -324,7 +323,7 @@ public abstract class StructureBase {
 	 * @return true if the frame blocks were placed successfully. Assumes that you
 	 *         are not in Tent Dimension.
 	 **/
-	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
+	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final Direction dirForward,
 			final StructureWidth size) {
 		return generate(worldIn, doorBase, dirForward, size, this.data.getDoorBlock(),
 				this.data.getTent().getFrameBlock(false), this.data.getTent().getFrameBlock(true));
@@ -333,9 +332,9 @@ public abstract class StructureBase {
 	/**
 	 * @return true if the structure was successfully removed (replaced with AIR)
 	 **/
-	public boolean remove(final World worldIn, final BlockPos doorPos, final EnumFacing dirForward,
+	public boolean remove(final World worldIn, final BlockPos doorPos, final Direction dirForward,
 			final StructureWidth size) {
-		IBlockState air = Blocks.AIR.getDefaultState();
+		BlockState air = Blocks.AIR.getDefaultState();
 		boolean flag = generate(worldIn, doorPos, dirForward, size, air, air, air);
 		// delete door TileEntity if found
 		if (worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
@@ -347,9 +346,9 @@ public abstract class StructureBase {
 		return flag;
 	}
 
-	/** Test each IBlockState in the given locations against the given Predicate **/
+	/** Test each BlockState in the given locations against the given Predicate **/
 	public static final boolean validateArray(final World worldIn, final BlockPos doorPos, final BlockPos[] posArray,
-			final EnumFacing facing, final Predicate<IBlockState> predicate) {
+			final Direction facing, final Predicate<BlockState> predicate) {
 		for (BlockPos p : posArray) {
 			BlockPos check = getPosFromDoor(doorPos, p, facing);
 			if (!validateBlock(worldIn, check, predicate)) {
@@ -360,18 +359,18 @@ public abstract class StructureBase {
 		return true;
 	}
 
-	/** Test the IBlockState at the given location against a given Predicate **/
-	public static final boolean validateBlock(final World worldIn, final BlockPos pos, final Predicate<IBlockState> p) {
+	/** Test the BlockState at the given location against a given Predicate **/
+	public static final boolean validateBlock(final World worldIn, final BlockPos pos, final Predicate<BlockState> p) {
 		return p.test(worldIn.getBlockState(pos));
 	}
 
 	/**
-	 * @return the EnumFacing direction in which it finds a valid and completed
+	 * @return the Direction direction in which it finds a valid and completed
 	 *         SMALL structure, null if none is found
 	 **/
-	public EnumFacing getValidFacing(final World worldIn, final BlockPos doorBase, final StructureWidth size) {
+	public Direction getValidFacing(final World worldIn, final BlockPos doorBase, final StructureWidth size) {
 		//StructureWidth s = this.getType().getSize();
-		for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+		for (Direction dir : Direction.HORIZONTALS) {
 			boolean isValid = isValidForFacing(worldIn, doorBase, size, dir);
 
 			if (isValid) {
@@ -385,7 +384,7 @@ public abstract class StructureBase {
 	 * @return true if there is empty space to create a structure of given size at
 	 *         this location
 	 **/
-	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size) {
+	public boolean canSpawn(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size) {
 		final Blueprint bp = this.getBlueprints(size);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED)) {
@@ -400,9 +399,9 @@ public abstract class StructureBase {
 
 	/**
 	 * @return true if there is a valid structure at the given location for the
-	 *         given Size and EnumFacing
+	 *         given Size and Direction
 	 **/
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, EnumFacing facing) {
+	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, Direction facing) {
 		final Blueprint bp = this.getBlueprints(size);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TENT_PRED)) {
@@ -420,8 +419,8 @@ public abstract class StructureBase {
 	}
 
 	/** @return true if a structure was successfully generated **/
-	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final EnumFacing dirForward,
-			final StructureWidth size, final IBlockState doorBlock, final IBlockState wallBlock, final IBlockState roofBlock);
+	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final Direction dirForward,
+			final StructureWidth size, final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock);
 
 	/** @return the Tent Type that is associated with this Structure **/
 	public abstract StructureTent getTentType();

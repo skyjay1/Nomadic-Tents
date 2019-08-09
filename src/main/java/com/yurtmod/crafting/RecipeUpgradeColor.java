@@ -1,22 +1,19 @@
 package com.yurtmod.crafting;
 
 import com.google.gson.JsonObject;
-import com.yurtmod.item.ItemDepthUpgrade;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
-import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IRecipeFactory;
@@ -28,9 +25,9 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 	
 	public static final RecipeUpgradeColor EMPTY = new RecipeUpgradeColor();
 
-	private final EnumDyeColor colorOut;
+	private final DyeColor colorOut;
 
-	public RecipeUpgradeColor(final EnumDyeColor color,	final NonNullList<Ingredient> ingredients, final boolean hasWater) {
+	public RecipeUpgradeColor(final DyeColor color,	final NonNullList<Ingredient> ingredients, final boolean hasWater) {
 		super(CATEGORY, hasWater ? 1 : 3, hasWater ? 2 : 3, ingredients, 
 				new StructureData().setColor(color)
 					.setAll(StructureTent.SHAMIANA, StructureWidth.SMALL, StructureDepth.NORMAL)
@@ -40,7 +37,7 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 	
 	private RecipeUpgradeColor() {
 		super(CATEGORY, 3, 3, NonNullList.create(), ItemStack.EMPTY);
-		this.colorOut = EnumDyeColor.WHITE;
+		this.colorOut = DyeColor.WHITE;
 	}
 	
 	public static boolean hasWaterBucket(final NonNullList<Ingredient> ingredients) {
@@ -71,7 +68,7 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 				// return true for Shamiana tents where EITHER the current color is white 
 				// OR this recipe produces white
 				if (data.getTent() == StructureTent.SHAMIANA && 
-						(this.colorOut == EnumDyeColor.WHITE || data.getColor() == EnumDyeColor.WHITE)) {
+						(this.colorOut == DyeColor.WHITE || data.getColor() == DyeColor.WHITE)) {
 					return true;
 				}
 			}
@@ -108,7 +105,7 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 		return true;
 	}
 	
-	public EnumDyeColor getColorOut() {
+	public DyeColor getColorOut() {
 		return colorOut;
 	}
 	
@@ -121,8 +118,8 @@ public class RecipeUpgradeColor extends ShapedRecipes implements IRecipe {
 			}			
 			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);
 			final String colorName = JsonUtils.getString(json, "result_color");
-			EnumDyeColor color = EnumDyeColor.WHITE;
-			for(EnumDyeColor c : EnumDyeColor.values()) {
+			DyeColor color = DyeColor.WHITE;
+			for(DyeColor c : DyeColor.values()) {
 				if(c.getName().equals(colorName)) {
 					color = c;
 					break;

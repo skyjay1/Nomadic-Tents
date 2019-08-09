@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonObject;
 import com.yurtmod.init.Content;
-import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureDepth;
@@ -18,7 +17,6 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.JsonUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IRecipeFactory;

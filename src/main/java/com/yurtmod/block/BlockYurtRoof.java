@@ -3,12 +3,12 @@ package com.yurtmod.block;
 import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.init.NomadicTents;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.state.IProperty;
+import net.minecraft.world.chunk.BlockStateContainer;
 
 public class BlockYurtRoof extends BlockUnbreakable implements IYurtBlock {
 	public static final PropertyBool OUTSIDE = PropertyBool.create("outside");
@@ -27,12 +27,12 @@ public class BlockYurtRoof extends BlockUnbreakable implements IYurtBlock {
 
 	@Override
 	@Deprecated // because the super method is
-	public IBlockState getStateFromMeta(int meta) {
+	public BlockState getStateFromMeta(int meta) {
 		return getDefaultState().withProperty(OUTSIDE, meta > 0);
 	}
 
 	@Override
-	public int getMetaFromState(IBlockState state) {
+	public int getMetaFromState(BlockState state) {
 		return state.getValue(OUTSIDE).booleanValue() ? 1 : 0;
 	}
 }

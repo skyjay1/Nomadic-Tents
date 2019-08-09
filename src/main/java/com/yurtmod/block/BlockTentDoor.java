@@ -1,6 +1,10 @@
 package com.yurtmod.block;
 
-import com.yurtmod.block.Categories.*;
+import com.yurtmod.block.Categories.IBedouinBlock;
+import com.yurtmod.block.Categories.IIndluBlock;
+import com.yurtmod.block.Categories.IShamianaBlock;
+import com.yurtmod.block.Categories.ITepeeBlock;
+import com.yurtmod.block.Categories.IYurtBlock;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.NomadicTents;
@@ -10,64 +14,69 @@ import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.util.StructureData;
 
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDoor.EnumDoorHalf;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.DoorBlock;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class BlockTentDoor extends BlockUnbreakable
 		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, 
 		IBedouinBlock, IIndluBlock, IShamianaBlock {
 	
-	public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis",
-			EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
+	public static final EnumProperty<Direction.Axis> AXIS = EnumProperty.<Direction.Axis>create("axis",
+			Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
 			
 	public static final int DECONSTRUCT_DAMAGE = 5;
 	private static final double aabbDis = 0.375D;
-	public static final AxisAlignedBB AABB_X = new AxisAlignedBB(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
-	public static final AxisAlignedBB AABB_Z = new AxisAlignedBB(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
+	public static final VoxelShape AABB_X = makeCuboidShape(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
+	public static final VoxelShape AABB_Z = makeCuboidShape(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
 	public final boolean isCube;
 
 	public BlockTentDoor(final String name, final boolean isFull) {
-		super(Material.WOOD);
+		super(Block.Properties.create(Material.WOOL));
 		this.setRegistryName(NomadicTents.MODID, name);
-		this.setUnlocalizedName(name);
+		//this.setUnlocalizedName(name);
 		this.isCube = isFull;
-		this.setDefaultState(this.blockState.getBaseState()
-				.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER)
-				.withProperty(AXIS, EnumFacing.Axis.X));
+		this.setDefaultState(this.stateContainer.getBaseState()
+				.with(DoorBlock.HALF, DoubleBlockHalf.LOWER)
+				.with(AXIS, Direction.Axis.X));
 	}
 
-	@Override
-	public boolean canPlaceBlockAt(World world, BlockPos pos) {
-		Material m1 = world.getBlockState(pos).getMaterial();
-		Material m2 = world.getBlockState(pos.up(1)).getMaterial();
-		return (m1 == Material.AIR || m1 == Material.WATER) && (m2 == Material.AIR || m2 == Material.WATER);
-	}
+//	@Override
+//	public boolean canPlaceBlockAt(World world, BlockPos pos) {
+//		Material m1 = world.getBlockState(pos).getMaterial();
+//		Material m2 = world.getBlockState(pos.up(1)).getMaterial();
+//		return (m1 == Material.AIR || m1 == Material.WATER) && (m2 == Material.AIR || m2 == Material.WATER);
+//	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
-			EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand,
+			BlockRayTraceResult result) {
 		if (!worldIn.isRemote) {
-			BlockPos base = state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER ? pos : pos.down(1);
+			BlockPos base = state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			// attempt to activate the TileEntity associated with this door
 			if (te instanceof TileEntityTentDoor) {
@@ -77,23 +86,23 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				ItemStack held = player.getHeldItem(hand);
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
-				if((player.capabilities.isCreativeMode || !TentConfig.GENERAL.COPY_CREATIVE_ONLY) 
-						&& held != null && held.hasTagCompound() 
-						&& held.getTagCompound().hasKey(ItemTent.TAG_COPY_TOOL)
-						&& held.getTagCompound().getBoolean(ItemTent.TAG_COPY_TOOL)) {
+				if((player.isCreative() || !TentConfig.GENERAL.COPY_CREATIVE_ONLY) 
+						&& held != null && held.hasTag()
+						&& held.getTag().contains(ItemTent.TAG_COPY_TOOL)
+						&& held.getTag().getBoolean(ItemTent.TAG_COPY_TOOL)) {
 					final ItemStack copyStack = teyd.getTentData().getDropStack();
 					if (copyStack != null) {
 						// drop the tent item (without affecting the tent)
-						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, copyStack);
+						ItemEntity dropItem = new ItemEntity(worldIn, player.posX, player.posY, player.posZ, copyStack);
 						dropItem.setPickupDelay(0);
-						worldIn.spawnEntity(dropItem);
+						worldIn.addEntity(dropItem);
 						// prevent this interaction from triggering player teleport
 						player.timeUntilPortal = player.getPortalCooldown();
 					}
 					return true;
 				}
 				// STEP 2:  make sure there is a valid tent before doing anything else
-				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
+				Direction dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, base, data.getWidth().getOverworldSize());
 				if (dir == null) {
 					return false;
@@ -112,9 +121,9 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					ItemStack toDrop = event.getTentStack();
 					if (toDrop != null) {
 						// drop the tent item
-						EntityItem dropItem = new EntityItem(worldIn, player.posX, player.posY, player.posZ, toDrop);
+						ItemEntity dropItem = new ItemEntity(worldIn, player.posX, player.posY, player.posZ, toDrop);
 						dropItem.setPickupDelay(0);
-						worldIn.spawnEntity(dropItem);
+						worldIn.addEntity(dropItem);
 						// alert the TileEntity
 						if(TentConfig.GENERAL.ALLOW_OVERWORLD_SETSPAWN) {
 							teyd.onPlayerRemove(player);
@@ -122,7 +131,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						// remove the structure
 						struct.remove(worldIn, base, dir, data.getWidth().getOverworldSize());
 						// damage the item
-						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player);
+						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
 
 						return true;
 					}
@@ -140,23 +149,22 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public void onEntityWalk(final World worldIn, final BlockPos pos, final Entity entityIn) {
-		this.onEntityCollidedWithBlock(worldIn, pos, worldIn.getBlockState(pos), entityIn);
+		this.onEntityCollision(worldIn.getBlockState(pos), worldIn, pos, entityIn);
 	}
 
 	/**
 	 * Called When an Entity Collided with the Block
 	 */
 	@Override
-	public void onEntityCollidedWithBlock(final World worldIn, final BlockPos pos, final IBlockState state,
-			final Entity entityIn) {
-		if (!worldIn.isRemote && worldIn.getBlockState(pos).getValue(BlockDoor.HALF) == EnumDoorHalf.LOWER) {
+	 public void onEntityCollision(final BlockState state, final World worldIn, final BlockPos pos, final Entity entityIn) {
+		if (!worldIn.isRemote && worldIn.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
 				StructureData type = teDoor.getTentData();
 				StructureBase struct = type.getStructure();
 				// make sure there is a valid tent before doing anything
-				EnumFacing dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
+				Direction dir = TentDimension.isTentDimension(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, pos, type.getWidth().getOverworldSize());
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
@@ -166,91 +174,70 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public void onBlockAdded(final World worldIn, final BlockPos pos, final IBlockState state) {
-		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER) {
+	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		if (state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			worldIn.setBlockState(pos.up(),
-					state.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.UPPER), 3);
+					state.with(DoorBlock.HALF, DoubleBlockHalf.UPPER), 3);
 		}
 	}
 
 	@Override
-	public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source, final BlockPos pos) {
+	public VoxelShape getShape(final BlockState state, final IBlockReader source, final BlockPos pos, final ISelectionContext cxt) {
 		if (this.isCube) {
-			return FULL_BLOCK_AABB;
+			return VoxelShapes.fullCube();
 		} else {
-			EnumFacing.Axis axis = state.getValue(AXIS);
-			if (axis == EnumFacing.Axis.X) {
+			Direction.Axis axis = state.get(AXIS);
+			if (axis == Direction.Axis.X) {
 				return AABB_X;
 			} else {
 				return AABB_Z;
 			}
 		}
 	}
-
+	
 	@Override
-	public boolean isOpaqueCube(final IBlockState state) {
+	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
 		return this.isCube;
 	}
-
+	
 	@Override
-	public boolean isFullCube(final IBlockState state) {
-		return this.isCube;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
-		return this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
-	}
-
-	@Override
-	public void onBlockDestroyedByPlayer(final World worldIn, final BlockPos pos, final IBlockState state) {
-		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER) {
-			// if it's on the bottom
-			worldIn.setBlockToAir(pos.up(1));
-		} else {
-			// if it's on the top
-			worldIn.setBlockToAir(pos.down(1));
-		}
-	}
-
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, BlockDoor.HALF, AXIS);
-	}
-
-	@Override
-	public IBlockState getStateFromMeta(final int meta) {
-		EnumDoorHalf half = meta % 2 == 0 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER;
-		int metaDiv2 = Math.floorDiv(meta, 2);
-		EnumFacing.Axis axis = metaDiv2 < 8 && metaDiv2 % 2 == 1
-				? EnumFacing.Axis.Z : EnumFacing.Axis.X;
-		return getDefaultState()
-				.withProperty(BlockDoor.HALF, half)
-				.withProperty(AXIS, axis);
-	}
-
-	@Override
-	public int getMetaFromState(final IBlockState state) {
-		int meta = 0;
-		if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER) {
-			meta += 1;
-		}
-		if (state.getValue(AXIS) == EnumFacing.Axis.Z) {
-			meta += 2;
-		}
-		return meta;
-	}
-
-	@Override
-	public boolean hasTileEntity(final IBlockState state) {
+	public boolean isSolid(final BlockState state) {
 		return true;
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+	@OnlyIn(Dist.CLIENT)
+	public BlockRenderLayer getRenderLayer() {
+		return this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
+	}
+
+	@Override
+	 public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
+		if (state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
+			// if it's on the bottom
+			worldIn.removeBlock(pos.up(1), false);
+		} else {
+			// if it's on the top
+			worldIn.removeBlock(pos.down(1), false);
+		}
+	}
+
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(DoorBlock.HALF, AXIS);
+	}
+
+	@Override
+	public boolean hasTileEntity(final BlockState state) {
+		return true;
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(final IBlockReader world) {
 		TileEntityTentDoor ret = new TileEntityTentDoor();
-		ret.setWorld(worldIn);
+		if(world instanceof World) {
+			ret.setWorld((World)world);
+		}
 		return ret;
 	}
 }

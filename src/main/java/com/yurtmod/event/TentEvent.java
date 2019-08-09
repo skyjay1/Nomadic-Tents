@@ -7,11 +7,12 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.Event;
 
 /**
  * This Event can be used to trigger behavior in other mods.
@@ -65,8 +66,8 @@ public class TentEvent extends Event {
 	 * @see TentEvent#isInsideTent()
 	 **/
 	@Nullable
-	public int getDimensionId() {
-		return this.teDoor != null ? this.teDoor.getWorld().provider.getDimension() : null;
+	public Dimension getDimensionId() {
+		return this.teDoor != null ? this.teDoor.getWorld().getDimension() : null;
 	}
 	
 	/**
@@ -78,9 +79,9 @@ public class TentEvent extends Event {
 	 **/
 	public static class Deconstruct extends TentEvent {
 		
-		final EntityPlayer player;
+		final PlayerEntity player;
 
-		public Deconstruct(final TileEntityTentDoor door, final EntityPlayer playerIn) {
+		public Deconstruct(final TileEntityTentDoor door, final PlayerEntity playerIn) {
 			super(door);
 			this.player = playerIn;
 		}
@@ -98,8 +99,8 @@ public class TentEvent extends Event {
 			return this.getData() != null ? this.getData().getDropStack() : ItemStack.EMPTY;
 		}
 		
-		/** @return the EntityPlayer who is picking up this tent **/
-		public EntityPlayer getPlayer() {
+		/** @return the PlayerEntity who is picking up this tent **/
+		public PlayerEntity getPlayer() {
 			return this.player;
 		}
 	}
@@ -131,7 +132,7 @@ public class TentEvent extends Event {
 		
 		/** @return whether or not the Entity is a player **/
 		public boolean isPlayer() {
-			return this.entity instanceof EntityPlayer;
+			return this.entity instanceof PlayerEntity;
 		}
 	}
 	
@@ -161,7 +162,7 @@ public class TentEvent extends Event {
 		
 		/** @return whether or not the Entity is a player **/
 		public boolean isPlayer() {
-			return this.entity instanceof EntityPlayer;
+			return this.entity instanceof PlayerEntity;
 		}
 		
 		/**

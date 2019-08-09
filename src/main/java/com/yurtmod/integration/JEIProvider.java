@@ -5,7 +5,6 @@ import com.yurtmod.crafting.RecipeUpgradeDepth;
 import com.yurtmod.crafting.RecipeUpgradeWidth;
 import com.yurtmod.init.Content;
 import com.yurtmod.structure.util.StructureData;
-import com.yurtmod.structure.util.StructureTent;
 
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.ISubtypeRegistry;

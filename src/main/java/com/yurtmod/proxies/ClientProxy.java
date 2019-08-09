@@ -6,15 +6,15 @@ import com.yurtmod.structure.util.StructureTent;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class ClientProxy extends CommonProxy {
@@ -28,7 +28,7 @@ public class ClientProxy extends CommonProxy {
 				final StructureData data = new StructureData(stack);
 				if(data.getTent() == StructureTent.SHAMIANA) {
 					// check if it's black and recolor slightly lighter than actual black
-					return data.getColor() == EnumDyeColor.BLACK ? 0x303030 : data.getColor().getColorValue();
+					return data.getColor() == DyeColor.BLACK ? 0x303030 : data.getColor().getColorValue();
 				}
 				return -1;
 				

@@ -9,10 +9,9 @@ import com.yurtmod.structure.util.Blueprint;
 import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -26,8 +25,8 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size, 
-			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
+	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size, 
+			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
 		boolean tentDim = TentDimension.isTentDimension(worldIn);
 		Blueprint bp = getBlueprints(size);
 		if(bp == null) {
@@ -53,7 +52,7 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean canSpawn(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth size) {
+	public boolean canSpawn(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size) {
 		// determine what blueprints to use
 		final Blueprint bp = this.getBlueprints(size);
 
@@ -62,14 +61,14 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, EnumFacing facing) {
+	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, Direction facing) {
 		final Blueprint bp = this.getBlueprints(size);
 		// check wall arrays
 		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
 	}
 
 	@Override
-	public void buildLayer(World worldIn, BlockPos doorPos, EnumFacing dirForward, IBlockState state,
+	public void buildLayer(World worldIn, BlockPos doorPos, Direction dirForward, BlockState state,
 			BlockPos[] coordinates) {
 		boolean isTepeeWall = state.getBlock() instanceof BlockTepeeWall;
 		if(isTepeeWall) {
@@ -78,7 +77,7 @@ public class StructureTepee extends StructureBase {
 				BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
 				// if it's a tepee block, calculate what kind of design it should have
 				if (isTepeeWall) {
-					IBlockState tepeeState;
+					BlockState tepeeState;
 					if (pos.getY() % 2 == 0) {
 						// psuedo-random seed ensures that all blocks that are same y-dis from door get
 						// the same seed

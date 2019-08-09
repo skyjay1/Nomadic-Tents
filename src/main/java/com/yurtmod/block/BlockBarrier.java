@@ -1,96 +1,84 @@
 package com.yurtmod.block;
 
-import com.yurtmod.block.Categories.*;
+import com.yurtmod.block.Categories.IBedouinBlock;
+import com.yurtmod.block.Categories.IIndluBlock;
+import com.yurtmod.block.Categories.IShamianaBlock;
+import com.yurtmod.block.Categories.ITepeeBlock;
+import com.yurtmod.block.Categories.IYurtBlock;
 
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BlockBarrier extends BlockUnbreakable implements 
 		IYurtBlock, ITepeeBlock, IBedouinBlock, IIndluBlock, IShamianaBlock {
 
 	public BlockBarrier() {
-		super(Material.BARRIER);
-		this.disableStats();
-		this.translucent = true;
+		super(Block.Properties.from(Blocks.BARRIER).variableOpacity());
 	}
-
+	
 	@Override
-	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
-		this.onEntityCollidedWithBlock(worldIn, pos, worldIn.getBlockState(pos), entityIn);
+	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, final ISelectionContext cxt) {
+		return VoxelShapes.fullCube();
 	}
-
+	
 	@Override
-	public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
-		return entity instanceof EntityPlayer && ((EntityPlayer) entity).isCreative();
+	public VoxelShape getRaytraceShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
+		return VoxelShapes.empty();
 	}
-
+	
 	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return this.FULL_BLOCK_AABB;
+	public VoxelShape getRenderShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
+		return VoxelShapes.empty();
 	}
-
+	
 	@Override
-	public AxisAlignedBB getSelectedBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
-		return this.SINGULAR_AABB;
-	}
-
-	@Override
-	public boolean isFullBlock(IBlockState state) {
+	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
 		return false;
 	}
-
-	/**
-	 * Used to determine ambient occlusion and culling when rebuilding chunks for
-	 * render
-	 */
+	
 	@Override
-	public boolean isOpaqueCube(IBlockState state) {
-		return false;
+	public boolean isSolid(final BlockState state) {
+		return true;
+	}
+
+//	@Override
+//	public boolean canEntityDestroy(BlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
+//		return entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative();
+//	}
+
+//	/**
+//	 * Used to determine ambient occlusion and culling when rebuilding chunks for
+//	 * render
+//	 */
+//	@Override
+//	public boolean isOpaqueCube(BlockState state) {
+//		return false;
+//	}
+
+	@Override
+	public BlockRenderType getRenderType(BlockState state) {
+		return BlockRenderType.INVISIBLE;
 	}
 
 	@Override
-	public boolean isFullCube(IBlockState state) {
-		return false;
-	}
-
-	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state) {
-		return EnumBlockRenderType.INVISIBLE;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getBlockLayer() {
+	@OnlyIn(Dist.CLIENT)
+	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public float getAmbientOcclusionLightValue(IBlockState state) {
-		return 1.0F;
-	}
-
-	/**
-	 * Spawns this Block's drops into the World as EntityItems.
-	 */
-	@Override
-	public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
-	}
-
-	@Override
-	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-		return BlockFaceShape.UNDEFINED;
-	}
+//	@Override
+//	@OnlyIn(Side.CLIENT)
+//	public float getAmbientOcclusionLightValue(BlockState state) {
+//		return 1.0F;
+//	}
 }

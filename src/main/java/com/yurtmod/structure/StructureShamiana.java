@@ -8,10 +8,9 @@ import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -23,8 +22,8 @@ public class StructureShamiana extends StructureBase {
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, EnumFacing dirForward, StructureWidth structureWidth,
-			IBlockState doorBlock, IBlockState wallBlock, IBlockState roofBlock) {
+	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth structureWidth,
+			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
 		final boolean tentDim = TentDimension.isTentDimension(worldIn);
 		final Blueprint bp = getBlueprints(structureWidth);
 		if (bp == null) {
@@ -58,9 +57,9 @@ public class StructureShamiana extends StructureBase {
 	}
 
 	@Override
-	public void buildLayer(final World worldIn, final BlockPos doorPos, final EnumFacing dirForward,
-			final IBlockState stateIn, final BlockPos[] coordinates) {
-		IBlockState state = stateIn;
+	public void buildLayer(final World worldIn, final BlockPos doorPos, final Direction dirForward,
+			final BlockState stateIn, final BlockPos[] coordinates) {
+		BlockState state = stateIn;
 		final boolean isWall = state.getBlock().getClass() == BlockShamianaWall.class;
 		if (isWall) {
 			state = BlockShamianaWall.getShamianaState(this.data.getColor(), false, true);

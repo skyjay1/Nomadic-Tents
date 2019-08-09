@@ -17,9 +17,9 @@ import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
 import mcp.mobius.waila.config.FormattingConfig;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDoor.EnumDoorHalf;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.block.DoorBlock.EnumDoorHalf;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -28,7 +28,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Optional;
 
 /**
  * WAILA integration -- using Hwyla:1.8.23-B38_1.12.
@@ -51,7 +50,7 @@ public final class WailaProvider implements IWailaDataProvider {
 	@Override
 	@Optional.Method(modid = NomadicTents.HWYLA)
 	public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
-		IBlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
+		BlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
 		if (state != null) {
 			if (state.getBlock() instanceof BlockTentDoor) {
 				return new StructureData(accessor.getNBTData().getCompoundTag(KEY_STRUCTURE_DATA)).getDropStack();
@@ -68,9 +67,9 @@ public final class WailaProvider implements IWailaDataProvider {
 	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world,
 			BlockPos pos) {
 		TileEntity tileEntity = te;
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 		if (state != null && state.getBlock() instanceof BlockTentDoor
-				&& state.getValue(BlockDoor.HALF) == EnumDoorHalf.UPPER) {
+				&& state.get(DoorBlock.HALF) == EnumDoorHalf.UPPER) {
 			tileEntity = world.getTileEntity(pos.down(1));
 		}
 

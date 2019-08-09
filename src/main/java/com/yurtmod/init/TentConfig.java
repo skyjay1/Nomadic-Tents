@@ -5,7 +5,6 @@ import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Config;
 

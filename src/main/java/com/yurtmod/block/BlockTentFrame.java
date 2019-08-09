@@ -9,22 +9,20 @@ import com.yurtmod.init.TentConfig;
 import com.yurtmod.item.ItemMallet;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockStateContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -49,8 +47,8 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	@Override
-	public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final EntityPlayer playerIn,
-			final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+	public boolean onBlockActivated(final World worldIn, final BlockPos pos, final BlockState state, final PlayerEntity playerIn,
+			final EnumHand hand, final Direction facing, final float hitX, final float hitY, final float hitZ) {
 		ItemStack heldItem = hand != null && playerIn != null ? playerIn.getHeldItem(hand) : null;
 		if (!worldIn.isRemote && heldItem != null && heldItem.getItem() instanceof ItemMallet) {
 			if (heldItem.getItem() == Content.ITEM_SUPER_MALLET) {
@@ -64,7 +62,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	@Override
 	@Deprecated // because super method is
-	public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source, final BlockPos pos) {
+	public AxisAlignedBB getBoundingBox(final BlockState state, final IBlockAccess source, final BlockPos pos) {
 		int meta = state.getValue(PROGRESS).intValue();
 		if (meta <= 1) {
 			return AABB_PROGRESS_0;
@@ -78,7 +76,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	@Override
 	@Deprecated // because super method is
 	@Nullable
-	public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState, final IBlockAccess worldIn, final BlockPos pos) {
+	public AxisAlignedBB getCollisionBoundingBox(final BlockState blockState, final IBlockAccess worldIn, final BlockPos pos) {
 		return NULL_AABB;
 	}
 
@@ -96,7 +94,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	 * @Override
 	 * 
 	 * @SideOnly(Side.CLIENT) public AxisAlignedBB
-	 * getSelectedBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+	 * getSelectedBoundingBox(BlockState blockState, World worldIn, BlockPos pos) {
 	 * return this.getBoundingBox(blockState, worldIn, pos); }
 	 */
 	@Override
@@ -106,7 +104,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	@Override
-	public boolean isFullCube(final IBlockState state) {
+	public boolean isFullCube(final BlockState state) {
 		return false;
 	}
 
@@ -121,26 +119,26 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	@Override
-	public IBlockState getStateFromMeta(final int meta) {
+	public BlockState getStateFromMeta(final int meta) {
 		return getDefaultState().withProperty(PROGRESS, Math.min(meta, MAX_META));
 	}
 
 	@Override
-	public int getMetaFromState(final IBlockState state) {
+	public int getMetaFromState(final BlockState state) {
 		return state.getValue(PROGRESS).intValue();
 	}
 
 	@Override
-	public boolean isOpaqueCube(final IBlockState state) {
+	public boolean isOpaqueCube(final BlockState state) {
 		return false;
 	}
 
 	/** @return the number by which to increment PROGRESS **/
-	public int getEffectiveness(final World worldIn, final BlockPos pos, final ItemStack mallet, final EntityPlayer player) {
+	public int getEffectiveness(final World worldIn, final BlockPos pos, final ItemStack mallet, final PlayerEntity player) {
 		return BASE_EFFECTIVENESS;
 	}
 
-	public boolean becomeReal(final World worldIn, final BlockPos pos, final ItemStack mallet, final EntityPlayer player) {
+	public boolean becomeReal(final World worldIn, final BlockPos pos, final ItemStack mallet, final PlayerEntity player) {
 		mallet.damageItem(CONSTRUCT_DAMAGE, player);
 		return !worldIn.isRemote && worldIn.setBlockState(pos, this.TO_BECOME.getBlock(), 3);
 	}
@@ -149,7 +147,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		return this.TO_BECOME;
 	}
 
-	public boolean onMalletUsed(final World worldIn, final BlockPos pos, final IBlockState state, final ItemStack mallet, final EntityPlayer player) {
+	public boolean onMalletUsed(final World worldIn, final BlockPos pos, final BlockState state, final ItemStack mallet, final PlayerEntity player) {
 		int meta = this.getMetaFromState(state);
 		int nextMeta = meta + getEffectiveness(worldIn, pos, mallet, player);
 		worldIn.setBlockState(pos, this.getDefaultState().withProperty(PROGRESS, Math.min(nextMeta, MAX_META)), 3);
@@ -159,8 +157,8 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		return true;
 	}
 
-	public boolean onSuperMalletUsed(final World worldIn, final BlockPos pos, final IBlockState state, final ItemStack mallet,
-			final EntityPlayer player) {
+	public boolean onSuperMalletUsed(final World worldIn, final BlockPos pos, final BlockState state, final ItemStack mallet,
+			final PlayerEntity player) {
 		// only continue if the config enables it
 		if (TentConfig.GENERAL.SUPER_MALLET_CREATIVE_ONLY && !player.isCreative()) {
 			return false;
@@ -183,15 +181,15 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	public static enum BlockToBecome {
-		YURT_WALL_INNER() { public IBlockState getBlock() { return Content.YURT_WALL_INNER.getDefaultState(); } }, 
-		YURT_WALL_OUTER() { public IBlockState getBlock() { return Content.YURT_WALL_OUTER.getDefaultState(); } }, 
-		YURT_ROOF() { public IBlockState getBlock() { return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true)); } }, 
-		TEPEE_WALL() { public IBlockState getBlock() { return Content.TEPEE_WALL_BLANK.getDefaultState(); } },
-		BEDOUIN_WALL() { public IBlockState getBlock() { return Content.BEDOUIN_WALL.getDefaultState(); } },
-		BEDOUIN_ROOF() { public IBlockState getBlock() { return Content.BEDOUIN_ROOF.getDefaultState(); } }, 
-		INDLU_WALL() { public IBlockState getBlock() { return Content.INDLU_WALL_OUTER.getDefaultState(); } },
-		SHAMIANA_WALL() { public IBlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } };
+		YURT_WALL_INNER() { public BlockState getBlock() { return Content.YURT_WALL_INNER.getDefaultState(); } }, 
+		YURT_WALL_OUTER() { public BlockState getBlock() { return Content.YURT_WALL_OUTER.getDefaultState(); } }, 
+		YURT_ROOF() { public BlockState getBlock() { return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true)); } }, 
+		TEPEE_WALL() { public BlockState getBlock() { return Content.TEPEE_WALL_BLANK.getDefaultState(); } },
+		BEDOUIN_WALL() { public BlockState getBlock() { return Content.BEDOUIN_WALL.getDefaultState(); } },
+		BEDOUIN_ROOF() { public BlockState getBlock() { return Content.BEDOUIN_ROOF.getDefaultState(); } }, 
+		INDLU_WALL() { public BlockState getBlock() { return Content.INDLU_WALL_OUTER.getDefaultState(); } },
+		SHAMIANA_WALL() { public BlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } };
 		
-		public abstract IBlockState getBlock();
+		public abstract BlockState getBlock();
 	}
 }
