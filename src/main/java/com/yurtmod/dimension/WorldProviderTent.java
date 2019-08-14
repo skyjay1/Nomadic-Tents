@@ -2,7 +2,7 @@ package com.yurtmod.dimension;
 
 import com.yurtmod.init.TentConfig;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.Biome;
@@ -45,7 +45,7 @@ public class WorldProviderTent extends WorldProvider {
 	}
 
 	@Override
-	public int getRespawnDimension(EntityPlayerMP player) {
+	public int getRespawnDimension(ServerPlayerEntity player) {
 		// this actually is only called if #canRespawnHere returns false, but that might
 		// change in the future
 		return TentConfig.GENERAL.ALLOW_SLEEP_TENT_DIM ? TentDimension.DIMENSION_ID : TentConfig.GENERAL.RESPAWN_DIMENSION;

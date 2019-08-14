@@ -12,26 +12,27 @@ import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.DoorBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.DoorBlock;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 		
 	public BlockTepeeWall(final String name) {
-		super(Material.CLOTH, MapColor.SAND);
-		this.setCreativeTab(NomadicTents.TAB);
+		super(Block.Properties.create(Material.WOOL, MaterialColor.SAND));
+		//this.setCreativeTab(NomadicTents.TAB);
 		this.setRegistryName(NomadicTents.MODID, name);
-		this.setUnlocalizedName(name);
-		this.setLightOpacity(LIGHT_OPACITY);
+		//this.setUnlocalizedName(name);
+		//this.setLightOpacity(LIGHT_OPACITY);
 	}
 
 	@Override
-	public void onBlockAdded(final World worldIn, final BlockPos pos, final BlockState stateIn) {
-		super.onBlockAdded(worldIn, pos, stateIn);
+	public void onBlockAdded(BlockState stateIn, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		super.onBlockAdded(stateIn, worldIn, pos, oldState, isMoving);
 		if (stateIn.getBlock() == Content.TEPEE_WALL_BLANK) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
 			BlockState state = getStateForRandomDesignWithChance(worldIn.rand, true);
@@ -119,7 +120,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 		if (pos == null) {
 			return null;
 		}
-		boolean isLower = world.getBlockState(pos).get(DoorBlock.HALF) == DoorBlock.DoubleBlockHalf.LOWER;
+		boolean isLower = world.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER;
 		return isLower ? pos : pos.down(1);
 	}
 

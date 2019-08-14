@@ -3,15 +3,19 @@ package com.yurtmod.dimension;
 import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;
 import net.minecraftforge.common.BiomeManager.BiomeType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.ObjectHolder;
 
 public class TentDimension {
 	
@@ -21,7 +25,7 @@ public class TentDimension {
 
 	public static final String BIOME_TENT_NAME = "Tent";
 
-	@GameRegistry.ObjectHolder(NomadicTents.MODID + ":" + BIOME_TENT_NAME)
+	@ObjectHolder(NomadicTents.MODID + ":" + BIOME_TENT_NAME)
 	public static BiomeTent biomeTent;
 
 	/** Structures are spaced this far apart for consistency and compatibility **/
@@ -33,8 +37,8 @@ public class TentDimension {
 
 	public static void preInit() {
 		DIMENSION_ID = TentConfig.GENERAL.TENT_DIM_ID;
-		TENT_DIMENSION = DimensionType.register(DIM_NAME, "_tent", DIMENSION_ID, WorldProviderTent.class, false);
-		DimensionManager.registerDimension(DIMENSION_ID, TentDimension.TENT_DIMENSION);
+//		TENT_DIMENSION = DimensionType.register(DIM_NAME, "_tent", DIMENSION_ID, WorldProviderTent.class, false);
+//		DimensionManager.registerDimension(DIMENSION_ID, TentDimension.TENT_DIMENSION);
 	}
 
 	public static void init() {
@@ -43,13 +47,35 @@ public class TentDimension {
 		// BiomeManager.addSpawnBiome(biomeTent);
 	}
 
+	public static World getConfigOverworld(final World server) {
+		final DimensionType type = DimensionType.getById(TentConfig.GENERAL.RESPAWN_DIMENSION);
+		return server.getServer().getWorld(type);
+	}
+	
+	public static ServerWorld getOverworld(final World server) {
+		return server.getServer().getWorld(DimensionType.OVERWORLD);
+	}
+	
+	public static ServerWorld getTent(final World server) {
+		return server.getServer().getWorld(DimensionType.getById(DIMENSION_ID));
+	}
+
 	/** Just for convenience **/
-	public static boolean isTentDimension(World world) {
-		return isTentDimension(world.provider.getDimension());
+	public static boolean isTentDimension(final IWorld world) {
+		return isTentDimension(world.getDimension().getType());
 	}
 
 	/** Convenience method to detect tent dimension **/
-	public static boolean isTentDimension(int id) {
-		return id == TentDimension.DIMENSION_ID;
+	// TODO not working!
+	public static boolean isTentDimension(final DimensionType type) {
+		return type.getId() == DIMENSION_ID;
 	}
+	
+	public static World getTentDimension(MinecraftServer server) {
+		return server.getWorld(DimensionType.getById(DIMENSION_ID));
+	}
+	
+//	public static World getTentDimension(Entity e) {
+//		return getTentDimension(e.getServer());
+//	}
 }

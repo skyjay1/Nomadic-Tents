@@ -4,25 +4,26 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonObject;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureTent;
 import com.yurtmod.structure.util.StructureWidth;
 
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.crafting.ShapedRecipe;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.common.crafting.IRecipeFactory;
-import net.minecraftforge.common.crafting.JsonContext;
 
-public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
+public class RecipeUpgradeWidth extends ShapedRecipe {
 	
 	public static final String CATEGORY = "tentcraftingwidth";
 	public static final RecipeUpgradeWidth EMPTY = new RecipeUpgradeWidth();
@@ -31,9 +32,9 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	private final StructureWidth widthIn;
 	private final StructureWidth widthOut;
 	
-	public RecipeUpgradeWidth(final StructureTent type, @Nullable final StructureWidth widthFrom, 
+	public RecipeUpgradeWidth(final ResourceLocation id, final StructureTent type, @Nullable final StructureWidth widthFrom, 
 			final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
-		super(CATEGORY, 3, calcRecipeHeight(type, widthTo), ingredients, 
+		super(id, CATEGORY, 3, calcRecipeHeight(type, widthTo), ingredients, 
 				new StructureData().setAll(type, widthTo, StructureDepth.NORMAL).writeTo(new ItemStack(Content.ITEM_TENT)));
 		this.tent = type;
 		this.widthIn = widthFrom;
@@ -41,7 +42,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	}
 	
 	private RecipeUpgradeWidth() {
-		super(CATEGORY, 3, 3, NonNullList.create(), ItemStack.EMPTY);
+		super(new ResourceLocation("empty"), CATEGORY, 3, 3, NonNullList.create(), ItemStack.EMPTY);
 		tent = StructureTent.YURT;
 		widthIn = StructureWidth.SMALL;
 		widthOut = StructureWidth.SMALL;
@@ -58,7 +59,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	 * Used to check if a recipe matches current crafting inventory
 	 */
 	@Override
-	public boolean matches(InventoryCrafting inv, World worldIn) {
+	public boolean matches(CraftingInventory inv, World worldIn) {
 		// check super conditions first
 		if(this != EMPTY && super.matches(inv, worldIn)) {
 			// find the tent item in the crafting grid
@@ -83,27 +84,27 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	 * Returns an Item that is the result of this recipe
 	 */
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting inv) {
+	public ItemStack getCraftingResult(CraftingInventory inv) {
 		if(this == EMPTY) {
 			return ItemStack.EMPTY;
 		}
 		
 		final ItemStack result = super.getCraftingResult(inv);
-		final NBTTagCompound resultTag = result.hasTagCompound() ? result.getTagCompound() : new NBTTagCompound();
+		final CompoundNBT resultTag = result.getOrCreateTag();
 		// find the tent in the input
 		ItemStack inputTent = getTentStack(inv);
 		
-		if (!inputTent.isEmpty() && inputTent.hasTagCompound()) {
+		if (!inputTent.isEmpty() && inputTent.hasTag()) {
 			final StructureData tentData = new StructureData(inputTent);
 			tentData.setWidth(this.widthOut);
 			// transfer those values to the new tent
-			resultTag.setTag(ItemTent.TENT_DATA, tentData.serializeNBT());
+			resultTag.put(ItemTent.TENT_DATA, tentData.serializeNBT());
 		} else {
 			// no tent was found, user is making a small tent
 			final StructureData data = new StructureData().setAll(this.tent, this.widthOut, StructureDepth.NORMAL);
-			resultTag.setTag(ItemTent.TENT_DATA, data.serializeNBT());
+			resultTag.put(ItemTent.TENT_DATA, data.serializeNBT());
 		}
-		result.setTagCompound(resultTag);
+		result.setTag(resultTag);
 		return result;
 	}
 	
@@ -130,7 +131,7 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	 * @param itemClass the target type of item to find
 	 * @return an ItemStack containing an item of type {@code itemClass}, or EMPTY if none is found
 	 **/
-	public static ItemStack getStackMatching(final InventoryCrafting inv, final Class<? extends Item> itemClass) {
+	public static ItemStack getStackMatching(final CraftingInventory inv, final Class<? extends Item> itemClass) {
 		for (int i = 0, l = inv.getSizeInventory(); i < l; ++i) {
 			final ItemStack stack = inv.getStackInSlot(i);
 			if (!stack.isEmpty() && stack.getItem() != null && itemClass.isAssignableFrom(stack.getItem().getClass())) {
@@ -143,23 +144,79 @@ public class RecipeUpgradeWidth extends ShapedRecipes implements IRecipe {
 	/**
 	 * @see #getStackMatching(InventoryCrafting, Class)
 	 **/
-	public static ItemStack getTentStack(final InventoryCrafting inv) {
+	public static ItemStack getTentStack(final CraftingInventory inv) {
 		return getStackMatching(inv, ItemTent.class);
 	}
 	
-	public static class Factory implements IRecipeFactory {
+	public static class Factory extends ShapedRecipe.Serializer {
+		
+		public static final ResourceLocation NAME = new ResourceLocation(NomadicTents.MODID, "tent_upgrade_width");
+//		@Override
+//		public IRecipe parse(JsonContext context, JsonObject json) {
+//			final ShapedRecipe recipe = ShapedRecipe.deserializeItem(json);			
+//			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
+//			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
+//			final ResourceLocation id = new ResourceLocation(NomadicTents.MODID, 
+//					"tents/" + tentType.getName() + "_" + widthOut.getName());
+//			return new RecipeUpgradeWidth(id, tentType, widthOut, recipe.getIngredients());	
+//		}
 
 		@Override
-		public IRecipe parse(JsonContext context, JsonObject json) {
+		public RecipeUpgradeWidth read(ResourceLocation recipeId, JsonObject json) {
 			if(json.has("disabled")) {
 				return RecipeUpgradeWidth.EMPTY;
 			}
-			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
-			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
-			// widthIn can be null
-			final StructureWidth widthIn = StructureWidth.getByName(JsonUtils.getString(json, "input_size"));
-			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
-			return new RecipeUpgradeWidth(tentType, widthIn, widthOut, recipe.getIngredients());			
+			final ShapedRecipe recipe = super.read(recipeId, json);
+			final StructureTent tentType = StructureTent.getByName(JSONUtils.getString(json, "tent_type"));
+			// input size may be null
+			final StructureWidth widthIn = StructureWidth.getByName(JSONUtils.getString(json, "input_size"));
+			final StructureWidth widthOut = StructureWidth.getByName(JSONUtils.getString(json, "result_size"));
+			return new RecipeUpgradeWidth(recipeId, tentType, widthIn, widthOut, recipe.getIngredients());	
 		}
+
+		@Override
+		public RecipeUpgradeWidth read(ResourceLocation recipeId, PacketBuffer buffer) {
+			if("empty".equals(recipeId.getPath())) {
+				return RecipeUpgradeWidth.EMPTY;
+			}
+			final ShapedRecipe recipe = super.read(recipeId, buffer);
+			final StructureTent tentType = StructureTent.getById(buffer.readByte());
+			final StructureWidth widthIn = StructureWidth.getById(buffer.readByte());
+			final StructureWidth widthOut = StructureWidth.getById(buffer.readByte());
+			return new RecipeUpgradeWidth(recipeId, tentType, widthIn, widthOut, recipe.getIngredients());
+		}
+
+		@Override
+		public void write(PacketBuffer buffer, ShapedRecipe recipeIn) {
+			super.write(buffer, recipeIn);
+			final RecipeUpgradeWidth recipe = (RecipeUpgradeWidth) recipeIn;
+			buffer.writeByte(recipe.getTent().getId());
+			buffer.writeByte(recipe.getWidthIn().getId());
+			buffer.writeByte(recipe.getWidthOut().getId());
+			
+//			buffer.writeVarInt(recipe.getRecipeWidth());
+//			buffer.writeVarInt(recipe.getRecipeHeight());
+//			buffer.writeString(recipe.getGroup());
+//
+//			for (final Ingredient ingredient : recipe.getIngredients()) {
+//				ingredient.writeToBuffer(buffer);
+//			}
+//
+//			buffer.writeItemStack(recipe.getRecipeOutput());
+		}
+
+
+//		@Override
+//		public IRecipe parse(JsonContext context, JsonObject json) {
+//			if(json.has("disabled")) {
+//				return RecipeUpgradeWidth.EMPTY;
+//			}
+//			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
+//			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
+//			// widthIn can be null
+//			final StructureWidth widthIn = StructureWidth.getByName(JsonUtils.getString(json, "input_size"));
+//			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
+//			return new RecipeUpgradeWidth(tentType, widthIn, widthOut, recipe.getIngredients());			
+//		}
 	}
 }

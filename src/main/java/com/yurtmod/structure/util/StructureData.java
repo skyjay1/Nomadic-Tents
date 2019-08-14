@@ -15,10 +15,10 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
-public class StructureData implements net.minecraftforge.common.util.INBTSerializable<NBTTagCompound> {
+public class StructureData implements net.minecraftforge.common.util.INBTSerializable<CompoundNBT> {
 	
 	////// String keys for NBT //////
 	public static final String KEY_TENT_CUR = "TentType";
@@ -44,7 +44,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 	
 	/** Deserializes the given NBT to set important fields **/
-	public StructureData(final NBTTagCompound nbt) {
+	public StructureData(final CompoundNBT nbt) {
 		this();
 		if(nbt != null) {
 			this.deserializeNBT(nbt);
@@ -284,7 +284,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	/** @return the same ItemStack with this object's info in its NBT data **/
 	public ItemStack writeTo(final ItemStack stack) {
 		if (stack.getTagCompound() == null) {
-			stack.setTagCompound(new NBTTagCompound());
+			stack.setTagCompound(new CompoundNBT());
 		}
 		stack.getTagCompound().setTag(ItemTent.TENT_DATA, this.serializeNBT());
 		return stack;
@@ -309,8 +309,8 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 
 	@Override
-	public NBTTagCompound serializeNBT() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public CompoundNBT serializeNBT() {
+		CompoundNBT nbt = new CompoundNBT();
 		// only write if non-null
 		if(this.tent != null) {
 			// 'Current' values
@@ -330,7 +330,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	}
 
 	@Override
-	public void deserializeNBT(final NBTTagCompound nbt) {
+	public void deserializeNBT(final CompoundNBT nbt) {
 		this.tent = StructureTent.getById(nbt.getByte(KEY_TENT_CUR));
 		this.width = StructureWidth.getById(nbt.getByte(KEY_WIDTH_CUR));
 		this.depth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_CUR));

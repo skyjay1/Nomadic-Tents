@@ -18,23 +18,23 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ItemTent extends Item {
 	/** Tent ItemStack NBTs should have this value for x and z offsets before it's set **/
@@ -43,14 +43,12 @@ public class ItemTent extends Item {
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
 
 	public ItemTent() {
-		this.setMaxStackSize(1);
-		this.setHasSubtypes(true);
-		this.setCreativeTab(NomadicTents.TAB);
+		super(new Item.Properties().maxStackSize(1).group(NomadicTents.TAB));
 		this.addPropertyOverride(new ResourceLocation(NomadicTents.MODID, "tent"),  new IItemPropertyGetter() {
 			@Override
-			public float apply(ItemStack stack, World worldIn, EntityLivingBase entityIn) {
-				if(stack.hasTagCompound() && stack.getTagCompound().hasKey(TENT_DATA)) {
-            		final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
+			public float call(ItemStack stack, World worldIn, LivingEntity entityIn) {
+				if(stack.hasTag() && stack.getTag().contains(TENT_DATA)) {
+            		final StructureData data = new StructureData(stack.getChildTag(TENT_DATA));
             		return (float)(data.getTent().getId() * StructureWidth.NUM_ENTRIES + data.getWidth().getId());
             	}
 				return 0;
@@ -73,54 +71,53 @@ public class ItemTent extends Item {
 		// make sure this tent has useable data
 		if(shouldFixOldStructureData(stack.getOrCreateSubCompound(TENT_DATA))) {
 			// tent has old information that needs to be transferred over
-			final NBTTagCompound tag = makeStructureDataFromOld(world, stack.getSubCompound(TENT_DATA));
+			final CompoundNBT tag = makeStructureDataFromOld(world, stack.getSubCompound(TENT_DATA));
 			stack.getTagCompound().setTag(TENT_DATA, tag);
 		} 
 	}
-
+	
 	@Override
-	public EnumActionResult onItemUseFirst(final PlayerEntity player, final World worldIn, final BlockPos pos,
-			final Direction side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
+	public ActionResultType onItemUse(final ItemUseContext cxt) {
 		// looks at the item info and spawns the correct tent in the correct form
-		if (!TentDimension.isTentDimension(worldIn) && !worldIn.isRemote) {
-			BlockPos hitPos = pos;
-			ItemStack stack = player.getHeldItem(hand);
-			Direction hitSide = side;
+		if (!TentDimension.isTentDimension(cxt.getWorld()) && !cxt.getWorld().isRemote) {
+			BlockPos hitPos = cxt.getPos();
+			ItemStack stack = cxt.getItem();
+			Direction hitSide = cxt.getFace();
 
-			if (worldIn.getBlockState(pos) == null || stack == null || stack.isEmpty()) {
-				return EnumActionResult.FAIL;
+			if (cxt.getWorld().getBlockState(hitPos) == null || stack == null || stack.isEmpty()) {
+				return ActionResultType.FAIL;
 			} else {
 				// make sure this tent has useable data
-				if(shouldFixOldStructureData(stack.getOrCreateSubCompound(TENT_DATA))) {
+				if(shouldFixOldStructureData(stack.getOrCreateChildTag(TENT_DATA))) {
 					// tent has old information that needs to be transferred over
-					final NBTTagCompound tag = makeStructureDataFromOld(worldIn, stack.getSubCompound(TENT_DATA));
-					stack.getTagCompound().setTag(TENT_DATA, tag);
-				} else if(shouldMakeNewStructureData(stack.getOrCreateSubCompound(TENT_DATA))){
+					final CompoundNBT tag = makeStructureDataFromOld(cxt.getWorld(), stack.getChildTag(TENT_DATA));
+					stack.getTag().put(TENT_DATA, tag);
+				} else if(shouldMakeNewStructureData(stack.getOrCreateChildTag(TENT_DATA))){
 					// tent has invalid ID and needs to be assigned
-					final NBTTagCompound tag = makeStructureData(worldIn, stack);
-					stack.getTagCompound().setTag(TENT_DATA, tag);
+					final CompoundNBT tag = makeStructureData(cxt.getWorld(), stack);
+					stack.getTag().put(TENT_DATA, tag);
 				}
 				// offset the BlockPos to build on if it's not replaceable
-				if (!StructureBase.REPLACE_BLOCK_PRED.test(worldIn.getBlockState(hitPos))) {
+				if (!StructureBase.REPLACE_BLOCK_PRED.test(cxt.getWorld().getBlockState(hitPos))) {
 					hitPos = hitPos.up(1);
 				}
 				// if you can't edit these blocks, return FAIL
-				if (!player.canPlayerEdit(hitPos, hitSide, stack)) {
-					return EnumActionResult.FAIL;
+				if (cxt.getPlayer() == null || !cxt.getPlayer().canPlayerEdit(hitPos, hitSide, stack)) {
+					return ActionResultType.FAIL;
 				} else {
 					// start checking to build structure
-					final Direction playerFacing = player.getHorizontalFacing();
-					final StructureData data = new StructureData(stack.getSubCompound(TENT_DATA));
+					final Direction playerFacing = cxt.getPlayer().getHorizontalFacing();
+					final StructureData data = new StructureData(stack.getChildTag(TENT_DATA));
 					final StructureWidth width = data.getWidth().getOverworldSize();
 					final StructureBase struct = data.getStructure();
 					// make sure the tent can be built here
-					if (struct.canSpawn(worldIn, hitPos, playerFacing, width)) {
+					if (struct.canSpawn(cxt.getWorld(), hitPos, playerFacing, width)) {
 						// build the frames
-						if (struct.generateFrameStructure(worldIn, hitPos, playerFacing, width)) {
+						if (struct.generateFrameStructure(cxt.getWorld(), hitPos, playerFacing, width)) {
 							// update the TileEntity information
-							final TileEntity te = worldIn.getTileEntity(hitPos);
+							final TileEntity te = cxt.getWorld().getTileEntity(hitPos);
 							if (te instanceof TileEntityTentDoor) {
-								StructureData.applyToTileEntity(player, stack, (TileEntityTentDoor) te);
+								StructureData.applyToTileEntity(cxt.getPlayer(), stack, (TileEntityTentDoor) te);
 							} else {
 								System.out.println(
 										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
@@ -132,7 +129,7 @@ public class ItemTent extends Item {
 				}
 			}
 		}
-		return EnumActionResult.PASS;
+		return ActionResultType.PASS;
 	}
 
 	@Override
@@ -175,7 +172,7 @@ public class ItemTent extends Item {
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		final StructureData data = new StructureData(stack);
 		// tooltip for all tents
@@ -196,8 +193,8 @@ public class ItemTent extends Item {
 	}
 	
 	/** @return TRUE if the given ItemStack contains tent NBT data in an outdated format **/
-	public static boolean shouldMakeNewStructureData(final NBTTagCompound tentData) {
-		return tentData.hasKey(StructureData.KEY_ID) && tentData.getLong(StructureData.KEY_ID) == ERROR_TAG;
+	public static boolean shouldMakeNewStructureData(final CompoundNBT tentData) {
+		return tentData.contains(StructureData.KEY_ID) && tentData.getLong(StructureData.KEY_ID) == ERROR_TAG;
 	}
 	
 	/**
@@ -205,9 +202,9 @@ public class ItemTent extends Item {
 	 * a real location. If data is missing or incorrect, this method allots a space
 	 * for this tent in the Tent dimension and updates the ItemStack NBT by giving it
 	 * a location ID
-	 * @return a new NBTTagCompound with correct value for ID
+	 * @return a new CompoundNBT with correct value for ID
 	 **/
-	public static NBTTagCompound makeStructureData(final World world, final ItemStack stack) {
+	public static CompoundNBT makeStructureData(final World world, final ItemStack stack) {
 		if (!world.isRemote) {
 			// check if data is missing or set incorrectly
 			StructureData data = new StructureData(stack);
@@ -217,7 +214,7 @@ public class ItemTent extends Item {
 			}
 			return data.serializeNBT();
 		}
-		return new NBTTagCompound();
+		return new CompoundNBT();
 	}
 	
 	/** Calculates and returns the next available ID for a tent, or -1 if this is the client **/
@@ -226,8 +223,8 @@ public class ItemTent extends Item {
 	}
 	
 	/** @return TRUE if the given ItemStack contains tent NBT data in an outdated format **/
-	public static boolean shouldFixOldStructureData(final NBTTagCompound tentData) {
-		return tentData.hasKey("StructureOffsetX");
+	public static boolean shouldFixOldStructureData(final CompoundNBT tentData) {
+		return tentData.contains("StructureOffsetX");
 	}
 	
 	/**
@@ -235,23 +232,23 @@ public class ItemTent extends Item {
 	 * the NBT data is stored in the old format. Uses that information to re-write
 	 * correctly formatted NBT data and updates the TentSaveData ID as needed
 	 * @param world the world
-	 * @param stack the old NBTTagCompound with old values
-	 * @return a new NBTTagCompound with correct keys and values as parsed from the old one.
+	 * @param stack the old CompoundNBT with old values
+	 * @return a new CompoundNBT with correct keys and values as parsed from the old one.
 	 **/
-	public static NBTTagCompound makeStructureDataFromOld(final World world, final NBTTagCompound oldTag) {
+	public static CompoundNBT makeStructureDataFromOld(final World world, final CompoundNBT oldTag) {
 		if(!world.isRemote) {
-			// Make a new NBTTagCompound using old keys to get values from old NBT
-			final NBTTagCompound dataTag = new NBTTagCompound();
-			dataTag.setByte(StructureData.KEY_TENT_CUR, (byte)oldTag.getShort("StructureTentType"));
-			dataTag.setByte(StructureData.KEY_WIDTH_CUR, (byte)oldTag.getShort("StructureWidthCurrent"));
+			// Make a new CompoundNBT using old keys to get values from old NBT
+			final CompoundNBT dataTag = new CompoundNBT();
+			dataTag.putByte(StructureData.KEY_TENT_CUR, (byte)oldTag.getShort("StructureTentType"));
+			dataTag.putByte(StructureData.KEY_WIDTH_CUR, (byte)oldTag.getShort("StructureWidthCurrent"));
 			//dataTag.setByte(StructureData.KEY_WIDTH_PREV, (byte)oldTag.getShort("StructureWidthPrevious"));
-			dataTag.setByte(StructureData.KEY_DEPTH_CUR, (byte)oldTag.getShort("StructureDepthCurrent"));
+			dataTag.putByte(StructureData.KEY_DEPTH_CUR, (byte)oldTag.getShort("StructureDepthCurrent"));
 			//dataTag.setByte(StructureData.KEY_DEPTH_PREV, (byte)oldTag.getShort("StructureDepthPrevious"));
-			final int offsetX = oldTag.getInteger("StructureOffsetX");
-			final int offsetZ = oldTag.getInteger("StructureOffsetZ");
+			final int offsetX = oldTag.getInt("StructureOffsetX");
+			final int offsetZ = oldTag.getInt("StructureOffsetZ");
 			final long ID = TileEntityTentDoor.getTentID(new BlockPos(
 					offsetX * TentDimension.TENT_SPACING, TentDimension.FLOOR_Y, offsetZ * TentDimension.TENT_SPACING));
-			dataTag.setLong(StructureData.KEY_ID, ID);
+			dataTag.putLong(StructureData.KEY_ID, ID);
 			// update WorldSaveData to make sure this ID isn't going to be used
 			final TentSaveData worldData = TentSaveData.forWorld(world);
 			while(worldData.getCurrentID() <= ID) {
@@ -260,6 +257,6 @@ public class ItemTent extends Item {
 			// return the new tag
 			return dataTag;
 		}
-		return new NBTTagCompound();
+		return new CompoundNBT();
 	}
 }

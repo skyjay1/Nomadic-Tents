@@ -6,12 +6,12 @@ import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.StructureData;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 
 public class TentTeleporter extends Teleporter {
@@ -23,9 +23,9 @@ public class TentTeleporter extends Teleporter {
 	private final double prevZ;
 	private final float prevYaw;
 	private final int prevDimID;
-	private final WorldServer worldServerTo;
+	private final ServerWorld worldServerTo;
 
-	public TentTeleporter(final int dimensionFrom, final WorldServer worldTo, final BlockPos doorPos, final DyeColor colorIn,
+	public TentTeleporter(final int dimensionFrom, final ServerWorld worldTo, final BlockPos doorPos, final DyeColor colorIn,
 			final double oldX, final double oldY, final double oldZ, final float oldYaw, final StructureData data) {
 		super(worldTo);
 		this.prevDimID = dimensionFrom;
@@ -39,7 +39,7 @@ public class TentTeleporter extends Teleporter {
 		this.tentData = data;
 	}
 	
-	public TentTeleporter(final int worldFrom, final WorldServer worldTo, final TileEntityTentDoor te) {
+	public TentTeleporter(final int worldFrom, final ServerWorld worldTo, final TileEntityTentDoor te) {
 		this(worldFrom, worldTo, te.getDoorPos(), te.getTentData().getColor(), 
 				te.getPrevX(), te.getPrevY(), te.getPrevZ(), te.getPrevFacing(), te.getTentData());
 	}
@@ -65,8 +65,8 @@ public class TentTeleporter extends Teleporter {
 		}
 				
 		// move the entity to the correct position
-		if (entity instanceof EntityPlayerMP) {
-			((EntityPlayerMP)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);			 
+		if (entity instanceof ServerPlayerEntity) {
+			((ServerPlayerEntity)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);			 
 		} else {
 			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 		}

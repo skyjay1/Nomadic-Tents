@@ -4,7 +4,9 @@ import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEventHandler;
 import com.yurtmod.proxies.CommonProxy;
 
+import net.minecraft.client.audio.SoundHandler.Loader;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -27,9 +29,9 @@ public class NomadicTents {
 			+ ".proxies.CommonProxy")
 	public static CommonProxy proxy;
 
-	public static final CreativeTabs TAB = new CreativeTabs("yurtMain") {
+	public static final ItemGroup TAB = new ItemGroup("yurtMain") {
 		@Override
-		public ItemStack getTabIconItem() {
+		public ItemStack createIcon() {
 			return new ItemStack(Content.ITEM_TENT);
 		}
 	};

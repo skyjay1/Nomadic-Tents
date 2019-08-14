@@ -26,6 +26,7 @@ import com.yurtmod.item.ItemTent;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
@@ -54,7 +55,7 @@ public class CommonProxy {
 		// helpful blocks
 		event.getRegistry().registerAll(
 			new BlockBarrier().setRegistryName(NomadicTents.MODID, "tentmod_barrier")
-					.setUnlocalizedName("tentmod_barrier").setCreativeTab(NomadicTents.TAB),
+					.setCreativeTab(NomadicTents.TAB),
 			new BlockUnbreakable(Material.GROUND).setRegistryName(NomadicTents.MODID, "super_dirt")
 					.setUnlocalizedName("super_dirt").setCreativeTab(NomadicTents.TAB)
 		);
@@ -143,9 +144,9 @@ public class CommonProxy {
 		event.getRegistry().registerAll(
 				// items
 				new ItemTent().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, "tent"),
-				new ItemMallet(ToolMaterial.IRON).setCreativeTab(NomadicTents.TAB)
+				new ItemMallet(ItemTier.IRON).setCreativeTab(NomadicTents.TAB)
 						.setRegistryName(NomadicTents.MODID, "mallet").setUnlocalizedName("mallet"),
-				new ItemSuperMallet(ToolMaterial.DIAMOND).setCreativeTab(NomadicTents.TAB)
+				new ItemSuperMallet(ItemTier.DIAMOND).setCreativeTab(NomadicTents.TAB)
 						.setRegistryName(NomadicTents.MODID, "super_mallet").setUnlocalizedName("super_mallet"),
 				// tent crafting items and upgrades
 				basicItem("tent_canvas"), basicItem("yurt_wall_piece"), basicItem("tepee_wall_piece"),
@@ -199,12 +200,11 @@ public class CommonProxy {
 	}
 
 	private static final Item basicItem(String name) {
-		return new Item().setCreativeTab(NomadicTents.TAB).setRegistryName(NomadicTents.MODID, name)
-				.setUnlocalizedName(name);
+		return new Item(new Item.Properties().group(NomadicTents.TAB)).setRegistryName(NomadicTents.MODID, name);
 	}
 
-	private static final ItemBlock makeIB(Block base) {
-		ItemBlock ib = new ItemBlock(base);
+	private static final BlockItem makeIB(Block base) {
+		BlockItem ib = new BlockItem(base, new Item.Properties().group(NomadicTents.TAB));
 		ib.setRegistryName(base.getRegistryName());
 		return ib;
 	}

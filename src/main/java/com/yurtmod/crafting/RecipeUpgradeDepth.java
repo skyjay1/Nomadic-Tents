@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.crafting.IRecipeFactory;
@@ -87,7 +87,7 @@ public class RecipeUpgradeDepth  extends ShapedRecipes implements IRecipe {
 		final ItemStack result = super.getCraftingResult(inv);
 		// find the tent in the input
 		final ItemStack inputTent = RecipeUpgradeWidth.getTentStack(inv);
-		final NBTTagCompound resultTag = result.hasTagCompound() ? result.getTagCompound() : new NBTTagCompound();
+		final CompoundNBT resultTag = result.hasTagCompound() ? result.getTagCompound() : new CompoundNBT();
 		
 		if (inputTent != null && inputTent.hasTagCompound()) {
 			final StructureData tentData = new StructureData(inputTent);		

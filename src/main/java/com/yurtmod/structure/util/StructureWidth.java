@@ -95,7 +95,6 @@ public enum StructureWidth implements IStringSerializable {
 		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
 	}
 	
-	@Nullable
 	public static StructureWidth getByName(final String name) {
 		if(name != null && !name.isEmpty()) {
 			for(final StructureWidth w : values()) {
@@ -104,7 +103,7 @@ public enum StructureWidth implements IStringSerializable {
 				}
 			}
 		}
-		return null;
+		return SMALL;
 	}
 
 	@Override

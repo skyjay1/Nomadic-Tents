@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -42,12 +42,12 @@ public class TentSaveData extends WorldSavedData {
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound nbt) {
+	public void readFromNBT(CompoundNBT nbt) {
 		idCount = nbt.getLong(ID_COUNT);
 		// read spawn map
 		final NBTTagList tagList = nbt.getTagList(KEY_SPAWNS, 9);
 		for(int i = 0, l = tagList.tagCount(); i < l; ++i) {
-			NBTTagCompound nbtCompound = tagList.getCompoundTagAt(i);
+			CompoundNBT nbtCompound = tagList.getCompoundTagAt(i);
 			if(nbtCompound.hasKey(KEY_SPAWNS + _UUID) && nbtCompound.hasKey(KEY_SPAWNS + _X)
 					&& nbtCompound.hasKey(KEY_SPAWNS + _Y) && nbtCompound.hasKey(KEY_SPAWNS + _Z)) {
 				final UUID uuid = UUID.fromString(nbtCompound.getString(KEY_SPAWNS + _UUID));
@@ -60,13 +60,13 @@ public class TentSaveData extends WorldSavedData {
 	}
 
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+	public CompoundNBT writeToNBT(CompoundNBT nbt) {
 		nbt.setLong(ID_COUNT, idCount);
 		// write spawn map
 		final NBTTagList tagList = new NBTTagList();
 		for(final Entry<UUID, BlockPos> uuid : prevSpawnMap.entrySet()) {
 			BlockPos prevSpawn = uuid.getValue();
-			final NBTTagCompound tagCompound = new NBTTagCompound();
+			final CompoundNBT tagCompound = new CompoundNBT();
 			tagCompound.setString(KEY_SPAWNS + _UUID, uuid.toString());
 			tagCompound.setInteger(KEY_SPAWNS + _X, prevSpawn.getX());
 			tagCompound.setInteger(KEY_SPAWNS + _Y, prevSpawn.getY());

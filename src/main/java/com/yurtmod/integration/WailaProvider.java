@@ -21,9 +21,9 @@ import net.minecraft.block.DoorBlock;
 import net.minecraft.block.DoorBlock.EnumDoorHalf;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -64,7 +64,7 @@ public final class WailaProvider implements IWailaDataProvider {
 	@Nonnull
 	@Override
 	@Optional.Method(modid = NomadicTents.HWYLA)
-	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world,
+	public CompoundNBT getNBTData(ServerPlayerEntity player, TileEntity te, CompoundNBT tag, World world,
 			BlockPos pos) {
 		TileEntity tileEntity = te;
 		BlockState state = world.getBlockState(pos);

@@ -9,14 +9,14 @@ import com.yurtmod.structure.util.StructureData;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemChorusFruit;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -38,8 +38,8 @@ public class TentEventHandler {
 		if(!event.getEntityPlayer().getEntityWorld().isRemote 
 				&& event.getEntityPlayer().getEntityWorld().getGameRules().getBoolean("doDaylightCycle")) {
 			final MinecraftServer server = event.getEntityPlayer().getServer();
-			final WorldServer overworld = server.getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION);
-			final WorldServer tentDim = server.getWorld(TentDimension.DIMENSION_ID);
+			final ServerWorld overworld = server.getWorld(TentConfig.GENERAL.RESPAWN_DIMENSION);
+			final ServerWorld tentDim = server.getWorld(TentDimension.DIMENSION_ID);
 			// only run this code for players waking up in a Tent
 			if(TentDimension.isTentDimension(event.getEntityPlayer().getEntityWorld())) {
 				boolean shouldChangeTime = TentConfig.GENERAL.ALLOW_SLEEP_TENT_DIM;
@@ -69,7 +69,7 @@ public class TentEventHandler {
 	}
 
 	// Updates sleep and daylight-cycle info for overworld and tent dimension
-	//public void handleSleepIn(final WorldServer s) {
+	//public void handleSleepIn(final ServerWorld s) {
 	//	long i = s.getWorldInfo().getWorldTime() + 24000L;
 	//	s.getWorldInfo().setWorldTime(i - i % 24000L);
 	//	s.updateAllPlayersSleepingFlag();
@@ -127,14 +127,14 @@ public class TentEventHandler {
 	 **/
 	@SubscribeEvent
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		if (event.player instanceof EntityPlayerMP && !event.player.getEntityWorld().isRemote) {
+		if (event.player instanceof ServerPlayerEntity && !event.player.getEntityWorld().isRemote) {
 			final int TENTDIM = TentDimension.DIMENSION_ID;
 			final int RESPAWN = TentConfig.GENERAL.RESPAWN_DIMENSION;
 			final int CUR_DIM = event.player.getEntityWorld().provider.getDimension();
-			EntityPlayerMP playerMP = (EntityPlayerMP) event.player;
+			ServerPlayerEntity playerMP = (ServerPlayerEntity) event.player;
 			final MinecraftServer mcServer = playerMP.getServer();
-			final WorldServer tentServer = mcServer.getWorld(TENTDIM);
-			final WorldServer overworld = mcServer.getWorld(RESPAWN);
+			final ServerWorld tentServer = mcServer.getWorld(TENTDIM);
+			final ServerWorld overworld = mcServer.getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
 			if (TentConfig.GENERAL.ALLOW_RESPAWN_INTERCEPT && CUR_DIM == TENTDIM) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
