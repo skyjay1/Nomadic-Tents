@@ -1,7 +1,0 @@
-{
-   "recipes": {
-        "tent_upgrade_width": "com.yurtmod.crafting.RecipeUpgradeWidth$Factory",
-		"tent_upgrade_depth": "com.yurtmod.crafting.RecipeUpgradeDepth$Factory",
-		"tent_upgrade_color": "com.yurtmod.crafting.RecipeUpgradeColor$Factory"
-    }
-}

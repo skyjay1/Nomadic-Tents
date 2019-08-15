@@ -1,0 +1,7 @@
+{
+   "recipes": {
+        "tent_upgrade_width": "nomadictents.crafting.RecipeUpgradeWidth$Factory",
+		"tent_upgrade_depth": "nomadictents.crafting.RecipeUpgradeDepth$Factory",
+		"tent_upgrade_color": "nomadictents.crafting.RecipeUpgradeColor$Factory"
+    }
+}

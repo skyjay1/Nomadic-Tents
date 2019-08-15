@@ -1,0 +1,6 @@
+{
+    "parent": "nomadictents:block/door_nonfull",
+    "textures": {
+        "t": "nomadictents:blocks/shamiana_door_lower_2"
+    }
+}

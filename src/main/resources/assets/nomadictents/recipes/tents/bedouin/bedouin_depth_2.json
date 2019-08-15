@@ -1,0 +1,31 @@
+{
+  "type": "nomadictents:tent_upgrade_depth",
+  "tent_type": "bedouin",
+  "min_size": "large",
+  "input_depth": 1,
+  "result_depth": 2,
+  "pattern": [
+   "DBD",
+   "DTD",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:iron_block"
+      },
+	"X": {
+        "item": "nomadictents:depth_upgrade_iron"
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

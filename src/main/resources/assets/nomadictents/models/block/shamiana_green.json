@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nomadictents:blocks/shamiana_green",
+        "particle": "nomadictents:blocks/shamiana_green"
+    }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "nomadictents:tent_upgrade_color",
+  "result_color": "red",
+  "pattern": [
+   "DDD",
+   "DTD",
+   "DDD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dye",
+		"data": 1
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

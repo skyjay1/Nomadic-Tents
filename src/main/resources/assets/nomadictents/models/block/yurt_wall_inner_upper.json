@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nomadictents:blocks/yurt_wall_inner_upper",
+        "particle": "nomadictents:blocks/yurt_wall_inner_upper"
+    }
+}

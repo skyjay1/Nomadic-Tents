@@ -1,0 +1,7 @@
+{
+    "parent":"block/cube_all",
+    "textures": {
+        "all": "nomadictents:blocks/tepee_wall_0",
+		"particle": "nomadictents:blocks/tepee_wall_0"
+    }
+}

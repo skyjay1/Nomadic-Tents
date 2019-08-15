@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "pattern=false": { "model": "nomadictents:shamiana_orange"},
+		"pattern=true": [
+			{ "model": "nomadictents:shamiana_orange_pattern1", "weight":3 },
+			{ "model": "nomadictents:shamiana_orange_pattern2", "weight":1 } ]
+    }
+}

@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "nomadictents:cos_tepee_wall_sun",
+    "count": 1,
+	"data": 0
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "nomadictents:cos_tepee_wall_hope",
+	  "data": 0
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "nomadictents:tent_upgrade_width",
+  "tent_type": "tepee",
+  "input_size": "",
+  "result_size": "small",
+  "pattern": [
+   " W ",
+   "WWW",
+   "W W"],
+  "key": {
+    "W": {
+        "item": "nomadictents:tepee_wall_piece"
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

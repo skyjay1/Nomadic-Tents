@@ -1,0 +1,6 @@
+{
+    "parent": "nomadictents:block/door_nonfull",
+    "textures": {
+        "t": "nomadictents:blocks/indlu_door_upper_2"
+    }
+}

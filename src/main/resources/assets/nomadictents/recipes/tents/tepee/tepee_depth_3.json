@@ -1,0 +1,31 @@
+{
+  "type": "nomadictents:tent_upgrade_depth",
+  "tent_type": "tepee",
+  "min_size": "huge",
+  "input_depth": 2,
+  "result_depth": 3,
+  "pattern": [
+   "DBD",
+   "DTD",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:gold_block"
+      },
+	"X": {
+        "item": "nomadictents:depth_upgrade_gold"
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

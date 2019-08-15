@@ -1,0 +1,6 @@
+{
+	"variants": {
+		"outside=true": { "model": "nomadictents:yurt_roof_outside"},
+		"outside=false": { "model": "nomadictents:yurt_roof_inside"}
+	}
+}

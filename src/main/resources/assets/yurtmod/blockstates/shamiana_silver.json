@@ -1,6 +1,0 @@
-{
-    "variants": {
-        "pattern=false": { "model": "yurtmod:shamiana_light_gray"},
-		"pattern=true": { "model": "yurtmod:shamiana_light_gray_pattern"}
-    }
-}

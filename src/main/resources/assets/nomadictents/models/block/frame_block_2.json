@@ -1,0 +1,6 @@
+{
+    "parent": "block/crop",
+    "textures": {
+        "crop": "nomadictents:blocks/yurt_frame_2"
+    }
+}

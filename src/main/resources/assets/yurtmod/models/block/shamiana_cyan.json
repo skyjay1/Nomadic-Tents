@@ -1,7 +1,0 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "yurtmod:blocks/shamiana_cyan",
-        "particle": "yurtmod:blocks/shamiana_cyan"
-    }
-}

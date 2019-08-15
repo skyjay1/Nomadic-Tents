@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   " IS",
+   " CI",
+   "S  "],
+  "key": {
+    "I": {
+        "item": "minecraft:iron_ingot"
+      },
+	"S": {
+		"type": "forge:ore_dict",
+		"ore": "stickWood"
+	  },
+	"C": {
+		"item": "nomadictents:tent_canvas"
+	  }
+  },
+  "result": {
+    "item": "nomadictents:mallet",
+    "count": 1
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "nomadictents:tent_upgrade_width",
+  "tent_type": "shamiana",
+  "input_size": "huge",
+  "result_size": "giant",
+  "pattern": [
+   "X X",
+   "YYY",
+   "YTY"],
+  "key": {
+    "Y": {
+        "item": "nomadictents:shamiana_wall_piece"
+      },
+	"X": {
+        "item": "nomadictents:tent_upgrade_obsidian"
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

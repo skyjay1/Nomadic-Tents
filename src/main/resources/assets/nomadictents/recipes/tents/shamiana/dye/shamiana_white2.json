@@ -1,0 +1,21 @@
+{
+  "type": "nomadictents:tent_upgrade_color",
+  "result_color": "white",
+  "pattern": [
+   "T",
+   "D"],
+  "key": {
+    "D": {
+        "item": "minecraft:water_bucket",
+		"data": 0
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

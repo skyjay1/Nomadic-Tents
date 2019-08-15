@@ -1,0 +1,18 @@
+{
+  "type": "nomadictents:tent_upgrade_width",
+  "tent_type": "shamiana",
+  "input_size": "",
+  "result_size": "small",
+  "pattern": [
+   "YYY",
+   "Y Y"],
+  "key": {
+    "Y": {
+        "item": "nomadictents:shamiana_wall_piece"
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

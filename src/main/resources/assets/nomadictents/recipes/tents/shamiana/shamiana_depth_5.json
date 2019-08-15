@@ -1,0 +1,31 @@
+{
+  "type": "nomadictents:tent_upgrade_depth",
+  "tent_type": "shamiana",
+  "min_size": "mega",
+  "input_depth": 4,
+  "result_depth": 5,
+  "pattern": [
+   "DBD",
+   "DTD",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:diamond_block"
+      },
+	"X": {
+        "item": "nomadictents:depth_upgrade_diamond"
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

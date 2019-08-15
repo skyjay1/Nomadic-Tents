@@ -1,0 +1,25 @@
+{
+  "type": "nomadictents:tent_upgrade_width",
+  "tent_type": "yurt",
+  "input_size": "huge",
+  "result_size": "giant",
+  "pattern": [
+   "XYX",
+   "YTY"],
+  "key": {
+    "Y": {
+        "item": "nomadictents:yurt_wall_piece"
+      },
+	"X": {
+        "item": "nomadictents:tent_upgrade_obsidian"
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

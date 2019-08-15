@@ -1,0 +1,31 @@
+{
+  "type": "nomadictents:tent_upgrade_depth",
+  "tent_type": "indlu",
+  "min_size": "medium",
+  "input_depth": 0,
+  "result_depth": 1,
+  "pattern": [
+   "DBD",
+   "DTD",
+   "DXD"],
+  "key": {
+    "D": {
+        "item": "minecraft:dirt",
+		"data": 0
+      },
+    "B": {
+        "item": "minecraft:cobblestone"
+      },
+	"X": {
+        "item": "nomadictents:depth_upgrade_stone"
+      },
+	"T": {
+        "item": "nomadictents:tent",
+		"data": 0
+      }
+  },
+  "result": {
+    "item": "nomadictents:tent",
+	 "data": 0
+  }
+}

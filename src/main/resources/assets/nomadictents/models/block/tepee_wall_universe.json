@@ -1,0 +1,12 @@
+{
+    "parent":"block/cube",
+    "textures": {
+        "north": "nomadictents:blocks/tepee_wall_9",
+		"south": "nomadictents:blocks/tepee_wall_9",
+		"east": "nomadictents:blocks/tepee_wall_9",
+		"west": "nomadictents:blocks/tepee_wall_9",
+		"up": "nomadictents:blocks/tepee_wall_0",
+		"down": "nomadictents:blocks/tepee_wall_0",
+		"particle": "nomadictents:blocks/tepee_wall_0"
+    }
+}
