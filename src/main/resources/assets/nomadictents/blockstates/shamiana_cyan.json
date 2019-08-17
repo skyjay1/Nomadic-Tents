@@ -1,6 +1,6 @@
 {
     "variants": {
-        "pattern=false": { "model": "nomadictents:shamiana_cyan"},
-		"pattern=true": { "model": "nomadictents:shamiana_cyan_pattern"}
+        "pattern=false": { "model": "nomadictents:block/shamiana_cyan"},
+		"pattern=true": { "model": "nomadictents:block/shamiana_cyan_pattern"}
     }
 }

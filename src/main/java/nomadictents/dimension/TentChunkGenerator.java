@@ -95,6 +95,6 @@ public class TentChunkGenerator extends OverworldChunkGenerator {
 
 	@Override
 	public int getGroundHeight() {
-		return TentManager.FLOOR_Y;
+		return TentDimension.FLOOR_Y;
 	}
 }

@@ -47,7 +47,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	}
 	
 	public BlockShamianaWall(final DyeColor colorIn, final boolean cosmetic) {
-		this(colorIn, (cosmetic ? "cos_shamiana" : "shamiana_").concat(colorIn.getName()), cosmetic);
+		this(colorIn, (cosmetic ? "cos_shamiana_" : "shamiana_").concat(colorIn.getName()), cosmetic);
 	}
 	
 	/** @return the DyeColor of this block **/
@@ -64,7 +64,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	public void onBlockAdded(BlockState stateIn, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		super.onBlockAdded(stateIn, worldIn, pos, oldState, isMoving);
 		// only do the complicated math when it's OVERWORLD and INDESTRUCTIBLE WHITE block
-		if (!TentManager.isTentDimension(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
+		if (!TentManager.isTent(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
 			BlockState state = null;
 			// determine what color to use based on TileEntity color data

@@ -34,7 +34,7 @@ public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
 			BlockState state = getStateForRandomDesignWithChance(worldIn.rand, true);
 			// this determines what pattern overworld tepees should have for each layer
-			if (!TentManager.isTentDimension(worldIn) && doorPos != null
+			if (!TentManager.isTent(worldIn) && doorPos != null
 					&& (Math.abs(pos.getY() - doorPos.getY()) % 2 == 0)
 					&& worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
 				TileEntityTentDoor te = (TileEntityTentDoor) worldIn.getTileEntity(doorPos);

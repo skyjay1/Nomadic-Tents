@@ -14,11 +14,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import nomadictents.block.BlockTentDoor;
 import nomadictents.block.BlockUnbreakable;
 import nomadictents.block.Categories.ITentBlockBase;
 import nomadictents.block.TileEntityTentDoor;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimension;
 import nomadictents.event.TentEvent;
 import nomadictents.init.Content;
 import nomadictents.init.TentConfig;
@@ -68,7 +69,7 @@ public abstract class StructureBase {
 	/**
 	 * Allots a space for and builds a sized structure in the Tent Dimension.
 	 * 
-	 * @param prevDimension the dimension id the player is leaving
+	 * @param worldServerFrom the dimension id the player is leaving
 	 * @param worldIn       the world (in Tent Dimension) to build in
 	 * @param doorPos       the BlockPos of the lower half of the tent door
 	 * @param prevX         the players x-pos before teleporting to the structure
@@ -79,7 +80,7 @@ public abstract class StructureBase {
 	 * @return if the structure was built or updated in the tent dimension, or already exists
 	 * @see TentEvent.TentResult
 	 **/
-	public final TentEvent.TentResult generateInTentDimension(final int prevDimension, final World worldIn, final BlockPos doorPos, 
+	public final TentEvent.TentResult generateInTentDimension(final DimensionType worldServerFrom, final World worldIn, final BlockPos doorPos, 
 			final double prevX, final double prevY, final double prevZ, final float prevFacing, final DyeColor color) {
 		TentEvent.TentResult result = TentEvent.TentResult.NONE;
 		// the corner of the square area alloted to this tent
@@ -103,7 +104,7 @@ public abstract class StructureBase {
 		} // IF THERE IS A TENT BUT IT NEEDS TO BE REBUILT...
 		else if (rebuildTent) {
 			// remove previous structure			
-			data.getStructure().remove(worldIn, doorPos, TentManager.STRUCTURE_DIR, prevData.getWidth());
+			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, prevData.getWidth());
 			result = TentEvent.TentResult.UPGRADED;			
 		}
 		
@@ -115,7 +116,7 @@ public abstract class StructureBase {
 		// if the tent does not exist OR needs to be upgraded/re-colored...
 		if(!structureExists || rebuildTent || recolorTent) {
 			// make a new structure!
-			this.generate(worldIn, doorPos, TentManager.STRUCTURE_DIR, this.data.getWidth(),
+			this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.data.getWidth(),
 					this.data.getDoorBlock(), this.data.getWallBlock(true),
 					this.data.getRoofBlock(true));
 		}
@@ -131,7 +132,7 @@ public abstract class StructureBase {
 		
 		// set or update TileEntityTentDoor information inside the tent
 		updateDoorInfo(worldIn, doorPos, this.data, 
-				prevX, prevY, prevZ, prevFacing, prevDimension);
+				prevX, prevY, prevZ, prevFacing, worldServerFrom);
 		return result;
 	}
 	
@@ -154,7 +155,7 @@ public abstract class StructureBase {
 	 */
 	public static final boolean updateDoorInfo(final World worldIn, final BlockPos doorPos, 
 			final StructureData data, final double prevX, final double prevY,
-			final double prevZ, final float prevFacing, final int prevDimension) {
+			final double prevZ, final float prevFacing, final DimensionType prevDimension) {
 		TileEntityTentDoor door = getDoorAt(worldIn, doorPos);
 		if (door != null) {
 			data.setID(TileEntityTentDoor.getTentID(doorPos));
@@ -296,7 +297,8 @@ public abstract class StructureBase {
 	 * use correct IProperty
 	 **/
 	public static void buildDoor(final World world, final BlockPos doorBase, final BlockState door, final Direction dir) {
-		BlockState doorL, doorU;
+		BlockState doorL;
+		BlockState doorU;
 		if (door.getBlock() instanceof BlockTentDoor) {
 			Direction.Axis axis = dir.getAxis() == Direction.Axis.Z ? Direction.Axis.Z : Direction.Axis.X;
 			doorL = door.with(DoorBlock.HALF, DoubleBlockHalf.LOWER).with(BlockTentDoor.AXIS, axis);

@@ -6,12 +6,14 @@ import java.util.List;
 import net.minecraft.util.math.BlockPos;
 
 public class Blueprint {
-	private final List<BlockPos> wallCoords, roofCoords, barrierCoords;
+	private final List<BlockPos> wallCoords;
+	private final List<BlockPos> roofCoords;
+	private final List<BlockPos> barrierCoords;
 
 	public Blueprint() {
-		this.wallCoords = new ArrayList();
-		this.roofCoords = new ArrayList();
-		this.barrierCoords = new ArrayList();
+		this.wallCoords = new ArrayList<>();
+		this.roofCoords = new ArrayList<>();
+		this.barrierCoords = new ArrayList<>();
 	}
 
 	/** 

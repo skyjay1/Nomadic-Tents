@@ -1,75 +1,75 @@
 package nomadictents.dimension;
 
-import net.minecraft.util.Direction;
+import java.util.function.BiFunction;
+
+import javax.annotation.Nullable;
+
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
-import net.minecraftforge.common.BiomeManager.BiomeEntry;
-import net.minecraftforge.common.BiomeManager.BiomeType;
-import nomadictents.init.Content;
-import nomadictents.init.TentConfig;
+import net.minecraftforge.common.ModDimension;
+import nomadictents.init.NomadicTents;
 
-public class TentManager {
+public final class TentManager {
 	
-	public static int DIMENSION_ID;
-	public static final String DIM_NAME = "TENT";
+	private static final String DIM_NAME = "tent";
+	private static final ResourceLocation DIM_RL = new ResourceLocation(NomadicTents.MODID, DIM_NAME);
+	
+	public static final ModDimension MOD_DIMENSION = new ModDimension() {
+		@Override
+		public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
+			return TentDimension::new;
+		}
+	}.setRegistryName(DIM_RL);	
 
-	public static final String BIOME_TENT_NAME = "Tent";
-
-	/** Structures are spaced this far apart for consistency and compatibility **/
-	public static final int TENT_SPACING = 32;
-	/** Y-level for the floor of all tent structures in Tent Dimension **/
-	public static final int FLOOR_Y = 70;
-	/** Default facing for all tent structures in Tent Dimension **/
-	public static final Direction STRUCTURE_DIR = Direction.EAST;
-
-	public static void preInit() {
-		DIMENSION_ID = TentConfig.CONFIG.TENT_DIM_ID.get();
+//	public static void preInit() {
+//		DIMENSION_ID = TentConfig.CONFIG.TENT_DIM_ID.get();
 //		TENT_DIMENSION = DimensionType.register(DIM_NAME, "_tent", DIMENSION_ID, WorldProviderTent.class, false);
 //		DimensionManager.registerDimension(DIMENSION_ID, TentDimension.TENT_DIMENSION);
+//	}
+	
+	/**
+	 * @return the DimensionType if it's registered, or null
+	 **/
+	@Nullable
+	public static DimensionType getTentDim() {
+		return DimensionType.byName(DIM_RL);
 	}
-
-	public static void init() {
-		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(Content.TENT_BIOME, 0));
-		BiomeDictionary.addTypes(Content.TENT_BIOME, BiomeDictionary.Type.VOID);
-		// BiomeManager.addSpawnBiome(biomeTent);
+	
+	/** 
+	 * @return the DimensionType of the 'home' or respawn dimension
+	 **/
+	public static DimensionType getOverworldDim() {
+		return DimensionType.OVERWORLD;
+		// TODO allow customization
 	}
 	
 	/** 
 	 * @return the ServerWorld of the 'home' or respawn dimension
-	 * @see TentConfig#getOverworld()
 	 **/
-	public static ServerWorld getOverworld(final World server) {
-		return server.getServer().getWorld(TentConfig.CONFIG.getOverworld());
+	public static ServerWorld getOverworld(final MinecraftServer server) {
+		return server.getWorld(DimensionType.OVERWORLD);
+		// TODO allow customization
 	}
 	
 	/** 
 	 * @return the ServerWorld of the Tent Dimension
-	 * @see TentConfig#getTentDim()
 	 **/
-	public static ServerWorld getTent(final World server) {
-		return server.getServer().getWorld(TentConfig.CONFIG.getTentDim());
+	public static ServerWorld getTentWorld(final MinecraftServer server) {
+		return server.getWorld(getTentDim());
 	}
 
 	/** Just for convenience **/
-	public static boolean isTentDimension(final IWorld world) {
-		return isTentDimension(world.getDimension().getType());
+	public static boolean isTent(final IWorld world) {
+		return isTent(world.getDimension().getType());
 	}
 
 	/** Convenience method to detect tent dimension **/
-	// TODO not working!
-	public static boolean isTentDimension(final DimensionType type) {
-		return type.getId() == DIMENSION_ID;
+	public static boolean isTent(final DimensionType type) {
+		return type != null && type == getTentDim();
 	}
-	
-	public static DimensionType getDimensionType() {
-		return DimensionType.getById(DIMENSION_ID);
-	}
-	
-//	public static World getTentDimension(Entity e) {
-//		return getTentDimension(e.getServer());
-//	}
 }

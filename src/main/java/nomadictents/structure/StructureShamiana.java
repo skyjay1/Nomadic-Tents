@@ -24,7 +24,7 @@ public class StructureShamiana extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth structureWidth,
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
-		final boolean tentDim = TentManager.isTentDimension(worldIn);
+		final boolean tentDim = TentManager.isTent(worldIn);
 		final Blueprint bp = getBlueprints(structureWidth);
 		if (bp == null) {
 			return false;
@@ -40,7 +40,7 @@ public class StructureShamiana extends StructureBase {
 			final boolean isRemoving = wallBlock.getMaterial() == Material.AIR;
 			final Block pole = Blocks.OAK_FENCE;
 			// place a pole in the middle
-			BlockPos pos = getPosFromDoor(doorBase, structureWidthNum, 0, 0, TentManager.STRUCTURE_DIR);
+			BlockPos pos = getPosFromDoor(doorBase, structureWidthNum, 0, 0, dirForward);
 			final int height = structureWidthNum + 3;
 			for (int i = 0; i < height; i++) {
 				final BlockPos p = pos.up(i);

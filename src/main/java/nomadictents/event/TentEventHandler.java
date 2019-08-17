@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
@@ -37,10 +38,10 @@ public class TentEventHandler {
 		if(!event.getPlayer().getEntityWorld().isRemote 
 				&& event.getPlayer().getEntityWorld().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)) {
 			final MinecraftServer server = event.getPlayer().getServer();
-			final ServerWorld overworld = server.getWorld(TentConfig.CONFIG.getOverworld());
-			final ServerWorld tentDim = server.getWorld(TentConfig.CONFIG.getTentDim());
+			final ServerWorld overworld = TentManager.getOverworld(server);
+			final ServerWorld tentDim = TentManager.getTentWorld(server);
 			// only run this code for players waking up in a Tent
-			if(TentManager.isTentDimension(event.getPlayer().getEntityWorld())) {
+			if(TentManager.isTent(event.getPlayer().getEntityWorld())) {
 				boolean shouldChangeTime = TentConfig.CONFIG.ALLOW_SLEEP_TENT_DIM.get();
 				// if config requires, check both overworld and tent players
 				if(TentConfig.CONFIG.IS_SLEEPING_STRICT.get()) {
@@ -66,13 +67,6 @@ public class TentEventHandler {
 		}
 		
 	}
-
-	// Updates sleep and daylight-cycle info for overworld and tent dimension
-	//public void handleSleepIn(final ServerWorld s) {
-	//	long i = s.getWorldInfo().getWorldTime() + 24000L;
-	//	s.getWorldInfo().setWorldTime(i - i % 24000L);
-	//	s.updateAllPlayersSleepingFlag();
-	//}
 
 	/** Makes Tent items fireproof if enabled **/
 	@SubscribeEvent
@@ -116,7 +110,7 @@ public class TentEventHandler {
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
 	private static boolean canCancelTeleport(final PlayerEntity player) {
-		return TentConfig.CONFIG.RESTRICT_TELEPORT_TENT_DIM.get() && TentManager.isTentDimension(player.getEntityWorld()) 
+		return TentConfig.CONFIG.RESTRICT_TELEPORT_TENT_DIM.get() && TentManager.isTent(player.getEntityWorld()) 
 				&& !player.isCreative();
 	}
 
@@ -127,33 +121,37 @@ public class TentEventHandler {
 	@SubscribeEvent
 	public void onPlayerRespawn(final PlayerRespawnEvent event) {
 		if (event.getPlayer() instanceof ServerPlayerEntity && !event.getPlayer().getEntityWorld().isRemote) {
-			final int TENTDIM = TentManager.DIMENSION_ID;
-			final int RESPAWN = TentConfig.CONFIG.RESPAWN_DIMENSION;
-			final int CUR_DIM = event.player.getEntityWorld().provider.getDimension();
-			ServerPlayerEntity playerMP = (ServerPlayerEntity) event.player;
-			final MinecraftServer mcServer = playerMP.getServer();
-			final ServerWorld tentServer = mcServer.getWorld(TENTDIM);
-			final ServerWorld overworld = mcServer.getWorld(RESPAWN);
+			final DimensionType TENTDIM = TentManager.getTentDim();
+			final DimensionType RESPAWN = TentManager.getOverworldDim();
+			final DimensionType CUR_DIM = event.getPlayer().getEntityWorld().getDimension().getType();
+			ServerPlayerEntity playerMP = (ServerPlayerEntity) event.getPlayer();
+			final ServerWorld overworld = playerMP.getServer().getWorld(RESPAWN);
 			// do all kind of checks to make sure you need to run this code...
-			if (TentConfig.CONFIG.ALLOW_RESPAWN_INTERCEPT.get() && CUR_DIM == TENTDIM) {
+			if (TentConfig.CONFIG.ALLOW_RESPAWN_INTERCEPT.get() && CUR_DIM.getId() == TENTDIM.getId()) {
 				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
-				BlockPos respawnPos = bedPos != null ? PlayerEntity.getBedLocation(tentServer, bedPos, false) : null;
+				BlockPos respawnPos = bedPos != null ? event.getPlayer().getBedLocation(TENTDIM)
+						/*PlayerEntity.getBedLocation(tentServer, bedPos, false)*/ : null;
 				if (null == respawnPos) {
 					// player respawned in tent dimension without a bed here
 					// this likely means they're falling to their death in the void
 					// let's do something about that
 					// first:  try to find their overworld bed
 					bedPos = playerMP.getBedLocation(RESPAWN);
-					respawnPos = bedPos != null ? PlayerEntity.getBedLocation(overworld, bedPos, false) : null;
+					respawnPos = bedPos != null ? event.getPlayer().getBedLocation(RESPAWN)
+							/* PlayerEntity.getBedLocation(overworld, bedPos, false) */ : null;
 					if (respawnPos == null) {
 						// they have no bed at all, send them to world spawn
-						respawnPos = overworld.provider.getRandomizedSpawnPoint();
+						respawnPos = overworld.getSpawnPoint();
 					}
 					// transfer player using Teleporter
-					final TentTeleporter tel = new TentTeleporter(TentManager.DIMENSION_ID, overworld,
+					final TentTeleporter tel = new TentTeleporter(playerMP.getServer(), TENTDIM, RESPAWN,
 							new BlockPos(0, 0, 0), null, respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(),
 							event.getPlayer().rotationYaw, new StructureData());
-					mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
+					
+					tel.teleport(playerMP);
+					
+					// TODO
+					// mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
 					event.getPlayer().setPositionAndUpdate(respawnPos.getX(), respawnPos.getY(), respawnPos.getZ());
 				}
 			} 

@@ -4,9 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemPropertyGetter;
@@ -29,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import nomadictents.block.TileEntityTentDoor;
+import nomadictents.dimension.TentDimension;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.NomadicTents;
 import nomadictents.init.TentSaveData;
@@ -81,7 +80,7 @@ public class ItemTent extends Item {
 	@Override
 	public ActionResultType onItemUse(final ItemUseContext cxt) {
 		// looks at the item info and spawns the correct tent in the correct form
-		if (!TentManager.isTentDimension(cxt.getWorld()) && !cxt.getWorld().isRemote) {
+		if (!TentManager.isTent(cxt.getWorld()) && !cxt.getWorld().isRemote) {
 			BlockPos hitPos = cxt.getPos();
 			ItemStack stack = cxt.getItem();
 			Direction hitSide = cxt.getFace();
@@ -142,7 +141,8 @@ public class ItemTent extends Item {
 	@Override
 	public ITextComponent getDisplayName(ItemStack stack) {
 		final StructureData data = new StructureData(stack);
-		return new TranslationTextComponent("item." + data.getTent().getName() + "_" + data.getWidth().getName());
+		final String prefix = "item.".concat(NomadicTents.MODID).concat(".");
+		return new TranslationTextComponent(prefix + data.getTent().getName() + "_" + data.getWidth().getName());
 	}
 
 	@Override
@@ -249,7 +249,7 @@ public class ItemTent extends Item {
 			final int offsetX = oldTag.getInt("StructureOffsetX");
 			final int offsetZ = oldTag.getInt("StructureOffsetZ");
 			final long ID = TileEntityTentDoor.getTentID(new BlockPos(
-					offsetX * TentManager.TENT_SPACING, TentManager.FLOOR_Y, offsetZ * TentManager.TENT_SPACING));
+					offsetX * TentDimension.TENT_SPACING, TentDimension.FLOOR_Y, offsetZ * TentDimension.TENT_SPACING));
 			dataTag.putLong(StructureData.KEY_ID, ID);
 			// update WorldSaveData to make sure this ID isn't going to be used
 			final TentSaveData worldData = TentSaveData.get(world.getServer());

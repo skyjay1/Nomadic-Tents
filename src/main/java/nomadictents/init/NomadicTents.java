@@ -7,8 +7,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
+import net.minecraftforge.common.BiomeManager.BiomeEntry;
+import net.minecraftforge.common.BiomeManager.BiomeType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.world.RegisterDimensionsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,7 +35,7 @@ public class NomadicTents {
 	public static final CommonProxy PROXY = DistExecutor.runForDist(() -> () -> new ClientProxy(),
 			() -> () -> new CommonProxy());
 
-	public static final ItemGroup TAB = new ItemGroup("yurtMain") {
+	public static final ItemGroup TAB = new ItemGroup(MODID) {
 		@Override
 		public ItemStack createIcon() {
 			return new ItemStack(Content.ITEM_TENT);
@@ -48,7 +52,9 @@ public class NomadicTents {
 	@SubscribeEvent
 	public static void setup(final RegisterDimensionsEvent event) {
 		System.out.println("yurtmod: RegisterDimensionsEvent!");
-		//DimensionManagerTent.setup(event);
+		PROXY.registerDimension(event);
+		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(Content.TENT_BIOME, 0));
+		BiomeDictionary.addTypes(Content.TENT_BIOME, BiomeDictionary.Type.VOID);
 	}
 	
 	@SubscribeEvent
@@ -64,7 +70,7 @@ public class NomadicTents {
 	}
 	
 	@SubscribeEvent
-	public static void registerTileEntity(final RegistryEvent.Register<TileEntityType<? extends TileEntity>> event) {
+	public static void registerTileEntity(final RegistryEvent.Register<TileEntityType<?>> event) {
 		System.out.println("yurtmod: RegisterTileEntityType");
 		PROXY.registerTileEntity(event);
 	}

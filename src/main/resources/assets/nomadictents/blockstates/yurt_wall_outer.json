@@ -1,6 +1,6 @@
 {
     "variants": {
-        "above_similar=true": { "model": "nomadictents:yurt_wall_outer_upper"},
-		"above_similar=false": { "model": "nomadictents:yurt_wall_outer_lower"}
+        "above_similar=true": { "model": "nomadictents:block/yurt_wall_outer_upper"},
+		"above_similar=false": { "model": "nomadictents:block/yurt_wall_outer_lower"}
     }
 }

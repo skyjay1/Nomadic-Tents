@@ -21,7 +21,7 @@ public class StructureBedouin extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth StructureWidth, 
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
-		final boolean tentDim = TentManager.isTentDimension(worldIn);
+		final boolean tentDim = TentManager.isTent(worldIn);
 		final Blueprint bp = getBlueprints(StructureWidth);
 		if(bp == null) {
 			return false;
@@ -35,7 +35,7 @@ public class StructureBedouin extends StructureBase {
 		final int StructureWidthNum = Math.floorDiv(StructureWidth.getSquareWidth(), 2);
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, StructureWidthNum, -1, 0, TentManager.STRUCTURE_DIR);
+			BlockPos pos = getPosFromDoor(doorBase, StructureWidthNum, -1, 0, dirForward);
 			if((worldIn.getBlockState(pos).getBlock() == Blocks.DIRT || worldIn.isAirBlock(pos))
 					&& worldIn.isAirBlock(pos.up(1))) {
 				if(StructureWidthNum > 2) {

@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nomadictents:frame_block_0" }
+        "normal": { "model": "nomadictents:block/frame_block_0" }
     }
 }

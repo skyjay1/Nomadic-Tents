@@ -3,7 +3,6 @@ package nomadictents.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
@@ -32,6 +31,7 @@ import nomadictents.block.Categories.IIndluBlock;
 import nomadictents.block.Categories.IShamianaBlock;
 import nomadictents.block.Categories.ITepeeBlock;
 import nomadictents.block.Categories.IYurtBlock;
+import nomadictents.dimension.TentDimension;
 import nomadictents.dimension.TentManager;
 import nomadictents.event.TentEvent;
 import nomadictents.init.NomadicTents;
@@ -42,7 +42,7 @@ import nomadictents.structure.StructureBase;
 import nomadictents.structure.util.StructureData;
 
 public abstract class BlockTentDoor extends BlockUnbreakable
-		implements ITileEntityProvider, ITepeeBlock, IYurtBlock, 
+		implements ITepeeBlock, IYurtBlock, 
 		IBedouinBlock, IIndluBlock, IShamianaBlock {
 	
 	public static final EnumProperty<Direction.Axis> AXIS = EnumProperty.<Direction.Axis>create("axis",
@@ -101,7 +101,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					return true;
 				}
 				// STEP 2:  make sure there is a valid tent before doing anything else
-				Direction dir = TentManager.isTentDimension(worldIn) ? TentManager.STRUCTURE_DIR
+				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, base, data.getWidth().getOverworldSize());
 				if (dir == null) {
 					return false;
@@ -109,7 +109,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				// STEP 3:  deconstruct the tent if the player uses a tentHammer on the door
 				// (and in overworld and with fully built tent)
 				if (held != null && held.getItem() instanceof ItemMallet
-						&& !TentManager.isTentDimension(worldIn)) {
+						&& !TentManager.isTent(worldIn)) {
 					// cancel deconstruction if player is not owner
 					if(TentConfig.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
@@ -163,7 +163,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				StructureData type = teDoor.getTentData();
 				StructureBase struct = type.getStructure();
 				// make sure there is a valid tent before doing anything
-				Direction dir = TentManager.isTentDimension(worldIn) ? TentManager.STRUCTURE_DIR
+				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, pos, type.getWidth().getOverworldSize());
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
@@ -232,7 +232,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(final IBlockReader world) {
+	public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
 		TileEntityTentDoor ret = new TileEntityTentDoor();
 		if(world instanceof World) {
 			ret.setWorld((World)world);

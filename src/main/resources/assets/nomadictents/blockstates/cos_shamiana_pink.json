@@ -1,8 +1,8 @@
 {
     "variants": {
-        "pattern=false": { "model": "nomadictents:shamiana_pink"},
+        "pattern=false": { "model": "nomadictents:block/shamiana_pink"},
 		"pattern=true": [
-			{ "model": "nomadictents:shamiana_pink_pattern1", "weight":3 },
-			{ "model": "nomadictents:shamiana_pink_pattern2", "weight":1 } ]
+			{ "model": "nomadictents:block/shamiana_pink_pattern1", "weight":3 },
+			{ "model": "nomadictents:block/shamiana_pink_pattern2", "weight":1 } ]
     }
 }

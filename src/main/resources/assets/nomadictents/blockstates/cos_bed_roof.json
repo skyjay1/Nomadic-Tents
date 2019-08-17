@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nomadictents:bed_roof" }
+        "normal": { "model": "nomadictents:block/bed_roof" }
     }
 }

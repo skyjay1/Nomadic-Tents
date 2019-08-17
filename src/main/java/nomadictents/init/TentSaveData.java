@@ -33,7 +33,7 @@ public class TentSaveData extends WorldSavedData {
 
 	public static TentSaveData get(MinecraftServer server) {
 		
-		return server.getWorld(TentManager.getDimensionType()).getSavedData()
+		return server.getWorld(TentManager.getTentDim()).getSavedData()
 				.get(() -> new TentSaveData(NomadicTents.MODID), NomadicTents.MODID);
 		
 //		MapStorage storage = world.getMapStorage();

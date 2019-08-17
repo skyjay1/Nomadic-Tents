@@ -1,7 +1,5 @@
 package nomadictents.proxies;
 
-import java.util.function.BiFunction;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -9,16 +7,17 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemTier;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.biome.Biomes;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeManager;
+import net.minecraftforge.common.BiomeManager.BiomeEntry;
+import net.minecraftforge.common.BiomeManager.BiomeType;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.world.RegisterDimensionsEvent;
 import nomadictents.block.BlockBarrier;
 import nomadictents.block.BlockBedouinRoof;
 import nomadictents.block.BlockBedouinWall;
@@ -34,6 +33,7 @@ import nomadictents.block.BlockYurtRoof;
 import nomadictents.block.BlockYurtWall;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.dimension.BiomeTent;
+import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
 import nomadictents.item.ItemDepthUpgrade;
@@ -41,22 +41,18 @@ import nomadictents.item.ItemMallet;
 import nomadictents.item.ItemSuperMallet;
 import nomadictents.item.ItemTent;
 
-@Mod.EventBusSubscriber
 public class CommonProxy {
 	
 	public void registerItemColors() {
 		// nothing
 	}
 
-	@SubscribeEvent
-	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
+	public void registerBiome(final RegistryEvent.Register<Biome> event) {
 		event.getRegistry().register(
-				new BiomeTent(new Biome.Builder().category(Biome.Category.NONE))
-						.setRegistryName(NomadicTents.MODID, "tent_biome"));
+				new BiomeTent().setRegistryName(NomadicTents.MODID, "tent_biome"));
 	}
 
-	@SubscribeEvent
-	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
+	public void registerBlocks(final RegistryEvent.Register<Block> event) {
 		// helpful blocks
 		event.getRegistry().registerAll(
 			new BlockBarrier().setRegistryName(NomadicTents.MODID, "tentmod_barrier"),
@@ -134,8 +130,7 @@ public class CommonProxy {
 		}
 	}
 
-	@SubscribeEvent
-	public static void registerItems(final RegistryEvent.Register<Item> event) {
+	public void registerItems(final RegistryEvent.Register<Item> event) {
 		// Item
 		event.getRegistry().registerAll(
 				// items
@@ -192,6 +187,22 @@ public class CommonProxy {
 			event.getRegistry().register(makeIB(BlockShamianaWall.getShamianaBlock(color, false)));
 		}
 	}
+	
+	public void registerTileEntity(final RegistryEvent.Register<TileEntityType<?>> event) {
+		TileEntityType.Builder<TileEntityTentDoor> builder = TileEntityType.Builder.create(TileEntityTentDoor::new, Content.YURT_DOOR_SML);
+		event.getRegistry().register(builder.build(null).setRegistryName(NomadicTents.MODID, "tileentitytentdoor"));
+	}
+
+	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
+		event.getRegistry().register(TentManager.MOD_DIMENSION);
+	}
+	
+	public void registerDimension(final RegisterDimensionsEvent event) {
+		//if (DimensionType.byName(TentManager.MOD_DIMENSION.getRegistryName()) == null) {
+			DimensionManager.registerDimension(TentManager.MOD_DIMENSION.getRegistryName(), TentManager.MOD_DIMENSION,
+					null, true);
+		//}
+	}
 
 	private static final Item basicItem(final String name) {
 		return new Item(new Item.Properties().group(NomadicTents.TAB)).setRegistryName(NomadicTents.MODID, name);
@@ -202,22 +213,4 @@ public class CommonProxy {
 		ib.setRegistryName(base.getRegistryName());
 		return ib;
 	}
-
-	public void registerTileEntity(final RegistryEvent.Register<TileEntityType<? extends TileEntity>> event) {
-		TileEntityType.Builder<TileEntityTentDoor> builder = TileEntityType.Builder.create(TileEntityTentDoor::new, Content.YURT_DOOR_SML);
-		event.getRegistry().register(builder.build(null));
-	}
-
-	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
-		event.getRegistry().register(new ModDimension() {
-
-			@Override
-			public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-		});
-	}
-
 }

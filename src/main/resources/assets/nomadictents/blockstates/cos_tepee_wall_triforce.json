@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "nomadictents:tepee_wall_triforce" }
+        "normal": { "model": "nomadictents:block/tepee_wall_triforce" }
     }
 }

@@ -9,7 +9,6 @@ import nomadictents.block.Categories.IShamianaBlock;
 import nomadictents.block.Categories.ITentBlockBase;
 import nomadictents.block.Categories.ITepeeBlock;
 import nomadictents.block.Categories.IYurtBlock;
-import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.init.TentConfig;
 import nomadictents.structure.StructureBase;

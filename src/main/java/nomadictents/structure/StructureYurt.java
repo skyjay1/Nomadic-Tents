@@ -22,7 +22,7 @@ public class StructureYurt extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size, 
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
-		boolean tentDim = TentManager.isTentDimension(worldIn);
+		boolean tentDim = TentManager.isTent(worldIn);
 		Blueprint bp = getBlueprints(size);
 		if(bp == null) {
 			return false;

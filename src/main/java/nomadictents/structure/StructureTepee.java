@@ -27,7 +27,7 @@ public class StructureTepee extends StructureBase {
 	@Override
 	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size, 
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
-		boolean tentDim = TentManager.isTentDimension(worldIn);
+		boolean tentDim = TentManager.isTent(worldIn);
 		Blueprint bp = getBlueprints(size);
 		if(bp == null) {
 			return false;
@@ -40,7 +40,7 @@ public class StructureTepee extends StructureBase {
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
 			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentManager.STRUCTURE_DIR);
+			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
 			if(sizeNum > 2 && (worldIn.getBlockState(pos).getBlock() == Blocks.DIRT || worldIn.isAirBlock(pos))
 					&& worldIn.isAirBlock(pos.up(1))) {
 				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);

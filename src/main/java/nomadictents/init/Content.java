@@ -4,19 +4,16 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.TileEntityTentDoor;
-import nomadictents.dimension.TentManager;
 
 public class Content {
 	
-	@ObjectHolder(NomadicTents.MODID + ":" + TentManager.DIM_NAME)
-	public static ModDimension MOD_DIMENSION;
-	
+	//// BIOME ////
 	@ObjectHolder(NomadicTents.MODID + ":tent_biome")
 	public static Biome TENT_BIOME;
 	
+	//// TILE ENTITY TYPE ////
 	@ObjectHolder(NomadicTents.MODID + ":tileentitytentdoor")
 	public static TileEntityType<TileEntityTentDoor> TE_DOOR;
 	
@@ -105,7 +102,7 @@ public class Content {
 	public static Block SHAMIANA_WALL_PURPLE;
 	@ObjectHolder(NomadicTents.MODID + ":shamiana_red")
 	public static Block SHAMIANA_WALL_RED;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_silver")
+	@ObjectHolder(NomadicTents.MODID + ":shamiana_light_gray")
 	public static Block SHAMIANA_WALL_LIGHT_GRAY;
 	@ObjectHolder(NomadicTents.MODID + ":shamiana_white")
 	public static Block SHAMIANA_WALL_WHITE;
@@ -224,7 +221,7 @@ public class Content {
 	public static Block COS_SHAMIANA_WALL_PURPLE;
 	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_red")
 	public static Block COS_SHAMIANA_WALL_RED;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_silver")
+	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_light_gray")
 	public static Block COS_SHAMIANA_WALL_LIGHT_GRAY;
 	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_white")
 	public static Block COS_SHAMIANA_WALL_WHITE;

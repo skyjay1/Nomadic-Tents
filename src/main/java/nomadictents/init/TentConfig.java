@@ -3,7 +3,6 @@ package nomadictents.init;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.item.ItemTent;
@@ -174,15 +173,5 @@ public final class TentConfig {
 			return TIERS_SHAMIANA.get();
 		}
 		return -1;
-	}
-	
-	/** @return the DimensionType of the Tent Dimension **/
-	public DimensionType getTentDim() {
-		return DimensionType.getById(TENT_DIM_ID.get());
-	}
-	
-	/** @return the DimensionType of the 'home' or respawn dimension **/
-	public DimensionType getOverworld() {
-		return DimensionType.getById(RESPAWN_DIMENSION.get());
 	}
 }

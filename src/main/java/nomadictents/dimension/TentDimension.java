@@ -2,6 +2,7 @@ package nomadictents.dimension;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -18,6 +19,13 @@ import nomadictents.init.Content;
 import nomadictents.init.TentConfig;
 
 public class TentDimension extends Dimension {
+	
+	/** Structures are spaced this far apart for consistency and compatibility **/
+	public static final int TENT_SPACING = 32;
+	/** Y-level for the floor of all tent structures in Tent Dimension **/
+	public static final int FLOOR_Y = 70;
+	/** Default facing for all tent structures in Tent Dimension **/
+	public static final Direction STRUCTURE_DIR = Direction.EAST;
 
 	public TentDimension(final World worldIn, final DimensionType typeIn) {
 		super(worldIn, typeIn);

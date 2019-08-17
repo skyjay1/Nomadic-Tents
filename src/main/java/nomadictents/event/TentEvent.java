@@ -57,7 +57,7 @@ public class TentEvent extends Event {
 	 * @see TentEvent#getDimensionId()
 	 **/
 	public boolean isInsideTent() {
-		return this.teDoor != null ? TentManager.isTentDimension(this.teDoor.getWorld()) : false;
+		return this.teDoor != null ? TentManager.isTent(this.teDoor.getWorld()) : false;
 	}
 	
 	/** 

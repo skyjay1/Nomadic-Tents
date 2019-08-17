@@ -12,7 +12,7 @@ import nomadictents.init.NomadicTents;
 
 public class ItemMallet extends Item {
 	public ItemMallet(IItemTier material) {
-		super(new Item.Properties().group(NomadicTents.TAB).defaultMaxDamage(material.getMaxUses()).maxStackSize(1));
+		super(new Item.Properties().group(NomadicTents.TAB).maxStackSize(1));
 	}
 
 	@Override
