@@ -11,12 +11,10 @@
         "item": "nomadictents:shamiana_wall_piece"
       },
 	"T": {
-        "item": "nomadictents:tent",
-		"data": 0
+        "item": "nomadictents:tent"
       }
   },
   "result": {
-    "item": "nomadictents:tent",
-	 "data": 0
+    "item": "nomadictents:tent"
   }
 }

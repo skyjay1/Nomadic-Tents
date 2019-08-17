@@ -7,16 +7,13 @@
    "DDD"],
   "key": {
     "D": {
-        "item": "minecraft:dye",
-		"data": 14
+        "item": "minecraft:orange_dye"
       },
 	"T": {
-        "item": "nomadictents:tent",
-		"data": 0
+        "item": "nomadictents:tent"
       }
   },
   "result": {
-    "item": "nomadictents:tent",
-	 "data": 0
+    "item": "nomadictents:tent"
   }
 }

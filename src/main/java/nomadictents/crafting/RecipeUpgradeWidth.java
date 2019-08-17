@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.nbt.CompoundNBT;
@@ -24,7 +25,7 @@ import nomadictents.structure.util.StructureWidth;
 
 public class RecipeUpgradeWidth extends ShapedRecipe {
 	
-	public static final String CATEGORY = "tentcraftingwidth";
+	public static final String CATEGORY = "tent_upgrade_width";
 	public static final RecipeUpgradeWidth EMPTY = new RecipeUpgradeWidth();
 	
 	private final StructureTent tent;
@@ -34,7 +35,7 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 	public RecipeUpgradeWidth(final ResourceLocation id, final StructureTent type, @Nullable final StructureWidth widthFrom, 
 			final StructureWidth widthTo, final NonNullList<Ingredient> ingredients) {
 		super(id, CATEGORY, 3, calcRecipeHeight(type, widthTo), ingredients, 
-				new StructureData().setAll(type, widthTo, StructureDepth.NORMAL).writeTo(new ItemStack(Content.ITEM_TENT)));
+				new StructureData().setAll(type, widthTo, StructureDepth.NORMAL).getDropStack());
 		this.tent = type;
 		this.widthIn = widthFrom;
 		this.widthOut = widthTo;
@@ -111,6 +112,11 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 	public boolean isDynamic() {
 		return true;
 	}
+
+	@Override
+	public IRecipeSerializer<?> getSerializer() {
+		return Content.SERIALIZER_WIDTH;
+	}
 	
 	public StructureTent getTent() {
 		return this.tent;
@@ -181,30 +187,6 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 			buffer.writeByte(recipe.getTent().getId());
 			buffer.writeByte(recipe.getWidthIn().getId());
 			buffer.writeByte(recipe.getWidthOut().getId());
-			
-//			buffer.writeVarInt(recipe.getRecipeWidth());
-//			buffer.writeVarInt(recipe.getRecipeHeight());
-//			buffer.writeString(recipe.getGroup());
-//
-//			for (final Ingredient ingredient : recipe.getIngredients()) {
-//				ingredient.writeToBuffer(buffer);
-//			}
-//
-//			buffer.writeItemStack(recipe.getRecipeOutput());
 		}
-
-
-//		@Override
-//		public IRecipe parse(JsonContext context, JsonObject json) {
-//			if(json.has("disabled")) {
-//				return RecipeUpgradeWidth.EMPTY;
-//			}
-//			final ShapedRecipes recipe = ShapedRecipes.deserialize(json);			
-//			final StructureTent tentType = StructureTent.getByName(JsonUtils.getString(json, "tent_type"));
-//			// widthIn can be null
-//			final StructureWidth widthIn = StructureWidth.getByName(JsonUtils.getString(json, "input_size"));
-//			final StructureWidth widthOut = StructureWidth.getByName(JsonUtils.getString(json, "result_size"));
-//			return new RecipeUpgradeWidth(tentType, widthIn, widthOut, recipe.getIngredients());			
-//		}
 	}
 }

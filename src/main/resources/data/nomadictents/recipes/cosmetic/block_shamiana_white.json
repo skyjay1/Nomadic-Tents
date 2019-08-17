@@ -1,14 +1,12 @@
 {
   "result": {
     "item": "nomadictents:cos_shamiana_white",
-    "count": 4,
-	"data": 0
+    "count": 6
   },
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "nomadictents:shamiana_wall_piece",
-	  "data": 0
+      "item": "nomadictents:shamiana_wall_piece"
     }
   ]
 }

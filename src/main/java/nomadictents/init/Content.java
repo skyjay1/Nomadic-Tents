@@ -2,13 +2,29 @@ package nomadictents.init;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.TileEntityTentDoor;
+import nomadictents.crafting.RecipeUpgradeColor;
+import nomadictents.crafting.RecipeUpgradeDepth;
+import nomadictents.crafting.RecipeUpgradeWidth;
 
 public class Content {
 	
+	//// RECIPE SERIALIZERS ////
+	//public static final RecipeType<RecipeUpgradeWidth> TYPE_WIDTH = RecipeType.get(RecipeUpgradeWidth.Serializer.NAME, RecipeUpgradeWidth.class);
+	//public static final RecipeType<RecipeUpgradeDepth> TYPE_DEPTH = RecipeType.get(RecipeUpgradeDepth.Serializer.NAME, RecipeUpgradeDepth.class);
+	
+	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeWidth.CATEGORY)
+	public static IRecipeSerializer<ShapedRecipe> SERIALIZER_WIDTH; // = IRecipeSerializer.register(RecipeUpgradeWidth.CATEGORY, new RecipeUpgradeWidth.Factory());
+	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeDepth.CATEGORY)
+	public static IRecipeSerializer<ShapedRecipe> SERIALIZER_DEPTH;// = IRecipeSerializer.register(RecipeUpgradeDepth.CATEGORY, new RecipeUpgradeDepth.Factory());
+	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeColor.CATEGORY)
+	public static IRecipeSerializer<ShapedRecipe> SERIALIZER_COLOR;
+
 	//// BIOME ////
 	@ObjectHolder(NomadicTents.MODID + ":tent_biome")
 	public static Biome TENT_BIOME;
@@ -266,10 +282,4 @@ public class Content {
 	public static Item ITEM_DEPTH_UPGRADE_OBSIDIAN;
 	@ObjectHolder(NomadicTents.MODID + ":depth_upgrade_diamond")
 	public static Item ITEM_DEPTH_UPGRADE_DIAMOND;
-
-	// TODO
-//	public static void mainRegistry() {
-//		GameRegistry.registerTileEntity(TileEntityTentDoor.class,
-//				new ResourceLocation(NomadicTents.MODID, "TileEntityTentDoor"));
-//	}
 }

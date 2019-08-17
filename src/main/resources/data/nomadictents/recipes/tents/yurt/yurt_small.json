@@ -12,7 +12,6 @@
       }
   },
   "result": {
-    "item": "nomadictents:tent",
-	 "data": 0
+    "item": "nomadictents:tent"
   }
 }

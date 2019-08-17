@@ -5,13 +5,28 @@
    "FSF",
    "FSF"],
   "key": {
-    "F": {
-        "type": "forge:ore_dict",
-		"ore": "treeLeaves"
-      },
+    "F": [
+	  {
+	    "item": "minecraft:oak_leaves"
+	  },
+	  {
+	    "item": "minecraft:spruce_leaves"
+	  },
+	  {
+	    "item": "minecraft:birch_leaves"
+	  },
+	  {
+	    "item": "minecraft:jungle_leaves"
+	  },
+	  {
+	    "item": "minecraft:acacia_leaves"
+	  },
+	  {
+	    "item": "minecraft:dark_oak_leaves"
+	  }
+	],
 	"S": {
-		"type": "forge:ore_dict",
-		"ore": "stickWood"
+		"item": "minecraft:stick"
 	  }
   },
   "result": {

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.nbt.CompoundNBT;
@@ -12,6 +13,7 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import nomadictents.init.Content;
 import nomadictents.item.ItemDepthUpgrade;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.util.StructureData;
@@ -21,7 +23,7 @@ import nomadictents.structure.util.StructureWidth;
 
 public class RecipeUpgradeDepth  extends ShapedRecipe {
 	
-	public static final String CATEGORY = "tentcraftingdepth";
+	public static final String CATEGORY = "tent_upgrade_depth";
 	
 	public static final RecipeUpgradeDepth EMPTY = new RecipeUpgradeDepth();
 	
@@ -102,6 +104,11 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 	@Override
 	public boolean isDynamic() {
 		return true;
+	}
+	
+	@Override
+	public IRecipeSerializer<?> getSerializer() {
+		return Content.SERIALIZER_DEPTH;
 	}
 	
 	public StructureTent getTentType() {

@@ -9,8 +9,7 @@
         "item": "minecraft:obsidian"
       },
 	"S": {
-		"type": "forge:ore_dict",
-		"ore": "stickWood"
+		"item": "minecraft:stick"
 	  }
   },
   "result": {

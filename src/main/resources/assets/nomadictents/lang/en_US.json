@@ -175,6 +175,7 @@
     "item.nomadictents.tepee_wall_piece": "Tepee Wall Section",
     "item.nomadictents.bed_wall_piece": "Bedouin Wall Section",
     "item.nomadictents.indlu_wall_piece": "Indlu Wall Section",
+	 "item.nomadictents.shamiana_wall_piece": "Shamiyana Wall Section",
 
     "_comment": "Chat / Tooltips / Waila",
     "tooltip.extra_dimensional_space": "Extra-dimensional space!",

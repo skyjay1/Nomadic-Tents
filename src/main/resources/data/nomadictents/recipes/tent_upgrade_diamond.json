@@ -12,8 +12,7 @@
         "item": "minecraft:diamond_block"
       },
 	"S": {
-		"type": "forge:ore_dict",
-		"ore": "stickWood"
+		"item": "minecraft:stick"
 	  }
   },
   "result": {

@@ -1,14 +1,12 @@
 {
   "result": {
     "item": "nomadictents:cos_tepee_wall_blank",
-    "count": 4,
-	"data": 0
+    "count": 4
   },
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "nomadictents:tepee_wall_piece",
-	  "data": 0
+      "item": "nomadictents:tepee_wall_piece"
     }
   ]
 }

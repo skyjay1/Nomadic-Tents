@@ -6,16 +6,13 @@
    "D"],
   "key": {
     "D": {
-        "item": "minecraft:water_bucket",
-		"data": 0
+        "item": "minecraft:water_bucket"
       },
 	"T": {
-        "item": "nomadictents:tent",
-		"data": 0
+        "item": "nomadictents:tent"
       }
   },
   "result": {
-    "item": "nomadictents:tent",
-	 "data": 0
+    "item": "nomadictents:tent"
   }
 }

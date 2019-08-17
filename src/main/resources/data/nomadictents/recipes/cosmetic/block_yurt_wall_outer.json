@@ -1,14 +1,12 @@
 {
   "result": {
     "item": "nomadictents:cos_yurt_wall_outer",
-    "count": 8,
-	"data": 0
+    "count": 8
   },
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "nomadictents:yurt_wall_piece",
-	  "data": 0
+      "item": "nomadictents:yurt_wall_piece"
     }
   ]
 }

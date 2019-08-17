@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import nomadictents.dimension.TentManager;
 import nomadictents.event.TentEventHandler;
 import nomadictents.proxies.ClientProxy;
 import nomadictents.proxies.CommonProxy;
@@ -52,7 +54,7 @@ public class NomadicTents {
 	@SubscribeEvent
 	public static void setup(final RegisterDimensionsEvent event) {
 		System.out.println("yurtmod: RegisterDimensionsEvent!");
-		PROXY.registerDimension(event);
+		TentManager.registerDimension(event);
 		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(Content.TENT_BIOME, 0));
 		BiomeDictionary.addTypes(Content.TENT_BIOME, BiomeDictionary.Type.VOID);
 	}
@@ -85,5 +87,11 @@ public class NomadicTents {
 	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
 		System.out.println("yurtmod: RegisterBiome");
 		PROXY.registerBiome(event);
+	}
+	
+	@SubscribeEvent
+	public static void registerRecipeSerializers(final RegistryEvent.Register<IRecipeSerializer<?>> event) {
+		System.out.println("yurtmod: RegisterRecipeSerializer");
+		PROXY.registerRecipeSerializers(event);
 	}
 }

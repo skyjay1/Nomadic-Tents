@@ -10,8 +10,7 @@
    "DXD"],
   "key": {
     "D": {
-        "item": "minecraft:dirt",
-		"data": 0
+        "item": "minecraft:dirt"
       },
     "B": {
         "item": "minecraft:cobblestone"
@@ -20,12 +19,10 @@
         "item": "nomadictents:depth_upgrade_stone"
       },
 	"T": {
-        "item": "nomadictents:tent",
-		"data": 0
+        "item": "nomadictents:tent"
       }
   },
   "result": {
-    "item": "nomadictents:tent",
-	 "data": 0
+    "item": "nomadictents:tent"
   }
 }

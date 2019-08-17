@@ -7,16 +7,13 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemTier;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
-import net.minecraftforge.common.BiomeManager.BiomeEntry;
-import net.minecraftforge.common.BiomeManager.BiomeType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.event.world.RegisterDimensionsEvent;
 import nomadictents.block.BlockBarrier;
 import nomadictents.block.BlockBedouinRoof;
@@ -32,6 +29,9 @@ import nomadictents.block.BlockUnbreakable;
 import nomadictents.block.BlockYurtRoof;
 import nomadictents.block.BlockYurtWall;
 import nomadictents.block.TileEntityTentDoor;
+import nomadictents.crafting.RecipeUpgradeColor;
+import nomadictents.crafting.RecipeUpgradeDepth;
+import nomadictents.crafting.RecipeUpgradeWidth;
 import nomadictents.dimension.BiomeTent;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
@@ -197,11 +197,19 @@ public class CommonProxy {
 		event.getRegistry().register(TentManager.MOD_DIMENSION);
 	}
 	
-	public void registerDimension(final RegisterDimensionsEvent event) {
-		//if (DimensionType.byName(TentManager.MOD_DIMENSION.getRegistryName()) == null) {
-			DimensionManager.registerDimension(TentManager.MOD_DIMENSION.getRegistryName(), TentManager.MOD_DIMENSION,
-					null, true);
-		//}
+//	public void registerDimension(final RegisterDimensionsEvent event) {
+//		//if (DimensionType.byName(TentManager.MOD_DIMENSION.getRegistryName()) == null) {
+//			DimensionManager.registerDimension(TentManager.MOD_DIMENSION.getRegistryName(), TentManager.MOD_DIMENSION,
+//					null, true);
+//		//}
+//	}
+	
+	public void registerRecipeSerializers(Register<IRecipeSerializer<?>> event) {
+		event.getRegistry().registerAll(
+				new RecipeUpgradeWidth.Factory().setRegistryName(NomadicTents.MODID, RecipeUpgradeWidth.CATEGORY),
+				new RecipeUpgradeDepth.Factory().setRegistryName(NomadicTents.MODID, RecipeUpgradeDepth.CATEGORY),
+				new RecipeUpgradeColor.Factory().setRegistryName(NomadicTents.MODID, RecipeUpgradeColor.CATEGORY)
+		);
 	}
 
 	private static final Item basicItem(final String name) {

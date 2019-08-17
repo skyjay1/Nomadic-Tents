@@ -12,8 +12,7 @@
         "item": "minecraft:emerald"
     },
 	"K": {
-		"type": "forge:ore_dict",
-		"ore": "stickWood"
+		"item": "minecraft:stick"
 	  },
 	"C": {
 		"item": "nomadictents:tent_canvas"

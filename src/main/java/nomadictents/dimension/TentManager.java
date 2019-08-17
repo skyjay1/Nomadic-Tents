@@ -11,20 +11,31 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
+import net.minecraftforge.event.world.RegisterDimensionsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import nomadictents.init.NomadicTents;
 
 public final class TentManager {
 	
 	private static final String DIM_NAME = "tent";
 	private static final ResourceLocation DIM_RL = new ResourceLocation(NomadicTents.MODID, DIM_NAME);
+	private static DimensionType TENT_DIMENSION_TYPE = null;
 	
 	public static final ModDimension MOD_DIMENSION = new ModDimension() {
 		@Override
 		public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
 			return TentDimension::new;
 		}
-	}.setRegistryName(DIM_RL);	
+	}.setRegistryName(DIM_RL);
+	
+	public static void registerDimension(final RegisterDimensionsEvent event) {
+		if (TENT_DIMENSION_TYPE == null) {
+			TENT_DIMENSION_TYPE = DimensionManager.registerDimension(DIM_RL, MOD_DIMENSION, null, true);
+		}
+	}
 
 //	public static void preInit() {
 //		DIMENSION_ID = TentConfig.CONFIG.TENT_DIM_ID.get();
@@ -37,7 +48,8 @@ public final class TentManager {
 	 **/
 	@Nullable
 	public static DimensionType getTentDim() {
-		return DimensionType.byName(DIM_RL);
+		return TENT_DIMENSION_TYPE;
+		//return DimensionType.byName(DIM_RL);
 	}
 	
 	/** 

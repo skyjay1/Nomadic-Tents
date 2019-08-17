@@ -1,5 +1,5 @@
 {
 	"variants": {
-		"normal": { "model": "nomadictents:block/super_dirt"}
+		"": { "model": "nomadictents:block/super_dirt"}
 	}
 }
