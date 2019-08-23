@@ -18,7 +18,7 @@ import nomadictents.init.Content;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.StructureBase;
 
-public class StructureData implements net.minecraftforge.common.util.INBTSerializable<CompoundNBT> {
+public class TentData implements net.minecraftforge.common.util.INBTSerializable<CompoundNBT> {
 	
 	////// String keys for NBT //////
 	public static final String KEY_TENT_CUR = "TentType";
@@ -31,67 +31,67 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	public static final String KEY_COLOR = "TentColor";
 	
 	////// Important fields with their default values //////
-	private StructureTent tent = StructureTent.getById((byte)0);
-	private StructureWidth width = StructureWidth.getById((byte)0);
-	private StructureDepth depth = StructureDepth.getById((byte)0);
-	//private StructureWidth prevWidth = StructureWidth.getById((byte)0);
-	//private StructureDepth prevDepth = StructureDepth.getById((byte)0);
+	private TentType tent = TentType.getById((byte)0);
+	private TentWidth width = TentWidth.getById((byte)0);
+	private TentDepth depth = TentDepth.getById((byte)0);
+	//private TentWidth prevWidth = TentWidth.getById((byte)0);
+	//private TentDepth prevDepth = TentDepth.getById((byte)0);
 	private DyeColor color = DyeColor.WHITE;
 	private long locationID = ItemTent.ERROR_TAG;
 	
-	public StructureData() {
+	public TentData() {
 		// empty constructor (uses defaults)
 	}
 	
 	/** Deserializes the given NBT to set important fields **/
-	public StructureData(final CompoundNBT nbt) {
+	public TentData(final CompoundNBT nbt) {
 		this();
 		if(nbt != null) {
 			this.deserializeNBT(nbt);
 		}
 	}
 	
-	/** Parses StructureData NBT information from the given stack, if it exists **/
-	public StructureData(final ItemStack tentStack) {
+	/** Parses TentData NBT information from the given stack, if it exists **/
+	public TentData(final ItemStack tentStack) {
 		this(tentStack != null && !tentStack.isEmpty() && tentStack.getItem() instanceof ItemTent 
 				? tentStack.getOrCreateChildTag(ItemTent.TENT_DATA) 
 				: null);
 	}
 	
-	/** @return the same StructureData object with the given values applied to both "Current" and "Previous" Values **/
-	public StructureData setAll(final StructureTent tentIn, final StructureWidth widthIn, final StructureDepth depthIn) {
+	/** @return the same TentData object with the given values applied to both "Current" and "Previous" Values **/
+	public TentData setAll(final TentType tentIn, final TentWidth widthIn, final TentDepth depthIn) {
 		this.setCurrent(tentIn, widthIn, depthIn);
 		//this.setPrev(widthIn, depthIn);
 		return this;
 	}
 	
-	/** @return the same StructureData with the given values used to set "Current" Values **/
-	public StructureData setCurrent(final StructureTent tentCur, final StructureWidth widthCur, final StructureDepth depthCur) {
+	/** @return the same TentData with the given values used to set "Current" Values **/
+	public TentData setCurrent(final TentType tentCur, final TentWidth widthCur, final TentDepth depthCur) {
 		this.tent = tentCur;
 		this.width = widthCur;
 		this.depth = depthCur;
 		return this;
 	}
 	
-	/** @return the same StructureData with the given valued used to set "Previous" Values **/
-//	public StructureData setPrev(final StructureWidth widthPrev, final StructureDepth depthPrev) {
+	/** @return the same TentData with the given valued used to set "Previous" Values **/
+//	public TentData setPrev(final TentWidth widthPrev, final TentDepth depthPrev) {
 //		this.prevWidth = widthPrev;
 //		this.prevDepth = depthPrev;
 //		return this;
 //	}
 	
-	/** @return a StructureData object that uses this object's "Previous" values for its "Current" ones **/
-//	public StructureData prevData() {
-//		return new StructureData()
+	/** @return a TentData object that uses this object's "Previous" values for its "Current" ones **/
+//	public TentData prevData() {
+//		return new TentData()
 //				.setCurrent(tent, prevWidth, prevDepth)
 //				.setPrev(prevWidth, prevDepth)
 //				.setID(locationID)
 //				.setColor(color);
 //	}
 	
-	/** @return an exact copy of this StructureData that is NOT the original **/
-	public StructureData copy() {
-		return new StructureData()
+	/** @return an exact copy of this TentData that is NOT the original **/
+	public TentData copy() {
+		return new TentData()
 				.setCurrent(tent, width, depth)
 				//.setPrev(prevWidth, prevDepth)
 				.setID(locationID)
@@ -107,70 +107,70 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	////// GETTERS AND SETTERS ///////
 	//////////////////////////////////
 
-	/** Set the StructureTent type used by this StructureData **/
-	public StructureData setTent(final StructureTent tentIn) {
+	/** Set the TentType type used by this TentData **/
+	public TentData setTent(final TentType tentIn) {
 		this.tent = tentIn;
 		return this;
 	}
 
-	/** Set or update the current Width used by this StructureData **/
-	public StructureData setWidth(final StructureWidth widthIn) {
+	/** Set or update the current Width used by this TentData **/
+	public TentData setWidth(final TentWidth widthIn) {
 		this.width = widthIn;
 		return this;
 	}
 	
-	/** Set or update the current Depth used by this StructureData **/
-	public StructureData setDepth(final StructureDepth depthIn) {
+	/** Set or update the current Depth used by this TentData **/
+	public TentData setDepth(final TentDepth depthIn) {
 		this.depth = depthIn;
 		return this;
 	}
 
-	/** Set or update the previous Width used by this StructureData **/
-//	public StructureData setPrevWidth(final StructureWidth widthIn) {
+	/** Set or update the previous Width used by this TentData **/
+//	public TentData setPrevWidth(final TentWidth widthIn) {
 //		this.prevWidth = widthIn;
 //		return this;
 //	}
 	
-	/** Set or update the previous Depth used by this StructureData **/
-//	public StructureData setPrevDepth(final StructureDepth depthIn) {
+	/** Set or update the previous Depth used by this TentData **/
+//	public TentData setPrevDepth(final TentDepth depthIn) {
 //		this.prevDepth = depthIn;
 //		return this;
 //	}
 	
-	/** Set or update the location ID of this StructureData **/
-	public StructureData setID(final long id) {
+	/** Set or update the location ID of this TentData **/
+	public TentData setID(final long id) {
 		this.locationID = id;
 		return this;
 	}
 	
 	/** Set the color of this tent. **/
-	public StructureData setColor(final DyeColor colorIn) {
+	public TentData setColor(final DyeColor colorIn) {
 		this.color = colorIn;
 		return this;
 	}
 	
-	/** @return the Tent type represented by this StructureData **/
-	public StructureTent getTent() {
+	/** @return the Tent type represented by this TentData **/
+	public TentType getTent() {
 		return this.tent;
 	}
 
-	/** @return the current Width of this StructureData **/
-	public StructureWidth getWidth() {
+	/** @return the current Width of this TentData **/
+	public TentWidth getWidth() {
 		return this.width;
 	}
 	
-	/** @return the current Depth of this StructureData **/
-	public StructureDepth getDepth() {
+	/** @return the current Depth of this TentData **/
+	public TentDepth getDepth() {
 		return this.depth;
 	}
 	
-	/** @return the previous Width of this StructureData (may be same as current) **/
-//	public StructureWidth getPrevWidth() {
+	/** @return the previous Width of this TentData (may be same as current) **/
+//	public TentWidth getPrevWidth() {
 //		return this.prevWidth;
 //	}
 	
-	/** @return the previous Depth of this StructureData (may be same as current) **/
-//	public StructureDepth getPrevDepth() {
+	/** @return the previous Depth of this TentData (may be same as current) **/
+//	public TentDepth getPrevDepth() {
 //		return this.prevDepth;
 //	}
 	
@@ -194,7 +194,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	public BlockState getDoorBlock() {
 		final boolean xl = this.getWidth().isXL();
 		final Block block = getDoorBlockRaw(xl);
-		final EnumProperty<StructureWidth> sizeEnum = xl ? BlockTentDoorHGM.SIZE_HGM :  BlockTentDoorSML.SIZE_SML;
+		final EnumProperty<TentWidth> sizeEnum = xl ? BlockTentDoorHGM.SIZE_HGM :  BlockTentDoorSML.SIZE_SML;
 		return block.getDefaultState().with(sizeEnum, this.getWidth());
 	}
 	
@@ -236,19 +236,19 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 //	}
 	
 	
-//	public boolean needsUpdate(final StructureData oldData) {
+//	public boolean needsUpdate(final TentData oldData) {
 //		return needsUpdateDepth(oldData) && needsUpdateWidth(oldData);
 //	}
 //	
-//	public boolean needsUpdateDepth(final StructureData oldData) {
+//	public boolean needsUpdateDepth(final TentData oldData) {
 //		return depth != oldData.getDepth();
 //	}
 //	
-//	public boolean needsUpdateWidth(final StructureData oldData) {
+//	public boolean needsUpdateWidth(final TentData oldData) {
 //		return width != oldData.getWidth();
 //	}
 //	
-//	public boolean needsUpdateColor(final StructureData oldData) {
+//	public boolean needsUpdateColor(final TentData oldData) {
 //		return color != oldData.getColor();
 //	}
 	
@@ -258,7 +258,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	 * @return whether the StructureBase should re-generate based on changed values.
 	 * @see StructureBase#generateInTentDimension(int, World, BlockPos, double, double, double, float)
 	 **/
-	public static boolean shouldUpdate(final StructureData oldData, final StructureData newData) {
+	public static boolean shouldUpdate(final TentData oldData, final TentData newData) {
 		return oldData.getWidth() != newData.getWidth() || oldData.getDepth() != newData.getDepth()
 				|| oldData.getColor() != newData.getColor();
 	}
@@ -270,13 +270,13 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}
-		te.setTentData(new StructureData(stack));
+		te.setTentData(new TentData(stack));
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
 		te.setOwner(PlayerEntity.getOfflineUUID(player.getName().getUnformattedComponentText()));
 	}
 
-	/** @return an NBT-tagged Tent ItemStack that represents this StructureData **/
+	/** @return an NBT-tagged Tent ItemStack that represents this TentData **/
 	public ItemStack getDropStack() {
 		return writeTo(new ItemStack(Content.ITEM_TENT, 1));
 	}
@@ -287,22 +287,22 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 		return stack;
 	}
 	
-	/** Note: the returned StructureBase only contains a COPY of this StructureData **/
+	/** Note: the returned StructureBase only contains a COPY of this TentData **/
 //	public StructureBase makePrevStructure() {
 //		return this.tent.makeStructure(this.prevData().copy());
 //	}
 	
-	/** Note: the returned StructureBase only contains a COPY of this StructureData **/
+	/** Note: the returned StructureBase only contains a COPY of this TentData **/
 	public StructureBase getStructure() {
 		return this.tent.makeStructure(this.copy());
 	}
 	
 	/** Unused **/
-	public static StructureData getRandom(final Random rand) {
-		final StructureTent t = StructureTent.values()[rand.nextInt(StructureTent.values().length)];
-		final StructureWidth w = StructureWidth.values()[rand.nextInt(StructureWidth.values().length)];
-		final StructureDepth d = StructureDepth.values()[rand.nextInt(StructureDepth.values().length)];
-		return new StructureData().setAll(t, w, d);
+	public static TentData getRandom(final Random rand) {
+		final TentType t = TentType.values()[rand.nextInt(TentType.values().length)];
+		final TentWidth w = TentWidth.values()[rand.nextInt(TentWidth.values().length)];
+		final TentDepth d = TentDepth.values()[rand.nextInt(TentDepth.values().length)];
+		return new TentData().setAll(t, w, d);
 	}
 
 	@Override
@@ -328,11 +328,11 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 
 	@Override
 	public void deserializeNBT(final CompoundNBT nbt) {
-		this.tent = StructureTent.getById(nbt.getByte(KEY_TENT_CUR));
-		this.width = StructureWidth.getById(nbt.getByte(KEY_WIDTH_CUR));
-		this.depth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_CUR));
-		//this.prevWidth = StructureWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
-		//this.prevDepth = StructureDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
+		this.tent = TentType.getById(nbt.getByte(KEY_TENT_CUR));
+		this.width = TentWidth.getById(nbt.getByte(KEY_WIDTH_CUR));
+		this.depth = TentDepth.getById(nbt.getByte(KEY_DEPTH_CUR));
+		//this.prevWidth = TentWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
+		//this.prevDepth = TentDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
 		this.locationID = nbt.getLong(KEY_ID);
 		this.color = nbt.contains(KEY_COLOR) ? DyeColor.byId(nbt.getInt(KEY_COLOR)) : DyeColor.WHITE;
 	}

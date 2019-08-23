@@ -5,16 +5,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
-import nomadictents.structure.util.StructureWidth;
+import nomadictents.structure.util.TentWidth;
 
 public class BlockTentDoorSML extends BlockTentDoor {
 	
-	public static final EnumProperty<StructureWidth> SIZE_SML = EnumProperty.<StructureWidth>create("size",
-			StructureWidth.class, StructureWidth.SMALL, StructureWidth.MEDIUM, StructureWidth.LARGE);
+	public static final EnumProperty<TentWidth> SIZE_SML = EnumProperty.<TentWidth>create("size",
+			TentWidth.class, TentWidth.SMALL, TentWidth.MEDIUM, TentWidth.LARGE);
 
 	public BlockTentDoorSML(final String name, final boolean isFull) {
 		super(name, isFull);
-		this.setDefaultState(this.getDefaultState().with(SIZE_SML, StructureWidth.SMALL));
+		this.setDefaultState(this.getDefaultState().with(SIZE_SML, TentWidth.SMALL));
 	}
 	
 	public BlockTentDoorSML(final String name) {

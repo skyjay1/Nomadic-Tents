@@ -19,13 +19,20 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import nomadictents.dimension.TentManager;
 import nomadictents.dimension.TentTeleporter;
 import nomadictents.init.TentConfig;
 import nomadictents.item.ItemTent;
-import nomadictents.structure.util.StructureData;
+import nomadictents.structure.util.TentData;
 
 public class TentEventHandler {
+	
+	@SubscribeEvent
+	public void onServerStarting(final FMLServerStartingEvent event) {
+		System.out.println("yurtmod: FMLServerStartingEvent");
+		TentManager.registerDimension();
+	}
 	
 	/**
 	 * This code is called AFTER a player wakes up but BEFORE any subsequent
@@ -146,7 +153,7 @@ public class TentEventHandler {
 					// transfer player using Teleporter
 					final TentTeleporter tel = new TentTeleporter(playerMP.getServer(), TENTDIM, RESPAWN,
 							new BlockPos(0, 0, 0), null, respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(),
-							event.getPlayer().rotationYaw, new StructureData());
+							event.getPlayer().rotationYaw, new TentData());
 					
 					tel.teleport(playerMP);
 					

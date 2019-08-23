@@ -3,19 +3,24 @@ package nomadictents.dimension;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.DyeColor;
+import net.minecraft.network.play.server.SPlayerAbilitiesPacket;
+import net.minecraft.network.play.server.SRespawnPacket;
+import net.minecraft.network.play.server.SServerDifficultyPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.event.TentEvent;
-import nomadictents.structure.util.StructureData;
+import nomadictents.structure.util.TentData;
 
 public class TentTeleporter extends Teleporter {
-	private final StructureData tentData;
+	private final TentData tentData;
 	private final BlockPos tentDoorPos;
 	private final DyeColor color;
 	private final double prevX;
@@ -27,7 +32,7 @@ public class TentTeleporter extends Teleporter {
 	private final MinecraftServer server;
 
 	public TentTeleporter(final MinecraftServer serverIn, final DimensionType dimFrom, final DimensionType dimTo, final BlockPos doorPos, final DyeColor colorIn,
-			final double oldX, final double oldY, final double oldZ, final float oldYaw, final StructureData data) {
+			final double oldX, final double oldY, final double oldZ, final float oldYaw, final TentData data) {
 		super(serverIn.getWorld(dimTo));
 		this.server = serverIn;
 		this.dimensionFrom = dimFrom;
@@ -57,16 +62,43 @@ public class TentTeleporter extends Teleporter {
 			final ServerWorld worldFrom = entityIn.getServer().getWorld(entityIn.dimension);
 			final ServerWorld worldTo = entityIn.getServer().getWorld(this.dimensionTo);
 			entityIn.dimension = this.dimensionTo;
-			entityIn.detach();			
-			Entity entity = entityIn.getType().create(worldTo);
-			if (entity != null) {
-				entity.copyDataFromOld(entityIn);
-				makePortal(entity);
+			
+			if (entityIn instanceof ServerPlayerEntity) {
+				final ServerPlayerEntity entityPlayer = (ServerPlayerEntity) entityIn;
+				WorldInfo worldinfo = this.world.getWorldInfo();
+				entityPlayer.connection.sendPacket(new SRespawnPacket(this.dimensionTo, worldinfo.getGenerator(),
+						entityPlayer.interactionManager.getGameType()));
+				entityPlayer.connection.sendPacket(
+						new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
+				PlayerList playerlist = this.server.getPlayerList();
+				playerlist.updatePermissionLevel(entityPlayer);
+				worldFrom.removeEntity(entityPlayer, true); // Forge: the player entity is moved to the new world, NOT cloned.
+														// So keep the data alive with no matching invalidate call.
+				entityPlayer.revive();
+				
+				makePortal(entityPlayer);
+
+				entityPlayer.setWorld(worldTo);
+				worldTo.func_217447_b(entityPlayer);
+				// entityPlayer.func_213846_b(worldFrom);
+				entityPlayer.interactionManager.setWorld(worldTo);
+				entityPlayer.connection.sendPacket(new SPlayerAbilitiesPacket(entityPlayer.abilities));
+				playerlist.sendWorldInfo(entityPlayer, worldTo);
+				playerlist.sendInventory(entityPlayer);
+				net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerChangedDimensionEvent(entityPlayer, this.dimensionFrom, this.dimensionTo);
+				return entityPlayer;
+			}
+			
+			//entityIn.detach();			
+			Entity copy = entityIn.getType().create(worldTo);
+			if (copy != null) {
+				copy.copyDataFromOld(entityIn);
+				makePortal(copy);
 			}
 			entityIn.remove(false);
 			worldFrom.resetUpdateEntityTick();
 			worldTo.resetUpdateEntityTick();
-			return entity;
+			return copy;
 		} else {
 			return null;
 		}

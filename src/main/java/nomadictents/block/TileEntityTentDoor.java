@@ -24,7 +24,7 @@ import nomadictents.init.Content;
 import nomadictents.init.TentConfig;
 import nomadictents.init.TentSaveData;
 import nomadictents.item.ItemTent;
-import nomadictents.structure.util.StructureData;
+import nomadictents.structure.util.TentData;
 
 public class TileEntityTentDoor extends TileEntity {
 
@@ -37,19 +37,16 @@ public class TileEntityTentDoor extends TileEntity {
 	private static final String S_PLAYER_UUID = "PlayerUUID";
 	private static final String S_PLAYER_DIM = "PreviousPlayerDimension";
 
-	private StructureData tent;
+	private TentData tent = new TentData();
 	private double prevX;
 	private double prevY;
 	private double prevZ;
 	private float prevFacing;
-	private DimensionType prevDimID;
+	private DimensionType prevDim = DimensionType.OVERWORLD;
 	private UUID owner;
 
 	public TileEntityTentDoor() {
 		super(Content.TE_DOOR);
-		if (this.tent == null) {
-			this.tent = new StructureData();
-		}
 	}
 	
 	/** 
@@ -57,7 +54,7 @@ public class TileEntityTentDoor extends TileEntity {
 	 * using a strict mathematical formula.
 	 * @return the Tent Dimension location of the tent's door
 	 * @see #getTentID(BlockPos)
-	 * @see StructureData#getID()
+	 * @see TentData#getID()
 	 **/
 	public static BlockPos getTentDoorPos(final long tentID) {
 		int x = (int)(tentID % 64) * (TentDimension.TENT_SPACING);
@@ -77,28 +74,24 @@ public class TileEntityTentDoor extends TileEntity {
 		return (pos.getX() / TentDimension.TENT_SPACING) + (pos.getZ() / TentDimension.TENT_SPACING) * 64L;
 	}
 	
-	public void setTentData(final StructureData tentData) {
+	public void setTentData(final TentData tentData) {
 		this.tent = tentData;
 	}
 	
-	public StructureData getTentData() {
+	public TentData getTentData() {
 		return this.tent;
 	}
 	
 	@Override
 	public void read(final CompoundNBT nbt) {
 		super.read(nbt);
-		// attempt to fix old data if possible
-		CompoundNBT tentData = nbt.getCompound(S_TENT_DATA);
-		if(ItemTent.shouldFixOldStructureData(tentData)) {
-			tentData = ItemTent.makeStructureDataFromOld(this.getWorld(), tentData);
-		}
-		this.tent = new StructureData(tentData);
+		// read values
+		this.tent = new TentData(nbt.getCompound(S_TENT_DATA));
 		this.prevX = nbt.getDouble(S_PLAYER_X);
 		this.prevY = nbt.getDouble(S_PLAYER_Y);
 		this.prevZ = nbt.getDouble(S_PLAYER_Z);
 		this.prevFacing = nbt.getFloat(S_PLAYER_YAW);
-		this.prevDimID = DimensionType.getById(nbt.getInt(S_PLAYER_DIM));
+		this.prevDim = DimensionType.getById(nbt.getInt(S_PLAYER_DIM));
 		this.owner = nbt.contains(S_PLAYER_UUID) ? nbt.getUniqueId(S_PLAYER_UUID) : null;
 	}
 
@@ -110,7 +103,7 @@ public class TileEntityTentDoor extends TileEntity {
 		nbt.putDouble(S_PLAYER_Y, prevY);
 		nbt.putDouble(S_PLAYER_Z, prevZ);
 		nbt.putFloat(S_PLAYER_YAW, prevFacing);
-		nbt.putInt(S_PLAYER_DIM, this.getPrevDimension().getId());
+		nbt.putInt(S_PLAYER_DIM, (this.getPrevDimension() != null ? this.getPrevDimension().getId() : TentManager.getOverworldDim().getId()));
 		if(this.owner != null) {
 			nbt.putUniqueId(S_PLAYER_UUID, owner);
 		}
@@ -119,7 +112,7 @@ public class TileEntityTentDoor extends TileEntity {
 	
 	/**
 	 * @return the location of the Tent Dimension door
-	 * corresponding to this door's StructureData
+	 * corresponding to this door's TentData
 	 **/
 	public BlockPos getDoorPos() {
 		return getTentDoorPos(this.getTentData().getID());
@@ -132,7 +125,7 @@ public class TileEntityTentDoor extends TileEntity {
 	}
 
 	public void setPrevDimension(final DimensionType prevDimension) {
-		this.prevDimID = prevDimension;
+		this.prevDim = prevDimension;
 	}
 	
 	public void setPrevFacing(float facing) {
@@ -140,7 +133,7 @@ public class TileEntityTentDoor extends TileEntity {
 	}
 
 	public DimensionType getPrevDimension() {
-		return this.prevDimID;
+		return this.prevDim;
 	}
 	
 	public double getPrevX() {

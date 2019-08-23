@@ -8,7 +8,7 @@
 //import nomadictents.crafting.RecipeUpgradeColor;
 //import nomadictents.crafting.RecipeUpgradeDepth;
 //import nomadictents.crafting.RecipeUpgradeWidth;
-//import nomadictents.structure.util.StructureData;
+//import nomadictents.structure.util.TentData;
 //
 //@JEIPlugin
 //public class JEIProvider implements mezz.jei.api.IModPlugin {
@@ -21,8 +21,8 @@
 //	@Override
 //	public void registerItemSubtypes(final ISubtypeRegistry subtypeRegistry) {
 //		subtypeRegistry.registerSubtypeInterpreter(Content.ITEM_TENT, i -> {
-//			final StructureData data = new StructureData(i);
-//			// build a unique name based on StructureTent and StructureWidth and Color
+//			final TentData data = new TentData(i);
+//			// build a unique name based on TentType and TentWidth and Color
 //			return data.getTent().getName().concat("_").concat(data.getWidth().getName())
 //					.concat("_").concat(data.getColor().getName());
 //		});
@@ -40,11 +40,11 @@
 //		// failed attempts below
 //		
 ////		final List<ItemStack> blacklisted = new ArrayList<>();
-////		for(StructureTent tent : StructureTent.values()) {
-////			for(StructureWidth size : StructureWidth.values()) {
-////				for(StructureDepth depth : StructureDepth.values()) {
+////		for(TentType tent : TentType.values()) {
+////			for(TentWidth size : TentWidth.values()) {
+////				for(TentDepth depth : TentDepth.values()) {
 ////					if(depth.getId() + 1 > TentConfig.TENTS.getMaxDepth(size)) {
-////						blacklisted.add(new StructureData().setAll(tent, size, depth).getDropStack());
+////						blacklisted.add(new TentData().setAll(tent, size, depth).getDropStack());
 ////					}
 ////				}
 ////			}

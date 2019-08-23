@@ -11,8 +11,8 @@
 //import net.minecraft.item.crafting.Ingredient;
 //import nomadictents.crafting.RecipeUpgradeWidth;
 //import nomadictents.item.ItemTent;
-//import nomadictents.structure.util.StructureData;
-//import nomadictents.structure.util.StructureDepth;
+//import nomadictents.structure.util.TentData;
+//import nomadictents.structure.util.TentDepth;
 //
 //public final class JEIWidthRecipe {
 //	
@@ -43,8 +43,8 @@
 //				for(final ItemStack stack : ingredient.getMatchingStacks()) {
 //					// if this ingredient is the TENT, we need to set NBT data
 //					if(stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemTent) {
-//						final StructureData data = new StructureData(stack);
-//						data.setAll(recipe.getTent(), recipe.getWidthIn(), StructureDepth.NORMAL);
+//						final TentData data = new TentData(stack);
+//						data.setAll(recipe.getTent(), recipe.getWidthIn(), TentDepth.NORMAL);
 //						// we changed some values, so we re-save to NBT
 //						data.writeTo(stack);
 //					}

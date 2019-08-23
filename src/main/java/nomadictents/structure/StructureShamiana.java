@@ -11,21 +11,21 @@ import nomadictents.block.BlockShamianaWall;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.structure.util.Blueprint;
-import nomadictents.structure.util.StructureTent;
-import nomadictents.structure.util.StructureWidth;
+import nomadictents.structure.util.TentType;
+import nomadictents.structure.util.TentWidth;
 
 public class StructureShamiana extends StructureBase {
 
 	@Override
-	public StructureTent getTentType() {
-		return StructureTent.SHAMIANA;
+	public TentType getTentType() {
+		return TentType.SHAMIANA;
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth structureWidth,
+	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth tentWidth,
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
 		final boolean tentDim = TentManager.isTent(worldIn);
-		final Blueprint bp = getBlueprints(structureWidth);
+		final Blueprint bp = getBlueprints(tentWidth);
 		if (bp == null) {
 			return false;
 		}
@@ -35,7 +35,7 @@ public class StructureShamiana extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		final int structureWidthNum = Math.floorDiv(structureWidth.getSquareWidth(), 2);
+		final int structureWidthNum = Math.floorDiv(tentWidth.getSquareWidth(), 2);
 		if (tentDim) {
 			final boolean isRemoving = wallBlock.getMaterial() == Material.AIR;
 			final Block pole = Blocks.OAK_FENCE;
@@ -46,7 +46,7 @@ public class StructureShamiana extends StructureBase {
 				final BlockPos p = pos.up(i);
 				if (isRemoving && worldIn.getBlockState(p).getBlock() == pole) {
 					worldIn.removeBlock(p, false);
-				} else if (/* structureWidth != StructureWidth.SMALL && */ !isRemoving && worldIn.isAirBlock(p)) {
+				} else if (/* structureWidth != TentWidth.SMALL && */ !isRemoving && worldIn.isAirBlock(p)) {
 					worldIn.setBlockState(p, pole.getDefaultState());
 				}
 			}
@@ -73,9 +73,9 @@ public class StructureShamiana extends StructureBase {
 		}
 	}
 
-	public static Blueprint makeBlueprints(final StructureWidth StructureWidth) {
+	public static Blueprint makeBlueprints(final TentWidth TentWidth) {
 		final Blueprint bp = new Blueprint();
-		switch (StructureWidth) {
+		switch (TentWidth) {
 		case SMALL:
 			bp.addWallCoords(new int[][] {
 					// layer 1

@@ -11,7 +11,7 @@ import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.dimension.TentManager;
-import nomadictents.structure.util.StructureData;
+import nomadictents.structure.util.TentData;
 
 /**
  * This Event can be used to trigger behavior in other mods.
@@ -35,14 +35,14 @@ public class TentEvent extends Event {
 	}
 	
 	/** 
-	 * @return the StructureData object contained in this event.
-	 * @see StructureData#getTent()
-	 * @see StructureData#getWidth()
-	 * @see StructureData#getDepth()
-	 * @see StructureData#getColor()
+	 * @return the TentData object contained in this event.
+	 * @see TentData#getTent()
+	 * @see TentData#getWidth()
+	 * @see TentData#getDepth()
+	 * @see TentData#getColor()
 	 **/
 	@Nullable
-	public StructureData getData() {
+	public TentData getData() {
 		return this.teDoor != null ? teDoor.getTentData() : null;
 	}
 	
@@ -91,7 +91,7 @@ public class TentEvent extends Event {
 		 * Use {@link TentEvent#getData()} to alter the return of
 		 * this method.
 		 * @return a copy of an ItemStack holding this tent, using
-		 * {@link StructureData#getDropStack()}, or EMPTY if there's
+		 * {@link TentData#getDropStack()}, or EMPTY if there's
 		 * a problem.
 		 **/
 		public ItemStack getTentStack() {

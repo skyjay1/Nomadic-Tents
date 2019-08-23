@@ -11,7 +11,7 @@
 //import net.minecraft.item.crafting.Ingredient;
 //import nomadictents.crafting.RecipeUpgradeDepth;
 //import nomadictents.item.ItemTent;
-//import nomadictents.structure.util.StructureData;
+//import nomadictents.structure.util.TentData;
 //
 //public final class JEIDepthRecipe {
 //	
@@ -43,7 +43,7 @@
 //					// if this ingredient is the TENT, we need to set NBT data and add subtypes
 //					if(stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemTent) {
 //						// correct NBT values for input tent
-//						StructureData data = new StructureData(stack)
+//						TentData data = new TentData(stack)
 //								.setAll(recipe.getTentType(), recipe.getMinSize(), recipe.getDepthIn());
 //						data.writeTo(stack);
 //					}

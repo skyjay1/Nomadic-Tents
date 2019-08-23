@@ -16,10 +16,10 @@ import net.minecraft.world.World;
 import nomadictents.init.Content;
 import nomadictents.item.ItemDepthUpgrade;
 import nomadictents.item.ItemTent;
-import nomadictents.structure.util.StructureData;
-import nomadictents.structure.util.StructureDepth;
-import nomadictents.structure.util.StructureTent;
-import nomadictents.structure.util.StructureWidth;
+import nomadictents.structure.util.TentData;
+import nomadictents.structure.util.TentDepth;
+import nomadictents.structure.util.TentType;
+import nomadictents.structure.util.TentWidth;
 
 public class RecipeUpgradeDepth  extends ShapedRecipe {
 	
@@ -27,16 +27,16 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 	
 	public static final RecipeUpgradeDepth EMPTY = new RecipeUpgradeDepth();
 	
-	private final StructureTent tent;
-	private final StructureWidth widthIn;
-	private final StructureDepth depthIn;
-	private final StructureDepth depthOut;
+	private final TentType tent;
+	private final TentWidth widthIn;
+	private final TentDepth depthIn;
+	private final TentDepth depthOut;
 
-	public RecipeUpgradeDepth(final ResourceLocation id, final StructureDepth depthFrom, final StructureDepth depthTo, 
-			final StructureTent tentType, final StructureWidth minSize,
+	public RecipeUpgradeDepth(final ResourceLocation id, final TentDepth depthFrom, final TentDepth depthTo, 
+			final TentType tentType, final TentWidth minSize,
 			final NonNullList<Ingredient> ingredients) {
 		super(id, CATEGORY, 3, 3, ingredients, 
-				new StructureData().setAll(tentType, minSize, depthTo).getDropStack());
+				new TentData().setAll(tentType, minSize, depthTo).getDropStack());
 		this.depthIn = depthFrom;
 		this.depthOut = depthTo;
 		this.tent = tentType;
@@ -45,10 +45,10 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 	
 	private RecipeUpgradeDepth() {
 		super(new ResourceLocation("empty"), CATEGORY, 3, 3, NonNullList.create(), ItemStack.EMPTY);
-		tent = StructureTent.YURT;
-		widthIn = StructureWidth.SMALL;
-		depthIn = StructureDepth.NORMAL;
-		depthOut = StructureDepth.NORMAL;
+		tent = TentType.YURT;
+		widthIn = TentWidth.SMALL;
+		depthIn = TentDepth.NORMAL;
+		depthOut = TentDepth.NORMAL;
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 				// no tent was found, cannot upgrade depth
 				return false;
 			} else {
-				final StructureData data = new StructureData(tentStack.getOrCreateChildTag(ItemTent.TENT_DATA));
+				final TentData data = new TentData(tentStack.getOrCreateChildTag(ItemTent.TENT_DATA));
 				// return true if tent depth matches that of this recipe and not fully upgraded already
 				if (data.getTent() == tent && data.getDepth() == this.depthIn 
 						&& data.getWidth().getId() >= this.widthIn.getId()
@@ -92,7 +92,7 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 		final CompoundNBT resultTag = result.hasTag() ? result.getTag() : new CompoundNBT();
 		
 		if (inputTent != null && inputTent.hasTag()) {
-			final StructureData tentData = new StructureData(inputTent);		
+			final TentData tentData = new TentData(inputTent);		
 			tentData.setDepth(this.depthOut);
 			// transfer those values to the new tent
 			resultTag.put(ItemTent.TENT_DATA, tentData.serializeNBT());
@@ -111,19 +111,19 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 		return Content.SERIALIZER_DEPTH;
 	}
 	
-	public StructureTent getTentType() {
+	public TentType getTentType() {
 		return this.tent;
 	}
 	
-	public StructureWidth getMinSize() {
+	public TentWidth getMinSize() {
 		return this.widthIn;
 	}
 	
-	public StructureDepth getDepthIn() {
+	public TentDepth getDepthIn() {
 		return this.depthIn;
 	}
 	
-	public StructureDepth getDepthOut() {
+	public TentDepth getDepthOut() {
 		return this.depthOut;
 	}
 	
@@ -135,10 +135,10 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 				return RecipeUpgradeDepth.EMPTY;
 			}
 			final ShapedRecipe recipe = super.read(recipeId, json);
-			final StructureTent tentType = StructureTent.getByName(JSONUtils.getString(json, "tent_type"));
-			final StructureWidth minWidth = StructureWidth.getByName(JSONUtils.getString(json, "min_size"));
-			final StructureDepth depthIn = StructureDepth.getById((byte)JSONUtils.getInt(json, "input_depth"));
-			final StructureDepth depthOut = StructureDepth.getById((byte)JSONUtils.getInt(json, "result_depth"));
+			final TentType tentType = TentType.getByName(JSONUtils.getString(json, "tent_type"));
+			final TentWidth minWidth = TentWidth.getByName(JSONUtils.getString(json, "min_size"));
+			final TentDepth depthIn = TentDepth.getById((byte)JSONUtils.getInt(json, "input_depth"));
+			final TentDepth depthOut = TentDepth.getById((byte)JSONUtils.getInt(json, "result_depth"));
 			return new RecipeUpgradeDepth(recipeId, depthIn, depthOut, tentType, minWidth, recipe.getIngredients());	
 		}
 
@@ -148,10 +148,10 @@ public class RecipeUpgradeDepth  extends ShapedRecipe {
 				return RecipeUpgradeDepth.EMPTY;
 			}
 			final ShapedRecipe recipe = super.read(recipeId, buffer);
-			final StructureTent tentType = StructureTent.getById(buffer.readByte());
-			final StructureWidth minWidth = StructureWidth.getById(buffer.readByte());
-			final StructureDepth depthIn = StructureDepth.getById(buffer.readByte());
-			final StructureDepth depthOut = StructureDepth.getById(buffer.readByte());
+			final TentType tentType = TentType.getById(buffer.readByte());
+			final TentWidth minWidth = TentWidth.getById(buffer.readByte());
+			final TentDepth depthIn = TentDepth.getById(buffer.readByte());
+			final TentDepth depthOut = TentDepth.getById(buffer.readByte());
 			return new RecipeUpgradeDepth(recipeId, depthIn, depthOut, tentType, minWidth, recipe.getIngredients());
 		}
 

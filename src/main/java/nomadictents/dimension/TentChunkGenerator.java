@@ -1,5 +1,6 @@
 package nomadictents.dimension;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -11,7 +12,6 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -42,11 +42,17 @@ public class TentChunkGenerator extends OverworldChunkGenerator {
 	public List<SpawnListEntry> getPossibleCreatures(final EntityClassification creatureType, final BlockPos pos) {
 		return Lists.newArrayList();
 	}
+	
+	@Override
+	public void generateSurface(final IChunk chunkIn) {
+		// do nothing
+	}
 
 	@Override
 	public void makeBase(final IWorld world, final IChunk chunkIn) {
-		ChunkPos pos = chunkIn.getPos();
-		chunkIn.setBiomes(new Biome[] { Content.TENT_BIOME });
+		final Biome[] biomes = new Biome[chunkIn.getBiomes().length];
+		Arrays.fill(biomes, Content.TENT_BIOME);
+		chunkIn.setBiomes(biomes);
 //		Chunk chunk = new Chunk(world, pos.x, pos.z, new Biome[] { Content.BIOME_TENT });
 //		chunk.generateSkylightMap();
 //		chunk.setStatus(ChunkStatus.BASE);

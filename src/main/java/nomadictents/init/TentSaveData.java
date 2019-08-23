@@ -32,17 +32,8 @@ public class TentSaveData extends WorldSavedData {
 	}
 
 	public static TentSaveData get(MinecraftServer server) {
-		
 		return server.getWorld(TentManager.getTentDim()).getSavedData()
-				.get(() -> new TentSaveData(NomadicTents.MODID), NomadicTents.MODID);
-		
-//		MapStorage storage = world.getMapStorage();
-//		TentSaveData result = (TentSaveData) storage.getOrLoadData(TentSaveData.class, NomadicTents.MODID);
-//		if (result == null) {
-//			result = new TentSaveData(NomadicTents.MODID);
-//			storage.setData(NomadicTents.MODID, result);
-//		}
-//		return result;
+				.getOrCreate(() -> new TentSaveData(NomadicTents.MODID), NomadicTents.MODID);
 	}
 
 	@Override
@@ -88,6 +79,8 @@ public class TentSaveData extends WorldSavedData {
 	 **/
 	public long getNextID() {
 		this.markDirty();
+		System.out.println("incrementing ID count from " + idCount);
+		System.out.println("My hash code: " + this.hashCode());
 		return ++idCount;
 	}
 

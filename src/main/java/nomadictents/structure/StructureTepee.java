@@ -12,20 +12,20 @@ import nomadictents.block.BlockTepeeWall;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.structure.util.Blueprint;
-import nomadictents.structure.util.StructureTent;
-import nomadictents.structure.util.StructureWidth;
+import nomadictents.structure.util.TentType;
+import nomadictents.structure.util.TentWidth;
 
 public class StructureTepee extends StructureBase {
 	
 	public static final int LAYER_DEPTH = 2;
 
 	@Override
-	public StructureTent getTentType() {
-		return StructureTent.TEPEE;
+	public TentType getTentType() {
+		return TentType.TEPEE;
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size, 
+	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size, 
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
 		boolean tentDim = TentManager.isTent(worldIn);
 		Blueprint bp = getBlueprints(size);
@@ -52,7 +52,7 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean canSpawn(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size) {
+	public boolean canSpawn(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size) {
 		// determine what blueprints to use
 		final Blueprint bp = this.getBlueprints(size);
 
@@ -61,7 +61,7 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, StructureWidth size, Direction facing) {
+	public boolean isValidForFacing(World worldIn, BlockPos doorBase, TentWidth size, Direction facing) {
 		final Blueprint bp = this.getBlueprints(size);
 		// check wall arrays
 		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
@@ -97,7 +97,7 @@ public class StructureTepee extends StructureBase {
 		}	
 	}
 	
-	public static Blueprint makeBlueprints(final StructureWidth size) {
+	public static Blueprint makeBlueprints(final TentWidth size) {
 		final Blueprint bp = new Blueprint();
 		switch (size) {
 		case MEGA:

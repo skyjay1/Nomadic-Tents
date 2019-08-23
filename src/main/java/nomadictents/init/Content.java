@@ -6,18 +6,21 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.crafting.RecipeUpgradeColor;
 import nomadictents.crafting.RecipeUpgradeDepth;
 import nomadictents.crafting.RecipeUpgradeWidth;
+import nomadictents.dimension.TentManager;
 
 public class Content {
 	
-	//// RECIPE SERIALIZERS ////
-	//public static final RecipeType<RecipeUpgradeWidth> TYPE_WIDTH = RecipeType.get(RecipeUpgradeWidth.Serializer.NAME, RecipeUpgradeWidth.class);
-	//public static final RecipeType<RecipeUpgradeDepth> TYPE_DEPTH = RecipeType.get(RecipeUpgradeDepth.Serializer.NAME, RecipeUpgradeDepth.class);
+	//// MOD DIMENSION ////
+	@ObjectHolder(NomadicTents.MODID + ":" + "tent_dimension")
+	public static ModDimension MOD_DIMENSION;
 	
+	//// RECIPE SERIALIZERS ////	
 	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeWidth.CATEGORY)
 	public static IRecipeSerializer<ShapedRecipe> SERIALIZER_WIDTH; // = IRecipeSerializer.register(RecipeUpgradeWidth.CATEGORY, new RecipeUpgradeWidth.Factory());
 	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeDepth.CATEGORY)

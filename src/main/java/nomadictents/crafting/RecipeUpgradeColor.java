@@ -17,10 +17,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import nomadictents.init.Content;
 import nomadictents.item.ItemTent;
-import nomadictents.structure.util.StructureData;
-import nomadictents.structure.util.StructureDepth;
-import nomadictents.structure.util.StructureTent;
-import nomadictents.structure.util.StructureWidth;
+import nomadictents.structure.util.TentData;
+import nomadictents.structure.util.TentDepth;
+import nomadictents.structure.util.TentType;
+import nomadictents.structure.util.TentWidth;
 
 public class RecipeUpgradeColor extends ShapedRecipe {
 	
@@ -32,8 +32,8 @@ public class RecipeUpgradeColor extends ShapedRecipe {
 
 	public RecipeUpgradeColor(final ResourceLocation id, final DyeColor color, final NonNullList<Ingredient> ingredients, final boolean hasWater) {
 		super(id, CATEGORY, hasWater ? 1 : 3, hasWater ? 2 : 3, ingredients, 
-				new StructureData().setColor(color)
-					.setAll(StructureTent.SHAMIANA, StructureWidth.SMALL, StructureDepth.NORMAL)
+				new TentData().setColor(color)
+					.setAll(TentType.SHAMIANA, TentWidth.SMALL, TentDepth.NORMAL)
 					.getDropStack());
 		this.colorOut = color;
 	}
@@ -67,10 +67,10 @@ public class RecipeUpgradeColor extends ShapedRecipe {
 				// no tent was found, cannot upgrade color
 				return false;
 			} else {
-				final StructureData data = new StructureData(tentStack.getOrCreateChildTag(ItemTent.TENT_DATA));
+				final TentData data = new TentData(tentStack.getOrCreateChildTag(ItemTent.TENT_DATA));
 				// return true for Shamiana tents where EITHER the current color is white 
 				// OR this recipe produces white
-				if (data.getTent() == StructureTent.SHAMIANA && 
+				if (data.getTent() == TentType.SHAMIANA && 
 						(this.colorOut == DyeColor.WHITE || data.getColor() == DyeColor.WHITE)) {
 					return true;
 				}
@@ -94,7 +94,7 @@ public class RecipeUpgradeColor extends ShapedRecipe {
 		final CompoundNBT resultTag = result.getOrCreateTag();
 		
 		if (inputTent != null && inputTent.hasTag()) {
-			final StructureData tentData = new StructureData(inputTent);		
+			final TentData tentData = new TentData(inputTent);		
 			tentData.setColor(colorOut);
 			// transfer those values to the new tent
 			resultTag.put(ItemTent.TENT_DATA, tentData.serializeNBT());

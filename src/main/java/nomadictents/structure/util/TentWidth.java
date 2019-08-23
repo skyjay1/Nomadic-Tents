@@ -5,7 +5,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import nomadictents.init.TentConfig;
 
-public enum StructureWidth implements IStringSerializable {
+public enum TentWidth implements IStringSerializable {
 	
 	SMALL(5, TextFormatting.RED) {
 		@Override
@@ -38,7 +38,7 @@ public enum StructureWidth implements IStringSerializable {
 	private final int squareWidth;
 	private final int doorOffsetZ;
 
-	StructureWidth(int sq, TextFormatting formatting) {
+	TentWidth(int sq, TextFormatting formatting) {
 		this.textFormatting = formatting;
 		this.squareWidth = sq;
 		this.doorOffsetZ = this.ordinal() + 2;
@@ -68,17 +68,17 @@ public enum StructureWidth implements IStringSerializable {
 	 * Used to determine frame structure blueprints and door variant (SML or HGM)
 	 * @return MEDIUM if this size is considered XL, otherwise SMALL
 	 **/
-	public StructureWidth getOverworldSize() {
+	public TentWidth getOverworldSize() {
 		return this.isXL() ? MEDIUM : SMALL;
 	}
 	
 	/** @return the first element of this enum **/
-	public static StructureWidth getSmallest() {
+	public static TentWidth getSmallest() {
 		return values()[0];
 	}
 	
 	/** @return the last element of this enum **/
-	public static StructureWidth getLargest() {
+	public static TentWidth getLargest() {
 		return values()[NUM_ENTRIES - 1];
 	}
 
@@ -87,14 +87,14 @@ public enum StructureWidth implements IStringSerializable {
 		return (byte)this.ordinal();
 	}
 	
-	/** @return The StructureWidth that uses this ID **/
-	public static StructureWidth getById(final byte id) {
+	/** @return The TentWidth that uses this ID **/
+	public static TentWidth getById(final byte id) {
 		return values()[MathHelper.clamp(id, 0, NUM_ENTRIES - 1)];
 	}
 	
-	public static StructureWidth getByName(final String name) {
+	public static TentWidth getByName(final String name) {
 		if(name != null && !name.isEmpty()) {
-			for(final StructureWidth w : values()) {
+			for(final TentWidth w : values()) {
 				if(name.equals(w.getName())) {
 					return w;
 				}

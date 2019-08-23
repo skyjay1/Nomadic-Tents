@@ -11,10 +11,10 @@
 //import net.minecraft.item.crafting.Ingredient;
 //import nomadictents.crafting.RecipeUpgradeColor;
 //import nomadictents.item.ItemTent;
-//import nomadictents.structure.util.StructureData;
-//import nomadictents.structure.util.StructureDepth;
-//import nomadictents.structure.util.StructureTent;
-//import nomadictents.structure.util.StructureWidth;
+//import nomadictents.structure.util.TentData;
+//import nomadictents.structure.util.TentDepth;
+//import nomadictents.structure.util.TentType;
+//import nomadictents.structure.util.TentWidth;
 //
 //public final class JEIColorRecipe {
 //	
@@ -49,18 +49,18 @@
 //					if(stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemTent) {
 //						// if the output is white, we should allow any color and any size combination as input
 //						if(this.recipe.getColorOut() == DyeColor.WHITE) {
-//							for(final StructureWidth size : StructureWidth.values()) {
+//							for(final TentWidth size : TentWidth.values()) {
 //								for(final DyeColor color : DyeColor.values()) {
 //									// add similar tents with different colors as ingredient inputs
-//									matchingStacks.add(new StructureData()
-//											.setAll(StructureTent.SHAMIANA, size, StructureDepth.NORMAL)
+//									matchingStacks.add(new TentData()
+//											.setAll(TentType.SHAMIANA, size, TentDepth.NORMAL)
 //											.setColor(color).getDropStack());
 //								}
 //							}
 //						} else {
 //							// if the output is NOT white, we should add all sizes of tent as possible input anyway
-//							for(final StructureWidth size : StructureWidth.values()) {
-//								matchingStacks.add(new StructureData().setAll(StructureTent.SHAMIANA, size, StructureDepth.NORMAL).getDropStack());
+//							for(final TentWidth size : TentWidth.values()) {
+//								matchingStacks.add(new TentData().setAll(TentType.SHAMIANA, size, TentDepth.NORMAL).getDropStack());
 //							}
 //						}
 //					} else {

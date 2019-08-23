@@ -6,8 +6,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.item.ItemTent;
-import nomadictents.structure.util.StructureDepth;
-import nomadictents.structure.util.StructureTent;
+import nomadictents.structure.util.TentDepth;
+import nomadictents.structure.util.TentType;
 
 public final class TentConfig {
 
@@ -57,8 +57,8 @@ public final class TentConfig {
 	public TentConfig(final ForgeConfigSpec.Builder builder) {
 		// values
 		//final String NOTE = "Note: Disable recipe by inserting ' \"disabled\":true ' in the JSON file";
-		final int maxWidth = StructureTent.values().length;
-		final int maxDepth = StructureDepth.values().length;
+		final int maxWidth = TentType.values().length;
+		final int maxDepth = TentDepth.values().length;
 		// begin section 'dimension'
 		builder.push("dimension");
 		// TODO this doesn't work...?
@@ -121,17 +121,17 @@ public final class TentConfig {
 		TIERS_SHAMIANA = builder.comment("Limit the upgrades a Shamiyana can recieve. 1=SMALL, 6=MEGA")
 				.defineInRange("Max Tiers: Shamiyana", maxWidth, 1, maxWidth);
 		DEPTH_SMALL = builder.comment("Limit the depth of a Small Tent. 1=No Upgrades, 6=Full Upgrades")
-				.defineInRange("Max Depth: Small", StructureDepth.NORMAL.getLayers(), 1, maxDepth);
+				.defineInRange("Max Depth: Small", TentDepth.NORMAL.getLayers(), 1, maxDepth);
 		DEPTH_MEDIUM = builder.comment("Limit the depth of a Medium Tent. 1=No Upgrades, 6=Full Upgrades")
-				.defineInRange("Max Depth: Medium", StructureDepth.DOUBLE.getLayers(), 1, maxDepth);
+				.defineInRange("Max Depth: Medium", TentDepth.DOUBLE.getLayers(), 1, maxDepth);
 		DEPTH_LARGE = builder.comment("Limit the depth of a Large Tent. 1=No Upgrades, 6=Full Upgrades")
-				.defineInRange("Max Depth: Large", StructureDepth.TRIPLE.getLayers(), 1, maxDepth);
+				.defineInRange("Max Depth: Large", TentDepth.TRIPLE.getLayers(), 1, maxDepth);
 		DEPTH_HUGE = builder.comment("Limit the depth of a Huge Tent. 1=No Upgrades, 6=Full Upgrades")
-				.defineInRange("Max Depth: Huge", StructureDepth.QUADRUPLE.getLayers(), 1, maxDepth);
+				.defineInRange("Max Depth: Huge", TentDepth.QUADRUPLE.getLayers(), 1, maxDepth);
 		DEPTH_GIANT = builder.comment("Limit the depth of a Giant Tent. 1=No Upgrades, 6=Full Upgrades")
-				.defineInRange("Max Depth: Giant", StructureDepth.QUINTUPLE.getLayers(), 1, maxDepth);
+				.defineInRange("Max Depth: Giant", TentDepth.QUINTUPLE.getLayers(), 1, maxDepth);
 		DEPTH_MEGA = builder.comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades")
-				.defineInRange("Max Depth: Mega", StructureDepth.SEXTUPLE.getLayers(), 1, maxDepth);
+				.defineInRange("Max Depth: Mega", TentDepth.SEXTUPLE.getLayers(), 1, maxDepth);
 		builder.pop();
 		// begin section 'other'
 		builder.push("other");
@@ -159,7 +159,7 @@ public final class TentConfig {
 	}
 
 	/** @return the maximum size of the given tent type **/
-	public int getMaxSize(final StructureTent tent) {
+	public int getMaxSize(final TentType tent) {
 		switch (tent) {
 		case BEDOUIN:
 			return TIERS_BEDOUIN.get();

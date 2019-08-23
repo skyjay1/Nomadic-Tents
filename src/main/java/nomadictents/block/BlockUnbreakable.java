@@ -4,10 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.PushReaction;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
 import net.minecraftforge.common.ToolType;
 
 public class BlockUnbreakable extends Block {
@@ -32,10 +29,10 @@ public class BlockUnbreakable extends Block {
 	/**
 	 * Get the Item that this Block should drop when harvested.
 	 */
-	@Override
-	public ItemStack getItem(final IBlockReader world, final BlockPos pos, final BlockState state) {
-		return cosmetic ? super.getItem(world, pos, state) : ItemStack.EMPTY;
-	}
+//	@Override
+//	public ItemStack getItem(final IBlockReader world, final BlockPos pos, final BlockState state) {
+//		return cosmetic ? super.getItem(world, pos, state) : ItemStack.EMPTY;
+//	}
 	
 	@Override
 	public PushReaction getPushReaction(final BlockState state) {

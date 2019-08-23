@@ -26,7 +26,7 @@
 //import nomadictents.block.BlockUnbreakable;
 //import nomadictents.block.TileEntityTentDoor;
 //import nomadictents.init.NomadicTents;
-//import nomadictents.structure.util.StructureData;
+//import nomadictents.structure.util.TentData;
 //
 ///**
 // * WAILA integration -- using Hwyla:1.8.23-B38_1.12.
@@ -34,7 +34,7 @@
 //@Optional.Interface(iface = "mcp.mobius.waila.api.IWailaDataProvider", modid = NomadicTents.HWYLA)
 //public final class WailaProvider implements IWailaDataProvider {
 //
-//	private static final String KEY_STRUCTURE_DATA = "StructureData";
+//	private static final String KEY_STRUCTURE_DATA = "TentData";
 //
 //	@Optional.Method(modid = NomadicTents.HWYLA)
 //	public static void callbackRegister(final IWailaRegistrar register) {
@@ -52,7 +52,7 @@
 //		BlockState state = accessor.getWorld().getBlockState(accessor.getPosition());
 //		if (state != null) {
 //			if (state.getBlock() instanceof BlockTentDoor) {
-//				return new StructureData(accessor.getNBTData().getCompoundTag(KEY_STRUCTURE_DATA)).getDropStack();
+//				return new TentData(accessor.getNBTData().getCompoundTag(KEY_STRUCTURE_DATA)).getDropStack();
 //			} else if (state.getBlock() instanceof BlockTentFrame) {
 //				return new ItemStack(((BlockTentFrame) state.getBlock()).getEnumBlockToBecome().getBlock().getBlock());
 //			}

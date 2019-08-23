@@ -18,7 +18,7 @@ import nomadictents.structure.StructureShamiana;
 import nomadictents.structure.StructureTepee;
 import nomadictents.structure.StructureYurt;
 
-public enum StructureTent implements IStringSerializable {
+public enum TentType implements IStringSerializable {
 	
 	YURT(new StructureYurt()) {
 		////////// YURT IMPLEMENTATIONS OF ABSTRACT METHODS //////////
@@ -76,12 +76,12 @@ public enum StructureTent implements IStringSerializable {
 	
 	private final StructureBase structure;
 	
-	StructureTent(final StructureBase struct) {
+	TentType(final StructureBase struct) {
 		this.structure = struct;
 	}
 	
-	/** @return a StructureBase that will use the given StructureData **/
-	public StructureBase makeStructure(final StructureData data) {
+	/** @return a StructureBase that will use the given TentData **/
+	public StructureBase makeStructure(final TentData data) {
 		return this.structure.withData(data);
 	}
 	
@@ -90,14 +90,14 @@ public enum StructureTent implements IStringSerializable {
 		return (byte)this.ordinal();
 	}
 	
-	/** @return The StructureTent that uses this ID **/
-	public static StructureTent getById(final byte id) {
+	/** @return The TentType that uses this ID **/
+	public static TentType getById(final byte id) {
 		return values()[id];
 	}
 	
-	/** @return the corresponding StructureTent, or YURT for invalid name **/
-	public static StructureTent getByName(final String name) {
-		for(final StructureTent t : values()) {
+	/** @return the corresponding TentType, or YURT for invalid name **/
+	public static TentType getByName(final String name) {
+		for(final TentType t : values()) {
 			if(name.equals(t.getName())) {
 				return t;
 			}

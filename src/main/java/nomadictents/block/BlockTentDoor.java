@@ -39,7 +39,7 @@ import nomadictents.init.TentConfig;
 import nomadictents.item.ItemMallet;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.StructureBase;
-import nomadictents.structure.util.StructureData;
+import nomadictents.structure.util.TentData;
 
 public abstract class BlockTentDoor extends BlockUnbreakable
 		implements ITepeeBlock, IYurtBlock, 
@@ -80,7 +80,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			// attempt to activate the TileEntity associated with this door
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
-				StructureData data = teyd.getTentData();
+				TentData data = teyd.getTentData();
 				StructureBase struct = data.getStructure();
 				ItemStack held = player.getHeldItem(hand);
 				
@@ -160,7 +160,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
-				StructureData type = teDoor.getTentData();
+				TentData type = teDoor.getTentData();
 				StructureBase struct = type.getStructure();
 				// make sure there is a valid tent before doing anything
 				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR

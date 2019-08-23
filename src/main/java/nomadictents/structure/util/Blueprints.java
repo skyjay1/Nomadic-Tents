@@ -17,12 +17,12 @@ public final class Blueprints {
 	
 	static {
 		// ADD ALL BLUEPRINTS
-		for(final StructureWidth width : StructureWidth.values()) {
-			put(StructureTent.YURT, width, StructureYurt.makeBlueprints(width));
-			put(StructureTent.TEPEE, width, StructureTepee.makeBlueprints(width));
-			put(StructureTent.BEDOUIN, width, StructureBedouin.makeBlueprints(width));
-			put(StructureTent.INDLU, width, StructureIndlu.makeBlueprints(width));
-			put(StructureTent.SHAMIANA, width, StructureShamiana.makeBlueprints(width));
+		for(final TentWidth width : TentWidth.values()) {
+			put(TentType.YURT, width, StructureYurt.makeBlueprints(width));
+			put(TentType.TEPEE, width, StructureTepee.makeBlueprints(width));
+			put(TentType.BEDOUIN, width, StructureBedouin.makeBlueprints(width));
+			put(TentType.INDLU, width, StructureIndlu.makeBlueprints(width));
+			put(TentType.SHAMIANA, width, StructureShamiana.makeBlueprints(width));
 		}
 	}
 	
@@ -30,14 +30,14 @@ public final class Blueprints {
 		// empty constructor
 	}
 	
-	private static boolean put(final StructureTent tent, final StructureWidth width, final Blueprint bp) {
+	private static boolean put(final TentType tent, final TentWidth width, final Blueprint bp) {
 		final TentKey key = new TentKey(tent, width);
 		map.put(key, bp);
 		return true;
 	}
 	
 	@Nullable
-	public static Blueprint get(final StructureTent tent, final StructureWidth width) {
+	public static Blueprint get(final TentType tent, final TentWidth width) {
 		final TentKey key = new TentKey(tent, width);
 		if(map.containsKey(key)) {
 			return map.get(key);
@@ -47,10 +47,10 @@ public final class Blueprints {
 	}
 	
 	private static final class TentKey {
-		private final StructureTent tent;
-		private final StructureWidth width;
+		private final TentType tent;
+		private final TentWidth width;
 		
-		private TentKey(final StructureTent tentIn, final StructureWidth widthIn) {
+		private TentKey(final TentType tentIn, final TentWidth widthIn) {
 			this.tent = tentIn;
 			this.width = widthIn;
 		}

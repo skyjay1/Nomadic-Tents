@@ -5,22 +5,17 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
-import net.minecraftforge.common.BiomeManager.BiomeEntry;
-import net.minecraftforge.common.BiomeManager.BiomeType;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.RegisterDimensionsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import nomadictents.dimension.TentManager;
 import nomadictents.event.TentEventHandler;
@@ -46,18 +41,16 @@ public class NomadicTents {
 	
 	public NomadicTents() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, TentConfig.SPEC);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(NomadicTents::setup);
+		//FMLJavaModLoadingContext.get().getModEventBus().addListener(NomadicTents::onServerStarting);
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
-		//MinecraftForge.EVENT_BUS.register(this);
+		//MinecraftForge.EVENT_BUS.addGenericListener(FMLServerStartingEvent.class, e -> {
+			
+			//BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(Content.TENT_BIOME, 0));
+			//BiomeDictionary.addTypes(Content.TENT_BIOME, BiomeDictionary.Type.VOID);
+		//});
 	}
 
-	@SubscribeEvent
-	public static void setup(final RegisterDimensionsEvent event) {
-		System.out.println("yurtmod: RegisterDimensionsEvent!");
-		TentManager.registerDimension(event);
-		BiomeManager.addBiome(BiomeType.COOL, new BiomeEntry(Content.TENT_BIOME, 0));
-		BiomeDictionary.addTypes(Content.TENT_BIOME, BiomeDictionary.Type.VOID);
-	}
+	
 	
 	@SubscribeEvent
 	public static void registerBlocks(final RegistryEvent.Register<Block> event) {

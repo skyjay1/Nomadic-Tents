@@ -1,5 +1,7 @@
 package nomadictents.proxies;
 
+import java.util.function.BiFunction;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -9,12 +11,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
-import net.minecraftforge.event.world.RegisterDimensionsEvent;
 import nomadictents.block.BlockBarrier;
 import nomadictents.block.BlockBedouinRoof;
 import nomadictents.block.BlockBedouinWall;
@@ -33,7 +36,7 @@ import nomadictents.crafting.RecipeUpgradeColor;
 import nomadictents.crafting.RecipeUpgradeDepth;
 import nomadictents.crafting.RecipeUpgradeWidth;
 import nomadictents.dimension.BiomeTent;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimension;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
 import nomadictents.item.ItemDepthUpgrade;
@@ -194,15 +197,13 @@ public class CommonProxy {
 	}
 
 	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
-		event.getRegistry().register(TentManager.MOD_DIMENSION);
+		event.getRegistry().register(new ModDimension() {
+			@Override
+			public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
+				return TentDimension::new;
+			}
+		}.setRegistryName(NomadicTents.MODID, "tent_dimension"));
 	}
-	
-//	public void registerDimension(final RegisterDimensionsEvent event) {
-//		//if (DimensionType.byName(TentManager.MOD_DIMENSION.getRegistryName()) == null) {
-//			DimensionManager.registerDimension(TentManager.MOD_DIMENSION.getRegistryName(), TentManager.MOD_DIMENSION,
-//					null, true);
-//		//}
-//	}
 	
 	public void registerRecipeSerializers(Register<IRecipeSerializer<?>> event) {
 		event.getRegistry().registerAll(

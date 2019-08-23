@@ -11,8 +11,8 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import nomadictents.init.Content;
-import nomadictents.structure.util.StructureData;
-import nomadictents.structure.util.StructureTent;
+import nomadictents.structure.util.TentData;
+import nomadictents.structure.util.TentType;
 
 @Mod.EventBusSubscriber
 public class ClientProxy extends CommonProxy {
@@ -23,8 +23,8 @@ public class ClientProxy extends CommonProxy {
 		ItemColors colors = Minecraft.getInstance().getItemColors();		
 		if (colors != null) {
 			colors.register((ItemStack stack, int tintIndex) -> {
-				final StructureData data = new StructureData(stack);
-				if(data.getTent() == StructureTent.SHAMIANA) {
+				final TentData data = new TentData(stack);
+				if(data.getTent() == TentType.SHAMIANA) {
 					// check if it's black and recolor slightly lighter than actual black
 					if(data.getColor() == DyeColor.BLACK) {
 						return 0x303030;

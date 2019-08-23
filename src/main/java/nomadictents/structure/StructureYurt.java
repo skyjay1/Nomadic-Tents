@@ -9,18 +9,18 @@ import net.minecraft.world.World;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.structure.util.Blueprint;
-import nomadictents.structure.util.StructureTent;
-import nomadictents.structure.util.StructureWidth;
+import nomadictents.structure.util.TentType;
+import nomadictents.structure.util.TentWidth;
 
 public class StructureYurt extends StructureBase {
 
 	@Override
-	public StructureTent getTentType() {
-		return StructureTent.YURT;
+	public TentType getTentType() {
+		return TentType.YURT;
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, StructureWidth size, 
+	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size, 
 			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
 		boolean tentDim = TentManager.isTent(worldIn);
 		Blueprint bp = getBlueprints(size);
@@ -46,7 +46,7 @@ public class StructureYurt extends StructureBase {
 		return !bp.isEmpty();
 	}
 
-	public static Blueprint makeBlueprints(final StructureWidth size) {
+	public static Blueprint makeBlueprints(final TentWidth size) {
 		final Blueprint bp = new Blueprint();
 		switch (size) {
 		case MEGA:
