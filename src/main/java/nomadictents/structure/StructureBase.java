@@ -31,14 +31,6 @@ import nomadictents.structure.util.TentType;
 import nomadictents.structure.util.TentWidth;
 
 public abstract class StructureBase {
-		
-	protected TentData data;
-	
-	/** 
-	 * Used in {@link #isValidForFacing(World, BlockPos, TentWidth, Direction)} 
-	 * to determine if the given BlockState is part of a specific type of tent
-	 **/
-	protected Predicate<BlockState> TENT_PRED;
 
 	/**
 	 * Predicate to test if a block can be replaced by frame blocks when setting up
@@ -55,17 +47,6 @@ public abstract class StructureBase {
 		}
 	};
 
-	public StructureBase withData(TentData tentData) {
-		this.data = tentData;
-		this.TENT_PRED = (BlockState b) 
-				-> this.data.getTent().getInterface().isAssignableFrom(b.getBlock().getClass());
-		return this;
-	}
-
-	public TentData getData() {
-		return this.data;
-	}
-
 	/**
 	 * Allots a space for and builds a sized structure in the Tent Dimension.
 	 * 
@@ -80,15 +61,16 @@ public abstract class StructureBase {
 	 * @return if the structure was built or updated in the tent dimension, or already exists
 	 * @see TentEvent.TentResult
 	 **/
-	public final TentEvent.TentResult generateInTentDimension(final DimensionType worldServerFrom, final World worldIn, final BlockPos doorPos, 
-			final double prevX, final double prevY, final double prevZ, final float prevFacing, final DyeColor color) {
+	public final TentEvent.TentResult generateInTentDimension(final DimensionType worldServerFrom, final World worldIn, 
+			final BlockPos doorPos, final TentData data, final double prevX, final double prevY, final double prevZ, 
+			final float prevFacing, final DyeColor color) {
 		TentEvent.TentResult result = TentEvent.TentResult.NONE;
 		// the corner of the square area alloted to this tent
-		final BlockPos corner = doorPos.add(0, 0, -1 * this.data.getWidth().getDoorZ());
+		final BlockPos corner = doorPos.add(0, 0, -1 * data.getWidth().getDoorZ());
 		// whether a structure was already built here (for upgrading and door-updating purposes)
 		final boolean structureExists = worldIn.getBlockState(doorPos).getBlock() instanceof BlockTentDoor;
 		// the old data stored by the tent door if it exists, or a copy of the new data if not
-		final TentData prevData = structureExists ? getDoorAt(worldIn, doorPos).getTentData() : this.data.copy();
+		final TentData prevData = structureExists ? getDoorAt(worldIn, doorPos).getTentData() : data.copy();
 		// if the tent exists but SIZE needs to be upgraded...
 		final boolean rebuildTent = !structureExists || data.getWidth() != prevData.getWidth();
 		// if the tent does not exist OR needs to be upgraded...
@@ -104,7 +86,7 @@ public abstract class StructureBase {
 		} // IF THERE IS A TENT BUT IT NEEDS TO BE REBUILT...
 		else if (rebuildTent) {
 			// remove previous structure			
-			data.getStructure().remove(worldIn, doorPos, TentDimension.STRUCTURE_DIR, prevData.getWidth());
+			data.getStructure().remove(worldIn, doorPos, prevData, TentDimension.STRUCTURE_DIR);
 			result = TentEvent.TentResult.UPGRADED;			
 		}
 		
@@ -116,9 +98,9 @@ public abstract class StructureBase {
 		// if the tent does not exist OR needs to be upgraded/re-colored...
 		if(!structureExists || rebuildTent || recolorTent) {
 			// make a new structure!
-			this.generate(worldIn, doorPos, TentDimension.STRUCTURE_DIR, this.data.getWidth(),
-					this.data.getDoorBlock(), this.data.getWallBlock(true),
-					this.data.getRoofBlock(true));
+			this.generate(worldIn, doorPos, data, TentDimension.STRUCTURE_DIR,
+					data.getDoorBlock(), data.getWallBlock(true),
+					data.getRoofBlock(true));
 		}
 
 		if(upgradePlatform) {
@@ -127,12 +109,11 @@ public abstract class StructureBase {
 			result = TentEvent.TentResult.UPGRADED;
 		} else if(buildPlatform) {
 			// make or re-make the platform
-			generatePlatform(worldIn, corner.down(1), this.data.getWidth(), this.data.getDepth());
+			generatePlatform(worldIn, corner.down(1), data.getWidth(), data.getDepth());
 		} 
 		
 		// set or update TileEntityTentDoor information inside the tent
-		updateDoorInfo(worldIn, doorPos, this.data, 
-				prevX, prevY, prevZ, prevFacing, worldServerFrom);
+		updateDoorInfo(worldIn, doorPos, data, prevX, prevY, prevZ, prevFacing, worldServerFrom);
 		return result;
 	}
 	
@@ -257,6 +238,7 @@ public abstract class StructureBase {
 	/**
 	 * This should only remove blocks that the tent originally spawned with in its floor.
 	 **/
+	@SuppressWarnings("unused")
 	private static boolean removePlatform(final World worldIn, final BlockPos corner, 
 			final TentWidth size, final TentDepth depth) {
 		final int sqWidth = size.getSquareWidth();
@@ -324,19 +306,18 @@ public abstract class StructureBase {
 	 * @return true if the frame blocks were placed successfully. Assumes that you
 	 *         are not in Tent Dimension.
 	 **/
-	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final Direction dirForward,
-			final TentWidth size) {
-		return generate(worldIn, doorBase, dirForward, size, this.data.getDoorBlock(),
-				this.data.getTent().getFrameBlock(false), this.data.getTent().getFrameBlock(true));
+	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final TentData data,
+			final Direction dirForward) {
+		return generate(worldIn, doorBase, data, dirForward, data.getDoorBlock(),
+				data.getTent().getFrameBlock(false), data.getTent().getFrameBlock(true));
 	}
 
 	/**
 	 * @return true if the structure was successfully removed (replaced with AIR)
 	 **/
-	public boolean remove(final World worldIn, final BlockPos doorPos, final Direction dirForward,
-			final TentWidth size) {
+	public boolean remove(final World worldIn, final BlockPos doorPos, final TentData data, final Direction dirForward) {
 		BlockState air = Blocks.AIR.getDefaultState();
-		boolean flag = generate(worldIn, doorPos, dirForward, size, air, air, air);
+		boolean flag = generate(worldIn, doorPos, data, dirForward, air, air, air);
 		// delete door TileEntity if found
 		if (worldIn.getTileEntity(doorPos) instanceof TileEntityTentDoor) {
 			worldIn.removeTileEntity(doorPos);
@@ -369,12 +350,9 @@ public abstract class StructureBase {
 	 * @return the Direction direction in which it finds a valid and completed
 	 *         SMALL structure, null if none is found
 	 **/
-	public Direction getValidFacing(final World worldIn, final BlockPos doorBase, final TentWidth size) {
-		//TentWidth s = this.getType().getSize();
+	public Direction getValidFacing(final World worldIn, final BlockPos doorBase, final TentData data) {
 		for (Direction dir : new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST }) {
-			boolean isValid = isValidForFacing(worldIn, doorBase, size, dir);
-
-			if (isValid) {
+			if (isValidForFacing(worldIn, data, doorBase, dir)) {
 				return dir;
 			}
 		}
@@ -385,8 +363,8 @@ public abstract class StructureBase {
 	 * @return true if there is empty space to create a structure of given size at
 	 *         this location
 	 **/
-	public boolean canSpawn(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size) {
-		final Blueprint bp = this.getBlueprints(size);
+	public boolean canSpawn(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward) {
+		final Blueprint bp = getBlueprints(data);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED)) {
 			return false;
@@ -402,8 +380,9 @@ public abstract class StructureBase {
 	 * @return true if there is a valid structure at the given location for the
 	 *         given Size and Direction
 	 **/
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, TentWidth size, Direction facing) {
-		final Blueprint bp = this.getBlueprints(size);
+	public boolean isValidForFacing(final World worldIn, final TentData data, final BlockPos doorBase, final Direction facing) {
+		final Blueprint bp = getBlueprints(data);
+		final Predicate<BlockState> TENT_PRED = makeTentPred(data);
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TENT_PRED)) {
 			return false;
@@ -415,13 +394,17 @@ public abstract class StructureBase {
 		return true;
 	}
 	
-	public Blueprint getBlueprints(final TentWidth size) {
-		return Blueprints.get(this.getTentType(), size);
+	public static Blueprint getBlueprints(final TentData data) {
+		return Blueprints.get(data.getTent(), data.getWidth());
+	}
+	
+	public static Predicate<BlockState> makeTentPred(final TentData data) {
+		return b -> data.getTent().getInterface().isAssignableFrom(b.getBlock().getClass());
 	}
 
 	/** @return true if a structure was successfully generated **/
-	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final Direction dirForward,
-			final TentWidth size, final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock);
+	public abstract boolean generate(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward,
+			final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock);
 
 	/** @return the Tent Type that is associated with this Structure **/
 	public abstract TentType getTentType();

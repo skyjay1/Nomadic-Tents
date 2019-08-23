@@ -1,6 +1,7 @@
 package nomadictents.structure;
 
 import java.util.Random;
+import java.util.function.Predicate;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -12,6 +13,7 @@ import nomadictents.block.BlockTepeeWall;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.structure.util.Blueprint;
+import nomadictents.structure.util.TentData;
 import nomadictents.structure.util.TentType;
 import nomadictents.structure.util.TentWidth;
 
@@ -25,10 +27,10 @@ public class StructureTepee extends StructureBase {
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size, 
-			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
+	public boolean generate(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward,
+			final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock) {
 		boolean tentDim = TentManager.isTent(worldIn);
-		Blueprint bp = getBlueprints(size);
+		Blueprint bp = getBlueprints(data);
 		if(bp == null) {
 			return false;
 		}
@@ -38,7 +40,7 @@ public class StructureTepee extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
+			final int sizeNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
 			// place a fire to light up the place (since there's no window or skylight)
 			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
 			if(sizeNum > 2 && (worldIn.getBlockState(pos).getBlock() == Blocks.DIRT || worldIn.isAirBlock(pos))
@@ -51,45 +53,41 @@ public class StructureTepee extends StructureBase {
 		return !bp.isEmpty();
 	}
 
-	@Override
-	public boolean canSpawn(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size) {
-		// determine what blueprints to use
-		final Blueprint bp = this.getBlueprints(size);
+//	@Override
+//	public boolean canSpawn(World worldIn, BlockPos doorBase, TentData data, Direction dirForward) {
+//		// determine what blueprints to use
+//		final Blueprint bp = this.getBlueprints(data);
+//		// check wall arrays
+//		return validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED);
+//	}
 
-		// check wall arrays
-		return validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED);
-	}
-
 	@Override
-	public boolean isValidForFacing(World worldIn, BlockPos doorBase, TentWidth size, Direction facing) {
-		final Blueprint bp = this.getBlueprints(size);
+	public boolean isValidForFacing(final World worldIn, final TentData data, final BlockPos doorBase, final Direction facing) {
+		final Blueprint bp = getBlueprints(data);
+		final Predicate<BlockState> TENT_PRED = (BlockState b) 
+				-> data.getTent().getInterface().isAssignableFrom(b.getBlock().getClass());
 		// check wall arrays
-		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, this.TENT_PRED);
+		return validateArray(worldIn, doorBase, bp.getWallCoords(), facing, TENT_PRED);
 	}
 
 	@Override
 	public void buildLayer(World worldIn, BlockPos doorPos, Direction dirForward, BlockState state,
 			BlockPos[] coordinates) {
-		boolean isTepeeWall = state.getBlock() instanceof BlockTepeeWall;
-		if(isTepeeWall) {
+		// if it's a tepee block, calculate what kind of design it should have
+		if(state.getBlock() instanceof BlockTepeeWall) {
 			// custom block-placement math for each position
 			for (BlockPos coord : coordinates) {
 				BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
-				// if it's a tepee block, calculate what kind of design it should have
-				if (isTepeeWall) {
-					BlockState tepeeState;
-					if (pos.getY() % 2 == 0) {
-						// psuedo-random seed ensures that all blocks that are same y-dis from door get
-						// the same seed
-						int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() + this.data.getWidth().getId() * 321);
-						tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
-					} else {
-						tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
-					}
-					worldIn.setBlockState(pos, tepeeState, 3);
+				BlockState tepeeState;
+				if (pos.getY() % 2 == 0) {
+					// psuedo-random seed ensures that all blocks that are same y-dis from door get
+					// the same seed
+					int randSeed = Math.abs(pos.getY() * 123 + doorPos.getX() + doorPos.getZ() * 321);
+					tepeeState = BlockTepeeWall.getStateForRandomPattern(new Random(randSeed), true);
 				} else {
-					worldIn.setBlockState(pos, state, 3);
+					tepeeState = BlockTepeeWall.getStateForRandomDesignWithChance(worldIn.rand, true);
 				}
+				worldIn.setBlockState(pos, tepeeState, 3);
 			}
 		} else {
 			// if it's not a tepee block, default to super method

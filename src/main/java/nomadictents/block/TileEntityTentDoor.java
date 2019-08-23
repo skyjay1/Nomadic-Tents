@@ -23,7 +23,6 @@ import nomadictents.event.TentEvent;
 import nomadictents.init.Content;
 import nomadictents.init.TentConfig;
 import nomadictents.init.TentSaveData;
-import nomadictents.item.ItemTent;
 import nomadictents.structure.util.TentData;
 
 public class TileEntityTentDoor extends TileEntity {

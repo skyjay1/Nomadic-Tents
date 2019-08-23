@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import nomadictents.dimension.TentManager;
 import nomadictents.structure.util.Blueprint;
+import nomadictents.structure.util.TentData;
 import nomadictents.structure.util.TentType;
 import nomadictents.structure.util.TentWidth;
 
@@ -19,10 +20,10 @@ public class StructureBedouin extends StructureBase {
 	}
 	
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth TentWidth, 
-			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
+	public boolean generate(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward,
+			final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock) {
 		final boolean tentDim = TentManager.isTent(worldIn);
-		final Blueprint bp = getBlueprints(TentWidth);
+		final Blueprint bp = getBlueprints(data);
 		if(bp == null) {
 			return false;
 		}
@@ -32,7 +33,7 @@ public class StructureBedouin extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		final int StructureWidthNum = Math.floorDiv(TentWidth.getSquareWidth(), 2);
+		final int StructureWidthNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
 			// place a fire to light up the place (since there's no window or skylight)
 			BlockPos pos = getPosFromDoor(doorBase, StructureWidthNum, -1, 0, dirForward);

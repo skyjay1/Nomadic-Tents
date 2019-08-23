@@ -22,9 +22,7 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 	
 	////// String keys for NBT //////
 	public static final String KEY_TENT_CUR = "TentType";
-	//public static final String KEY_WIDTH_PREV = "WidthPrev";
 	public static final String KEY_WIDTH_CUR = "WidthCur";
-	//public static final String KEY_DEPTH_PREV = "DepthPrev";
 	public static final String KEY_DEPTH_CUR = "DepthCur";
 	public static final String KEY_ID = "ID";	
 	// this one is only really used for Shamiana tent
@@ -34,8 +32,6 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 	private TentType tent = TentType.getById((byte)0);
 	private TentWidth width = TentWidth.getById((byte)0);
 	private TentDepth depth = TentDepth.getById((byte)0);
-	//private TentWidth prevWidth = TentWidth.getById((byte)0);
-	//private TentDepth prevDepth = TentDepth.getById((byte)0);
 	private DyeColor color = DyeColor.WHITE;
 	private long locationID = ItemTent.ERROR_TAG;
 	
@@ -58,47 +54,23 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 				: null);
 	}
 	
-	/** @return the same TentData object with the given values applied to both "Current" and "Previous" Values **/
+	/** @return the same TentData object with the given values **/
 	public TentData setAll(final TentType tentIn, final TentWidth widthIn, final TentDepth depthIn) {
-		this.setCurrent(tentIn, widthIn, depthIn);
-		//this.setPrev(widthIn, depthIn);
+		this.tent = tentIn;
+		this.width = widthIn;
+		this.depth = depthIn;
 		return this;
 	}
-	
-	/** @return the same TentData with the given values used to set "Current" Values **/
-	public TentData setCurrent(final TentType tentCur, final TentWidth widthCur, final TentDepth depthCur) {
-		this.tent = tentCur;
-		this.width = widthCur;
-		this.depth = depthCur;
-		return this;
-	}
-	
-	/** @return the same TentData with the given valued used to set "Previous" Values **/
-//	public TentData setPrev(final TentWidth widthPrev, final TentDepth depthPrev) {
-//		this.prevWidth = widthPrev;
-//		this.prevDepth = depthPrev;
-//		return this;
-//	}
-	
-	/** @return a TentData object that uses this object's "Previous" values for its "Current" ones **/
-//	public TentData prevData() {
-//		return new TentData()
-//				.setCurrent(tent, prevWidth, prevDepth)
-//				.setPrev(prevWidth, prevDepth)
-//				.setID(locationID)
-//				.setColor(color);
-//	}
 	
 	/** @return an exact copy of this TentData that is NOT the original **/
 	public TentData copy() {
 		return new TentData()
-				.setCurrent(tent, width, depth)
-				//.setPrev(prevWidth, prevDepth)
+				.setAll(tent, width, depth)
 				.setID(locationID)
 				.setColor(color);
 	}
 	
-	/** @return true if this object has valid X and Z coordinates **/
+	/** @return true if this object has valid ID **/
 	public boolean isValid() {
 		return locationID != ItemTent.ERROR_TAG;
 	}
@@ -124,18 +96,6 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 		this.depth = depthIn;
 		return this;
 	}
-
-	/** Set or update the previous Width used by this TentData **/
-//	public TentData setPrevWidth(final TentWidth widthIn) {
-//		this.prevWidth = widthIn;
-//		return this;
-//	}
-	
-	/** Set or update the previous Depth used by this TentData **/
-//	public TentData setPrevDepth(final TentDepth depthIn) {
-//		this.prevDepth = depthIn;
-//		return this;
-//	}
 	
 	/** Set or update the location ID of this TentData **/
 	public TentData setID(final long id) {
@@ -143,7 +103,7 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 		return this;
 	}
 	
-	/** Set the color of this tent. **/
+	/** Set or update the color of this TentData **/
 	public TentData setColor(final DyeColor colorIn) {
 		this.color = colorIn;
 		return this;
@@ -164,24 +124,12 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 		return this.depth;
 	}
 	
-	/** @return the previous Width of this TentData (may be same as current) **/
-//	public TentWidth getPrevWidth() {
-//		return this.prevWidth;
-//	}
-	
-	/** @return the previous Depth of this TentData (may be same as current) **/
-//	public TentDepth getPrevDepth() {
-//		return this.prevDepth;
-//	}
-	
-	/**
-	 * @return the Location ID of this tent
-	 **/
+	/** @return the Location ID of this tent **/
 	public long getID() {
 		return locationID;
 	}
 	
-	/** @return the color data stored by this door. Defaults to WHITE **/
+	/** @return the color data stored by this TentData, defaults to WHITE **/
 	public DyeColor getColor() {
 		return this.color;
 	}
@@ -229,29 +177,6 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 	/////// OTHER HELPFUL /////////
 	///////////////////////////////
 	
-	/** Sets "Previous" values to be equal to "Current" ones. Usually means tent structure was fully updated. **/
-//	public void resetPrevData() {
-//		this.prevWidth = this.width;
-//		this.prevDepth = this.depth;
-//	}
-	
-	
-//	public boolean needsUpdate(final TentData oldData) {
-//		return needsUpdateDepth(oldData) && needsUpdateWidth(oldData);
-//	}
-//	
-//	public boolean needsUpdateDepth(final TentData oldData) {
-//		return depth != oldData.getDepth();
-//	}
-//	
-//	public boolean needsUpdateWidth(final TentData oldData) {
-//		return width != oldData.getWidth();
-//	}
-//	
-//	public boolean needsUpdateColor(final TentData oldData) {
-//		return color != oldData.getColor();
-//	}
-	
 	/** 
 	 * @param oldData the data stored in the Tent Dimension door
 	 * @param newData the data passed by the tent ItemStack and TentTeleporter
@@ -266,7 +191,7 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 	/** Uses internal fields and Player location to update the given TileEntityTentDoor, including Owner if enabled */
 	public static void applyToTileEntity(final PlayerEntity player, final ItemStack stack, final TileEntityTentDoor te) {
 		if (stack.getTag() == null || !stack.getTag().contains(ItemTent.TENT_DATA)) {
-			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
+			System.out.println("[TentData] ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}
@@ -274,6 +199,14 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
 		te.setPrevFacing(player.rotationYaw);
 		te.setOwner(PlayerEntity.getOfflineUUID(player.getName().getUnformattedComponentText()));
+	}
+	
+	/** Unused **/
+	public static TentData getRandom(final Random rand) {
+		final TentType t = TentType.values()[rand.nextInt(TentType.values().length)];
+		final TentWidth w = TentWidth.values()[rand.nextInt(TentWidth.values().length)];
+		final TentDepth d = TentDepth.values()[rand.nextInt(TentDepth.values().length)];
+		return new TentData().setAll(t, w, d);
 	}
 
 	/** @return an NBT-tagged Tent ItemStack that represents this TentData **/
@@ -288,21 +221,8 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 	}
 	
 	/** Note: the returned StructureBase only contains a COPY of this TentData **/
-//	public StructureBase makePrevStructure() {
-//		return this.tent.makeStructure(this.prevData().copy());
-//	}
-	
-	/** Note: the returned StructureBase only contains a COPY of this TentData **/
 	public StructureBase getStructure() {
-		return this.tent.makeStructure(this.copy());
-	}
-	
-	/** Unused **/
-	public static TentData getRandom(final Random rand) {
-		final TentType t = TentType.values()[rand.nextInt(TentType.values().length)];
-		final TentWidth w = TentWidth.values()[rand.nextInt(TentWidth.values().length)];
-		final TentDepth d = TentDepth.values()[rand.nextInt(TentDepth.values().length)];
-		return new TentData().setAll(t, w, d);
+		return this.tent.getStructure();
 	}
 
 	@Override
@@ -314,9 +234,6 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 			nbt.putByte(KEY_TENT_CUR, this.tent.getId());
 			nbt.putByte(KEY_WIDTH_CUR, this.width.getId());
 			nbt.putByte(KEY_DEPTH_CUR, this.depth.getId());
-			// 'Previous' values
-			//nbt.setByte(KEY_WIDTH_PREV, this.prevWidth.getId());
-			//nbt.setByte(KEY_DEPTH_PREV, this.prevDepth.getId());
 			// Location ID
 			nbt.putLong(KEY_ID, locationID);
 			// Color (optional)
@@ -331,8 +248,6 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 		this.tent = TentType.getById(nbt.getByte(KEY_TENT_CUR));
 		this.width = TentWidth.getById(nbt.getByte(KEY_WIDTH_CUR));
 		this.depth = TentDepth.getById(nbt.getByte(KEY_DEPTH_CUR));
-		//this.prevWidth = TentWidth.getById(nbt.getByte(KEY_WIDTH_PREV));
-		//this.prevDepth = TentDepth.getById(nbt.getByte(KEY_DEPTH_PREV));
 		this.locationID = nbt.getLong(KEY_ID);
 		this.color = nbt.contains(KEY_COLOR) ? DyeColor.byId(nbt.getInt(KEY_COLOR)) : DyeColor.WHITE;
 	}

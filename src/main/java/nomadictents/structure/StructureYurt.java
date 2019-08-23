@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.structure.util.Blueprint;
+import nomadictents.structure.util.TentData;
 import nomadictents.structure.util.TentType;
 import nomadictents.structure.util.TentWidth;
 
@@ -20,10 +21,10 @@ public class StructureYurt extends StructureBase {
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth size, 
-			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
+	public boolean generate(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward,
+			final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock) {
 		boolean tentDim = TentManager.isTent(worldIn);
-		Blueprint bp = getBlueprints(size);
+		Blueprint bp = getBlueprints(data);
 		if(bp == null) {
 			return false;
 		}
@@ -34,7 +35,7 @@ public class StructureYurt extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
+			final int sizeNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
 			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
 			if (sizeNum > 2 && (worldIn.getBlockState(pos).getBlock() == Blocks.DIRT || worldIn.isAirBlock(pos))
 					&& worldIn.isAirBlock(pos.up(1))) {

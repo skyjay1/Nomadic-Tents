@@ -94,9 +94,9 @@ public class ItemTent extends Item {
 					stack.getTag().put(TENT_DATA, tag);
 				}
 				// offset the BlockPos to build on if it's not replaceable
-				if (!StructureBase.REPLACE_BLOCK_PRED.test(cxt.getWorld().getBlockState(hitPos))) {
+				//if (!StructureBase.REPLACE_BLOCK_PRED.test(cxt.getWorld().getBlockState(hitPos))) {
 					hitPos = hitPos.up(1);
-				}
+				//}
 				// if you can't edit these blocks, return FAIL
 				if (cxt.getPlayer() == null || !cxt.getPlayer().canPlayerEdit(hitPos, hitSide, stack)) {
 					return ActionResultType.FAIL;
@@ -104,12 +104,11 @@ public class ItemTent extends Item {
 					// start checking to build structure
 					final Direction playerFacing = cxt.getPlayer().getHorizontalFacing();
 					final TentData data = new TentData(stack.getChildTag(TENT_DATA));
-					final TentWidth width = data.getWidth().getOverworldSize();
 					final StructureBase struct = data.getStructure();
 					// make sure the tent can be built here
-					if (struct.canSpawn(cxt.getWorld(), hitPos, playerFacing, width)) {
+					if (struct.canSpawn(cxt.getWorld(), hitPos, data, playerFacing)) {
 						// build the frames
-						if (struct.generateFrameStructure(cxt.getWorld(), hitPos, playerFacing, width)) {
+						if (struct.generateFrameStructure(cxt.getWorld(), hitPos, data, playerFacing)) {
 							// update the TileEntity information
 							final TileEntity te = cxt.getWorld().getTileEntity(hitPos);
 							if (te instanceof TileEntityTentDoor) {

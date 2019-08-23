@@ -81,8 +81,8 @@ public enum TentType implements IStringSerializable {
 	}
 	
 	/** @return a StructureBase that will use the given TentData **/
-	public StructureBase makeStructure(final TentData data) {
-		return this.structure.withData(data);
+	public StructureBase getStructure() {
+		return this.structure;
 	}
 	
 	/** @return A unique identifier. For now just the ordinal value **/

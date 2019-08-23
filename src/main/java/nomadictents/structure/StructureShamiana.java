@@ -11,6 +11,7 @@ import nomadictents.block.BlockShamianaWall;
 import nomadictents.dimension.TentManager;
 import nomadictents.init.Content;
 import nomadictents.structure.util.Blueprint;
+import nomadictents.structure.util.TentData;
 import nomadictents.structure.util.TentType;
 import nomadictents.structure.util.TentWidth;
 
@@ -22,20 +23,24 @@ public class StructureShamiana extends StructureBase {
 	}
 
 	@Override
-	public boolean generate(World worldIn, BlockPos doorBase, Direction dirForward, TentWidth tentWidth,
-			BlockState doorBlock, BlockState wallBlock, BlockState roofBlock) {
+	public boolean generate(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward,
+			final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock) {
 		final boolean tentDim = TentManager.isTent(worldIn);
-		final Blueprint bp = getBlueprints(tentWidth);
+		final Blueprint bp = getBlueprints(data);
 		if (bp == null) {
 			return false;
 		}
 		// build all relevant layers
-		this.buildLayer(worldIn, doorBase, dirForward, wallBlock, bp.getWallCoords());
-		this.buildLayer(worldIn, doorBase, dirForward, roofBlock, bp.getRoofCoords());
+		BlockState wallBlockColored = wallBlock;
+		if (wallBlock.getBlock().getClass() == BlockShamianaWall.class) {
+			wallBlockColored = BlockShamianaWall.getShamianaState(data.getColor(), false, true);
+		}
+		this.buildLayer(worldIn, doorBase, dirForward, wallBlockColored, bp.getWallCoords());
+		this.buildLayer(worldIn, doorBase, dirForward, wallBlockColored, bp.getRoofCoords());
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		final int structureWidthNum = Math.floorDiv(tentWidth.getSquareWidth(), 2);
+		final int structureWidthNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
 		if (tentDim) {
 			final boolean isRemoving = wallBlock.getMaterial() == Material.AIR;
 			final Block pole = Blocks.OAK_FENCE;
@@ -56,22 +61,22 @@ public class StructureShamiana extends StructureBase {
 		return !bp.isEmpty();
 	}
 
-	@Override
-	public void buildLayer(final World worldIn, final BlockPos doorPos, final Direction dirForward,
-			final BlockState stateIn, final BlockPos[] coordinates) {
-		BlockState state = stateIn;
-		final boolean isWall = state.getBlock().getClass() == BlockShamianaWall.class;
-		if (isWall) {
-			state = BlockShamianaWall.getShamianaState(this.data.getColor(), false, true);
-		}
-		for (final BlockPos coord : coordinates) {
-			final BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
-			if (isWall) {
-				state = state.with(BlockShamianaWall.PATTERN, BlockShamianaWall.shouldBePattern(pos, doorPos));
-			}
-			worldIn.setBlockState(pos, state, 3);
-		}
-	}
+//	@Override
+//	public void buildLayer(final World worldIn, final BlockPos doorPos, final Direction dirForward,
+//			final BlockState stateIn, final BlockPos[] coordinates) {
+//		BlockState state = stateIn;
+//		final boolean isWall = state.getBlock().getClass() == BlockShamianaWall.class;
+//		if (isWall) {
+//			state = BlockShamianaWall.getShamianaState(data.getColor(), false, true);
+//		}
+//		for (final BlockPos coord : coordinates) {
+//			final BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
+//			if (isWall) {
+//				state = state.with(BlockShamianaWall.PATTERN, BlockShamianaWall.shouldBePattern(pos, doorPos));
+//			}
+//			worldIn.setBlockState(pos, state, 3);
+//		}
+//	}
 
 	public static Blueprint makeBlueprints(final TentWidth TentWidth) {
 		final Blueprint bp = new Blueprint();

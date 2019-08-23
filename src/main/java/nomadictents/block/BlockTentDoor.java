@@ -72,6 +72,11 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 //	}
 
 	@Override
+	public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
+		onBlockActivated(state, worldIn, pos, player, player.getActiveHand(), null);
+	}
+
+	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand,
 			BlockRayTraceResult result) {
 		if (!worldIn.isRemote) {
@@ -81,6 +86,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
 				TentData data = teyd.getTentData();
+				TentData dataOverworld = data.copy().setWidth(data.getWidth().getOverworldSize());
 				StructureBase struct = data.getStructure();
 				ItemStack held = player.getHeldItem(hand);
 				
@@ -102,7 +108,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				}
 				// STEP 2:  make sure there is a valid tent before doing anything else
 				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, base, data.getWidth().getOverworldSize());
+						: struct.getValidFacing(worldIn, base, dataOverworld);
 				if (dir == null) {
 					return false;
 				}
@@ -128,7 +134,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 							teyd.onPlayerRemove(player);
 						}
 						// remove the structure
-						struct.remove(worldIn, base, dir, data.getWidth().getOverworldSize());
+						struct.remove(worldIn, base, dataOverworld, dir);
 						// damage the item
 						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
 
@@ -160,11 +166,11 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
-				TentData type = teDoor.getTentData();
-				StructureBase struct = type.getStructure();
+				TentData data = teDoor.getTentData();
+				StructureBase struct = data.getStructure();
 				// make sure there is a valid tent before doing anything
 				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, pos, type.getWidth().getOverworldSize());
+						: struct.getValidFacing(worldIn, pos, data.copy().setWidth(data.getWidth().getOverworldSize()));
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
 				}
@@ -173,7 +179,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onBlockAdded(final BlockState state, final World worldIn, final BlockPos pos, final BlockState oldState, final boolean isMoving) {
 		if (state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			worldIn.setBlockState(pos.up(),
 					state.with(DoorBlock.HALF, DoubleBlockHalf.UPPER), 3);
@@ -193,7 +199,22 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			}
 		}
 	}
-	
+
+	@Override
+	public VoxelShape getRaytraceShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		// copy-pasted
+		if (this.isCube) {
+			return VoxelShapes.fullCube();
+		} else {
+			Direction.Axis axis = state.get(AXIS);
+			if (axis == Direction.Axis.X) {
+				return AABB_X;
+			} else {
+				return AABB_Z;
+			}
+		}
+	}
+
 	@Override
 	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
 		return this.isCube;
@@ -211,7 +232,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	 public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
+	 public void onPlayerDestroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
 		if (state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			// if it's on the bottom
 			worldIn.removeBlock(pos.up(1), false);
@@ -222,7 +243,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void fillStateContainer(final StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(DoorBlock.HALF, AXIS);
 	}
 
