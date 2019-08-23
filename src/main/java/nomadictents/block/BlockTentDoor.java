@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
@@ -42,8 +43,7 @@ import nomadictents.structure.StructureBase;
 import nomadictents.structure.util.TentData;
 
 public abstract class BlockTentDoor extends BlockUnbreakable
-		implements ITepeeBlock, IYurtBlock, 
-		IBedouinBlock, IIndluBlock, IShamianaBlock {
+		implements ITepeeBlock, IYurtBlock, IBedouinBlock, IIndluBlock, IShamianaBlock {
 	
 	public static final EnumProperty<Direction.Axis> AXIS = EnumProperty.<Direction.Axis>create("axis",
 			Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
@@ -72,6 +72,11 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 //	}
 
 	@Override
+	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+		return false;
+	}
+
+	@Override
 	public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
 		onBlockActivated(state, worldIn, pos, player, player.getActiveHand(), null);
 	}
@@ -79,7 +84,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand,
 			BlockRayTraceResult result) {
-		if (!worldIn.isRemote) {
+		//if (!worldIn.isRemote) {
 			BlockPos base = state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			// attempt to activate the TileEntity associated with this door
@@ -148,7 +153,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			} else {
 				System.out.println("[BlockTentDoor] Error! Failed to retrieve TileEntityTentDoor at " + pos);
 			}
-		}
+		//}
 		return false;
 	}
 
@@ -201,21 +206,6 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public VoxelShape getRaytraceShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		// copy-pasted
-		if (this.isCube) {
-			return VoxelShapes.fullCube();
-		} else {
-			Direction.Axis axis = state.get(AXIS);
-			if (axis == Direction.Axis.X) {
-				return AABB_X;
-			} else {
-				return AABB_Z;
-			}
-		}
-	}
-
-	@Override
 	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
 		return this.isCube;
 	}
@@ -228,7 +218,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getRenderLayer() {
-		return this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
+		return BlockRenderLayer.SOLID;  //this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
