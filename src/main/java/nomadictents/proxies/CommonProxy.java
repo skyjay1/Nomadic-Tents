@@ -18,31 +18,14 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
-import nomadictents.block.BlockBarrier;
-import nomadictents.block.BlockBedouinRoof;
-import nomadictents.block.BlockBedouinWall;
-import nomadictents.block.BlockIndluWall;
-import nomadictents.block.BlockShamianaWall;
-import nomadictents.block.BlockTentDoorHGM;
-import nomadictents.block.BlockTentDoorSML;
-import nomadictents.block.BlockTentFrame;
+import nomadictents.block.*;
 import nomadictents.block.BlockTentFrame.BlockToBecome;
-import nomadictents.block.BlockTepeeWall;
-import nomadictents.block.BlockUnbreakable;
-import nomadictents.block.BlockYurtRoof;
-import nomadictents.block.BlockYurtWall;
-import nomadictents.block.TileEntityTentDoor;
-import nomadictents.crafting.RecipeUpgradeColor;
-import nomadictents.crafting.RecipeUpgradeDepth;
-import nomadictents.crafting.RecipeUpgradeWidth;
+import nomadictents.crafting.*;
 import nomadictents.dimension.BiomeTent;
 import nomadictents.dimension.TentDimension;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
-import nomadictents.item.ItemDepthUpgrade;
-import nomadictents.item.ItemMallet;
-import nomadictents.item.ItemSuperMallet;
-import nomadictents.item.ItemTent;
+import nomadictents.item.*;
 
 public class CommonProxy {
 	
@@ -192,7 +175,10 @@ public class CommonProxy {
 	}
 	
 	public void registerTileEntity(final RegistryEvent.Register<TileEntityType<?>> event) {
-		TileEntityType.Builder<TileEntityTentDoor> builder = TileEntityType.Builder.create(TileEntityTentDoor::new, Content.YURT_DOOR_SML);
+		TileEntityType.Builder<TileEntityTentDoor> builder = TileEntityType.Builder.create(TileEntityTentDoor::new, 
+				Content.YURT_DOOR_SML, Content.YURT_DOOR_HGM, Content.TEPEE_DOOR_SML, Content.TEPEE_DOOR_HGM,
+				Content.BEDOUIN_DOOR_SML, Content.BEDOUIN_DOOR_HGM, Content.INDLU_DOOR_SML, Content.INDLU_DOOR_HGM,
+				Content.SHAMIANA_DOOR_SML, Content.SHAMIANA_DOOR_HGM);
 		event.getRegistry().register(builder.build(null).setRegistryName(NomadicTents.MODID, "tileentitytentdoor"));
 	}
 
@@ -205,7 +191,7 @@ public class CommonProxy {
 		}.setRegistryName(NomadicTents.MODID, "tent_dimension"));
 	}
 	
-	public void registerRecipeSerializers(Register<IRecipeSerializer<?>> event) {
+	public void registerRecipeSerializers(final Register<IRecipeSerializer<?>> event) {
 		event.getRegistry().registerAll(
 				new RecipeUpgradeWidth.Factory().setRegistryName(NomadicTents.MODID, RecipeUpgradeWidth.CATEGORY),
 				new RecipeUpgradeDepth.Factory().setRegistryName(NomadicTents.MODID, RecipeUpgradeDepth.CATEGORY),

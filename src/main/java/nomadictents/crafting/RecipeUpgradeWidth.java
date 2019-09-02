@@ -62,18 +62,18 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 	public boolean matches(CraftingInventory inv, World worldIn) {
 		// check super conditions first
 		if(this != EMPTY && super.matches(inv, worldIn)) {
-			// find the tent item in the crafting grid
-			ItemStack tentStack = getTentStack(inv);
-			if (tentStack.isEmpty() && null == this.widthIn) {
-				// no tent was found, user must be
-				// crafting a small tent
+			if (this.widthOut == TentWidth.SMALL) {
 				return true;
 			} else {
-				final TentData data = new TentData(tentStack);
-				// return true if the tent is upgradeable to match this one
-				if (data.getTent() == this.tent && data.getWidth() == widthIn
-					&& this.widthOut.getId() < data.getTent().getMaxSize()) {
-					return true;
+				// find the tent item in the crafting grid		
+				ItemStack tentStack = getTentStack(inv);
+				if(!tentStack.isEmpty()) {
+					final TentData data = new TentData(tentStack);
+					// return true if the tent is upgradeable to match this one
+					if (data.getTent() == this.tent && data.getWidth() == widthIn
+						&& this.widthOut.getId() < data.getTent().getMaxSize()) {
+						return true;
+					}
 				}
 			}
 		}

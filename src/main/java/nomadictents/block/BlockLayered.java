@@ -38,6 +38,6 @@ public class BlockLayered extends BlockUnbreakable {
 				&& worldIn.getBlockState(myPos.down(2)).getBlock() != this;
 		BlockState toSet = this.getDefaultState().with(ABOVE_SIMILAR, above);
 		worldIn.setBlockState(myPos, toSet, 3);
-		// worldIn.notifyNeighborsOfStateChange(myPos, this);
+		worldIn.notifyNeighborsOfStateChange(myPos, state.getBlock());
 	}
 }

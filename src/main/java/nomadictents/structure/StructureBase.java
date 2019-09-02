@@ -308,7 +308,7 @@ public abstract class StructureBase {
 	 **/
 	public boolean generateFrameStructure(final World worldIn, final BlockPos doorBase, final TentData data,
 			final Direction dirForward) {
-		return generate(worldIn, doorBase, data, dirForward, data.getDoorBlock(),
+		return generate(worldIn, doorBase, data.copyForOverworld(), dirForward, data.getDoorBlock(),
 				data.getTent().getFrameBlock(false), data.getTent().getFrameBlock(true));
 	}
 
@@ -363,8 +363,8 @@ public abstract class StructureBase {
 	 * @return true if there is empty space to create a structure of given size at
 	 *         this location
 	 **/
-	public boolean canSpawn(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward) {
-		final Blueprint bp = getBlueprints(data);
+	public boolean canGenerateFrameStructure(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward) {
+		final Blueprint bp = getBlueprints(data.copyForOverworld());
 		// check wall and roof arrays
 		if (bp.hasWallCoords() && !validateArray(worldIn, doorBase, bp.getWallCoords(), dirForward, REPLACE_BLOCK_PRED)) {
 			return false;

@@ -41,7 +41,6 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		super(Block.Properties.create(Material.WOOD).doesNotBlockMovement());
 		this.TO_BECOME = type;
 		this.setRegistryName(NomadicTents.MODID, name);
-		//this.setUnlocalizedName(name);
 		this.setDefaultState(this.stateContainer.getBaseState().with(PROGRESS, 0));
 	}
 
@@ -58,10 +57,14 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public VoxelShape getRenderShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
-		int meta = state.get(PROGRESS).intValue();
+		int meta = 0;
+		if(state.has(PROGRESS)) {
+			meta = state.get(PROGRESS).intValue();
+		}
+		// return a sized and oriented box based on progress
 		if (meta <= 1) {
 			return AABB_PROGRESS_0;
 		} else if (meta <= MAX_META / 2) {
@@ -70,6 +73,11 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			return AABB_PROGRESS_2;
 		}
 	}
+	
+//	@Override
+//	public VoxelShape getShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, final ISelectionContext context) {
+//		
+//	}
 	
 	@Override
 	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, final ISelectionContext cxt) {

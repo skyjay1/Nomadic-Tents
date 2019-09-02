@@ -62,12 +62,24 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 		return this;
 	}
 	
-	/** @return an exact copy of this TentData that is NOT the original **/
+	/** @return an exact copy of this TentData. Does not affect the original **/
 	public TentData copy() {
 		return new TentData()
 				.setAll(tent, width, depth)
 				.setID(locationID)
 				.setColor(color);
+	}
+	
+	/**
+	 * Used primarily for generating and verifying frame structures
+	 * in the Overworld.
+	 * @return A copy of this TentData but with its Overworld width.
+	 * Does not affect the original TentData object.
+	 * @see #copy()
+	 * @see TentWidth#getOverworldSize()
+	 **/
+	public TentData copyForOverworld() {
+		return copy().setWidth(width.getOverworldSize());
 	}
 	
 	/** @return true if this object has valid ID **/

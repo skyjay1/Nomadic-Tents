@@ -60,31 +60,16 @@ public class ItemTent extends Item {
 	public void onCreated(final ItemStack stack, final World world, final PlayerEntity player) {
 		super.onCreated(stack, world, player);
 	}
-
-//	/**
-//	 * Called each tick as long the item is on a player inventory.
-//	 * Only reliably called Client-Side
-//	 **/
-//	@Override
-//	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-//		super.onUpdate(stack, world, entity, itemSlot, isSelected);
-//		// make sure this tent has useable data
-//		if(shouldFixOldStructureData(stack.getOrCreateChildTag(TENT_DATA))) {
-//			// tent has old information that needs to be transferred over
-//			final CompoundNBT tag = makeStructureDataFromOld(world, stack.getSubCompound(TENT_DATA));
-//			stack.getTag().put(TENT_DATA, tag);
-//		} 
-//	}
 	
 	@Override
 	public ActionResultType onItemUse(final ItemUseContext cxt) {
 		// looks at the item info and builds the correct tent in-world
 		if (!TentManager.isTent(cxt.getWorld()) /*&& !cxt.getWorld().isRemote*/) {
-			BlockPos hitPos = cxt.getPos();
+			BlockPos hitPos = cxt.getPos().up();
 			ItemStack stack = cxt.getItem();
 			Direction hitSide = cxt.getFace();
 
-			if (stack == null || stack.isEmpty()) {
+			if (stack == null || stack.isEmpty() || hitSide != Direction.UP) {
 				return ActionResultType.FAIL;
 			} else {
 				// make sure this tent has useable data
@@ -94,9 +79,9 @@ public class ItemTent extends Item {
 					stack.getTag().put(TENT_DATA, tag);
 				}
 				// offset the BlockPos to build on if it's not replaceable
-				//if (!StructureBase.REPLACE_BLOCK_PRED.test(cxt.getWorld().getBlockState(hitPos))) {
-					hitPos = hitPos.up(1);
-				//}
+//				if (StructureBase.REPLACE_BLOCK_PRED.test(cxt.getWorld().getBlockState(hitPos))) {
+//					hitPos = hitPos.down();
+//				}
 				// if you can't edit these blocks, return FAIL
 				if (cxt.getPlayer() == null || !cxt.getPlayer().canPlayerEdit(hitPos, hitSide, stack)) {
 					return ActionResultType.FAIL;
@@ -106,7 +91,7 @@ public class ItemTent extends Item {
 					final TentData data = new TentData(stack.getChildTag(TENT_DATA));
 					final StructureBase struct = data.getStructure();
 					// make sure the tent can be built here
-					if (struct.canSpawn(cxt.getWorld(), hitPos, data, playerFacing)) {
+					if (struct.canGenerateFrameStructure(cxt.getWorld(), hitPos, data, playerFacing)) {
 						// build the frames
 						if (struct.generateFrameStructure(cxt.getWorld(), hitPos, data, playerFacing)) {
 							// update the TileEntity information
@@ -118,7 +103,7 @@ public class ItemTent extends Item {
 										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
 							}
 							// remove tent from inventory
-							stack.shrink(1);
+							stack = ItemStack.EMPTY;
 						}
 					}
 				}

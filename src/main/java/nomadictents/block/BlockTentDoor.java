@@ -8,7 +8,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
@@ -20,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -35,6 +33,7 @@ import nomadictents.block.Categories.IYurtBlock;
 import nomadictents.dimension.TentDimension;
 import nomadictents.dimension.TentManager;
 import nomadictents.event.TentEvent;
+import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
 import nomadictents.init.TentConfig;
 import nomadictents.item.ItemMallet;
@@ -52,13 +51,10 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	private static final double aabbDis = 0.375D;
 	public static final VoxelShape AABB_X = makeCuboidShape(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
 	public static final VoxelShape AABB_Z = makeCuboidShape(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
-	public final boolean isCube;
 
-	public BlockTentDoor(final String name, final boolean isFull) {
+	public BlockTentDoor(final String name) {
 		super(Block.Properties.create(Material.WOOL));
 		this.setRegistryName(NomadicTents.MODID, name);
-		//this.setUnlocalizedName(name);
-		this.isCube = isFull;
 		this.setDefaultState(this.stateContainer.getBaseState()
 				.with(DoorBlock.HALF, DoubleBlockHalf.LOWER)
 				.with(AXIS, Direction.Axis.X));
@@ -71,28 +67,23 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 //		return (m1 == Material.AIR || m1 == Material.WATER) && (m2 == Material.AIR || m2 == Material.WATER);
 //	}
 
-	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
-		return false;
-	}
-
-	@Override
-	public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
-		onBlockActivated(state, worldIn, pos, player, player.getActiveHand(), null);
-	}
+//	@Override
+//	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+//		return false;
+//	}
 
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand,
 			BlockRayTraceResult result) {
-		//if (!worldIn.isRemote) {
+		if (!worldIn.isRemote) {
 			BlockPos base = state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
 			// attempt to activate the TileEntity associated with this door
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teyd = (TileEntityTentDoor) te;
-				TentData data = teyd.getTentData();
-				TentData dataOverworld = data.copy().setWidth(data.getWidth().getOverworldSize());
-				StructureBase struct = data.getStructure();
+				//TentData data = teyd.getTentData();
+				TentData dataOverworld = teyd.getTentData().copyForOverworld();
+				StructureBase struct = dataOverworld.getStructure();
 				ItemStack held = player.getHeldItem(hand);
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
@@ -141,7 +132,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						// remove the structure
 						struct.remove(worldIn, base, dataOverworld, dir);
 						// damage the item
-						player.getHeldItem(hand).damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
+						held.damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
 
 						return true;
 					}
@@ -153,7 +144,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			} else {
 				System.out.println("[BlockTentDoor] Error! Failed to retrieve TileEntityTentDoor at " + pos);
 			}
-		//}
+		}
 		return false;
 	}
 
@@ -171,11 +162,11 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
-				TentData data = teDoor.getTentData();
-				StructureBase struct = data.getStructure();
+				TentData dataOverworld = teDoor.getTentData().copyForOverworld();
+				StructureBase struct = dataOverworld.getStructure();
 				// make sure there is a valid tent before doing anything
 				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, pos, data.copy().setWidth(data.getWidth().getOverworldSize()));
+						: struct.getValidFacing(worldIn, pos, dataOverworld);
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
 				}
@@ -192,33 +183,47 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public VoxelShape getShape(final BlockState state, final IBlockReader source, final BlockPos pos, final ISelectionContext cxt) {
-		if (this.isCube) {
-			return VoxelShapes.fullCube();
-		} else {
-			Direction.Axis axis = state.get(AXIS);
-			if (axis == Direction.Axis.X) {
-				return AABB_X;
-			} else {
-				return AABB_Z;
-			}
+	public VoxelShape getRenderShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
+		switch ((Direction.Axis) state.get(AXIS)) {
+		case Z:
+			return AABB_Z;
+		case X:
+		default:
+			return AABB_X;
 		}
 	}
 
 	@Override
-	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
-		return this.isCube;
+	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos,
+			final ISelectionContext cxt) {
+		return getRenderShape(state, worldIn, pos);
+	}
+
+	@Override
+	public VoxelShape getRaytraceShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
+		return getRenderShape(state, worldIn, pos);
 	}
 	
+//	@Override
+//	public VoxelShape getShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, 
+//			final ISelectionContext cxt) {
+//		
+//	}
+
 	@Override
-	public boolean isSolid(final BlockState state) {
-		return true;
+	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
+		return false;
 	}
+//	
+//	@Override
+//	public boolean isSolid(final BlockState state) {
+//		return true;
+//	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.SOLID;  //this.isCube ? BlockRenderLayer.SOLID : BlockRenderLayer.CUTOUT;
+		return BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
@@ -244,7 +249,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
-		TileEntityTentDoor ret = new TileEntityTentDoor();
+		TileEntityTentDoor ret = Content.TE_DOOR.create();
 		if(world instanceof World) {
 			ret.setWorld((World)world);
 		}

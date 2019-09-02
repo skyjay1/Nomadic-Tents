@@ -12,13 +12,9 @@ public class BlockTentDoorHGM extends BlockTentDoor {
 	public static final EnumProperty<TentWidth> SIZE_HGM = EnumProperty.<TentWidth>create("size",
 			TentWidth.class, TentWidth.HUGE, TentWidth.GIANT, TentWidth.MEGA);
 
-	public BlockTentDoorHGM(final String name, boolean isFull) {
-		super(name, isFull);
-		this.setDefaultState(this.getDefaultState().with(SIZE_HGM, TentWidth.HUGE));
-	}
-	
 	public BlockTentDoorHGM(final String name) {
-		this(name, false);
+		super(name);
+		this.setDefaultState(this.getDefaultState().with(SIZE_HGM, TentWidth.HUGE));
 	}
 
 	@Override

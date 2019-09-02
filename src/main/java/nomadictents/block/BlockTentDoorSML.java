@@ -12,13 +12,9 @@ public class BlockTentDoorSML extends BlockTentDoor {
 	public static final EnumProperty<TentWidth> SIZE_SML = EnumProperty.<TentWidth>create("size",
 			TentWidth.class, TentWidth.SMALL, TentWidth.MEDIUM, TentWidth.LARGE);
 
-	public BlockTentDoorSML(final String name, final boolean isFull) {
-		super(name, isFull);
-		this.setDefaultState(this.getDefaultState().with(SIZE_SML, TentWidth.SMALL));
-	}
-	
 	public BlockTentDoorSML(final String name) {
-		this(name, false);
+		super(name);
+		this.setDefaultState(this.getDefaultState().with(SIZE_SML, TentWidth.SMALL));
 	}
 
 	@Override
