@@ -15,6 +15,7 @@ import nomadictents.block.BlockTentDoorHGM;
 import nomadictents.block.BlockTentDoorSML;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.init.Content;
+import nomadictents.init.NomadicTents;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.StructureBase;
 
@@ -203,7 +204,7 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 	/** Uses internal fields and Player location to update the given TileEntityTentDoor, including Owner if enabled */
 	public static void applyToTileEntity(final PlayerEntity player, final ItemStack stack, final TileEntityTentDoor te) {
 		if (stack.getTag() == null || !stack.getTag().contains(ItemTent.TENT_DATA)) {
-			System.out.println("[TentData] ItemStack did not have any NBT information to pass to the TileEntity!");
+			NomadicTents.LOGGER.error("ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}

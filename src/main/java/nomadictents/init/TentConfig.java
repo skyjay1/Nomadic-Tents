@@ -16,15 +16,15 @@ public final class TentConfig {
 	public static final ForgeConfigSpec SPEC = BUILDER.build();
 
 	// Dimension behavior configs
-	public final ForgeConfigSpec.ConfigValue<Integer> TENT_DIM_ID;
-	public final ForgeConfigSpec.ConfigValue<Integer> RESPAWN_DIMENSION;
+	// TODO public final ForgeConfigSpec.ConfigValue<Integer> TENT_DIM_ID;
+	// TODO public final ForgeConfigSpec.ConfigValue<Integer> RESPAWN_DIMENSION;
 	public final ForgeConfigSpec.BooleanValue ALLOW_SLEEP_TENT_DIM;
 	public final ForgeConfigSpec.BooleanValue RESTRICT_TELEPORT_TENT_DIM;
 	public final ForgeConfigSpec.BooleanValue ALLOW_RESPAWN_INTERCEPT;
 	public final ForgeConfigSpec.BooleanValue ALLOW_OVERWORLD_SETSPAWN;
 	public final ForgeConfigSpec.BooleanValue IS_SLEEPING_STRICT;
 	public final ForgeConfigSpec.BooleanValue ENABLE_WEATHER;
-	//public final ForgeConfigSpec.BooleanValue SAFE_TELEPORT; // TODO
+	// TODO public final ForgeConfigSpec.BooleanValue SAFE_TELEPORT;
 	// Player permissions
 	public final ForgeConfigSpec.BooleanValue SUPER_MALLET_CREATIVE_ONLY;
 	public final ForgeConfigSpec.BooleanValue OWNER_ENTRANCE;
@@ -61,11 +61,10 @@ public final class TentConfig {
 		final int maxDepth = TentDepth.values().length;
 		// begin section 'dimension'
 		builder.push("dimension");
-		// TODO this doesn't work...?
-		TENT_DIM_ID = builder.comment("ID for the Tent Dimension").define("Dimension ID", -2);
-		RESPAWN_DIMENSION = builder
-				.comment("The dimension in which players will respawn from the tent dimension as needed")
-				.define("Home Dimension ID", 0);
+		//TENT_DIM_ID = builder.comment("ID for the Tent Dimension").define("Dimension ID", -2);
+		//RESPAWN_DIMENSION = builder
+		//		.comment("The dimension in which players will respawn from the tent dimension as needed")
+		//		.define("Home Dimension ID", 0);
 		ALLOW_SLEEP_TENT_DIM = builder.comment("When false, beds used in the Tent Dimension will explode")
 				.define("Allow Sleep in Tent", true);
 		RESTRICT_TELEPORT_TENT_DIM = builder
@@ -81,7 +80,7 @@ public final class TentConfig {
 		IS_SLEEPING_STRICT = builder.comment(
 				"When true, players in a tent can only sleep through the night if overworld players are asleep too")
 				.define("Tent Sleeping Strict", true);
-		ENABLE_WEATHER = builder.comment("")
+		ENABLE_WEATHER = builder.comment("When true, weather (ie, rain) is enabled in the tent dimension")
 				.define("Enable Weather", true);
 		builder.pop();
 		// begin section 'permissions'
@@ -110,15 +109,15 @@ public final class TentConfig {
 		ALLOW_BEDOUIN = builder.comment("Whether the Bedouin can be built and used").define("Enable Bedouin", true);
 		ALLOW_INDLU = builder.comment("Whether the Indlu can be built and used").define("Enable Indlu", true);
 		ALLOW_SHAMIANA = builder.comment("Whether the Shamiyana can be built and used").define("Enable Shamiyana", true);
-		TIERS_YURT = builder.comment("Limit the upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
+		TIERS_YURT = builder.comment("Limit the size upgrades a Yurt can recieve. 1=SMALL, 6=MEGA")
 				.defineInRange("Max Tiers: Yurt", maxWidth, 1, maxWidth);
-		TIERS_TEPEE = builder.comment("Limit the upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
+		TIERS_TEPEE = builder.comment("Limit the size upgrades a Tepee can recieve. 1=SMALL, 6=MEGA")
 				.defineInRange("Max Tiers: Tepee", maxWidth, 1, maxWidth);
-		TIERS_BEDOUIN = builder.comment("Limit the upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
+		TIERS_BEDOUIN = builder.comment("Limit the size upgrades a Bedouin can recieve. 1=SMALL, 6=MEGA")
 				.defineInRange("Max Tiers: Bedouin", maxWidth, 1, maxWidth);
-		TIERS_INDLU = builder.comment("Limit the upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
+		TIERS_INDLU = builder.comment("Limit the size upgrades an Indlu can recieve. 1=SMALL, 6=MEGA")
 				.defineInRange("Max Tiers: Indlu", maxWidth, 1, maxWidth);
-		TIERS_SHAMIANA = builder.comment("Limit the upgrades a Shamiyana can recieve. 1=SMALL, 6=MEGA")
+		TIERS_SHAMIANA = builder.comment("Limit the size upgrades a Shamiyana can recieve. 1=SMALL, 6=MEGA")
 				.defineInRange("Max Tiers: Shamiyana", maxWidth, 1, maxWidth);
 		DEPTH_SMALL = builder.comment("Limit the depth of a Small Tent. 1=No Upgrades, 6=Full Upgrades")
 				.defineInRange("Max Depth: Small", TentDepth.NORMAL.getLayers(), 1, maxDepth);
@@ -150,28 +149,11 @@ public final class TentConfig {
 	/** @return the Block to use in a tent platform (floor) **/
 	public Block getFloorBlock() {
 		Block floor = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(FLOOR_BLOCK.get()));
-		// Why do we prevent using diamond or gold for the floor? Because I said so,
-		// that's why.
+		// Why do we prevent using diamond or gold for the floor? 
+		// Because I said so, that's why.
 		if (floor == null || floor == Blocks.DIAMOND_BLOCK || floor == Blocks.GOLD_BLOCK) {
 			floor = Blocks.DIRT;
 		}
 		return floor;
-	}
-
-	/** @return the maximum size of the given tent type **/
-	public int getMaxSize(final TentType tent) {
-		switch (tent) {
-		case BEDOUIN:
-			return TIERS_BEDOUIN.get();
-		case INDLU:
-			return TIERS_INDLU.get();
-		case TEPEE:
-			return TIERS_TEPEE.get();
-		case YURT:
-			return TIERS_YURT.get();
-		case SHAMIANA:
-			return TIERS_SHAMIANA.get();
-		}
-		return -1;
 	}
 }

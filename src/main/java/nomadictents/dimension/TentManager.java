@@ -20,8 +20,6 @@ public final class TentManager {
 	public static void registerDimension() {
 		if (TENT_DIMENSION_TYPE == null && DimensionType.byName(DIM_RL) == null) {
 			TENT_DIMENSION_TYPE = DimensionManager.registerDimension(DIM_RL, Content.MOD_DIMENSION, null, true);
-			System.out.println("Registered Dimension!");
-			System.out.println(TENT_DIMENSION_TYPE == null ? "nvm... it's null" : "name: " + TENT_DIMENSION_TYPE.toString());
 		}
 	}
 	

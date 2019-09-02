@@ -61,7 +61,7 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 	@Override
 	public boolean matches(CraftingInventory inv, World worldIn) {
 		// check super conditions first
-		if(this != EMPTY && super.matches(inv, worldIn)) {
+		if(this != EMPTY && this.tent.isEnabled() && super.matches(inv, worldIn)) {
 			if (this.widthOut == TentWidth.SMALL) {
 				return true;
 			} else {
@@ -85,7 +85,7 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 	 */
 	@Override
 	public ItemStack getCraftingResult(CraftingInventory inv) {
-		if(this == EMPTY) {
+		if(this == EMPTY || !this.tent.isEnabled()) {
 			return ItemStack.EMPTY;
 		}
 		
@@ -162,7 +162,6 @@ public class RecipeUpgradeWidth extends ShapedRecipe {
 			}
 			final ShapedRecipe recipe = super.read(recipeId, json);
 			final TentType tentType = TentType.getByName(JSONUtils.getString(json, "tent_type"));
-			// input size may be null
 			final TentWidth widthIn = TentWidth.getByName(JSONUtils.getString(json, "input_size"));
 			final TentWidth widthOut = TentWidth.getByName(JSONUtils.getString(json, "result_size"));
 			return new RecipeUpgradeWidth(recipeId, tentType, widthIn, widthOut, recipe.getIngredients());	

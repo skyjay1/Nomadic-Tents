@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
@@ -29,7 +30,7 @@ import nomadictents.item.*;
 
 public class CommonProxy {
 	
-	public void registerItemColors() {
+	public void registerItemColors(final ColorHandlerEvent.Item event) {
 		// nothing
 	}
 

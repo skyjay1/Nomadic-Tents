@@ -22,6 +22,7 @@ import nomadictents.block.TileEntityTentDoor;
 import nomadictents.dimension.TentDimension;
 import nomadictents.event.TentEvent;
 import nomadictents.init.Content;
+import nomadictents.init.NomadicTents;
 import nomadictents.init.TentConfig;
 import nomadictents.structure.util.Blueprint;
 import nomadictents.structure.util.Blueprints;
@@ -123,7 +124,7 @@ public abstract class StructureBase {
 		if(te instanceof TileEntityTentDoor) {
 			return (TileEntityTentDoor) te;
 		} else {
-			System.out.println("[StructureBase] Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
+			NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
 			return null;
 		}
 	}

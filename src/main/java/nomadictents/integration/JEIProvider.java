@@ -1,14 +1,22 @@
 package nomadictents.integration;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaRecipeCategoryUid;
+import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import nomadictents.crafting.RecipeUpgradeColor;
 import nomadictents.crafting.RecipeUpgradeDepth;
 import nomadictents.crafting.RecipeUpgradeWidth;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
+import nomadictents.item.ItemTent;
 import nomadictents.structure.util.TentData;
 
 @JeiPlugin
@@ -31,9 +39,14 @@ public class JEIProvider implements mezz.jei.api.IModPlugin {
 		});
 	}
 	
-	/**
-	 * Register this mod plugin with the mod registry.
-	 */
+	@Override
+	public void registerRecipes(final IRecipeRegistration registry) {
+		final List<IRecipe<?>> list = Minecraft.getInstance().world.getRecipeManager().getRecipes().stream()
+			.filter(r -> r.getRecipeOutput().getItem() instanceof ItemTent)
+			.collect(Collectors.toList());
+		registry.addRecipes(list, VanillaRecipeCategoryUid.CRAFTING);
+	}
+	
 	@Override
 	public void registerVanillaCategoryExtensions(final IVanillaCategoryExtensionRegistration registry) {
 		registry.getCraftingCategory().addCategoryExtension(RecipeUpgradeWidth.class, JEIWidthRecipe.Wrapper::new);

@@ -22,6 +22,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import nomadictents.dimension.TentManager;
 import nomadictents.dimension.TentTeleporter;
+import nomadictents.init.NomadicTents;
 import nomadictents.init.TentConfig;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.util.TentData;
@@ -30,7 +31,7 @@ public class TentEventHandler {
 	
 	@SubscribeEvent
 	public void onServerStarting(final FMLServerStartingEvent event) {
-		System.out.println("yurtmod: FMLServerStartingEvent");
+		NomadicTents.LOGGER.debug("nomadictents: FMLServerStartingEvent");
 		TentManager.registerDimension();
 	}
 	

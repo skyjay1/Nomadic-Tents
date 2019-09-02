@@ -1,5 +1,8 @@
 package nomadictents.init;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -7,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
@@ -36,6 +40,8 @@ public class NomadicTents {
 		}
 	};
 	
+	public static final Logger LOGGER = LogManager.getFormatterLogger(MODID);
+	
 	public NomadicTents() {
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, TentConfig.SPEC);
 		//FMLJavaModLoadingContext.get().getModEventBus().addListener(NomadicTents::onServerStarting);
@@ -51,37 +57,43 @@ public class NomadicTents {
 	
 	@SubscribeEvent
 	public static void registerBlocks(final RegistryEvent.Register<Block> event) {
-		System.out.println("yurtmod: RegisterBlocks");
+		LOGGER.debug("nomadictents: RegisterBlocks");
 		PROXY.registerBlocks(event);
 	}
 
 	@SubscribeEvent
 	public static void registerItems(final RegistryEvent.Register<Item> event) {
-		System.out.println("yurtmod: RegisterItems");
+		LOGGER.debug("nomadictents: RegisterItems");
 		PROXY.registerItems(event);
 	}
 	
 	@SubscribeEvent
 	public static void registerTileEntity(final RegistryEvent.Register<TileEntityType<?>> event) {
-		System.out.println("yurtmod: RegisterTileEntityType");
+		LOGGER.debug("nomadictents: RegisterTileEntityType");
 		PROXY.registerTileEntity(event);
 	}
 	
 	@SubscribeEvent
 	public static void registerDimension(final RegistryEvent.Register<ModDimension> event) {
-		System.out.println("yurtmod: RegisterDimension");
+		LOGGER.debug("nomadictents: RegisterDimension");
 		PROXY.registerDimension(event);
 	}
 	
 	@SubscribeEvent
 	public static void registerBiome(final RegistryEvent.Register<Biome> event) {
-		System.out.println("yurtmod: RegisterBiome");
+		LOGGER.debug("nomadictents: RegisterBiome");
 		PROXY.registerBiome(event);
 	}
 	
 	@SubscribeEvent
 	public static void registerRecipeSerializers(final RegistryEvent.Register<IRecipeSerializer<?>> event) {
-		System.out.println("yurtmod: RegisterRecipeSerializer");
+		LOGGER.debug("nomadictents: RegisterRecipeSerializer");
 		PROXY.registerRecipeSerializers(event);
+	}
+	
+	@SubscribeEvent
+	public static void registerItemColors(final ColorHandlerEvent.Item event) {
+		LOGGER.debug("nomadictents: RegisterColorHandler");
+		PROXY.registerItemColors(event);
 	}
 }

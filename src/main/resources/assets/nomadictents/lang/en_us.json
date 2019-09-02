@@ -179,6 +179,7 @@
 
     "_comment": "Chat / Tooltips / Waila",
     "tooltip.extra_dimensional_space": "Extra-dimensional space!",
+	"tooltip.id": "ID: %s",
     "chat.no_teleport": "Teleporting is not allowed inside your tent.",
     "tooltip.depth_upgrades": "Depth Upgrades: %s / %s",
     "waila.progress": "Progress: %s",

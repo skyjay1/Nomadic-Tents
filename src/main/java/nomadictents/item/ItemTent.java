@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -62,11 +64,10 @@ public class ItemTent extends Item {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(final ItemUseContext cxt) {
+	public ActionResultType onItemUseFirst(ItemStack stack, final ItemUseContext cxt) {
 		// looks at the item info and builds the correct tent in-world
 		if (!TentManager.isTent(cxt.getWorld()) /*&& !cxt.getWorld().isRemote*/) {
 			BlockPos hitPos = cxt.getPos().up();
-			ItemStack stack = cxt.getItem();
 			Direction hitSide = cxt.getFace();
 
 			if (stack == null || stack.isEmpty() || hitSide != Direction.UP) {
@@ -99,8 +100,7 @@ public class ItemTent extends Item {
 							if (te instanceof TileEntityTentDoor) {
 								TentData.applyToTileEntity(cxt.getPlayer(), stack, (TileEntityTentDoor) te);
 							} else {
-								System.out.println(
-										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
+								NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
 							}
 							// remove tent from inventory
 							stack = ItemStack.EMPTY;
@@ -170,6 +170,10 @@ public class ItemTent extends Item {
 		final int maxCount = TentDepth.maxUpgrades(data);
 		if(depthCount > 0 || flagIn.isAdvanced() /* || net.minecraft.client.gui.GuiScreen.isShiftKeyDown() */) {
 			tooltip.add(new TranslationTextComponent("tooltip.depth_upgrades", depthCount, maxCount).applyTextStyle(TextFormatting.GRAY));
+		}
+		// Other information for advanced tooltip
+		if(flagIn.isAdvanced()) {
+			tooltip.add(new TranslationTextComponent("tooltip.id", data.getID()).applyTextStyle(TextFormatting.GRAY));
 		}
 	}
 	

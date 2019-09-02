@@ -11,7 +11,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.storage.WorldSavedData;
 import nomadictents.dimension.TentManager;
 
@@ -33,7 +32,7 @@ public class TentSaveData extends WorldSavedData {
 	}
 
 	public static TentSaveData get(MinecraftServer server) {
-		return server.getWorld(DimensionType.OVERWORLD).getSavedData()
+		return TentManager.getOverworld(server).getSavedData()
 				.getOrCreate(() -> new TentSaveData(NomadicTents.MODID), NomadicTents.MODID);
 	}
 
@@ -80,9 +79,6 @@ public class TentSaveData extends WorldSavedData {
 	 **/
 	public long getNextID() {
 		this.markDirty();
-		// DEBUG
-		System.out.println("incrementing ID count from " + idCount);
-		System.out.println("My hash code: " + this.hashCode());
 		return ++idCount;
 	}
 

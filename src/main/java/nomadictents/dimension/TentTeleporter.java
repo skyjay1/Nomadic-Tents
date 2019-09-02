@@ -138,8 +138,6 @@ public class TentTeleporter extends Teleporter {
 			MinecraftForge.EVENT_BUS.post(event);
 		}
 		
-		// DEBUG
-		// System.out.println(this.toString());
 		return true;
 	}
 
