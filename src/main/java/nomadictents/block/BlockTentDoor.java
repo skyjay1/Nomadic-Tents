@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
@@ -67,10 +68,10 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 //		return (m1 == Material.AIR || m1 == Material.WATER) && (m2 == Material.AIR || m2 == Material.WATER);
 //	}
 
-//	@Override
-//	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
-//		return false;
-//	}
+	@Override
+	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+		return false;
+	}
 
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand,
@@ -158,6 +159,8 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	 */
 	@Override
 	 public void onEntityCollision(final BlockState state, final World worldIn, final BlockPos pos, final Entity entityIn) {
+		// TODO collision is not working in survival
+		/*
 		if (!worldIn.isRemote && worldIn.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
@@ -172,6 +175,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				}
 			}
 		}
+		*/
 	}
 
 	@Override

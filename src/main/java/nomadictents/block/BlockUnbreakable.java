@@ -4,15 +4,17 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.PushReaction;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 
 public class BlockUnbreakable extends Block {
 	public static final AxisAlignedBB SINGULAR_AABB = new AxisAlignedBB(0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D);
 
 	public static final int LIGHT_OPACITY = 7;
 	
-	protected final boolean cosmetic;
+	private final boolean cosmetic;
 	
 	public BlockUnbreakable(final Block.Properties prop) {
 		this(prop, false);
@@ -20,9 +22,8 @@ public class BlockUnbreakable extends Block {
 	
 	public BlockUnbreakable(final Block.Properties prop, final boolean isCosmetic) {
 		super(isCosmetic 
-				? prop.hardnessAndResistance(-1.0F, 3600000.0F).sound(SoundType.CLOTH)
-					.harvestLevel(10).harvestTool(ToolType.PICKAXE).noDrops()
-				: prop.hardnessAndResistance(0.6F, 0.2F).sound(SoundType.CLOTH).harvestLevel(-1));
+				? prop.hardnessAndResistance(-1.0F, 3600000.0F).sound(SoundType.CLOTH).noDrops()
+				: prop.hardnessAndResistance(0.6F, 0.2F).sound(SoundType.CLOTH));
 		this.cosmetic = isCosmetic;
 	}
 	
@@ -36,7 +37,17 @@ public class BlockUnbreakable extends Block {
 	
 	@Override
 	public PushReaction getPushReaction(final BlockState state) {
-		return cosmetic ? super.getPushReaction(state) : PushReaction.BLOCK;
+		return state.getBlock() instanceof BlockUnbreakable && 
+				((BlockUnbreakable)state.getBlock()).isCosmetic() ? PushReaction.NORMAL : PushReaction.BLOCK;
+	}
+	
+	@SuppressWarnings("deprecation")
+	@Override
+	public float getPlayerRelativeBlockHardness(final BlockState state, final PlayerEntity player, 
+			final IBlockReader worldIn, final BlockPos pos) {
+		return state.getBlock() instanceof BlockUnbreakable && 
+				((BlockUnbreakable)state.getBlock()).isCosmetic() 
+				? super.getPlayerRelativeBlockHardness(state, player, worldIn, pos) : -100F;
 	}
 	
 	/** @return TRUE for cosmetic block, FALSE if this block is unbreakable **/

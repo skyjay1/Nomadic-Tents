@@ -32,7 +32,7 @@ public class StructureShamiana extends StructureBase {
 		}
 		// build all relevant layers
 		BlockState wallBlockColored = wallBlock;
-		if (wallBlock.getBlock().getClass() == BlockShamianaWall.class) {
+		if (wallBlock.getBlock() instanceof BlockShamianaWall) {
 			wallBlockColored = BlockShamianaWall.getShamianaState(data.getColor(), false, true);
 		}
 		this.buildLayer(worldIn, doorBase, dirForward, wallBlockColored, bp.getWallCoords());
@@ -61,22 +61,19 @@ public class StructureShamiana extends StructureBase {
 		return !bp.isEmpty();
 	}
 
-//	@Override
-//	public void buildLayer(final World worldIn, final BlockPos doorPos, final Direction dirForward,
-//			final BlockState stateIn, final BlockPos[] coordinates) {
-//		BlockState state = stateIn;
-//		final boolean isWall = state.getBlock().getClass() == BlockShamianaWall.class;
-//		if (isWall) {
-//			state = BlockShamianaWall.getShamianaState(data.getColor(), false, true);
-//		}
-//		for (final BlockPos coord : coordinates) {
-//			final BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
-//			if (isWall) {
-//				state = state.with(BlockShamianaWall.PATTERN, BlockShamianaWall.shouldBePattern(pos, doorPos));
-//			}
-//			worldIn.setBlockState(pos, state, 3);
-//		}
-//	}
+	@Override
+	public void buildLayer(final World worldIn, final BlockPos doorPos, final Direction dirForward,
+			final BlockState stateIn, final BlockPos[] coordinates) {
+		BlockState state = stateIn;
+		final boolean isWall = state.getBlock() instanceof BlockShamianaWall;
+		for (final BlockPos coord : coordinates) {
+			final BlockPos pos = getPosFromDoor(doorPos, coord, dirForward);
+			if (isWall) {
+				state = state.with(BlockShamianaWall.PATTERN, BlockShamianaWall.shouldBePattern(pos, doorPos));
+			}
+			worldIn.setBlockState(pos, state, 3);
+		}
+	}
 
 	public static Blueprint makeBlueprints(final TentWidth TentWidth) {
 		final Blueprint bp = new Blueprint();

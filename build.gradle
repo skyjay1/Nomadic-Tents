@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 
 version = '10.0.0-beta'
 group = 'nomadictents' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'nomadictents'
+archivesBaseName = 'NomadicTents-1.14.4'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 

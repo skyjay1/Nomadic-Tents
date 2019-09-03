@@ -125,10 +125,10 @@ public class CommonProxy {
 				new ItemMallet(ItemTier.IRON).setRegistryName(NomadicTents.MODID, "mallet"),
 				new ItemSuperMallet(ItemTier.DIAMOND).setRegistryName(NomadicTents.MODID, "super_mallet"),
 				// tent crafting items and upgrades
-				basicItem("tent_canvas"), basicItem("yurt_wall_piece"), basicItem("tepee_wall_piece"),
-				basicItem("bed_wall_piece"), basicItem("indlu_wall_piece"), 
-				basicItem("shamiana_wall_piece"), basicItem("tent_upgrade_gold"),
-				basicItem("tent_upgrade_obsidian"), basicItem("tent_upgrade_diamond"),
+				makeItem("tent_canvas"), makeItem("yurt_wall_piece"), makeItem("tepee_wall_piece"),
+				makeItem("bed_wall_piece"), makeItem("indlu_wall_piece"), 
+				makeItem("shamiana_wall_piece"), makeItem("tent_upgrade_gold"),
+				makeItem("tent_upgrade_obsidian"), makeItem("tent_upgrade_diamond"),
 				new ItemDepthUpgrade("depth_upgrade_stone"), new ItemDepthUpgrade("depth_upgrade_iron"),
 				new ItemDepthUpgrade("depth_upgrade_gold"), new ItemDepthUpgrade("depth_upgrade_obsidian"),
 				new ItemDepthUpgrade("depth_upgrade_diamond"),
@@ -200,7 +200,7 @@ public class CommonProxy {
 		);
 	}
 
-	private static final Item basicItem(final String name) {
+	private static final Item makeItem(final String name) {
 		return new Item(new Item.Properties().group(NomadicTents.TAB)).setRegistryName(NomadicTents.MODID, name);
 	}
 
