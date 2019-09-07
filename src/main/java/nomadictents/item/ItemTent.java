@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -17,7 +16,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -39,8 +37,8 @@ import nomadictents.structure.util.TentType;
 import nomadictents.structure.util.TentWidth;
 
 public class ItemTent extends Item {
-	/** Tent ItemStack NBTs should have this value for x and z offsets before it's set **/
-	public static final int ERROR_TAG = Short.MIN_VALUE;
+	/** Tent ItemStack NBTs should have this value for location ID before it's set **/
+	public static final int ERROR_TAG = Short.MIN_VALUE; // -32768
 	public static final String TENT_DATA = "TentData";
 	public static final String TAG_COPY_TOOL = "TentCopyTool";
 

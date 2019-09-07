@@ -2,6 +2,7 @@ package nomadictents.structure;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -33,20 +34,12 @@ public class StructureBedouin extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		final int StructureWidthNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, StructureWidthNum, -1, 0, dirForward);
-			if((worldIn.getBlockState(pos).getBlock() == Blocks.DIRT || worldIn.isAirBlock(pos))
-					&& worldIn.isAirBlock(pos.up(1))) {
-				if(StructureWidthNum > 2) {
-					worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
-					worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 2);
-				} else {
-					worldIn.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState(), 2);
-					worldIn.setBlockState(pos.up(), Blocks.TORCH.getDefaultState(), 2);
+			if(data.getWidth().getId() > TentWidth.SMALL.getId()) {
+				final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
+				if(worldIn.isAirBlock(center)) {
+					worldIn.setBlockState(center, Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true), 3);
 				}
-				
 			}
 		}
 		return !bp.isEmpty();

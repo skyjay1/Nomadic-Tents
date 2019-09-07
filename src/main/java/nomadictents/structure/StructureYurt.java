@@ -2,6 +2,7 @@ package nomadictents.structure;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -35,12 +36,11 @@ public class StructureYurt extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			final int sizeNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
-			if (sizeNum > 2 && (worldIn.getBlockState(pos).getBlock() == Blocks.DIRT || worldIn.isAirBlock(pos))
-					&& worldIn.isAirBlock(pos.up(1))) {
-				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
-				worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 3);
+			if(data.getWidth().getId() > TentWidth.SMALL.getId()) {
+				final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
+				if(worldIn.isAirBlock(center)) {
+					worldIn.setBlockState(center, Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true), 3);
+				}
 			}
 			buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(), bp.getBarrierCoords());
 		}

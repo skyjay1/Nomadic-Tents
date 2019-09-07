@@ -7,7 +7,6 @@ import nomadictents.block.Categories.IBedouinBlock;
 
 public class BlockBedouinRoof extends BlockUnbreakable implements IBedouinBlock {
 	public BlockBedouinRoof(final boolean cosmetic) {
-		super(Block.Properties.create(Material.WOOL, DyeColor.BROWN), cosmetic);
-		//this.setLightOpacity(LIGHT_OPACITY);
+		super(Block.Properties.create(Material.WOOL, DyeColor.BROWN).variableOpacity(), cosmetic);
 	}
 }

@@ -28,13 +28,10 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	private static final Block[] blockColorsCosmetic = new Block[16];
 		
 	public BlockShamianaWall(final DyeColor colorIn, final String name, final boolean cosmetic) {
-		super(Block.Properties.create(Material.WOOL, colorIn), cosmetic);
+		super(Block.Properties.create(Material.WOOL, colorIn).variableOpacity(), cosmetic);
 		// set local values and names based on color
 		this.color = colorIn;
 		this.setRegistryName(NomadicTents.MODID, name);
-		//this.setUnlocalizedName(name);
-		//this.setCreativeTab(NomadicTents.TAB);
-		//this.setLightOpacity(LIGHT_OPACITY);
 		// when property is TRUE, texture will be PATTERN. 
 		// when property is FALSE, texture will be PLAIN.
 		this.setDefaultState(this.stateContainer.getBaseState().with(PATTERN, false));

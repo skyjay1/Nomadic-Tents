@@ -22,7 +22,7 @@ import nomadictents.init.TentConfig;
 public class BlockTepeeWall extends BlockUnbreakable implements ITepeeBlock {
 		
 	public BlockTepeeWall(final String name, final boolean cosmetic) {
-		super(Block.Properties.create(Material.WOOL, MaterialColor.SAND), cosmetic);
+		super(Block.Properties.create(Material.WOOL, MaterialColor.SAND).variableOpacity(), cosmetic);
 		this.setRegistryName(NomadicTents.MODID, name);
 		//this.setLightOpacity(LIGHT_OPACITY);
 	}

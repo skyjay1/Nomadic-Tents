@@ -34,10 +34,9 @@ public class StructureIndlu extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			final int sizeNum = Math.floorDiv(data.getWidth().getSquareWidth(), 2);
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
-			worldIn.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState(), 2);
-			worldIn.setBlockState(pos.up(), Blocks.TORCH.getDefaultState(), 2);
+			BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
+			worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
+			worldIn.setBlockState(center, Blocks.TORCH.getDefaultState(), 2);
 		}
 		return !bp.isEmpty();
 	}

@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '10.0.0-beta'
+version = '10.0.1-beta'
 group = 'nomadictents' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'NomadicTents-1.14.4'
 
@@ -28,7 +28,7 @@ minecraft {
     mappings channel: 'snapshot', version: '20190719-1.14.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -101,7 +101,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     
-	minecraft 'net.minecraftforge:forge:1.14.4-28.0.83'
+	minecraft 'net.minecraftforge:forge:1.14.4-28.0.93'
 	
 	compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.5-B66_1.14.4")
 	

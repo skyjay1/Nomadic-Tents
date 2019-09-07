@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.block.material.Material;
@@ -289,6 +290,13 @@ public abstract class StructureBase {
 			world.setBlockState(doorBase, doorL, 3);
 			world.setBlockState(doorBase.up(1), doorU, 3);
 		}
+	}
+	
+	/**
+	 * @return the BlockPos in the center of this tent (same y-level as the given BlockPos)
+	 **/
+	public static BlockPos getCenter(final BlockPos doorBase, final TentWidth width, final Direction dir) {
+		return getPosFromDoor(doorBase, Math.floorDiv(width.getSquareWidth(), 2), 0, 0, dir);
 	}
 
 	/**

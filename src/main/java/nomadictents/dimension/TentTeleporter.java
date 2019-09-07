@@ -65,6 +65,9 @@ public class TentTeleporter extends Teleporter {
 			
 			if (entityIn instanceof ServerPlayerEntity) {
 				final ServerPlayerEntity entityPlayer = (ServerPlayerEntity) entityIn;
+				// Access Transformer exposes this field
+				entityPlayer.invulnerableDimensionChange = true;
+				// End Access Transformer
 				WorldInfo worldinfo = this.world.getWorldInfo();
 				entityPlayer.connection.sendPacket(new SRespawnPacket(this.dimensionTo, worldinfo.getGenerator(),
 						entityPlayer.interactionManager.getGameType()));
@@ -76,6 +79,7 @@ public class TentTeleporter extends Teleporter {
 														// So keep the data alive with no matching invalidate call.
 				entityPlayer.revive();
 				
+				// Place the player in the correct positions and trigger Tent updates
 				makePortal(entityPlayer);
 
 				entityPlayer.setWorld(worldTo);
@@ -86,10 +90,11 @@ public class TentTeleporter extends Teleporter {
 				playerlist.sendWorldInfo(entityPlayer, worldTo);
 				playerlist.sendInventory(entityPlayer);
 				net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerChangedDimensionEvent(entityPlayer, this.dimensionFrom, this.dimensionTo);
+				entityPlayer.clearInvulnerableDimensionChange();
 				return entityPlayer;
 			}
 			
-			//entityIn.detach();			
+			entityIn.detach();			
 			Entity copy = entityIn.getType().create(worldTo);
 			if (copy != null) {
 				copy.copyDataFromOld(entityIn);

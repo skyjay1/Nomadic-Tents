@@ -12,8 +12,7 @@ public class BlockYurtRoof extends BlockUnbreakable implements IYurtBlock {
 	public static final BooleanProperty OUTSIDE = BooleanProperty.create("outside");
 	
 	public BlockYurtRoof(final boolean cosmetic) {
-		super(Block.Properties.create(Material.WOOL, MaterialColor.LIGHT_BLUE), cosmetic);
-		//this.setLightOpacity(LIGHT_OPACITY);
+		super(Block.Properties.create(Material.WOOL, MaterialColor.LIGHT_BLUE).variableOpacity(), cosmetic);
 		this.setDefaultState(this.stateContainer.getBaseState().with(OUTSIDE, Boolean.valueOf(false)));
 	}
 	

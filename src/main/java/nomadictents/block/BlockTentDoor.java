@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -54,7 +55,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	public static final VoxelShape AABB_Z = makeCuboidShape(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
 
 	public BlockTentDoor(final String name) {
-		super(Block.Properties.create(Material.WOOL));
+		super(Block.Properties.create(Material.WOOL).variableOpacity());
 		this.setRegistryName(NomadicTents.MODID, name);
 		this.setDefaultState(this.stateContainer.getBaseState()
 				.with(DoorBlock.HALF, DoubleBlockHalf.LOWER)
@@ -159,8 +160,9 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	 */
 	@Override
 	 public void onEntityCollision(final BlockState state, final World worldIn, final BlockPos pos, final Entity entityIn) {
-		// TODO collision is not working in survival
+		// TODO fix collision in survival
 		/*
+		
 		if (!worldIn.isRemote && worldIn.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			TileEntity te = worldIn.getTileEntity(pos);
 			if (te instanceof TileEntityTentDoor) {
@@ -200,7 +202,8 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	@Override
 	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos,
 			final ISelectionContext cxt) {
-		return getRenderShape(state, worldIn, pos);
+		//return getRenderShape(state, worldIn, pos);
+		return VoxelShapes.fullCube();
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,7 +17,11 @@ public class BlockIndluWall extends BlockUnbreakable implements IIndluBlock {
 
 	public BlockIndluWall(final boolean cosmetic) {
 		super(Block.Properties.create(Material.LEAVES), cosmetic);
-		//this.setLightOpacity(3);
+	}
+	
+	@Override
+	public int getOpacity(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
+		return 3;
 	}
 
 	@OnlyIn(Dist.CLIENT)
