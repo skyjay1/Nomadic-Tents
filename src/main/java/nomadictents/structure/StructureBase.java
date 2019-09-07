@@ -78,7 +78,7 @@ public abstract class StructureBase {
 		// if the tent does not exist OR needs to be upgraded...
 		final boolean buildPlatform = !structureExists || rebuildTent;
 		// if the tent exists but PLATFORM needs to be upgraded...
-		final boolean upgradePlatform = structureExists && data.getDepth() != prevData.getDepth();
+		final boolean upgradePlatform = structureExists && !buildPlatform && data.getDepth() != prevData.getDepth();
 		// if the tent exists but COLOR needs to be updated...
 		final boolean recolorTent = structureExists && prevData.getColor() != color;
 		
@@ -105,13 +105,13 @@ public abstract class StructureBase {
 					data.getRoofBlock(true));
 		}
 
-		if(upgradePlatform) {
+		if(buildPlatform) {
+			// make or re-make the platform
+			generatePlatform(worldIn, corner.down(1), data.getWidth(), data.getDepth());
+		} else if(upgradePlatform) {
 			// if the tent depth has changed...
 			upgradePlatformDepth(worldIn, corner.down(1), data.getWidth(), prevData.getDepth(), data.getDepth());
 			result = TentEvent.TentResult.UPGRADED;
-		} else if(buildPlatform) {
-			// make or re-make the platform
-			generatePlatform(worldIn, corner.down(1), data.getWidth(), data.getDepth());
 		} 
 		
 		// set or update TileEntityTentDoor information inside the tent

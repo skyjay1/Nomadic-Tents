@@ -1,5 +1,6 @@
 package nomadictents.structure;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
@@ -35,11 +36,15 @@ public class StructureBedouin extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			if(data.getWidth().getId() > TentWidth.SMALL.getId()) {
-				final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
-				if(worldIn.isAirBlock(center)) {
-					worldIn.setBlockState(center, Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true), 3);
-				}
+			// build a campfire in the center of the tent (use torch for smallest tent)
+			final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
+			final BlockState fire = data.getWidth() == TentWidth.SMALL 
+					? Blocks.TORCH.getDefaultState()
+					: Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true);
+			if(worldIn.isAirBlock(center) && (worldIn.isAirBlock(center.down()) 
+					|| Block.isDirt(worldIn.getBlockState(center.down()).getBlock()))) {
+				worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
+				worldIn.setBlockState(center, fire, 2);
 			}
 		}
 		return !bp.isEmpty();

@@ -7,7 +7,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.util.TentDepth;
-import nomadictents.structure.util.TentType;
+import nomadictents.structure.util.TentWidth;
 
 public final class TentConfig {
 
@@ -57,7 +57,7 @@ public final class TentConfig {
 	public TentConfig(final ForgeConfigSpec.Builder builder) {
 		// values
 		//final String NOTE = "Note: Disable recipe by inserting ' \"disabled\":true ' in the JSON file";
-		final int maxWidth = TentType.values().length;
+		final int maxWidth = TentWidth.values().length;
 		final int maxDepth = TentDepth.values().length;
 		// begin section 'dimension'
 		builder.push("dimension");

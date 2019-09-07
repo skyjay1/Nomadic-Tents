@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -101,7 +102,7 @@ public class ItemTent extends Item {
 								NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
 							}
 							// remove tent from inventory
-							stack = ItemStack.EMPTY;
+							stack.setCount(0);
 						}
 					}
 				}
@@ -166,7 +167,7 @@ public class ItemTent extends Item {
 		// tooltip if depth upgrades applied (or shift held)
 		final int depthCount = TentDepth.countUpgrades(data);
 		final int maxCount = TentDepth.maxUpgrades(data);
-		if(depthCount > 0 || flagIn.isAdvanced() /* || net.minecraft.client.gui.GuiScreen.isShiftKeyDown() */) {
+		if(depthCount > 0 || flagIn.isAdvanced() || Screen.hasShiftDown()) {
 			tooltip.add(new TranslationTextComponent("tooltip.depth_upgrades", depthCount, maxCount).applyTextStyle(TextFormatting.GRAY));
 		}
 		// Other information for advanced tooltip
