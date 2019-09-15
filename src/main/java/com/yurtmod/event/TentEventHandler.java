@@ -90,13 +90,13 @@ public class TentEventHandler {
 	 * EXPERIMENTAL cancel non-creative player teleportation using Chorus Fruit
 	 **/
 	@SubscribeEvent
-	public void onItemUse(LivingEntityUseItemEvent.Start event) {
+	public void onItemUse(final LivingEntityUseItemEvent.Start event) {
 		if(event.getEntityLiving() instanceof EntityPlayer && !event.getItem().isEmpty() 
 				&& event.getItem().getItem() instanceof ItemChorusFruit) {
 			EntityPlayer player = (EntityPlayer)event.getEntityLiving();
 			if(canCancelTeleport(player)) {
 				event.setDuration(-100);
-				player.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")), true);
+				player.sendStatusMessage(new TextComponentTranslation("chat.no_teleport"), true);
 			}
 		}
 	}
@@ -110,15 +110,15 @@ public class TentEventHandler {
 			EntityPlayer player = (EntityPlayer)event.getEntityLiving();
 			if(canCancelTeleport(player)) {
 				event.setCanceled(true);
-				player.sendStatusMessage(new TextComponentTranslation(TextFormatting.RED + I18n.format("chat.no_teleport")), true);
+				player.sendStatusMessage(new TextComponentTranslation("chat.no_teleport"), true);
 			}
 		}
 	}
 	
 	/** @return whether the teleporting should be canceled according to conditions and config **/
-	private static boolean canCancelTeleport(EntityPlayer player) {
+	private static boolean canCancelTeleport(final EntityPlayer player) {
 		return TentConfig.GENERAL.RESTRICT_TELEPORT_TENT_DIM && TentDimension.isTentDimension(player.getEntityWorld()) 
-				&& !player.isCreative();
+				&& !player.isCreative() && !player.world.isRemote;
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class TentEventHandler {
 	
 	@SubscribeEvent
 	public void onNameFormat(final PlayerEvent.NameFormat event) {
-		String PREFIX = "[Nomad King] ";
+		String PREFIX = "[Tent Overlord] ";
 		String GOLD = "";
 		String RESET = "";
 		// attempt to avoid crashing on dedicated server

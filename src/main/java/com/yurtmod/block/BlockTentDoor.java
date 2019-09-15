@@ -106,6 +106,14 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					if(TentConfig.GENERAL.OWNER_PICKUP && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
 					}
+					
+					// EXPERIMENTAL: check item use duration
+					//System.out.println("Item In Use Count: " + player.getItemInUseCount());
+					//System.out.println("Item In Use Max Count: " + held.getMaxItemUseDuration());
+					//if(player.getItemInUseCount() + 1 < held.getMaxItemUseDuration()) {
+					//	return false;
+					//}
+					
 					// STEP 4:  drop the tent item and damage the tool
 					final TentEvent.Deconstruct event = new TentEvent.Deconstruct(teyd, player);
 					MinecraftForge.EVENT_BUS.post(event);
