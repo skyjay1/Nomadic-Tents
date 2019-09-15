@@ -54,9 +54,9 @@ public class TentEventHandler {
 					}
 				}
 				if(shouldChangeTime) {
-					// the time just as the player wakes up, before it is changed to day
-					long currentTime = overworld.getWorldInfo().getWorldTime();
-					overworld.getWorldInfo().setWorldTime(currentTime - currentTime % 24000L);
+					// the time just as the player wakes up, before it is changed to day, with one day added
+					long nextDay = overworld.getWorldInfo().getWorldTime() + 24000L;
+					overworld.getWorldInfo().setWorldTime(nextDay - nextDay % 24000L);
 				}
 			}
 			// sleeping anywhere should always sync tent to overworld
