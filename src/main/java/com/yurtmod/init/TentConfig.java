@@ -33,7 +33,7 @@ public final class TentConfig {
 		
 		@Config.Name("Restrict Teleporting")
 		@Config.Comment("When true, only creative-mode players can teleport within the Tent Dimension")
-		public boolean RESTRICT_TELEPORT_TENT_DIM = true;
+		public boolean RESTRICT_TELEPORT_TENT_DIM = false;
 		
 		@Config.Name("Allow Respawn Logic")
 		@Config.Comment("When true, players who die in Tent Dimension will be sent to overworld IF they have no bed. Disable if buggy")
