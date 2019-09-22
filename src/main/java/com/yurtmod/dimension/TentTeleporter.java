@@ -8,6 +8,7 @@ import com.yurtmod.structure.util.StructureData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Teleporter;
@@ -66,7 +67,11 @@ public class TentTeleporter extends Teleporter {
 				
 		// move the entity to the correct position
 		if (entity instanceof EntityPlayerMP) {
-			((EntityPlayerMP)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);			 
+			final EntityPlayerMP player = ((EntityPlayerMP)entity);
+			player.connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);
+			player.connection.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
+	        player.interactionManager.setWorld(worldServerTo);
+	        player.connection.sendPacket(new SPacketPlayerAbilities(player.capabilities));
 		} else {
 			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 		}

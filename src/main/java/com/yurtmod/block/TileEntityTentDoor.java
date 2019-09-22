@@ -247,7 +247,7 @@ public class TileEntityTentDoor extends TileEntity {
 					ReflectionHelper.setPrivateValue(EntityPlayerMP.class, player, Boolean.valueOf(true),
 							"field_184851_cj", "invulnerableDimensionChange");
 					// transfer player to dimension
-					mcServer.getPlayerList().transferPlayerToDimension(player, dimTo, tel);
+					mcServer.getPlayerList().transferPlayerToDimension(player, dimTo, (ITeleporter)tel);
 				} catch (UnableToFindFieldException e) {
 					e.printStackTrace();
 					return false;
