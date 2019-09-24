@@ -1,5 +1,8 @@
 package com.yurtmod.init;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEventHandler;
 import com.yurtmod.proxies.CommonProxy;
@@ -27,6 +30,8 @@ public class NomadicTents {
 	@SidedProxy(clientSide = "com." + MODID + ".proxies.ClientProxy", serverSide = "com." + MODID
 			+ ".proxies.CommonProxy")
 	public static CommonProxy proxy;
+	
+	public static final Logger LOGGER = LogManager.getFormatterLogger(MODID);
 
 	public static final CreativeTabs TAB = new CreativeTabs("yurtMain") {
 		@Override

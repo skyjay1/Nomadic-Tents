@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.dimension.TentTeleporter;
 import com.yurtmod.event.TentEvent;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.item.ItemTent;
@@ -249,7 +250,8 @@ public class TileEntityTentDoor extends TileEntity {
 					// transfer player to dimension
 					mcServer.getPlayerList().transferPlayerToDimension(player, dimTo, (ITeleporter)tel);
 				} catch (UnableToFindFieldException e) {
-					e.printStackTrace();
+					NomadicTents.LOGGER.error("Failed to update 'invulnerableDimensionChange' for player!");
+					NomadicTents.LOGGER.catching(e);
 					return false;
 				}
 			} else {

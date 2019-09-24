@@ -1,13 +1,13 @@
 package com.yurtmod.proxies;
 
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.structure.util.StructureData;
 import com.yurtmod.structure.util.StructureTent;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,7 +22,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void registerItemColors() {
 		//// Shamiana Tent Colorization
-		ItemColors colors = Minecraft.getMinecraft().getItemColors();		
+		net.minecraft.client.renderer.color.ItemColors colors = Minecraft.getMinecraft().getItemColors();		
 		if (colors != null) {
 			colors.registerItemColorHandler((ItemStack stack, int tintIndex) -> {
 				final StructureData data = new StructureData(stack);
@@ -130,7 +130,7 @@ public class ClientProxy extends CommonProxy {
 			// register cosmetic blocks under the model name of their non-cosmetic equivalent
 			register(i, i.getRegistryName().toString().replace("cos_", ""), meta);
 		} else {
-			System.out.println("[NomadicTents.ClientProxy] Tried to register render for a null ItemBlock. Skipping.");
+			NomadicTents.LOGGER.error("Tried to register render for a null ItemBlock. Skipping.");
 		}
 	}
 

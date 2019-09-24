@@ -140,7 +140,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					return ((TileEntityTentDoor) te).onPlayerActivate(player);
 				}
 			} else {
-				System.out.println("[BlockTentDoor] Error! Failed to retrieve TileEntityTentDoor at " + pos);
+				NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + pos);
 			}
 		}
 		return false;

@@ -10,6 +10,7 @@ import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.event.TentEvent;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.init.TentConfig;
 import com.yurtmod.structure.util.Blueprint;
 import com.yurtmod.structure.util.Blueprints;
@@ -143,7 +144,7 @@ public abstract class StructureBase {
 		if(te instanceof TileEntityTentDoor) {
 			return (TileEntityTentDoor) te;
 		} else {
-			System.out.println("[StructureBase] Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
+			NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + doorPos.toString());
 			return null;
 		}
 	}

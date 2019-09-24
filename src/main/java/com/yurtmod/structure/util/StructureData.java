@@ -8,6 +8,7 @@ import com.yurtmod.block.BlockTentDoorHGM;
 import com.yurtmod.block.BlockTentDoorSML;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.init.Content;
+import com.yurtmod.init.NomadicTents;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.StructureBase;
 
@@ -267,7 +268,7 @@ public class StructureData implements net.minecraftforge.common.util.INBTSeriali
 	/** Uses internal fields and Player location to update the given TileEntityTentDoor, including Owner if enabled */
 	public static void applyToTileEntity(final EntityPlayer player, final ItemStack stack, final TileEntityTentDoor te) {
 		if (stack.getTagCompound() == null || !stack.getTagCompound().hasKey(ItemTent.TENT_DATA)) {
-			System.out.println("[StructureType] ItemStack did not have any NBT information to pass to the TileEntity!");
+			NomadicTents.LOGGER.error("ItemStack did not have any NBT information to pass to the TileEntity!");
 			te.getWorld().removeTileEntity(te.getPos());
 			return;
 		}

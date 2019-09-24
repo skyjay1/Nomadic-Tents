@@ -123,8 +123,7 @@ public class ItemTent extends Item {
 							if (te instanceof TileEntityTentDoor) {
 								StructureData.applyToTileEntity(player, stack, (TileEntityTentDoor) te);
 							} else {
-								System.out.println(
-										"[ItemTent] Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
+								NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + hitPos);
 							}
 							// remove tent from inventory
 							stack.shrink(1);
