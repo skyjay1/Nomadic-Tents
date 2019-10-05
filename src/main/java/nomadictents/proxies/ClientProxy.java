@@ -1,10 +1,10 @@
 package nomadictents.proxies;
 
-import net.minecraft.client.renderer.color.ItemColors;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import nomadictents.init.Content;
 import nomadictents.structure.util.TentData;
 import nomadictents.structure.util.TentType;
@@ -12,9 +12,10 @@ import nomadictents.structure.util.TentType;
 public class ClientProxy extends CommonProxy {
 	
 	@Override
-	public void registerItemColors(final ColorHandlerEvent.Item event) {
+	@OnlyIn(Dist.CLIENT)
+	public void registerItemColors(final net.minecraftforge.client.event.ColorHandlerEvent.Item event) {
 		//// Shamiana Tent Colorization
-		ItemColors colors = event.getItemColors();		
+		net.minecraft.client.renderer.color.ItemColors colors = event.getItemColors();		
 		if (colors != null) {
 			colors.register((ItemStack stack, int tintIndex) -> {
 				final TentData data = new TentData(stack);
