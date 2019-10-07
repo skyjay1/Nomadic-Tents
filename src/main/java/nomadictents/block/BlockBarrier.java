@@ -74,10 +74,4 @@ public class BlockBarrier extends BlockUnbreakable implements
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}
-
-//	@Override
-//	@OnlyIn(Side.CLIENT)
-//	public float getAmbientOcclusionLightValue(BlockState state) {
-//		return 1.0F;
-//	}
 }

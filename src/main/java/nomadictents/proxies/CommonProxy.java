@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
@@ -24,14 +24,15 @@ import nomadictents.block.BlockTentFrame.BlockToBecome;
 import nomadictents.crafting.*;
 import nomadictents.dimension.BiomeTent;
 import nomadictents.dimension.TentDimension;
+import nomadictents.event.TentEventHandler;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
 import nomadictents.item.*;
 
 public class CommonProxy {
 	
-	public void registerItemColors(final ColorHandlerEvent.Item event) {
-		// nothing
+	public void registerEventHandlers() {
+		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
 	}
 
 	public void registerBiome(final RegistryEvent.Register<Biome> event) {

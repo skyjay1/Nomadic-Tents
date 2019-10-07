@@ -101,7 +101,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     
-	minecraft 'net.minecraftforge:forge:1.14.4-28.1.22'
+	minecraft 'net.minecraftforge:forge:1.14.4-28.1.37'
 	
 	compile fg.deobf("mcp.mobius.waila:Hwyla:1.10.5-B66_1.14.4")
 	
