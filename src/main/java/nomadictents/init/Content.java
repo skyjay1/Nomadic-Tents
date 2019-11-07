@@ -1,292 +1,304 @@
 package nomadictents.init;
 
+import java.util.function.BiFunction;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.crafting.RecipeUpgradeColor;
 import nomadictents.crafting.RecipeUpgradeDepth;
 import nomadictents.crafting.RecipeUpgradeWidth;
+import nomadictents.dimension.TentDimension;
 
 /**
  * Contains all of this mod's registry-eligible objects
  * (blocks, items, tile entity types, etc.) annotated with
  * the {@link ObjectHolder} annotation
  **/
+@ObjectHolder(NomadicTents.MODID)
 public class Content {
 	
 	//// MOD DIMENSION ////
-	@ObjectHolder(NomadicTents.MODID + ":" + "tent_dimension")
-	public static final ModDimension MOD_DIMENSION = null;
+	@ObjectHolder("tent_dimension")
+	public static final ModDimension MOD_DIMENSION = new ModDimension() {
+		@Override
+		public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
+			return TentDimension::new;
+		}
+	}.setRegistryName(NomadicTents.MODID, "tent_dimension");
 	
 	//// RECIPE SERIALIZERS ////	
-	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeWidth.CATEGORY)
+	@ObjectHolder(RecipeUpgradeWidth.CATEGORY)
 	public static final IRecipeSerializer<ShapedRecipe> SERIALIZER_WIDTH = null; 
-	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeDepth.CATEGORY)
+	@ObjectHolder(RecipeUpgradeDepth.CATEGORY)
 	public static final IRecipeSerializer<ShapedRecipe> SERIALIZER_DEPTH = null;
-	@ObjectHolder(NomadicTents.MODID + ":" + RecipeUpgradeColor.CATEGORY)
+	@ObjectHolder(RecipeUpgradeColor.CATEGORY)
 	public static final IRecipeSerializer<ShapedRecipe> SERIALIZER_COLOR = null;
 
 	//// BIOME ////
-	@ObjectHolder(NomadicTents.MODID + ":tent_biome")
+	@ObjectHolder("tent_biome")
 	public static final Biome TENT_BIOME = null;
 	
 	//// TILE ENTITY TYPE ////
-	@ObjectHolder(NomadicTents.MODID + ":tileentitytentdoor")
+	@ObjectHolder("tileentitytentdoor")
 	public static final TileEntityType<TileEntityTentDoor> TE_DOOR = null;
 	
 	//// UTILITY BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":tentmod_barrier")
+	@ObjectHolder("tentmod_barrier")
 	public static final Block TENT_BARRIER = null;
-	@ObjectHolder(NomadicTents.MODID + ":super_dirt")
+	@ObjectHolder("super_dirt")
 	public static final Block SUPER_DIRT = null;
 	
 	//// YURT BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":yurt_roof")
+	@ObjectHolder("yurt_roof")
 	public static final Block YURT_ROOF = null;
-	@ObjectHolder(NomadicTents.MODID + ":yurt_wall_outer")
+	@ObjectHolder("yurt_wall_outer")
 	public static final Block YURT_WALL_OUTER = null;
-	@ObjectHolder(NomadicTents.MODID + ":yurt_wall_inner")
+	@ObjectHolder("yurt_wall_inner")
 	public static final Block YURT_WALL_INNER = null;
 	
 	//// BEDOUIN BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":bed_wall")
+	@ObjectHolder("bed_wall")
 	public static final Block BEDOUIN_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":bed_roof")
+	@ObjectHolder("bed_roof")
 	public static final Block BEDOUIN_ROOF = null;
 	
 	//// INDLU BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":indlu_wall_outer")
+	@ObjectHolder("indlu_wall_outer")
 	public static final Block INDLU_WALL_OUTER = null;
-	@ObjectHolder(NomadicTents.MODID + ":indlu_wall_inner")
+	@ObjectHolder("indlu_wall_inner")
 	public static final Block INDLU_WALL_INNER = null;
 	
 	//// TEPEE BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_blank")
+	@ObjectHolder("tepee_wall_blank")
 	public static final Block TEPEE_WALL_BLANK = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_black")
+	@ObjectHolder("tepee_wall_black")
 	public static final Block TEPEE_WALL_BLACK = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_red")
+	@ObjectHolder("tepee_wall_red")
 	public static final Block TEPEE_WALL_RED = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_yellow")
+	@ObjectHolder("tepee_wall_yellow")
 	public static final Block TEPEE_WALL_YELLOW = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_orange")
+	@ObjectHolder("tepee_wall_orange")
 	public static final Block TEPEE_WALL_ORANGE = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_white")
+	@ObjectHolder("tepee_wall_white")
 	public static final Block TEPEE_WALL_WHITE = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_hope")
+	@ObjectHolder("tepee_wall_hope")
 	public static final Block TEPEE_WALL_HOPE = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_sun")
+	@ObjectHolder("tepee_wall_sun")
 	public static final Block TEPEE_WALL_SUN = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_creeper")
+	@ObjectHolder("tepee_wall_creeper")
 	public static final Block TEPEE_WALL_CREEPER = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_universe")
+	@ObjectHolder("tepee_wall_universe")
 	public static final Block TEPEE_WALL_UNIVERSE = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_eagle")
+	@ObjectHolder("tepee_wall_eagle")
 	public static final Block TEPEE_WALL_EAGLE = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_triforce")
+	@ObjectHolder("tepee_wall_triforce")
 	public static final Block TEPEE_WALL_TRIFORCE = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_dreamcatcher")
+	@ObjectHolder("tepee_wall_dreamcatcher")
 	public static final Block TEPEE_WALL_DREAMCATCHER = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_rain")
+	@ObjectHolder("tepee_wall_rain")
 	public static final Block TEPEE_WALL_RAIN = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_magic")
+	@ObjectHolder("tepee_wall_magic")
 	public static final Block TEPEE_WALL_MAGIC = null;
 	
 	//// SHAMIANA BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_black")
+	@ObjectHolder("shamiana_black")
 	public static final Block SHAMIANA_WALL_BLACK = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_blue")
+	@ObjectHolder("shamiana_blue")
 	public static final Block SHAMIANA_WALL_BLUE = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_brown")
+	@ObjectHolder("shamiana_brown")
 	public static final Block SHAMIANA_WALL_BROWN = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_cyan")
+	@ObjectHolder("shamiana_cyan")
 	public static final Block SHAMIANA_WALL_CYAN = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_gray")
+	@ObjectHolder("shamiana_gray")
 	public static final Block SHAMIANA_WALL_GRAY = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_green")
+	@ObjectHolder("shamiana_green")
 	public static final Block SHAMIANA_WALL_GREEN = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_light_blue")
+	@ObjectHolder("shamiana_light_blue")
 	public static final Block SHAMIANA_WALL_LIGHT_BLUE = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_lime")
+	@ObjectHolder("shamiana_lime")
 	public static final Block SHAMIANA_WALL_LIME = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_magenta")
+	@ObjectHolder("shamiana_magenta")
 	public static final Block SHAMIANA_WALL_MAGENTA = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_orange")
+	@ObjectHolder("shamiana_orange")
 	public static final Block SHAMIANA_WALL_ORANGE = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_pink")
+	@ObjectHolder("shamiana_pink")
 	public static final Block SHAMIANA_WALL_PINK = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_purple")
+	@ObjectHolder("shamiana_purple")
 	public static final Block SHAMIANA_WALL_PURPLE = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_red")
+	@ObjectHolder("shamiana_red")
 	public static final Block SHAMIANA_WALL_RED = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_light_gray")
+	@ObjectHolder("shamiana_light_gray")
 	public static final Block SHAMIANA_WALL_LIGHT_GRAY = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_white")
+	@ObjectHolder("shamiana_white")
 	public static final Block SHAMIANA_WALL_WHITE = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_yellow")
+	@ObjectHolder("shamiana_yellow")
 	public static final Block SHAMIANA_WALL_YELLOW = null;
 	
 	//// DOOR BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":yurt_door_0")
+	@ObjectHolder("yurt_door_0")
 	public static final Block YURT_DOOR_SML = null;
-	@ObjectHolder(NomadicTents.MODID + ":yurt_door_1")
+	@ObjectHolder("yurt_door_1")
 	public static final Block YURT_DOOR_HGM = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_door_0")
+	@ObjectHolder("tepee_door_0")
 	public static final Block TEPEE_DOOR_SML = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_door_1")
+	@ObjectHolder("tepee_door_1")
 	public static final Block TEPEE_DOOR_HGM = null;
-	@ObjectHolder(NomadicTents.MODID + ":bed_door_0")
+	@ObjectHolder("bed_door_0")
 	public static final Block BEDOUIN_DOOR_SML = null;
-	@ObjectHolder(NomadicTents.MODID + ":bed_door_1")
+	@ObjectHolder("bed_door_1")
 	public static final Block BEDOUIN_DOOR_HGM = null;
-	@ObjectHolder(NomadicTents.MODID + ":indlu_door_0")
+	@ObjectHolder("indlu_door_0")
 	public static final Block INDLU_DOOR_SML = null;
-	@ObjectHolder(NomadicTents.MODID + ":indlu_door_1")
+	@ObjectHolder("indlu_door_1")
 	public static final Block INDLU_DOOR_HGM = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_door_0")
+	@ObjectHolder("shamiana_door_0")
 	public static final Block SHAMIANA_DOOR_SML = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_door_1")
+	@ObjectHolder("shamiana_door_1")
 	public static final Block SHAMIANA_DOOR_HGM = null;
 	
 	//// FRAME BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":frame_yurt_wall")
+	@ObjectHolder("frame_yurt_wall")
 	public static final Block FRAME_YURT_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":frame_yurt_roof")
+	@ObjectHolder("frame_yurt_roof")
 	public static final Block FRAME_YURT_ROOF = null;
-	@ObjectHolder(NomadicTents.MODID + ":frame_tepee_wall")
+	@ObjectHolder("frame_tepee_wall")
 	public static final Block FRAME_TEPEE_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":frame_bed_wall")
+	@ObjectHolder("frame_bed_wall")
 	public static final Block FRAME_BEDOUIN_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":frame_bed_roof")
+	@ObjectHolder("frame_bed_roof")
 	public static final Block FRAME_BEDOUIN_ROOF = null;
-	@ObjectHolder(NomadicTents.MODID + ":frame_indlu_wall")
+	@ObjectHolder("frame_indlu_wall")
 	public static final Block FRAME_INDLU_WALL = null;
 	
 	//// SHAMIANA FRAME BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":frame_shamiana_wall")
+	@ObjectHolder("frame_shamiana_wall")
 	public static final Block FRAME_SHAMIANA_WALL = null;
 	
 	//// COSMETIC (breakable + craftable) BLOCKS ////
-	@ObjectHolder(NomadicTents.MODID + ":cos_yurt_roof")
+	@ObjectHolder("cos_yurt_roof")
 	public static final Block COS_YURT_ROOF = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_yurt_wall_outer")
+	@ObjectHolder("cos_yurt_wall_outer")
 	public static final Block COS_YURT_WALL_OUTER = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_yurt_wall_inner")
+	@ObjectHolder("cos_yurt_wall_inner")
 	public static final Block COS_YURT_WALL_INNER = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_bed_wall")
+	@ObjectHolder("cos_bed_wall")
 	public static final Block COS_BEDOUIN_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_bed_roof")
+	@ObjectHolder("cos_bed_roof")
 	public static final Block COS_BEDOUIN_ROOF = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_indlu_wall_outer")
+	@ObjectHolder("cos_indlu_wall_outer")
 	public static final Block COS_INDLU_WALL_OUTER = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_indlu_wall_inner")
+	@ObjectHolder("cos_indlu_wall_inner")
 	public static final Block COS_INDLU_WALL_INNER = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_blank")
+	@ObjectHolder("cos_tepee_wall_blank")
 	public static final Block COS_TEPEE_WALL_BLANK = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_black")
+	@ObjectHolder("cos_tepee_wall_black")
 	public static final Block COS_TEPEE_WALL_BLACK = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_red")
+	@ObjectHolder("cos_tepee_wall_red")
 	public static final Block COS_TEPEE_WALL_RED = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_yellow")
+	@ObjectHolder("cos_tepee_wall_yellow")
 	public static final Block COS_TEPEE_WALL_YELLOW = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_orange")
+	@ObjectHolder("cos_tepee_wall_orange")
 	public static final Block COS_TEPEE_WALL_ORANGE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_white")
+	@ObjectHolder("cos_tepee_wall_white")
 	public static final Block COS_TEPEE_WALL_WHITE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_hope")
+	@ObjectHolder("cos_tepee_wall_hope")
 	public static final Block COS_TEPEE_WALL_HOPE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_sun")
+	@ObjectHolder("cos_tepee_wall_sun")
 	public static final Block COS_TEPEE_WALL_SUN = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_creeper")
+	@ObjectHolder("cos_tepee_wall_creeper")
 	public static final Block COS_TEPEE_WALL_CREEPER = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_universe")
+	@ObjectHolder("cos_tepee_wall_universe")
 	public static final Block COS_TEPEE_WALL_UNIVERSE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_eagle")
+	@ObjectHolder("cos_tepee_wall_eagle")
 	public static final Block COS_TEPEE_WALL_EAGLE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_triforce")
+	@ObjectHolder("cos_tepee_wall_triforce")
 	public static final Block COS_TEPEE_WALL_TRIFORCE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_dreamcatcher")
+	@ObjectHolder("cos_tepee_wall_dreamcatcher")
 	public static final Block COS_TEPEE_WALL_DREAMCATCHER = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_rain")
+	@ObjectHolder("cos_tepee_wall_rain")
 	public static final Block COS_TEPEE_WALL_RAIN = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_tepee_wall_magic")
+	@ObjectHolder("cos_tepee_wall_magic")
 	public static final Block COS_TEPEE_WALL_MAGIC = null;
 	
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_black")
+	@ObjectHolder("cos_shamiana_black")
 	public static final Block COS_SHAMIANA_WALL_BLACK = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_blue")
+	@ObjectHolder("cos_shamiana_blue")
 	public static final Block COS_SHAMIANA_WALL_BLUE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_brown")
+	@ObjectHolder("cos_shamiana_brown")
 	public static final Block COS_SHAMIANA_WALL_BROWN = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_cyan")
+	@ObjectHolder("cos_shamiana_cyan")
 	public static final Block COS_SHAMIANA_WALL_CYAN = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_gray")
+	@ObjectHolder("cos_shamiana_gray")
 	public static final Block COS_SHAMIANA_WALL_GRAY = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_green")
+	@ObjectHolder("cos_shamiana_green")
 	public static final Block COS_SHAMIANA_WALL_GREEN = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_light_blue")
+	@ObjectHolder("cos_shamiana_light_blue")
 	public static final Block COS_SHAMIANA_WALL_LIGHT_BLUE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_lime")
+	@ObjectHolder("cos_shamiana_lime")
 	public static final Block COS_SHAMIANA_WALL_LIME = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_magenta")
+	@ObjectHolder("cos_shamiana_magenta")
 	public static final Block COS_SHAMIANA_WALL_MAGENTA = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_orange")
+	@ObjectHolder("cos_shamiana_orange")
 	public static final Block COS_SHAMIANA_WALL_ORANGE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_pink")
+	@ObjectHolder("cos_shamiana_pink")
 	public static final Block COS_SHAMIANA_WALL_PINK = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_purple")
+	@ObjectHolder("cos_shamiana_purple")
 	public static final Block COS_SHAMIANA_WALL_PURPLE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_red")
+	@ObjectHolder("cos_shamiana_red")
 	public static final Block COS_SHAMIANA_WALL_RED = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_light_gray")
+	@ObjectHolder("cos_shamiana_light_gray")
 	public static final Block COS_SHAMIANA_WALL_LIGHT_GRAY = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_white")
+	@ObjectHolder("cos_shamiana_white")
 	public static final Block COS_SHAMIANA_WALL_WHITE = null;
-	@ObjectHolder(NomadicTents.MODID + ":cos_shamiana_yellow")
+	@ObjectHolder("cos_shamiana_yellow")
 	public static final Block COS_SHAMIANA_WALL_YELLOW = null;
 	
 
 	//// ITEMS ////
-	@ObjectHolder(NomadicTents.MODID + ":tent")
+	@ObjectHolder("tent")
 	public static final Item ITEM_TENT = null;
-	@ObjectHolder(NomadicTents.MODID + ":mallet")
+	@ObjectHolder("mallet")
 	public static final Item ITEM_MALLET = null;
-	@ObjectHolder(NomadicTents.MODID + ":super_mallet")
+	@ObjectHolder("super_mallet")
 	public static final Item ITEM_SUPER_MALLET = null;
-	@ObjectHolder(NomadicTents.MODID + ":tent_canvas")
+	@ObjectHolder("tent_canvas")
 	public static final Item ITEM_TENT_CANVAS = null;
-	@ObjectHolder(NomadicTents.MODID + ":yurt_wall_piece")
+	@ObjectHolder("yurt_wall_piece")
 	public static final Item ITEM_YURT_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":tepee_wall_piece")
+	@ObjectHolder("tepee_wall_piece")
 	public static final Item ITEM_TEPEE_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":bed_wall_piece")
+	@ObjectHolder("bed_wall_piece")
 	public static final Item ITEM_BEDOUIN_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":indlu_wall_piece")
+	@ObjectHolder("indlu_wall_piece")
 	public static final Item ITEM_INDLU_WALL = null;
-	@ObjectHolder(NomadicTents.MODID + ":shamiana_wall_piece")
+	@ObjectHolder("shamiana_wall_piece")
 	public static final Item ITEM_SHAMIANA_WALL = null;
 	
 	//// UPGRADES ////
-	@ObjectHolder(NomadicTents.MODID + ":tent_upgrade_gold")
+	@ObjectHolder("tent_upgrade_gold")
 	public static final Item ITEM_UPGRADE_GOLD = null;
-	@ObjectHolder(NomadicTents.MODID + ":tent_upgrade_obsidian")
+	@ObjectHolder("tent_upgrade_obsidian")
 	public static final Item ITEM_UPGRADE_OBSDIDIAN = null;
-	@ObjectHolder(NomadicTents.MODID + ":tent_upgrade_diamond")
+	@ObjectHolder("tent_upgrade_diamond")
 	public static final Item ITEM_UPGRADE_DIAMOND = null;
-	@ObjectHolder(NomadicTents.MODID + ":depth_upgrade_stone")
+	@ObjectHolder("depth_upgrade_stone")
 	public static final Item ITEM_DEPTH_UPGRADE_STONE = null;
-	@ObjectHolder(NomadicTents.MODID + ":depth_upgrade_iron")
+	@ObjectHolder("depth_upgrade_iron")
 	public static final Item ITEM_DEPTH_UPGRADE_IRON = null;
-	@ObjectHolder(NomadicTents.MODID + ":depth_upgrade_gold")
+	@ObjectHolder("depth_upgrade_gold")
 	public static final Item ITEM_DEPTH_UPGRADE_GOLD = null;
-	@ObjectHolder(NomadicTents.MODID + ":depth_upgrade_obsidian")
+	@ObjectHolder("depth_upgrade_obsidian")
 	public static final Item ITEM_DEPTH_UPGRADE_OBSIDIAN = null;
-	@ObjectHolder(NomadicTents.MODID + ":depth_upgrade_diamond")
+	@ObjectHolder("depth_upgrade_diamond")
 	public static final Item ITEM_DEPTH_UPGRADE_DIAMOND = null;
 }

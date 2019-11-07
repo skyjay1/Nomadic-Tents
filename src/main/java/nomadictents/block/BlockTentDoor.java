@@ -161,7 +161,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	@Override
 	 public void onEntityCollision(final BlockState state, final World worldIn, final BlockPos pos, final Entity entityIn) {
 		// TODO fix collision in survival
-		/*
+		
 		
 		if (!worldIn.isRemote && worldIn.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
 			TileEntity te = worldIn.getTileEntity(pos);
@@ -177,7 +177,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				}
 			}
 		}
-		*/
+		
 	}
 
 	@Override

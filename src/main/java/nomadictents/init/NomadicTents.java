@@ -10,6 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,6 +19,9 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
+import nomadictents.event.TentEventHandler;
 import nomadictents.proxies.ClientProxy;
 import nomadictents.proxies.CommonProxy;
 
@@ -40,9 +45,24 @@ public class NomadicTents {
 	public static final Logger LOGGER = LogManager.getFormatterLogger(MODID);
 	
 	public NomadicTents() {
+		// register and load config
+		LOGGER.debug(MODID + ": RegisterConfig");
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, TentConfig.SPEC);
+		TentConfig.loadConfig(TentConfig.SPEC, FMLPaths.CONFIGDIR.get().resolve(MODID + "-server.toml"));
+		// register event handlers
 		LOGGER.debug(MODID + ": RegisterEventHandlers");
-		PROXY.registerEventHandlers();
+		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
+		// client-side registry
+		try {
+			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+				FMLJavaModLoadingContext.get().getModEventBus()
+				.register(nomadictents.event.ClientTentEventHandler.class);
+
+			});
+		} catch (final Exception e) {
+			LOGGER.error("Caught exception while registering Client-Side event handler");
+			LOGGER.error(e.getMessage());
+		}
 	}
 
 	@SubscribeEvent

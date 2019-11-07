@@ -1,7 +1,5 @@
 package nomadictents.proxies;
 
-import java.util.function.BiFunction;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
@@ -11,29 +9,36 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemTier;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
-import nomadictents.block.*;
+import nomadictents.block.BlockBarrier;
+import nomadictents.block.BlockBedouinRoof;
+import nomadictents.block.BlockBedouinWall;
+import nomadictents.block.BlockIndluWall;
+import nomadictents.block.BlockShamianaWall;
+import nomadictents.block.BlockTentDoorHGM;
+import nomadictents.block.BlockTentDoorSML;
+import nomadictents.block.BlockTentFrame;
 import nomadictents.block.BlockTentFrame.BlockToBecome;
-import nomadictents.crafting.*;
+import nomadictents.block.BlockTepeeWall;
+import nomadictents.block.BlockUnbreakable;
+import nomadictents.block.BlockYurtRoof;
+import nomadictents.block.BlockYurtWall;
+import nomadictents.block.TileEntityTentDoor;
+import nomadictents.crafting.RecipeUpgradeColor;
+import nomadictents.crafting.RecipeUpgradeDepth;
+import nomadictents.crafting.RecipeUpgradeWidth;
 import nomadictents.dimension.BiomeTent;
-import nomadictents.dimension.TentDimension;
-import nomadictents.event.TentEventHandler;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
-import nomadictents.item.*;
+import nomadictents.item.ItemDepthUpgrade;
+import nomadictents.item.ItemMallet;
+import nomadictents.item.ItemSuperMallet;
+import nomadictents.item.ItemTent;
 
 public class CommonProxy {
-	
-	public void registerEventHandlers() {
-		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
-	}
 
 	public void registerBiome(final RegistryEvent.Register<Biome> event) {
 		event.getRegistry().register(
@@ -185,12 +190,7 @@ public class CommonProxy {
 	}
 
 	public void registerDimension(final RegistryEvent.Register<ModDimension> event) {
-		event.getRegistry().register(new ModDimension() {
-			@Override
-			public BiFunction<World, DimensionType, ? extends Dimension> getFactory() {
-				return TentDimension::new;
-			}
-		}.setRegistryName(NomadicTents.MODID, "tent_dimension"));
+		event.getRegistry().register(Content.MOD_DIMENSION);
 	}
 	
 	public void registerRecipeSerializers(final Register<IRecipeSerializer<?>> event) {

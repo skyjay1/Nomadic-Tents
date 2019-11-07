@@ -1,5 +1,10 @@
 package nomadictents.init;
 
+import java.nio.file.Path;
+
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
@@ -155,5 +160,17 @@ public final class TentConfig {
 			floor = Blocks.DIRT;
 		}
 		return floor;
+	}
+
+	/**
+	 * Loads a config file to initialize values early
+	 * @param spec the spec
+	 * @param path the exact path to the config
+	 */
+	public static void loadConfig(final ForgeConfigSpec spec, final Path path) {
+		final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave()
+				.writingMode(WritingMode.REPLACE).build();
+		configData.load();
+		spec.setConfig(configData);
 	}
 }

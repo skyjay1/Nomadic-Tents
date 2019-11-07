@@ -132,6 +132,7 @@ public class TentTeleporter extends Teleporter {
 				
 		// move the entity to the correct position
 		if (entity instanceof ServerPlayerEntity) {
+			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 			((ServerPlayerEntity)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);			 
 		} else {
 			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
