@@ -12,7 +12,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.storage.WorldSavedData;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimensionManager;
 
 public class TentSaveData extends WorldSavedData {
 	
@@ -32,7 +32,7 @@ public class TentSaveData extends WorldSavedData {
 	}
 
 	public static TentSaveData get(MinecraftServer server) {
-		return TentManager.getOverworld(server).getSavedData()
+		return TentDimensionManager.getOverworld(server).getSavedData()
 				.getOrCreate(() -> new TentSaveData(NomadicTents.MODID), NomadicTents.MODID);
 	}
 

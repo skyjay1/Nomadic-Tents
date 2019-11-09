@@ -8,6 +8,7 @@ import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.item.ItemTent;
@@ -22,7 +23,7 @@ public final class TentConfig {
 
 	// Dimension behavior configs
 	// TODO public final ForgeConfigSpec.ConfigValue<Integer> TENT_DIM_ID;
-	// TODO public final ForgeConfigSpec.ConfigValue<Integer> RESPAWN_DIMENSION;
+	public final ForgeConfigSpec.ConfigValue<String> RESPAWN_DIMENSION;
 	public final ForgeConfigSpec.BooleanValue ALLOW_SLEEP_TENT_DIM;
 	public final ForgeConfigSpec.BooleanValue RESTRICT_TELEPORT_TENT_DIM;
 	public final ForgeConfigSpec.BooleanValue ALLOW_RESPAWN_INTERCEPT;
@@ -67,9 +68,9 @@ public final class TentConfig {
 		// begin section 'dimension'
 		builder.push("dimension");
 		//TENT_DIM_ID = builder.comment("ID for the Tent Dimension").define("Dimension ID", -2);
-		//RESPAWN_DIMENSION = builder
-		//		.comment("The dimension in which players will respawn from the tent dimension as needed")
-		//		.define("Home Dimension ID", 0);
+		RESPAWN_DIMENSION = builder
+				.comment("The dimension in which players will respawn from the tent dimension as needed")
+				.define("Home Dimension", DimensionType.OVERWORLD.getRegistryName().toString());
 		ALLOW_SLEEP_TENT_DIM = builder.comment("When false, beds used in the Tent Dimension will explode")
 				.define("Allow Sleep in Tent", true);
 		RESTRICT_TELEPORT_TENT_DIM = builder

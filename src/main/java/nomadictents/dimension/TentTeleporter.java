@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
@@ -78,10 +79,6 @@ public class TentTeleporter extends Teleporter {
 				worldFrom.removeEntity(entityPlayer, true); // Forge: the player entity is moved to the new world, NOT cloned.
 														// So keep the data alive with no matching invalidate call.
 				entityPlayer.revive();
-				
-				// Place the player in the correct positions and trigger Tent updates
-				makePortal(entityPlayer);
-
 				entityPlayer.setWorld(worldTo);
 				worldTo.func_217447_b(entityPlayer);
 				// entityPlayer.func_213846_b(worldFrom);
@@ -89,8 +86,12 @@ public class TentTeleporter extends Teleporter {
 				entityPlayer.connection.sendPacket(new SPlayerAbilitiesPacket(entityPlayer.abilities));
 				playerlist.sendWorldInfo(entityPlayer, worldTo);
 				playerlist.sendInventory(entityPlayer);
+				
+				// Place the player in the correct positions and trigger Tent updates
+				makePortal(entityPlayer);
+				
 				net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerChangedDimensionEvent(entityPlayer, this.dimensionFrom, this.dimensionTo);
-				entityPlayer.clearInvulnerableDimensionChange();
+				//entityPlayer.clearInvulnerableDimensionChange();
 				return entityPlayer;
 			}
 			
@@ -98,15 +99,20 @@ public class TentTeleporter extends Teleporter {
 			Entity copy = entityIn.getType().create(worldTo);
 			if (copy != null) {
 				copy.copyDataFromOld(entityIn);
+				// set location and motion
 				makePortal(copy);
+				copy.setMotion(entityIn.getMotion().mul(Vec3d.fromPitchYaw(entityIn.rotationPitch, getYaw()).normalize()));
+				// used to unnaturally add entities to world
+				worldTo.func_217460_e(copy);
 			}
-			entityIn.remove(false);
+			// update world
 			worldFrom.resetUpdateEntityTick();
 			worldTo.resetUpdateEntityTick();
+			// remove old entity
+			entityIn.remove(false);
 			return copy;
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	@Override
@@ -121,25 +127,26 @@ public class TentTeleporter extends Teleporter {
 		final ServerWorld worldTo = this.server.getWorld(dimensionTo);
 		
 		// build a structure inside the tent dimension, if needed
-		if (TentManager.isTent(dimensionTo)) {
+		if (TentDimensionManager.isTent(dimensionTo)) {
 			entityX += entity.getWidth();
 			// try to build a tent in that location (tent should check if it already exists)
 			result = this.tentData.getStructure().generateInTentDimension(dimensionFrom, worldTo, 
 					tentDoorPos, tentData, prevX, prevY, prevZ, prevYaw, color);
 			// also synchronize the time between Tent and Overworld dimensions
-			worldTo.getWorldInfo().setDayTime(TentManager.getOverworld(entity.getServer()).getDayTime());
+			worldTo.getWorldInfo().setDayTime(TentDimensionManager.getOverworld(entity.getServer()).getDayTime());
 		}
 				
 		// move the entity to the correct position
 		if (entity instanceof ServerPlayerEntity) {
-			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
-			((ServerPlayerEntity)entity).connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);			 
-		} else {
-			entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
+			final ServerPlayerEntity player = (ServerPlayerEntity)entity;
+			player.invulnerableDimensionChange = true;
+			player.setPositionAndUpdate(entityX, entityY, entityZ);
+			player.connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);
 		}
+		entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 
 		// inform the event bus of the result of this teleportation
-		if (TentManager.isTent(dimensionTo) && worldTo.getTileEntity(tentDoorPos) instanceof TileEntityTentDoor) {
+		if (TentDimensionManager.isTent(dimensionTo) && worldTo.getTileEntity(tentDoorPos) instanceof TileEntityTentDoor) {
 			final TentEvent.PostEnter event = new TentEvent.PostEnter((TileEntityTentDoor)worldTo.getTileEntity(tentDoorPos), entity, result);
 			MinecraftForge.EVENT_BUS.post(event);
 		}
@@ -153,31 +160,30 @@ public class TentTeleporter extends Teleporter {
 	}
 	
 	public double getX() {
-		return TentManager.isTent(this.dimensionTo) 
-				? this.tentDoorPos.getX() + 0.9D : this.prevX;
+		return TentDimensionManager.isTent(this.dimensionTo) 
+				? (this.tentDoorPos.getX() + 0.9D) : this.prevX;
 	}
 	
 	public double getY() {
-		return TentManager.isTent(this.dimensionTo) 
-				? this.tentDoorPos.getY() + 0.01D : this.prevY;
+		return TentDimensionManager.isTent(this.dimensionTo) 
+				? (this.tentDoorPos.getY() + 0.01D) : this.prevY;
 	}
 	
 	public double getZ() {
-		return TentManager.isTent(this.dimensionTo) 
-				? this.tentDoorPos.getZ() + 0.5D : this.prevZ;
+		return TentDimensionManager.isTent(this.dimensionTo) 
+				? (this.tentDoorPos.getZ() + 0.5D) : this.prevZ;
 	}
-	
+
 	public float getYaw() {
-		return TentManager.isTent(this.dimensionTo) 
+		return TentDimensionManager.isTent(this.dimensionTo) 
 				? -90F : MathHelper.wrapDegrees(this.prevYaw + 180F);
 	}
 
 	@Override
 	public String toString() {
-		String out = "\n[TentTeleporter]\n" + "structure=" + this.tentData + "\ntentDoorPos=" + this.tentDoorPos
+		return "\n[TentTeleporter]\n" + "structure=" + this.tentData + "\ntentDoorPos=" + this.tentDoorPos
 				+ "\nprevX=" + this.prevX + "\nprevY=" + this.prevY + "\nprevZ=" + this.prevZ + "\nprevFacing=" 
 				+ this.prevYaw + "\nprevDimID=" + this.dimensionFrom + "\n" + "nextDimID=" 
-				/*+ this.worldServerTo.provider.getDimension()*/ + "\n";
-		return out;
+				+ this.dimensionTo + "\n";
 	}
 }

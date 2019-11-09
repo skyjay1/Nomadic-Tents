@@ -28,7 +28,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import nomadictents.block.TileEntityTentDoor;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimensionManager;
 import nomadictents.init.NomadicTents;
 import nomadictents.init.TentSaveData;
 import nomadictents.structure.StructureBase;
@@ -65,7 +65,7 @@ public class ItemTent extends Item {
 	@Override
 	public ActionResultType onItemUseFirst(ItemStack stack, final ItemUseContext cxt) {
 		// looks at the item info and builds the correct tent in-world
-		if (!TentManager.isTent(cxt.getWorld()) /*&& !cxt.getWorld().isRemote*/) {
+		if (!TentDimensionManager.isTent(cxt.getWorld()) /*&& !cxt.getWorld().isRemote*/) {
 			BlockPos hitPos = cxt.getPos().up();
 			Direction hitSide = cxt.getFace();
 

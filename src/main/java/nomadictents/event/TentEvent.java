@@ -10,7 +10,7 @@ import net.minecraft.world.dimension.Dimension;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 import nomadictents.block.TileEntityTentDoor;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimensionManager;
 import nomadictents.structure.util.TentData;
 
 /**
@@ -57,7 +57,7 @@ public class TentEvent extends Event {
 	 * @see TentEvent#getDimensionId()
 	 **/
 	public boolean isInsideTent() {
-		return this.teDoor != null ? TentManager.isTent(this.teDoor.getWorld()) : false;
+		return this.teDoor != null ? TentDimensionManager.isTent(this.teDoor.getWorld()) : false;
 	}
 	
 	/** 

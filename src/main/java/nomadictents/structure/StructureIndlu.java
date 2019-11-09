@@ -8,7 +8,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimensionManager;
 import nomadictents.structure.util.Blueprint;
 import nomadictents.structure.util.TentData;
 import nomadictents.structure.util.TentType;
@@ -24,7 +24,7 @@ public class StructureIndlu extends StructureBase {
 	@Override
 	public boolean generate(final World worldIn, final BlockPos doorBase, final TentData data, final Direction dirForward,
 			final BlockState doorBlock, final BlockState wallBlock, final BlockState roofBlock) {
-		boolean tentDim = TentManager.isTent(worldIn);
+		boolean tentDim = TentDimensionManager.isTent(worldIn);
 		Blueprint bp = getBlueprints(data);
 		if(bp == null) {
 			return false;

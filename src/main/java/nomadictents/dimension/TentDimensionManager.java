@@ -10,8 +10,9 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.DimensionManager;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
+import nomadictents.init.TentConfig;
 
-public final class TentManager {
+public final class TentDimensionManager {
 	
 	public static final String DIM_NAME = "tent";
 	public static final ResourceLocation DIM_RL = new ResourceLocation(NomadicTents.MODID, DIM_NAME);
@@ -36,15 +37,19 @@ public final class TentManager {
 	 * @return the DimensionType of the 'home' or respawn dimension
 	 **/
 	public static DimensionType getOverworldDim() {
+		final String s = TentConfig.CONFIG.RESPAWN_DIMENSION.get();
+		final ResourceLocation r = s != null ? new ResourceLocation(s) : null;
+		if(r != null && DimensionType.byName(r) != null) {
+			return DimensionType.byName(r);
+		}
 		return DimensionType.OVERWORLD;
-		// TODO allow customization
 	}
 	
 	/** 
 	 * @return the ServerWorld of the 'home' or respawn dimension
 	 **/
 	public static ServerWorld getOverworld(final MinecraftServer server) {
-		return server.getWorld(DimensionType.OVERWORLD);
+		return server.getWorld(getOverworldDim());
 		// TODO allow customization
 	}
 	

@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import nomadictents.block.Categories.IFrameBlock;
 import nomadictents.block.Categories.IShamianaBlock;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimensionManager;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
 
@@ -61,7 +61,7 @@ public class BlockShamianaWall extends BlockUnbreakable implements IShamianaBloc
 	public void onBlockAdded(BlockState stateIn, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		super.onBlockAdded(stateIn, worldIn, pos, oldState, isMoving);
 		// only do the complicated math when it's OVERWORLD and INDESTRUCTIBLE WHITE block
-		if (!TentManager.isTent(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
+		if (!TentDimensionManager.isTent(worldIn) && stateIn.getBlock() == Content.SHAMIANA_WALL_WHITE) {
 			BlockPos doorPos = traceToDoorNearby(worldIn, pos);
 			BlockState state = null;
 			// determine what color to use based on TileEntity color data

@@ -24,8 +24,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import nomadictents.block.Categories.IBedouinBlock;
 import nomadictents.block.Categories.IIndluBlock;
@@ -33,7 +31,7 @@ import nomadictents.block.Categories.IShamianaBlock;
 import nomadictents.block.Categories.ITepeeBlock;
 import nomadictents.block.Categories.IYurtBlock;
 import nomadictents.dimension.TentDimension;
-import nomadictents.dimension.TentManager;
+import nomadictents.dimension.TentDimensionManager;
 import nomadictents.event.TentEvent;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
@@ -50,9 +48,9 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 			Direction.Axis.class, Direction.Axis.X, Direction.Axis.Z);
 			
 	public static final int DECONSTRUCT_DAMAGE = 5;
-	private static final double aabbDis = 0.375D;
-	public static final VoxelShape AABB_X = makeCuboidShape(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
-	public static final VoxelShape AABB_Z = makeCuboidShape(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
+	protected static final double aabbDis = 0.375D;
+	protected static final VoxelShape AABB_X = VoxelShapes.create(aabbDis, 0.0D, 0.0D, 1.0D - aabbDis, 1.0D, 1.0D);
+	protected static final VoxelShape AABB_Z = VoxelShapes.create(0.0D, 0.0D, aabbDis, 1.0D, 1.0D, 1.0D - aabbDis);
 
 	public BlockTentDoor(final String name) {
 		super(Block.Properties.create(Material.WOOL).variableOpacity());
@@ -105,7 +103,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					return true;
 				}
 				// STEP 2:  make sure there is a valid tent before doing anything else
-				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
+				Direction dir = TentDimensionManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, base, dataOverworld);
 				if (dir == null) {
 					return false;
@@ -113,7 +111,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				// STEP 3:  deconstruct the tent if the player uses a tentHammer on the door
 				// (and in overworld and with fully built tent)
 				if (held != null && held.getItem() instanceof ItemMallet
-						&& !TentManager.isTent(worldIn)) {
+						&& !TentDimensionManager.isTent(worldIn)) {
 					// cancel deconstruction if player is not owner
 					if(TentConfig.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
 						return false;
@@ -160,18 +158,16 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	 */
 	@Override
 	 public void onEntityCollision(final BlockState state, final World worldIn, final BlockPos pos, final Entity entityIn) {
-		// TODO fix collision in survival
-		
-		
-		if (!worldIn.isRemote && worldIn.getBlockState(pos).get(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
-			TileEntity te = worldIn.getTileEntity(pos);
+		final BlockPos lowerPos = state.get(DoorBlock.HALF) == DoubleBlockHalf.UPPER ? pos.down(1) : pos;
+		if (!worldIn.isRemote) {
+			TileEntity te = worldIn.getTileEntity(lowerPos);
 			if (te instanceof TileEntityTentDoor) {
 				TileEntityTentDoor teDoor = (TileEntityTentDoor) te;
 				TentData dataOverworld = teDoor.getTentData().copyForOverworld();
 				StructureBase struct = dataOverworld.getStructure();
 				// make sure there is a valid tent before doing anything
-				Direction dir = TentManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
-						: struct.getValidFacing(worldIn, pos, dataOverworld);
+				Direction dir = TentDimensionManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
+						: struct.getValidFacing(worldIn, lowerPos, dataOverworld);
 				if (dir != null) {
 					teDoor.onEntityCollide(entityIn, dir);
 				}
@@ -187,48 +183,26 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					state.with(DoorBlock.HALF, DoubleBlockHalf.UPPER), 3);
 		}
 	}
-
+	
 	@Override
-	public VoxelShape getRenderShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
-		switch ((Direction.Axis) state.get(AXIS)) {
+	public VoxelShape getShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, 
+			final ISelectionContext cxt) {
+		switch (state.get(AXIS)) {
 		case Z:
 			return AABB_Z;
 		case X:
-		default:
 			return AABB_X;
+		default:
+			return VoxelShapes.fullCube();
 		}
 	}
-
-	@Override
-	public VoxelShape getCollisionShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos,
-			final ISelectionContext cxt) {
-		//return getRenderShape(state, worldIn, pos);
-		return VoxelShapes.fullCube();
-	}
-
-	@Override
-	public VoxelShape getRaytraceShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
-		return getRenderShape(state, worldIn, pos);
-	}
 	
-//	@Override
-//	public VoxelShape getShape(final BlockState state, final IBlockReader worldIn, final BlockPos pos, 
-//			final ISelectionContext cxt) {
-//		
-//	}
-
 	@Override
-	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
-		return false;
+	public boolean isSolid(final BlockState state) {
+		return true;
 	}
-//	
-//	@Override
-//	public boolean isSolid(final BlockState state) {
-//		return true;
-//	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;
 	}

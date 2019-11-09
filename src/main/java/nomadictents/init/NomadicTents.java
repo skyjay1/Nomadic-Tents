@@ -53,16 +53,15 @@ public class NomadicTents {
 		LOGGER.debug(MODID + ": RegisterEventHandlers");
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());
 		// client-side registry
-		try {
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+			try {
 				FMLJavaModLoadingContext.get().getModEventBus()
 				.register(nomadictents.event.ClientTentEventHandler.class);
-
-			});
-		} catch (final Exception e) {
-			LOGGER.error("Caught exception while registering Client-Side event handler");
-			LOGGER.error(e.getMessage());
-		}
+			} catch (final Exception e) {
+				LOGGER.error("Caught exception while registering Client-Side event handler");
+				LOGGER.error(e.getMessage());
+			}
+		});	
 	}
 
 	@SubscribeEvent
