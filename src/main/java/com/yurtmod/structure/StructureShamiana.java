@@ -38,17 +38,19 @@ public class StructureShamiana extends StructureBase {
 		// add dimension-only features
 		final int structureWidthNum = Math.floorDiv(structureWidth.getSquareWidth(), 2);
 		if (tentDim) {
-			final boolean isRemoving = wallBlock.getMaterial() == Material.AIR;
-			final Block pole = Blocks.OAK_FENCE;
-			// place a pole in the middle
-			BlockPos pos = getPosFromDoor(doorBase, structureWidthNum, 0, 0, TentDimension.STRUCTURE_DIR);
-			final int height = structureWidthNum + 3;
-			for (int i = 0; i < height; i++) {
-				final BlockPos p = pos.up(i);
-				if (isRemoving && worldIn.getBlockState(p).getBlock() == pole) {
-					worldIn.setBlockToAir(p);
-				} else if (/* structureWidth != StructureWidth.SMALL && */ !isRemoving && worldIn.isAirBlock(p)) {
-					worldIn.setBlockState(p, pole.getDefaultState());
+			if(getTentType().areFeaturesEnabled()) {
+				final boolean isRemoving = wallBlock.getMaterial() == Material.AIR;
+				final Block pole = Blocks.OAK_FENCE;
+				// place a pole in the middle
+				BlockPos pos = getPosFromDoor(doorBase, structureWidthNum, 0, 0, TentDimension.STRUCTURE_DIR);
+				final int height = structureWidthNum + 3;
+				for (int i = 0; i < height; i++) {
+					final BlockPos p = pos.up(i);
+					if (isRemoving && worldIn.getBlockState(p).getBlock() == pole) {
+						worldIn.setBlockToAir(p);
+					} else if (/* structureWidth != StructureWidth.SMALL && */ !isRemoving && worldIn.isAirBlock(p)) {
+						worldIn.setBlockState(p, pole.getDefaultState());
+					}
 				}
 			}
 			super.buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(),

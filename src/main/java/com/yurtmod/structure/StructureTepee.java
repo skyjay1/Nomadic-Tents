@@ -39,13 +39,15 @@ public class StructureTepee extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
-			// place a fire to light up the place (since there's no window or skylight)
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentDimension.STRUCTURE_DIR);
-			if(sizeNum > 2 && (worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
-					&& worldIn.isAirBlock(pos.up(1))) {
-				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
-				worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 2);
+			if(getTentType().areFeaturesEnabled()) {
+				final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
+				// place a fire to light up the place (since there's no window or skylight)
+				BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, TentDimension.STRUCTURE_DIR);
+				if(sizeNum > 2 && (worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
+						&& worldIn.isAirBlock(pos.up(1))) {
+					worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
+					worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 2);
+				}
 			}
 			super.buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(), bp.getBarrierCoords());
 		}

@@ -34,7 +34,7 @@ public class StructureBedouin extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		final int StructureWidthNum = Math.floorDiv(StructureWidth.getSquareWidth(), 2);
-		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
+		if (getTentType().areFeaturesEnabled() && tentDim && wallBlock.getMaterial() != Material.AIR) {
 			// place a fire to light up the place (since there's no window or skylight)
 			BlockPos pos = getPosFromDoor(doorBase, StructureWidthNum, -1, 0, TentDimension.STRUCTURE_DIR);
 			if((worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))

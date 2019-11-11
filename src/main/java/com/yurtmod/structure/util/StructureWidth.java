@@ -72,7 +72,13 @@ public enum StructureWidth implements IStringSerializable {
 	 * @return MEDIUM if this size is considered XL, otherwise SMALL
 	 **/
 	public StructureWidth getOverworldSize() {
-		return this.isXL() ? MEDIUM : SMALL;
+		if(TentConfig.GENERAL.USE_ACTUAL_SIZE) {
+			return this;
+		} else if(this.isXL()) {
+			return MEDIUM;
+		} else {
+			return SMALL;
+		}
 	}
 	
 	/** @return the first element of this enum **/

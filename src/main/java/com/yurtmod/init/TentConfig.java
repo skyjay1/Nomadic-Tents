@@ -91,6 +91,10 @@ public final class TentConfig {
 			"1) Updates XP and 2) Plays Nether sound"})
 		public boolean SAFE_TELEPORT = false;
 		
+		@Config.Name("Use Actual Size")
+		@Config.Comment("When true, tents will be the same size on the outside and inside")
+		public boolean USE_ACTUAL_SIZE = false;
+		
 		@Config.Name("Tent Floor")
 		@Config.Comment({"Specify the block used for the harvestable layer of all tent floors",
 				"Format: [mod]:[name] ~ Example: minecraft:sand"})
@@ -109,7 +113,8 @@ public final class TentConfig {
 	
 	public static class ConfigTents {
 		
-		private final String NOTE = "Note: Disable recipe by inserting ' \"disabled\":true ' in the JSON file";
+		private static final String NOTE = "Note: Disable recipe by inserting ' \"disabled\":true ' in the JSON file";
+		private static final String featureComment = "Enables pre-built features in new tents (torches, campfires, etc)";
 		
 		@Config.Name("Enable Yurt")
 		@Config.Comment("Whether the Yurt can be built and used")
@@ -185,5 +190,25 @@ public final class TentConfig {
 		@Config.Comment({"Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades", NOTE})
 		@Config.RangeInt(min = 1, max = 6)
 		public int DEPTH_MEGA = StructureDepth.SEXTUPLE.getLayers();
+		
+		@Config.Name("Enable Yurt Features")
+		@Config.Comment(featureComment)
+		public boolean ENABLE_YURT_FEATURES = true;
+		
+		@Config.Name("Enable Tepee Features")
+		@Config.Comment(featureComment)
+		public boolean ENABLE_TEPEE_FEATURES = true;
+		
+		@Config.Name("Enable Bedouin Features")
+		@Config.Comment(featureComment)
+		public boolean ENABLE_BEDOUIN_FEATURES = true;
+		
+		@Config.Name("Enable Indlu Features")
+		@Config.Comment(featureComment)
+		public boolean ENABLE_INDLU_FEATURES = true;
+		
+		@Config.Name("Enable Shamiyana Features")
+		@Config.Comment(featureComment)
+		public boolean ENABLE_SHAMIANA_FEATURES = true;
 	}
 }

@@ -15,6 +15,7 @@ public enum StructureTent implements IStringSerializable {
 	YURT(new StructureYurt()) {
 		////////// YURT IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_YURT; }
+		public boolean areFeaturesEnabled() { return TentConfig.TENTS.ENABLE_YURT_FEATURES; }
 		public int getMaxSize() { return TentConfig.TENTS.TIERS_YURT; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IYurtBlock.class; }
 		public IBlockState getRoofBlock(int dimID) { return Content.YURT_ROOF.getDefaultState().withProperty(BlockYurtRoof.OUTSIDE, !TentDimension.isTentDimension(dimID) ); }
@@ -28,6 +29,7 @@ public enum StructureTent implements IStringSerializable {
 	TEPEE(new StructureTepee()) {
 		////////// TEPEE IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_TEPEE; }
+		public boolean areFeaturesEnabled() { return TentConfig.TENTS.ENABLE_TEPEE_FEATURES; }
 		public int getMaxSize() { return TentConfig.TENTS.TIERS_TEPEE; }
 		public Class<? extends ITentBlockBase> getInterface() {	return ITepeeBlock.class; }
 		public IBlockState getWallBlock(int dimID) { return Content.TEPEE_WALL_BLANK.getDefaultState();	}
@@ -37,6 +39,7 @@ public enum StructureTent implements IStringSerializable {
 	BEDOUIN(new StructureBedouin()) {
 		////////// BEDOUIN IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_BEDOUIN; }
+		public boolean areFeaturesEnabled() { return TentConfig.TENTS.ENABLE_BEDOUIN_FEATURES; }
 		public int getMaxSize() { return TentConfig.TENTS.TIERS_BEDOUIN; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IBedouinBlock.class; }
 		public IBlockState getWallBlock(int dimID) { return Content.BEDOUIN_WALL.getDefaultState(); }
@@ -46,6 +49,7 @@ public enum StructureTent implements IStringSerializable {
 	INDLU(new StructureIndlu()) {
 		////////// INDLU IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_INDLU; }
+		public boolean areFeaturesEnabled() { return TentConfig.TENTS.ENABLE_INDLU_FEATURES; }
 		public int getMaxSize() { return TentConfig.TENTS.TIERS_INDLU; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IIndluBlock.class; }
 		public IBlockState getRoofBlock(int dimID) { return Content.INDLU_WALL_OUTER.getDefaultState(); }
@@ -59,15 +63,12 @@ public enum StructureTent implements IStringSerializable {
 	SHAMIANA(new StructureShamiana()) {
 		////////// SHAMIANA IMPLEMENTATIONS OF ABSTRACT METHODS //////////
 		public boolean isEnabled() { return TentConfig.TENTS.ALLOW_SHAMIANA; }
+		public boolean areFeaturesEnabled() { return TentConfig.TENTS.ENABLE_SHAMIANA_FEATURES; }
 		public int getMaxSize() { return TentConfig.TENTS.TIERS_SHAMIANA; }
 		public Class<? extends ITentBlockBase> getInterface() {	return IShamianaBlock.class; }
 		public IBlockState getRoofBlock(int dimID) { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); }
 		public IBlockState getWallBlock(int dimID) { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); }
-		public IBlockState getFrameBlock(boolean isRoof) { 
-			// TODO we might re-enable the roof
-			return isRoof ? Content.FRAME_SHAMIANA_WALL.getDefaultState() 
-					: Content.FRAME_SHAMIANA_WALL.getDefaultState(); 
-		}
+		public IBlockState getFrameBlock(boolean isRoof) { return Content.FRAME_SHAMIANA_WALL.getDefaultState(); }
 	};
 	
 	private final StructureBase structure;
@@ -110,6 +111,9 @@ public enum StructureTent implements IStringSerializable {
 	
 	/** @return whether this tent type is enabled in the config **/
 	public abstract boolean isEnabled();
+	
+	/** @return whether pre-built features can appear in new tents **/
+	public abstract boolean areFeaturesEnabled();
 
 	/** @return the block interface expected by this structure type **/
 	public abstract Class<? extends ITentBlockBase> getInterface();

@@ -33,7 +33,7 @@ public class StructureIndlu extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
+		if (getTentType().areFeaturesEnabled() && tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
 			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
 			worldIn.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState(), 2);

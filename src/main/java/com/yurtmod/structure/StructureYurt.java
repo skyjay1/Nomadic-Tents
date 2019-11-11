@@ -35,12 +35,14 @@ public class StructureYurt extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
-			BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
-			if (sizeNum > 2 && (worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
-					&& worldIn.isAirBlock(pos.up(1))) {
-				worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
-				worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 3);
+			if(getTentType().areFeaturesEnabled()) {
+				final int sizeNum = Math.floorDiv(size.getSquareWidth(), 2);
+				BlockPos pos = getPosFromDoor(doorBase, sizeNum, -1, 0, dirForward);
+				if (sizeNum > 2 && (worldIn.getBlockState(pos) == Blocks.DIRT || worldIn.isAirBlock(pos))
+						&& worldIn.isAirBlock(pos.up(1))) {
+					worldIn.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
+					worldIn.setBlockState(pos.up(), Blocks.FIRE.getDefaultState(), 3);
+				}
 			}
 			buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(), bp.getBarrierCoords());
 		}
