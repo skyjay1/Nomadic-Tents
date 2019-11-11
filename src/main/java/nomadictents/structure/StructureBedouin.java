@@ -35,7 +35,7 @@ public class StructureBedouin extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
+		if (getTentType().areFeaturesEnabled() && tentDim && wallBlock.getMaterial() != Material.AIR) {
 			// build a campfire in the center of the tent (use torch for smallest tent)
 			final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
 			final BlockState fire = data.getWidth() == TentWidth.SMALL 

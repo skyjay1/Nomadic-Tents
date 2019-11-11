@@ -42,15 +42,17 @@ public class StructureTepee extends StructureBase {
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
 		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
-			// build a campfire in the center of the tent (use torch for smallest tent)
-			final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
-			final BlockState fire = data.getWidth() == TentWidth.SMALL 
-					? Blocks.TORCH.getDefaultState()
-					: Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true);
-			if(worldIn.isAirBlock(center) && (worldIn.isAirBlock(center.down()) 
-					|| Block.isDirt(worldIn.getBlockState(center.down()).getBlock()))) {
-				worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
-				worldIn.setBlockState(center, fire, 2);
+			if(getTentType().areFeaturesEnabled()) {
+				// build a campfire in the center of the tent (use torch for smallest tent)
+				final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
+				final BlockState fire = data.getWidth() == TentWidth.SMALL 
+						? Blocks.TORCH.getDefaultState()
+						: Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true);
+				if(worldIn.isAirBlock(center) && (worldIn.isAirBlock(center.down()) 
+						|| Block.isDirt(worldIn.getBlockState(center.down()).getBlock()))) {
+					worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
+					worldIn.setBlockState(center, fire, 2);
+				}
 			}
 			super.buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(), bp.getBarrierCoords());
 		}

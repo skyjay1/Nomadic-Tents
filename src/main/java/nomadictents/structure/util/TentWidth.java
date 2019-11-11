@@ -69,7 +69,13 @@ public enum TentWidth implements IStringSerializable {
 	 * @return MEDIUM if this size is considered XL, otherwise SMALL
 	 **/
 	public TentWidth getOverworldSize() {
-		return this.isXL() ? MEDIUM : SMALL;
+		if(TentConfig.CONFIG.USE_ACTUAL_SIZE.get()) {
+			return this;
+		} else if(this.isXL()) {
+			return MEDIUM;
+		} else {
+			return SMALL;
+		}
 	}
 	
 	/** @return the first element of this enum **/

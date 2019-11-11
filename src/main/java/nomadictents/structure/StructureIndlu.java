@@ -3,7 +3,6 @@ package nomadictents.structure;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.CampfireBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -35,7 +34,7 @@ public class StructureIndlu extends StructureBase {
 		// make door
 		buildDoor(worldIn, doorBase, doorBlock, dirForward);
 		// add dimension-only features
-		if (tentDim && wallBlock.getMaterial() != Material.AIR) {
+		if (getTentType().areFeaturesEnabled() && tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
 			final BlockState fire = Blocks.TORCH.getDefaultState();
 			if(worldIn.isAirBlock(center) && (worldIn.isAirBlock(center.down()) 

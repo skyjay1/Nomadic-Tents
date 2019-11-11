@@ -55,16 +55,23 @@ public final class TentConfig {
 	public final ForgeConfigSpec.IntValue DEPTH_HUGE;
 	public final ForgeConfigSpec.IntValue DEPTH_GIANT;
 	public final ForgeConfigSpec.IntValue DEPTH_MEGA;
+	public final ForgeConfigSpec.BooleanValue ENABLE_YURT_FEATURES;
+	public final ForgeConfigSpec.BooleanValue ENABLE_TEPEE_FEATURES;
+	public final ForgeConfigSpec.BooleanValue ENABLE_BEDOUIN_FEATURES;
+	public final ForgeConfigSpec.BooleanValue ENABLE_INDLU_FEATURES;
+	public final ForgeConfigSpec.BooleanValue ENABLE_SHAMIANA_FEATURES;
 	// other
 	public final ForgeConfigSpec.BooleanValue IS_TENT_FIREPROOF;
 	public final ForgeConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
 	public final ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
+	public final ForgeConfigSpec.BooleanValue USE_ACTUAL_SIZE;
 
 	public TentConfig(final ForgeConfigSpec.Builder builder) {
 		// values
 		//final String NOTE = "Note: Disable recipe by inserting ' \"disabled\":true ' in the JSON file";
 		final int maxWidth = TentWidth.values().length;
 		final int maxDepth = TentDepth.values().length;
+		final String featureComment = "Enables pre-built features in new tents (torches, campfires, etc)";
 		// begin section 'dimension'
 		builder.push("dimension");
 		//TENT_DIM_ID = builder.comment("ID for the Tent Dimension").define("Dimension ID", -2);
@@ -137,6 +144,11 @@ public final class TentConfig {
 				.defineInRange("Max Depth: Giant", TentDepth.QUINTUPLE.getLayers(), 1, maxDepth);
 		DEPTH_MEGA = builder.comment("Limit the depth of a Mega Tent. 1=No Upgrades, 6=Full Upgrades")
 				.defineInRange("Max Depth: Mega", TentDepth.SEXTUPLE.getLayers(), 1, maxDepth);
+		ENABLE_YURT_FEATURES = builder.comment(featureComment).define("Enable Yurt Features", true);
+		ENABLE_TEPEE_FEATURES = builder.comment(featureComment).define("Enable Tepee Features", true);
+		ENABLE_BEDOUIN_FEATURES = builder.comment(featureComment).define("Enable Bedouin Features", true);
+		ENABLE_INDLU_FEATURES = builder.comment(featureComment).define("Enable Indlu Features", true);
+		ENABLE_SHAMIANA_FEATURES = builder.comment(featureComment).define("Enable Shamiyana Features", true);
 		builder.pop();
 		// begin section 'other'
 		builder.push("other");
@@ -149,6 +161,8 @@ public final class TentConfig {
 				.comment("Specify the block used for the harvestable layer of all tent floors",
 						"Format: [mod]:[name] ~ Example: minecraft:sand")
 				.define("Tent Floor", Blocks.DIRT.getRegistryName().toString());
+		USE_ACTUAL_SIZE = builder.comment("When true, tents will be the same size on the outside and inside")
+				.define("Use Actual Size", false);
 		builder.pop();
 	}
 
