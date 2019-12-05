@@ -1,9 +1,11 @@
 package nomadictents.init;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -11,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
+import nomadictents.dimension.TentDimensionManager;
 import nomadictents.item.ItemTent;
 import nomadictents.structure.util.TentDepth;
 import nomadictents.structure.util.TentWidth;
@@ -30,6 +33,7 @@ public final class TentConfig {
 	public final ForgeConfigSpec.BooleanValue ALLOW_OVERWORLD_SETSPAWN;
 	public final ForgeConfigSpec.BooleanValue IS_SLEEPING_STRICT;
 	public final ForgeConfigSpec.BooleanValue ENABLE_WEATHER;
+	public final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_BLACKLIST;
 	// TODO public final ForgeConfigSpec.BooleanValue SAFE_TELEPORT;
 	// Player permissions
 	public final ForgeConfigSpec.BooleanValue SUPER_MALLET_CREATIVE_ONLY;
@@ -95,6 +99,8 @@ public final class TentConfig {
 				.define("Tent Sleeping Strict", true);
 		ENABLE_WEATHER = builder.comment("When true, weather (ie, rain) is enabled in the tent dimension")
 				.define("Enable Weather", true);
+		DIMENSION_BLACKLIST = builder.comment("Dimensions in which tents cannot be used")
+				.define("Dimension Blacklist", Lists.newArrayList(TentDimensionManager.DIM_RL.toString()));
 		builder.pop();
 		// begin section 'permissions'
 		builder.push("permissions");
@@ -175,6 +181,11 @@ public final class TentConfig {
 			floor = Blocks.DIRT;
 		}
 		return floor;
+	}
+	
+	/** @return if tents should not be placed in the given DimensionType **/
+	public boolean isDimBlacklisted(final DimensionType type) {
+		return type != null && DIMENSION_BLACKLIST.get().contains(type.getRegistryName().toString());
 	}
 
 	/**

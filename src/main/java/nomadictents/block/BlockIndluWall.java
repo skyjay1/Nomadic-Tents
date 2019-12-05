@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -16,7 +17,7 @@ import nomadictents.block.Categories.IIndluBlock;
 public class BlockIndluWall extends BlockUnbreakable implements IIndluBlock {
 
 	public BlockIndluWall(final boolean cosmetic) {
-		super(Block.Properties.create(Material.LEAVES), cosmetic);
+		super(Block.Properties.create(Material.WOOL, MaterialColor.FOLIAGE), cosmetic);
 	}
 	
 	@Override
