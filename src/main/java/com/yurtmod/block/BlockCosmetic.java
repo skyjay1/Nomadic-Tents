@@ -161,10 +161,7 @@ public class BlockCosmetic extends Block {
 				final float hitX, final float hitY, final float hitZ, final int meta, final EntityLivingBase placer,
 				final EnumHand hand) {
 			// if the player is sneaking, place cosmetic PATTERN instead
-			if(placer != null && placer.isSneaking()) {
-				return getShamianaState(this.getColor(), true, false);
-			}
-			return getShamianaState(this.getColor(), false, false);
+			return getShamianaState(this.getColor(), placer != null && placer.isSneaking(), false);
 		}
 	}
 }

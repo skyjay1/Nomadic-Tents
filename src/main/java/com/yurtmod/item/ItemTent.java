@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.yurtmod.block.TileEntityTentDoor;
 import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.init.NomadicTents;
+import com.yurtmod.init.TentConfig;
 import com.yurtmod.init.TentSaveData;
 import com.yurtmod.structure.StructureBase;
 import com.yurtmod.structure.util.StructureData;
@@ -83,7 +84,7 @@ public class ItemTent extends Item {
 	public EnumActionResult onItemUseFirst(final EntityPlayer player, final World worldIn, final BlockPos pos,
 			final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
 		// looks at the item info and spawns the correct tent in the correct form
-		if (!TentDimension.isTentDimension(worldIn) && !worldIn.isRemote) {
+		if (!worldIn.isRemote && !TentDimension.isTentDimension(worldIn) && !TentConfig.GENERAL.isDimBlacklisted(worldIn)) {
 			BlockPos hitPos = pos;
 			ItemStack stack = player.getHeldItem(hand);
 			EnumFacing hitSide = side;

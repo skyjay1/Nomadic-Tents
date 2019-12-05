@@ -5,6 +5,7 @@ import java.util.Random;
 import com.yurtmod.block.Categories.IIndluBlock;
 import com.yurtmod.init.NomadicTents;
 
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumParticleTypes;
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockIndluWall extends BlockUnbreakable implements IIndluBlock {
 
 	public BlockIndluWall() {
-		super(Material.LEAVES);
+		super(Material.CLOTH, MapColor.FOLIAGE);
 		this.setLightOpacity(3);
 		this.setCreativeTab(NomadicTents.TAB);
 	}

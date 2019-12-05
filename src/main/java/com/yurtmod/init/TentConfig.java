@@ -1,11 +1,13 @@
 package com.yurtmod.init;
 
+import com.yurtmod.dimension.TentDimension;
 import com.yurtmod.item.ItemTent;
 import com.yurtmod.structure.util.StructureDepth;
 import com.yurtmod.structure.util.StructureWidth;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.config.Config;
 
@@ -26,6 +28,10 @@ public final class TentConfig {
 		@Config.Name("Home Dimension ID")
 		@Config.Comment("The dimension in which players will respawn from the tent dimension as needed")
 		public int RESPAWN_DIMENSION = 0;
+		
+		@Config.Name("Dimension Blacklist")
+		@Config.Comment("Dimensions in which tents cannot be placed")
+		public String[] DIM_BLACKLIST = { TentDimension.DIM_NAME };
 		
 		@Config.Name("Allow Sleep in Tent")
 		@Config.Comment("When false, beds used in the Tent Dimension will explode")
@@ -108,6 +114,16 @@ public final class TentConfig {
 				floor = Blocks.DIRT;
 			}
 			return floor;
+		}
+		
+		public boolean isDimBlacklisted(final World world) {
+			final String name = world.provider.getDimensionType().getName();
+			for(final String n : DIM_BLACKLIST) {
+				if(name.equals(n)) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 	
