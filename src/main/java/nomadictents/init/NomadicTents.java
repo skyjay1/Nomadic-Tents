@@ -48,7 +48,7 @@ public class NomadicTents {
 		// register and load config
 		LOGGER.debug(MODID + ": RegisterConfig");
 		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, TentConfig.SPEC);
-		TentConfig.loadConfig(TentConfig.SPEC, FMLPaths.CONFIGDIR.get().resolve(MODID + "-server.toml"));
+		// TentConfig.loadConfig(TentConfig.SPEC, FMLPaths.CONFIGDIR.get().resolve(MODID + "-server.toml"));
 		// register event handlers
 		LOGGER.debug(MODID + ": RegisterEventHandlers");
 		MinecraftForge.EVENT_BUS.register(new TentEventHandler());

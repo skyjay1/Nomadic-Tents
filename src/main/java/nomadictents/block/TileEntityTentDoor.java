@@ -1,5 +1,6 @@
 package nomadictents.block;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -7,14 +8,17 @@ import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EndermanEntity;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
@@ -168,8 +172,8 @@ public class TileEntityTentDoor extends TileEntity {
 	 * <br>2) the player's UUID matches, or
 	 * <br>3) the player is in creative-mode **/
 	public boolean isOwner(final PlayerEntity player) {
-		return !this.hasOwner() || PlayerEntity.getOfflineUUID(player.getName()
-					.getUnformattedComponentText()).equals(this.owner) || player.isCreative();
+		return !this.hasOwner() || player.isCreative() ||
+				PlayerEntity.getOfflineUUID(player.getName().getUnformattedComponentText()).equals(this.owner);
 	}
 	
 	@Nullable
@@ -205,7 +209,18 @@ public class TileEntityTentDoor extends TileEntity {
 		if(TentDimensionManager.isTent(dimTo) && MinecraftForge.EVENT_BUS.post(new TentEvent.PreEnter(this, entity))) {
 			return false;
 		}
-				
+		
+		// check for nearby monsters if that config option is enabled
+		if (TentDimensionManager.isTent(dimTo) && player != null && !player.isCreative() && TentConfig.CONFIG.ENTER_MUST_BE_SAFE.get()) {
+			final AxisAlignedBB box = new AxisAlignedBB(pos).grow(8.0D, 5.0D, 8.0D);
+			List<MonsterEntity> list = entity.getEntityWorld().getEntitiesWithinAABB(MonsterEntity.class, box,
+					e -> e.isPreventingPlayerRest(player));
+			if (!list.isEmpty()) {
+				player.sendStatusMessage(new TranslationTextComponent("chat.monsters_nearby"), true);
+				return false;
+			}
+		}
+		
 		// continue with the teleportation code		
 		entity.setPortal(this.getPos());
 		if (entity.timeUntilPortal > 0) {
@@ -250,7 +265,7 @@ public class TileEntityTentDoor extends TileEntity {
 		if (isSpawnInTent(player, tentCenter, true) && !data.containsSpawn(uuid) && overworld.getDimension().canRespawnHere()) {
 			// First, map the player's old spawn point in case the tent is taken down
 			data.putSpawn(uuid, oldSpawn);
-			// Next, set their spawn point to be this location
+			// Next, update their spawn point to be this location
 			player.setSpawnPoint(prevCoords, true, overworldId);
 			return true;
 		} else if (isSpawnInTent(player, tentCenter, false)) {

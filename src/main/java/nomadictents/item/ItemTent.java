@@ -160,21 +160,22 @@ public class ItemTent extends Item {
 		// tooltip for all tents
 		final TextFormatting color = data.getWidth().getTooltipColor();
 		tooltip.add(new TranslationTextComponent("tooltip.extra_dimensional_space").applyTextStyle(color));
-		// tooltip for color (if applicable)
+		// tooltip to show color (if applicable)
 		if(data.getTent() == TentType.SHAMIANA) {
 			String s = new TranslationTextComponent(data.getColor().getTranslationKey()).getFormattedText();
 			s = s.substring(0, 1).toUpperCase() + s.substring(1, s.length());
 			tooltip.add(new StringTextComponent(s).applyTextStyles(TextFormatting.WHITE, TextFormatting.ITALIC));
 		}
-		// tooltip if depth upgrades applied (or shift held)
+		// tooltip to show number of Depth Upgrades
 		final int depthCount = TentDepth.countUpgrades(data);
 		final int maxCount = TentDepth.maxUpgrades(data);
 		if(depthCount > 0 || flagIn.isAdvanced() || Screen.hasShiftDown()) {
 			tooltip.add(new TranslationTextComponent("tooltip.depth_upgrades", depthCount, maxCount).applyTextStyle(TextFormatting.GRAY));
 		}
-		// Other information for advanced tooltip
-		if(flagIn.isAdvanced()) {
-			tooltip.add(new TranslationTextComponent("tooltip.id", data.getID()).applyTextStyle(TextFormatting.GRAY));
+		// tooltip to show ID
+		if(flagIn.isAdvanced() || Screen.hasShiftDown()) {
+			final String id = data.getID() == ItemTent.ERROR_TAG ? "None" : String.valueOf(data.getID());
+			tooltip.add(new TranslationTextComponent("tooltip.id", id).applyTextStyle(TextFormatting.GRAY));
 		}
 	}
 	

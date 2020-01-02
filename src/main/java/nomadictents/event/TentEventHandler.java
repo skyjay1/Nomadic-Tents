@@ -180,12 +180,12 @@ public class TentEventHandler {
 	 **/
 	private static BlockPos getBedPos(final ServerPlayerEntity player, final DimensionType dim) {
 		final BlockPos bedPos = player.getBedLocation(dim);
-		 boolean flag = player.isSpawnForced(dim);
-		 if (bedPos != null) {
-	         Optional<Vec3d> optional = PlayerEntity.func_213822_a(player.getServer().getWorld(dim), bedPos, flag);
-	         return optional.isPresent() ? new BlockPos(optional.get()) : null;
-		 }
-		 return bedPos;
+		boolean flag = player.isSpawnForced(dim);
+		if (bedPos != null) {
+			Optional<Vec3d> optional = PlayerEntity.func_213822_a(player.getServer().getWorld(dim), bedPos, flag);
+			return optional.isPresent() ? new BlockPos(optional.get()) : null;
+		}
+		return bedPos;
 	}
 	
 	@SubscribeEvent

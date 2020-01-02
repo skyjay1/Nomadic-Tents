@@ -26,7 +26,6 @@ public final class TentConfig {
 	public static final ForgeConfigSpec SPEC = BUILDER.build();
 
 	// Dimension behavior configs
-	// TODO public final ForgeConfigSpec.ConfigValue<Integer> TENT_DIM_ID;
 	public final ForgeConfigSpec.ConfigValue<String> RESPAWN_DIMENSION;
 	public final ForgeConfigSpec.BooleanValue ALLOW_SLEEP_TENT_DIM;
 	public final ForgeConfigSpec.BooleanValue RESTRICT_TELEPORT_TENT_DIM;
@@ -35,7 +34,6 @@ public final class TentConfig {
 	public final ForgeConfigSpec.BooleanValue IS_SLEEPING_STRICT;
 	public final ForgeConfigSpec.BooleanValue ENABLE_WEATHER;
 	public final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_BLACKLIST;
-	// TODO public final ForgeConfigSpec.BooleanValue SAFE_TELEPORT;
 	// Player permissions
 	public final ForgeConfigSpec.BooleanValue SUPER_MALLET_CREATIVE_ONLY;
 	public final ForgeConfigSpec.BooleanValue OWNER_ENTRANCE;
@@ -43,6 +41,7 @@ public final class TentConfig {
 	public final ForgeConfigSpec.BooleanValue ALLOW_PLAYER_COLLIDE;
 	public final ForgeConfigSpec.BooleanValue ALLOW_NONPLAYER_COLLIDE;
 	public final ForgeConfigSpec.BooleanValue COPY_CREATIVE_ONLY;
+	public final ForgeConfigSpec.BooleanValue ENTER_MUST_BE_SAFE;
 	// Tent types and tiers
 	public final ForgeConfigSpec.BooleanValue ALLOW_YURT;
 	public final ForgeConfigSpec.BooleanValue ALLOW_TEPEE;
@@ -121,6 +120,8 @@ public final class TentConfig {
 				"(Note: this is done by clicking a tent door with any item that has NBT tag '" + ItemTent.TAG_COPY_TOOL
 						+ "' set to true)")
 				.define("Copy is Creative-Only", true);
+		ENTER_MUST_BE_SAFE = builder.comment("When true, players can only enter tents when there are no nearby monsters")
+				.define("Prevent Entering when Fighting", false);
 		builder.pop();
 		// begin section 'tents'
 		builder.push("tents");
@@ -200,6 +201,7 @@ public final class TentConfig {
 	 * @param path the exact path to the config
 	 */
 	public static void loadConfig(final ForgeConfigSpec spec, final Path path) {
+		// CURRENTLY UNUSED
 		final CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave()
 				.writingMode(WritingMode.REPLACE).build();
 		configData.load();

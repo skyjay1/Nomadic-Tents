@@ -57,12 +57,13 @@ public class TentEvent extends Event {
 	 * @see TentEvent#getDimensionId()
 	 **/
 	public boolean isInsideTent() {
-		return this.teDoor != null ? TentDimensionManager.isTent(this.teDoor.getWorld()) : false;
+		return this.teDoor != null && TentDimensionManager.isTent(this.teDoor.getWorld());
 	}
 	
 	/** 
 	 * @return the dimension in which this event is taking place.
 	 * @see TentEvent#isInsideTent()
+	 * @see Dimension#getType()
 	 **/
 	@Nullable
 	public Dimension getDimensionId() {
@@ -74,7 +75,7 @@ public class TentEvent extends Event {
 	 * and triggers a tent de-construction. It has
 	 * already been verified that the tent exists and
 	 * that the player has permissions to pick up the
-	 * tent.
+	 * tent. The tent has not yet been deconstructed.
 	 **/
 	public static class Deconstruct extends TentEvent {
 		
