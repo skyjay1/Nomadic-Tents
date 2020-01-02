@@ -1,5 +1,6 @@
 package nomadictents.block;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -13,6 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
@@ -200,11 +202,8 @@ public class TileEntityTentDoor extends TileEntity {
 
 		// inform the event bus that we're about to teleport an entity.
 		// this event is cancelable and can prevent teleportation
-		if(TentDimensionManager.isTent(dimTo)) {
-			final TentEvent.PreEnter event = new TentEvent.PreEnter(this, entity);
-			if(MinecraftForge.EVENT_BUS.post(event)) {
-				return false;
-			}
+		if(TentDimensionManager.isTent(dimTo) && MinecraftForge.EVENT_BUS.post(new TentEvent.PreEnter(this, entity))) {
+			return false;
 		}
 				
 		// continue with the teleportation code		
@@ -220,34 +219,10 @@ public class TileEntityTentDoor extends TileEntity {
 				attemptSetSpawn(this.getWorld(), player, this.getPos().add(this.tent.getWidth().getDoorZ(), 0, 0), 
 					this.prevX, this.prevY, this.prevZ);
 			}
-			
-			// EXPERIMENTAL
-			tel.teleport(entity);
+			// call teleportation code
 			if(entity != null && entity.isAlive()) {
-				entity.setPositionAndUpdate(tel.getX(), tel.getY(), tel.getZ());
+				return tel.makePortal(entity);
 			}
-			
-			// depending on config, may use alternate form of teleportation
-//			if (player != null && !TentConfig.GENERAL.SAFE_TELEPORT) {
-				// ~ Alter a private field using reflection ~
-				// If we call Entity#changeDimension(int, ITeleporter)
-				// then XP is updated correctly, but a Nether Portal sound plays.
-				// So we leave it to the user to decide which one to use.
-//				try {
-//					ReflectionHelper.setPrivateValue(ServerPlayerEntity.class, player, Boolean.valueOf(true),
-//							"field_184851_cj", "invulnerableDimensionChange");
-//					// transfer player to dimension
-//					mcServer.getPlayerList().transferPlayerToDimension(player, dimTo, tel);
-//				} catch (UnableToFindFieldException e) {
-//					e.printStackTrace();
-//					return false;
-//				}
-//			} else {
-				// teleport the entity normally
-//				entity.changeDimension(dimTo, (ITeleporter)tel);
-//			}
-			//this.resetPrevTentData();
-			return true;
 		}
 		return false;
 	}
@@ -346,12 +321,17 @@ public class TileEntityTentDoor extends TileEntity {
 	 * @return whether this player has a spawn point near the given BlockPos
 	 */
 	private static boolean isSpawnInTent(PlayerEntity player, BlockPos tentCenter, boolean andBed) {
-		BlockPos tentSpawn = player.getBedLocation(TentDimensionManager.getTentDim());
-		if(andBed && tentSpawn != null) {
-			tentSpawn = player.getBedLocation(TentDimensionManager.getTentDim());
+		final DimensionType tent = TentDimensionManager.getTentDim();
+		BlockPos bedPos = player.getBedLocation(tent);
+		if(andBed && bedPos != null) {
+			boolean flag = player.isSpawnForced(tent);
+			if (bedPos != null) {
+				Optional<Vec3d> optional = PlayerEntity.func_213822_a(player.getServer().getWorld(tent), bedPos, flag);
+				bedPos = optional.isPresent() ? new BlockPos(optional.get()) : null;
+			}
 		}
-		final double maxDistanceSq = Math.pow(TentDimension.TENT_SPACING * 0.8D, 2.0D) + 1.0D;
-		return tentSpawn != null && tentCenter.distanceSq(tentSpawn) < maxDistanceSq;
+		final double maxDistanceSq = Math.pow(TentDimension.TENT_SPACING * 0.5D, 2.0D) + 1.0D;
+		return bedPos != null && new BlockPos(tentCenter.getX(), bedPos.getY(), tentCenter.getZ()).distanceSq(bedPos) < maxDistanceSq;
 	}
 
 	/**

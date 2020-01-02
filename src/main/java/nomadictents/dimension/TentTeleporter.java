@@ -1,20 +1,18 @@
 package nomadictents.dimension;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.entity.projectile.ThrowableEntity;
 import net.minecraft.item.DyeColor;
-import net.minecraft.network.play.server.SPlayerAbilitiesPacket;
-import net.minecraft.network.play.server.SRespawnPacket;
-import net.minecraft.network.play.server.SServerDifficultyPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
 import nomadictents.block.TileEntityTentDoor;
 import nomadictents.event.TentEvent;
@@ -51,81 +49,32 @@ public class TentTeleporter extends Teleporter {
 		this(te.getWorld().getServer(), worldFrom, worldTo, te.getDoorPos(), te.getTentData().getColor(), 
 				te.getPrevX(), te.getPrevY(), te.getPrevZ(), te.getPrevFacing(), te.getTentData());
 	}
-	
-	/**
-	 * MAKE-SHIFT TELEPORTATION CODE UNTIL I FIGURE OUT THE "RIGHT" WAY TO DO IT
-	 **/
-	public Entity teleport(final Entity entityIn) {
-		if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(entityIn, this.dimensionTo)) {
-			return null;
-		}
-		if (!entityIn.getEntityWorld().isRemote && entityIn.isAlive()) {
-			final ServerWorld worldFrom = entityIn.getServer().getWorld(entityIn.dimension);
-			final ServerWorld worldTo = entityIn.getServer().getWorld(this.dimensionTo);
-			entityIn.dimension = this.dimensionTo;
-			
-			if (entityIn instanceof ServerPlayerEntity) {
-				final ServerPlayerEntity entityPlayer = (ServerPlayerEntity) entityIn;
-				// Access Transformer exposes this field
-				entityPlayer.invulnerableDimensionChange = true;
-				// End Access Transformer
-				WorldInfo worldinfo = this.world.getWorldInfo();
-				entityPlayer.connection.sendPacket(new SRespawnPacket(this.dimensionTo, worldinfo.getGenerator(),
-						entityPlayer.interactionManager.getGameType()));
-				entityPlayer.connection.sendPacket(
-						new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
-				PlayerList playerlist = this.server.getPlayerList();
-				playerlist.updatePermissionLevel(entityPlayer);
-				worldFrom.removeEntity(entityPlayer, true); // Forge: the player entity is moved to the new world, NOT cloned.
-														// So keep the data alive with no matching invalidate call.
-				entityPlayer.revive();
-				entityPlayer.setWorld(worldTo);
-				worldTo.func_217447_b(entityPlayer);
-				// entityPlayer.func_213846_b(worldFrom);
-				entityPlayer.interactionManager.setWorld(worldTo);
-				entityPlayer.connection.sendPacket(new SPlayerAbilitiesPacket(entityPlayer.abilities));
-				playerlist.sendWorldInfo(entityPlayer, worldTo);
-				playerlist.sendInventory(entityPlayer);
-				
-				// Place the player in the correct positions and trigger Tent updates
-				makePortal(entityPlayer);
-				
-				net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerChangedDimensionEvent(entityPlayer, this.dimensionFrom, this.dimensionTo);
-				//entityPlayer.clearInvulnerableDimensionChange();
-				return entityPlayer;
-			}
-			
-			entityIn.detach();			
-			Entity copy = entityIn.getType().create(worldTo);
-			if (copy != null) {
-				copy.copyDataFromOld(entityIn);
-				// set location and motion
-				makePortal(copy);
-				copy.setMotion(entityIn.getMotion().mul(Vec3d.fromPitchYaw(entityIn.rotationPitch, getYaw()).normalize()));
-				// used to unnaturally add entities to world
-				worldTo.func_217460_e(copy);
-			}
-			// update world
-			worldFrom.resetUpdateEntityTick();
-			worldTo.resetUpdateEntityTick();
-			// remove old entity
-			entityIn.remove(false);
-			return copy;
-		}
-		return null;
-	}
 
+	/**
+	 * Does two things:
+	 * <br>1. If the entity is entering the tent, creates a structure in the tent dimension
+	 * <br>2. Places the entity at the correct location (next to the door)
+	 * @param entity the Entity to teleport
+	 * @return if the entity was teleported
+	 **/
 	@Override
 	public boolean makePortal(final Entity entity) {
+		// check if we're allowed to teleport to the dimension
+		if (entity == null || !entity.isAlive() || entity.world.isRemote() || 
+				!net.minecraftforge.common.ForgeHooks.onTravelToDimension(entity, this.dimensionTo)) {
+			return false;
+		}
+		// these values will be used below
 		double entityX = getX();
 		double entityY = getY();
 		double entityZ = getZ();
 		float yaw = getYaw();
 		float pitch = entity.rotationPitch;
-		entity.setMotion(0.0D, 0.0D, 0.0D);
 		TentEvent.TentResult result = TentEvent.TentResult.NONE;
+		final ServerWorld worldFrom = entity.getServer().getWorld(entity.dimension);
 		final ServerWorld worldTo = this.server.getWorld(dimensionTo);
-		
+		worldTo.getChunk(new BlockPos(entityX, entityY, entityZ));
+
 		// build a structure inside the tent dimension, if needed
 		if (TentDimensionManager.isTent(dimensionTo)) {
 			entityX += entity.getWidth();
@@ -133,17 +82,44 @@ public class TentTeleporter extends Teleporter {
 			result = this.tentData.getStructure().generateInTentDimension(dimensionFrom, worldTo, 
 					tentDoorPos, tentData, prevX, prevY, prevZ, prevYaw, color);
 			// also synchronize the time between Tent and Overworld dimensions
-			worldTo.getWorldInfo().setDayTime(TentDimensionManager.getOverworld(entity.getServer()).getDayTime());
+			worldTo.getWorldInfo().setDayTime(TentDimensionManager.getOverworld(entity.getServer()).getWorldInfo().getDayTime());
 		}
 				
-		// move the entity to the correct position
+		// move the entity to the correct position and dimension
+		entity.dimension = this.dimensionTo;
 		if (entity instanceof ServerPlayerEntity) {
 			final ServerPlayerEntity player = (ServerPlayerEntity)entity;
+			player.setMotion(0.0D, 0.0D, 0.0D);
+			// Access Transformer exposes this field
 			player.invulnerableDimensionChange = true;
+			// set location and motion
+			player.teleport(worldTo, entityX, entityY, entityZ, yaw, pitch);
+			player.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 			player.setPositionAndUpdate(entityX, entityY, entityZ);
-			player.connection.setPlayerLocation(entityX, entityY, entityZ, yaw, pitch);
+			player.timeUntilPortal = player.getPortalCooldown() + 10;
+		} else {
+			// if it's non-player, make a copy of the entity and place it in the dimension
+			entity.detach();		
+			Entity copy = entity.getType().create(worldTo);
+			if (copy != null) {
+				copy.copyDataFromOld(entity);
+				// depending on the type of entity, we may alter the target location
+				if(entity instanceof ThrowableEntity || entity instanceof ItemEntity
+						|| entity instanceof AbstractArrowEntity) {
+					entityY += 0.9D;
+				}
+				// set location and motion
+				copy.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
+				copy.setMotion(entity.getMotion().mul(Vec3d.fromPitchYaw(entity.rotationPitch, getYaw()).normalize()));
+				// used to unnaturally add entities to world
+				worldTo.func_217460_e(copy);
+				// update world
+				worldFrom.resetUpdateEntityTick();
+				worldTo.resetUpdateEntityTick();
+				// remove old entity
+				entity.remove(false);
+			}
 		}
-		entity.setLocationAndAngles(entityX, entityY, entityZ, yaw, pitch);
 
 		// inform the event bus of the result of this teleportation
 		if (TentDimensionManager.isTent(dimensionTo) && worldTo.getTileEntity(tentDoorPos) instanceof TileEntityTentDoor) {

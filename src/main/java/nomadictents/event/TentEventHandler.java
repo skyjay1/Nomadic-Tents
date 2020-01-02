@@ -2,6 +2,7 @@ package nomadictents.event;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.minecraft.entity.item.EnderPearlEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -12,6 +13,7 @@ import net.minecraft.item.EnderPearlItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
@@ -134,47 +136,56 @@ public class TentEventHandler {
 	}
 
 	/**
-	 * EXPERIMENTAL Used to stop players who die in Tent Dimension, without beds,
+	 * Used to stop players who die in Tent Dimension, without beds,
 	 * from falling forever into the void
 	 **/
 	@SubscribeEvent
 	public void onPlayerRespawn(final PlayerRespawnEvent event) {
-		if (event.getPlayer() instanceof ServerPlayerEntity && !event.getPlayer().getEntityWorld().isRemote) {
-			final DimensionType TENTDIM = TentDimensionManager.getTentDim();
-			final DimensionType RESPAWN = TentDimensionManager.getOverworldDim();
-			final DimensionType CUR_DIM = event.getPlayer().getEntityWorld().getDimension().getType();
-			ServerPlayerEntity playerMP = (ServerPlayerEntity) event.getPlayer();
-			final ServerWorld overworld = playerMP.getServer().getWorld(RESPAWN);
-			// do all kind of checks to make sure you need to run this code...
-			if (TentConfig.CONFIG.ALLOW_RESPAWN_INTERCEPT.get() && CUR_DIM.getId() == TENTDIM.getId()) {
-				BlockPos bedPos = playerMP.getBedLocation(TENTDIM);
-				BlockPos respawnPos = bedPos != null ? event.getPlayer().getBedLocation(TENTDIM)
-						/*PlayerEntity.getBedLocation(tentServer, bedPos, false)*/ : null;
+		if (event.getPlayer() instanceof ServerPlayerEntity && !event.getPlayer().getEntityWorld().isRemote()
+				&& TentConfig.CONFIG.ALLOW_RESPAWN_INTERCEPT.get()) {
+			final DimensionType tentDim = TentDimensionManager.getTentDim();
+			final DimensionType respawnDim = TentDimensionManager.getOverworldDim();
+			final DimensionType curDim = event.getPlayer().getEntityWorld().getDimension().getType();
+			final ServerPlayerEntity playerMP = (ServerPlayerEntity) event.getPlayer();
+			final ServerWorld overworld = playerMP.getServer().getWorld(respawnDim);
+			// only run this code if player respawns in the Tent Dimension
+			if (curDim.getId() == tentDim.getId()) {
+				BlockPos respawnPos = getBedPos(playerMP, tentDim);
 				if (null == respawnPos) {
-					// player respawned in tent dimension without a bed here
-					// this likely means they're falling to their death in the void
-					// let's do something about that
-					// first:  try to find their overworld bed
-					bedPos = playerMP.getBedLocation(RESPAWN);
-					respawnPos = bedPos != null ? event.getPlayer().getBedLocation(RESPAWN)
-							/* PlayerEntity.getBedLocation(overworld, bedPos, false) */ : null;
-					if (respawnPos == null) {
-						// they have no bed at all, send them to world spawn
+					// If no tent dimension bed found, it means the player
+					// respawned in tent dimension without a bed here.
+					// This likely means they're falling to their death in the void
+					// Let's do something about that!
+					// First try to find their overworld bed
+					respawnPos = getBedPos(playerMP, respawnDim);
+					if (null == respawnPos) {
+						// If they have no bed at all, send them to world spawn
 						respawnPos = overworld.getSpawnPoint();
 					}
 					// transfer player using Teleporter
-					final TentTeleporter tel = new TentTeleporter(playerMP.getServer(), TENTDIM, RESPAWN,
+					final TentTeleporter tel = new TentTeleporter(playerMP.getServer(), tentDim, respawnDim,
 							new BlockPos(0, 0, 0), null, respawnPos.getX(), respawnPos.getY(), respawnPos.getZ(),
-							event.getPlayer().rotationYaw, new TentData());
-					
-					tel.teleport(playerMP);
-					
-					// TODO
-					// mcServer.getPlayerList().transferPlayerToDimension(playerMP, RESPAWN, tel);
-					event.getPlayer().setPositionAndUpdate(respawnPos.getX(), respawnPos.getY(), respawnPos.getZ());
+							playerMP.rotationYaw, new TentData());
+					tel.makePortal(playerMP);
+					playerMP.setPositionAndUpdate(respawnPos.getX(), respawnPos.getY(), respawnPos.getZ());
 				}
 			} 
 		}
+	}
+
+	/**
+	 * @param player the player
+	 * @param dim the dimension of the potential bed
+	 * @return the BlockPos near the bed, or null if none is available
+	 **/
+	private static BlockPos getBedPos(final ServerPlayerEntity player, final DimensionType dim) {
+		final BlockPos bedPos = player.getBedLocation(dim);
+		 boolean flag = player.isSpawnForced(dim);
+		 if (bedPos != null) {
+	         Optional<Vec3d> optional = PlayerEntity.func_213822_a(player.getServer().getWorld(dim), bedPos, flag);
+	         return optional.isPresent() ? new BlockPos(optional.get()) : null;
+		 }
+		 return bedPos;
 	}
 	
 	@SubscribeEvent
