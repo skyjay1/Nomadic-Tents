@@ -19,7 +19,7 @@ public class BlockBarrier extends BlockUnbreakable implements
 		IYurtBlock, ITepeeBlock, IBedouinBlock, IIndluBlock, IShamianaBlock {
 
 	public BlockBarrier() {
-		super(Block.Properties.from(Blocks.BARRIER).variableOpacity());
+		super(Block.Properties.from(Blocks.BARRIER).variableOpacity().notSolid());
 	}
 	
 	@Override

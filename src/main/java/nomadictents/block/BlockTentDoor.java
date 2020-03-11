@@ -13,8 +13,11 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -70,7 +73,8 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
+	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player,
+	    final Hand hand, final BlockRayTraceResult raytrace) {
 		if (!worldIn.isRemote) {
 			BlockPos base = state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
@@ -80,7 +84,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				//TentData data = teyd.getTentData();
 				TentData dataOverworld = teyd.getTentData().copyForOverworld();
 				StructureBase struct = dataOverworld.getStructure();
-				ItemStack held = player.getHeldItem(player.getActiveHand());
+				ItemStack held = player.getHeldItem(hand);
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
 				if((player.isCreative() || !TentConfig.CONFIG.COPY_CREATIVE_ONLY.get()) 
@@ -96,13 +100,13 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						// prevent this interaction from triggering player teleport
 						player.timeUntilPortal = player.getPortalCooldown();
 					}
-					return;
+					return ActionResultType.PASS;
 				}
 				// STEP 2:  make sure there is a valid tent before doing anything else
 				Direction dir = TentDimensionManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, base, dataOverworld);
 				if (dir == null) {
-					return;
+					return ActionResultType.FAIL;
 				}
 				// STEP 3:  deconstruct the tent if the player uses a tentHammer on the door
 				// (and in overworld and with fully built tent)
@@ -110,7 +114,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						&& !TentDimensionManager.isTent(worldIn)) {
 					// cancel deconstruction if player is not owner
 					if(TentConfig.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
-						return;
+						return ActionResultType.FAIL;
 					}
 					// If deconstructing, drop the tent item and damage the tool
 					final TentEvent.Deconstruct event = new TentEvent.Deconstruct(teyd, player);
@@ -128,17 +132,19 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						// remove the structure
 						struct.remove(worldIn, base, dataOverworld, dir);
 						// damage the item
-						held.damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(player.getActiveHand()));
+						held.damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
+						return ActionResultType.SUCCESS;
 					}
 				} else {
 					// if the player did not use special items on this door,
 					// move on to TileEntity logic to teleport player
-					((TileEntityTentDoor) te).onPlayerActivate(player);
+					return ((TileEntityTentDoor) te).onPlayerActivate(player) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 				}
 			} else {
 				NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + pos);
 			}
 		}
+		return ActionResultType.PASS;
 	}
 
 	@Override

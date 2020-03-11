@@ -38,7 +38,7 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	private final Supplier<BlockState> blockToBecome;
 
 	public BlockTentFrame(final Supplier<BlockState> become, final String name) {
-		super(Block.Properties.create(Material.WOOD).doesNotBlockMovement());
+		super(Block.Properties.create(Material.WOOD).doesNotBlockMovement().notSolid());
 		this.blockToBecome = become;
 		this.setRegistryName(NomadicTents.MODID, name);
 		this.setDefaultState(this.stateContainer.getBaseState().with(PROGRESS, 0));
@@ -109,11 +109,11 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
 		return false;
 	}
-	
-//	@Override
-//	public boolean isSolid(final BlockState state) {
-//		return false;
-//	}
+
+  @Override
+  public boolean isTransparent(final BlockState state) {
+    return true;
+  }
 
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
