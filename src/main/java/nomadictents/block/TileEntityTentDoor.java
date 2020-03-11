@@ -266,7 +266,7 @@ public class TileEntityTentDoor extends TileEntity {
 			// First, map the player's old spawn point in case the tent is taken down
 			data.putSpawn(uuid, oldSpawn);
 			// Next, update their spawn point to be this location
-			player.setSpawnPoint(prevCoords, true, overworldId);
+			player.setSpawnPoint(prevCoords, true, true, overworldId);
 			return true;
 		} else if (isSpawnInTent(player, tentCenter, false)) {
 			// if their spawnpoint was in the tent but NOT their bed
@@ -325,7 +325,7 @@ public class TileEntityTentDoor extends TileEntity {
         	}
     	}
     	// finally set the player's spawn point to whatever it was before tent was set up
-    	player.setSpawnPoint(posToSet, false, overworldId);
+    	player.setSpawnPoint(posToSet, false, true, overworldId);
     	data.removeSpawn(uuid);
     }
 	
@@ -385,9 +385,9 @@ public class TileEntityTentDoor extends TileEntity {
 		if (canTeleportEntity(player)) {
 			// remember the entity coordinates from the overworld
 			if (!TentDimensionManager.isTent(player.getEntityWorld())) {
-				double posX = player.posX;
-				double posY = player.posY;
-				double posZ = player.posZ;
+				double posX = player.getPosX();
+				double posY = player.getPosY();
+				double posZ = player.getPosZ();
 				this.setOverworldXYZ(posX, posY, posZ);
 				this.setPrevFacing(player.getRotationYawHead());
 			}

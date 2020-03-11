@@ -4,14 +4,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import nomadictents.block.Categories.IBedouinBlock;
 import nomadictents.block.Categories.IIndluBlock;
 import nomadictents.block.Categories.IShamianaBlock;
@@ -45,10 +42,10 @@ public class BlockBarrier extends BlockUnbreakable implements
 		return false;
 	}
 	
-	@Override
-	public boolean isSolid(final BlockState state) {
-		return true;
-	}
+//	@Override
+//	public boolean isSolid(final BlockState state) {
+//		return true;
+//	}
 
 //	@Override
 //	public boolean canEntityDestroy(BlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
@@ -69,9 +66,9 @@ public class BlockBarrier extends BlockUnbreakable implements
 		return BlockRenderType.INVISIBLE;
 	}
 
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public BlockRenderLayer getRenderLayer() {
+//		return BlockRenderLayer.CUTOUT;
+//	}
 }

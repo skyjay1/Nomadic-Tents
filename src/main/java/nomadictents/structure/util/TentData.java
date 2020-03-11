@@ -209,7 +209,7 @@ public class TentData implements net.minecraftforge.common.util.INBTSerializable
 			return;
 		}
 		te.setTentData(new TentData(stack));
-		te.setOverworldXYZ(player.posX, player.posY, player.posZ);
+		te.setOverworldXYZ(player.getPosX(), player.getPosY(), player.getPosZ());
 		te.setPrevFacing(player.rotationYaw);
 		te.setOwner(PlayerEntity.getOfflineUUID(player.getName().getUnformattedComponentText()));
 	}

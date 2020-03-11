@@ -1,5 +1,7 @@
 package nomadictents.block;
 
+import java.util.function.Supplier;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -8,7 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -17,8 +19,6 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import nomadictents.block.Categories.IFrameBlock;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
@@ -35,27 +35,27 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	public static final VoxelShape AABB_PROGRESS_1 = makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D);
 	public static final VoxelShape AABB_PROGRESS_2 = makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
 
-	private final BlockToBecome TO_BECOME;
+	private final Supplier<BlockState> blockToBecome;
 
-	public BlockTentFrame(final BlockToBecome type, final String name) {
+	public BlockTentFrame(final Supplier<BlockState> become, final String name) {
 		super(Block.Properties.create(Material.WOOD).doesNotBlockMovement());
-		this.TO_BECOME = type;
+		this.blockToBecome = become;
 		this.setRegistryName(NomadicTents.MODID, name);
 		this.setDefaultState(this.stateContainer.getBaseState().with(PROGRESS, 0));
 	}
 
 	@Override
-	public boolean onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, 
+	public ActionResultType onBlockActivated(final BlockState state, final World worldIn, final BlockPos pos, 
 			final PlayerEntity playerIn, final Hand hand, final BlockRayTraceResult result) {
 		ItemStack heldItem = hand != null && playerIn != null ? playerIn.getHeldItem(hand) : null;
 		if (!worldIn.isRemote && heldItem != null && heldItem.getItem() instanceof ItemMallet) {
 			if (heldItem.getItem() == Content.ITEM_SUPER_MALLET) {
-				return onSuperMalletUsed(worldIn, pos, state, heldItem, playerIn, hand);
+				return onSuperMalletUsed(worldIn, pos, state, heldItem, playerIn, hand) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 			} else {
-				return onMalletUsed(worldIn, pos, state, heldItem, playerIn, hand);
+				return onMalletUsed(worldIn, pos, state, heldItem, playerIn, hand) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 			}
 		}
-		return false;
+		return ActionResultType.PASS;
 	}
 
 	@Override
@@ -99,28 +99,21 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 		return;
 	}
 
-	/*
-	 * @Override
-	 * 
-	 * @SideOnly(Side.CLIENT) public AxisAlignedBB
-	 * getSelectedBoundingBox(BlockState blockState, World worldIn, BlockPos pos) {
-	 * return this.getBoundingBox(blockState, worldIn, pos); }
-	 */
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
+//	@Override
+//	@OnlyIn(Dist.CLIENT)
+//	public BlockRenderLayer getRenderLayer() {
+//		return BlockRenderLayer.CUTOUT;
+//	}
 
 	@Override
 	public boolean isNormalCube(final BlockState state, final IBlockReader worldIn, final BlockPos pos) {
 		return false;
 	}
 	
-	@Override
-	public boolean isSolid(final BlockState state) {
-		return false;
-	}
+//	@Override
+//	public boolean isSolid(final BlockState state) {
+//		return false;
+//	}
 
 	@Override
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -134,11 +127,11 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	public boolean becomeReal(final World worldIn, final BlockPos pos, final ItemStack mallet, final PlayerEntity player, final Hand hand) {
 		mallet.damageItem(CONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
-		return !worldIn.isRemote && worldIn.setBlockState(pos, this.TO_BECOME.getBlock(), 3);
+		return !worldIn.isRemote && worldIn.setBlockState(pos, this.getBlockToBecome(), 3);
 	}
 	
-	public BlockToBecome getEnumBlockToBecome() {
-		return this.TO_BECOME;
+	public BlockState getBlockToBecome() {
+		return this.blockToBecome.get();
 	}
 
 	public boolean onMalletUsed(final World worldIn, final BlockPos pos, final BlockState state, final ItemStack mallet, final PlayerEntity player, final Hand hand) {
@@ -172,18 +165,5 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			}
 		}
 		return true;
-	}
-
-	public static enum BlockToBecome {
-		YURT_WALL_INNER() { public BlockState getBlock() { return Content.YURT_WALL_INNER.getDefaultState(); } }, 
-		YURT_WALL_OUTER() { public BlockState getBlock() { return Content.YURT_WALL_OUTER.getDefaultState(); } }, 
-		YURT_ROOF() { public BlockState getBlock() { return Content.YURT_ROOF.getDefaultState().with(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true)); } }, 
-		TEPEE_WALL() { public BlockState getBlock() { return Content.TEPEE_WALL_BLANK.getDefaultState(); } },
-		BEDOUIN_WALL() { public BlockState getBlock() { return Content.BEDOUIN_WALL.getDefaultState(); } },
-		BEDOUIN_ROOF() { public BlockState getBlock() { return Content.BEDOUIN_ROOF.getDefaultState(); } }, 
-		INDLU_WALL() { public BlockState getBlock() { return Content.INDLU_WALL_OUTER.getDefaultState(); } },
-		SHAMIANA_WALL() { public BlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } };
-		
-		public abstract BlockState getBlock();
 	}
 }

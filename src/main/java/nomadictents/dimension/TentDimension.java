@@ -8,14 +8,12 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import nomadictents.init.Content;
 import nomadictents.init.TentConfig;
 
 public class TentDimension extends Dimension {
@@ -28,7 +26,7 @@ public class TentDimension extends Dimension {
 	public static final Direction STRUCTURE_DIR = Direction.EAST;
 
 	public TentDimension(final World worldIn, final DimensionType typeIn) {
-		super(worldIn, typeIn);
+		super(worldIn, typeIn, 1.0F);
 	}
 
 	@Override
@@ -85,9 +83,9 @@ public class TentDimension extends Dimension {
 	public boolean doesXZShowFog(int x, int z) {
 		return false;
 	}
-	
-	@Override
-	public Biome getBiome(final BlockPos pos) {
-		return Content.TENT_BIOME;
-	}
+//	
+//	@Override
+//	public Biome getBiome(final BlockPos pos) {
+//		return Content.TENT_BIOME;
+//	}
 }

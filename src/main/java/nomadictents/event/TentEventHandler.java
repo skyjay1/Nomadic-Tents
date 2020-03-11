@@ -52,7 +52,7 @@ public class TentEventHandler {
 		if(event.getPlayer().isServerWorld() 
 				&& event.getPlayer().getEntityWorld().getGameRules().getBoolean(GameRules.DO_DAYLIGHT_CYCLE)
 				&& TentDimensionManager.isTent(event.getPlayer().getEntityWorld())
-				&& event.shouldSetSpawn()) {
+				/* && event.shouldSetSpawn() //TODO */) {
 			final MinecraftServer server = event.getPlayer().getServer();
 			final ServerWorld overworld = TentDimensionManager.getOverworld(server);
 			final ServerWorld tentDim = TentDimensionManager.getTentWorld(server);
@@ -190,17 +190,12 @@ public class TentEventHandler {
 	
 	@SubscribeEvent
 	public void onNameFormat(final PlayerEvent.NameFormat event) {
-		String PREFIX = "[Nomad King] ";
-		String GOLD = "";
-		String RESET = "";
-		// attempt to avoid crashing on dedicated server
-		try {
-			GOLD = net.minecraft.util.text.TextFormatting.GOLD.toString();
-			RESET = net.minecraft.util.text.TextFormatting.RESET.toString();
-		} catch(Exception e) { }
+		String prefix = "[Nomad King] ";
+		String gold = net.minecraft.util.text.TextFormatting.GOLD.toString();
+		String reset = net.minecraft.util.text.TextFormatting.RESET.toString();
 		
 		if("skyjay1".equals(event.getUsername())) {
-			String special = GOLD + PREFIX + RESET;
+			String special = gold + prefix + reset;
 			event.setDisplayname(special.concat(event.getDisplayname()));
 		}
 	}

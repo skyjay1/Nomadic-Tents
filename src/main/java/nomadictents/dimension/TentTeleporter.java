@@ -131,8 +131,8 @@ public class TentTeleporter extends Teleporter {
 	}
 
 	@Override
-	public boolean func_222268_a(Entity entity, float f) {
-		return makePortal(entity);
+	public boolean placeInPortal(Entity entity, float f) {
+		return makePortal(entity); 
 	}
 	
 	public double getX() {

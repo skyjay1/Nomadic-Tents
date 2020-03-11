@@ -54,7 +54,7 @@ public final class WailaProvider implements IWailaPlugin,
 		if (accessor.getBlock() instanceof BlockTentDoor) {
 			return new TentData(accessor.getServerData().getCompound(KEY_STRUCTURE_DATA)).getDropStack();
 		} else if (accessor.getBlock() instanceof BlockTentFrame) {
-			return new ItemStack(((BlockTentFrame) accessor.getBlock()).getEnumBlockToBecome().getBlock().getBlock());
+			return new ItemStack(((BlockTentFrame) accessor.getBlock()).getBlockToBecome().getBlock());
 		}
 		return accessor.getStack();
 	}

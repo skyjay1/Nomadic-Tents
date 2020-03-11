@@ -1,6 +1,5 @@
 package nomadictents.structure;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
@@ -37,11 +36,14 @@ public class StructureIndlu extends StructureBase {
 		if (getTentType().areFeaturesEnabled() && tentDim && wallBlock.getMaterial() != Material.AIR) {
 			final BlockPos center = getCenter(doorBase, data.getWidth(), dirForward);
 			final BlockState fire = Blocks.TORCH.getDefaultState();
-			if(worldIn.isAirBlock(center) && (worldIn.isAirBlock(center.down()) 
-					|| Block.isDirt(worldIn.getBlockState(center.down()).getBlock()))) {
-				worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
-				worldIn.setBlockState(center, fire, 2);
-			}
+			// place a cobblestone (support)
+      if(worldIn.isAirBlock(center.down()) || worldIn.getBlockState(center.down()).getBlock() == Blocks.DIRT) {
+        worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
+      }
+      // place the campfire / torch
+      if(worldIn.isAirBlock(center)) {
+        worldIn.setBlockState(center, fire, 2);
+      }
 		}
 		return !bp.isEmpty();
 	}

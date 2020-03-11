@@ -1,16 +1,11 @@
 package nomadictents.block;
 
-import java.util.List;
-
-import com.mojang.datafixers.util.Either;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathType;
@@ -18,16 +13,11 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -80,8 +70,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 	}
 
 	@Override
-	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand,
-			BlockRayTraceResult result) {
+	public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
 		if (!worldIn.isRemote) {
 			BlockPos base = state.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos : pos.down(1);
 			TileEntity te = worldIn.getTileEntity(base);
@@ -91,7 +80,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 				//TentData data = teyd.getTentData();
 				TentData dataOverworld = teyd.getTentData().copyForOverworld();
 				StructureBase struct = dataOverworld.getStructure();
-				ItemStack held = player.getHeldItem(hand);
+				ItemStack held = player.getHeldItem(player.getActiveHand());
 				
 				// STEP 1:  check if it's the copy tool and creative-mode player
 				if((player.isCreative() || !TentConfig.CONFIG.COPY_CREATIVE_ONLY.get()) 
@@ -101,19 +90,19 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					final ItemStack copyStack = teyd.getTentData().getDropStack();
 					if (copyStack != null) {
 						// drop the tent item (without affecting the tent)
-						ItemEntity dropItem = new ItemEntity(worldIn, player.posX, player.posY, player.posZ, copyStack);
+						ItemEntity dropItem = new ItemEntity(worldIn, player.getPosX(), player.getPosY(), player.getPosZ(), copyStack);
 						dropItem.setPickupDelay(0);
 						worldIn.addEntity(dropItem);
 						// prevent this interaction from triggering player teleport
 						player.timeUntilPortal = player.getPortalCooldown();
 					}
-					return true;
+					return;
 				}
 				// STEP 2:  make sure there is a valid tent before doing anything else
 				Direction dir = TentDimensionManager.isTent(worldIn) ? TentDimension.STRUCTURE_DIR
 						: struct.getValidFacing(worldIn, base, dataOverworld);
 				if (dir == null) {
-					return false;
+					return;
 				}
 				// STEP 3:  deconstruct the tent if the player uses a tentHammer on the door
 				// (and in overworld and with fully built tent)
@@ -121,7 +110,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						&& !TentDimensionManager.isTent(worldIn)) {
 					// cancel deconstruction if player is not owner
 					if(TentConfig.CONFIG.OWNER_PICKUP.get() && teyd.hasOwner() && !teyd.isOwner(player)) {
-						return false;
+						return;
 					}
 					// If deconstructing, drop the tent item and damage the tool
 					final TentEvent.Deconstruct event = new TentEvent.Deconstruct(teyd, player);
@@ -129,7 +118,7 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 					ItemStack toDrop = event.getTentStack();
 					if (toDrop != null) {
 						// drop the tent item
-						ItemEntity dropItem = new ItemEntity(worldIn, player.posX, player.posY, player.posZ, toDrop);
+						ItemEntity dropItem = new ItemEntity(worldIn, player.getPosX(), player.getPosY(), player.getPosZ(), toDrop);
 						dropItem.setPickupDelay(0);
 						worldIn.addEntity(dropItem);
 						// alert the TileEntity
@@ -139,20 +128,17 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 						// remove the structure
 						struct.remove(worldIn, base, dataOverworld, dir);
 						// damage the item
-						held.damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
-
-						return true;
+						held.damageItem(DECONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(player.getActiveHand()));
 					}
 				} else {
 					// if the player did not use special items on this door,
 					// move on to TileEntity logic to teleport player
-					return ((TileEntityTentDoor) te).onPlayerActivate(player);
+					((TileEntityTentDoor) te).onPlayerActivate(player);
 				}
 			} else {
 				NomadicTents.LOGGER.error("Error! Failed to retrieve TileEntityTentDoor at " + pos);
 			}
 		}
-		return false;
 	}
 
 	@Override
@@ -204,15 +190,15 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 		}
 	}
 	
-	@Override
-	public boolean isSolid(final BlockState state) {
-		return true;
-	}
-
-	@Override
-	public BlockRenderLayer getRenderLayer() {
-		return BlockRenderLayer.CUTOUT;
-	}
+//	@Override
+//	public boolean isSolid(final BlockState state) {
+//		return true;
+//	}
+//
+//	@Override
+//	public BlockRenderLayer getRenderLayer() {
+//		return BlockRenderLayer.CUTOUT;
+//	}
 
 	@Override
 	 public void onPlayerDestroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
@@ -237,10 +223,6 @@ public abstract class BlockTentDoor extends BlockUnbreakable
 
 	@Override
 	public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
-		TileEntityTentDoor ret = Content.TE_DOOR.create();
-		if(world instanceof World) {
-			ret.setWorld((World)world);
-		}
-		return ret;
+		return Content.TE_DOOR.create();
 	}
 }

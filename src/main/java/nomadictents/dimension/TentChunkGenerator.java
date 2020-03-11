@@ -1,7 +1,7 @@
 package nomadictents.dimension;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
@@ -16,12 +16,10 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.biome.provider.SingleBiomeProvider;
 import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.gen.GenerationStage.Carving;
 import net.minecraft.world.gen.OverworldChunkGenerator;
 import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -35,7 +33,7 @@ public class TentChunkGenerator extends OverworldChunkGenerator {
 	protected final Long2ObjectMap<LongSet> structureReferenceCache = Long2ObjectMaps.emptyMap();
 
 	public TentChunkGenerator(final IWorld worldIn, Dimension dimension, OverworldGenSettings settings) {
-		super(worldIn, new SingleBiomeProvider(new SingleBiomeProviderSettings().setBiome(Content.TENT_BIOME)), settings);
+		super(worldIn, new SingleBiomeProvider(new SingleBiomeProviderSettings(null).setBiome(Content.TENT_BIOME)), settings);
 	}
 
 	@Override
@@ -43,23 +41,24 @@ public class TentChunkGenerator extends OverworldChunkGenerator {
 		return Lists.newArrayList();
 	}
 	
-	@Override
-	public void generateSurface(final IChunk chunkIn) {
-		// do nothing
-	}
+//	@Override
+//	public void generateSurface(final IChunk chunkIn) {
+//		// do nothing
+//	}
 
 	@Override
 	public void makeBase(final IWorld world, final IChunk chunkIn) {
-		final Biome[] biomes = new Biome[chunkIn.getBiomes().length];
-		Arrays.fill(biomes, Content.TENT_BIOME);
-		chunkIn.setBiomes(biomes);
-//		Chunk chunk = new Chunk(world, pos.x, pos.z, new Biome[] { Content.BIOME_TENT });
-//		chunk.generateSkylightMap();
-//		chunk.setStatus(ChunkStatus.BASE);
+	  // do nothing???
+	  // TODO this probably breaks things
+	}
+	
+	@Override
+	public void makeBedrock(final IChunk chunkIn, final Random rand) {
+	  // do nothing
 	}
 
-	@Override
-	public void carve(final IChunk chunk, final Carving carvingStage) { }
+//	@Override
+//	public void carve(final IChunk chunk, final Carving carvingStage) { }
 
 	@Override
 	public void decorate(final WorldGenRegion region) { }
@@ -76,23 +75,12 @@ public class TentChunkGenerator extends OverworldChunkGenerator {
 	@Override
 	public boolean hasStructure(Biome biomeIn, Structure<?> structureIn) {
 		return false;
-	}
-
+	}	
+	
 //	@Override
-//	public Long2ObjectMap<StructureStart> getStructureReferenceToStartMap(Structure<?> structureIn) {
-//		return this.structureStartCache;
-//		this.getStructureConfig(p_202087_1_, p_202087_2_)
+//	public BiomeProvider getBiomeProvider() {
+//		return this.biomeProvider;
 //	}
-//
-//	@Override
-//	public Long2ObjectMap<LongSet> getStructurePositionToReferenceMap(Structure<?> structureIn) {
-//		return this.structureReferenceCache;
-//	}
-//
-	@Override
-	public BiomeProvider getBiomeProvider() {
-		return new SingleBiomeProvider(new SingleBiomeProviderSettings().setBiome(Content.TENT_BIOME));
-	}
 
 	@Override
 	public long getSeed() {

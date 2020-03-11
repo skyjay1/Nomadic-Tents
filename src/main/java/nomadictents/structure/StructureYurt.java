@@ -1,6 +1,5 @@
 package nomadictents.structure;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CampfireBlock;
@@ -43,11 +42,14 @@ public class StructureYurt extends StructureBase {
 				final BlockState fire = data.getWidth() == TentWidth.SMALL 
 						? Blocks.TORCH.getDefaultState()
 						: Blocks.CAMPFIRE.getDefaultState().with(CampfireBlock.LIT, true);
-				if(worldIn.isAirBlock(center) && (worldIn.isAirBlock(center.down()) 
-						|| Block.isDirt(worldIn.getBlockState(center.down()).getBlock()))) {
-					worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
-					worldIn.setBlockState(center, fire, 2);
-				}
+				// place a cobblestone (support)
+	      if(worldIn.isAirBlock(center.down()) || worldIn.getBlockState(center.down()).getBlock() == Blocks.DIRT) {
+	        worldIn.setBlockState(center.down(), Blocks.COBBLESTONE.getDefaultState(), 2);
+	      }
+	      // place the campfire / torch
+	      if(worldIn.isAirBlock(center)) {
+	        worldIn.setBlockState(center, fire, 2);
+	      }
 			}
 			buildLayer(worldIn, doorBase, dirForward, Content.TENT_BARRIER.getDefaultState(), bp.getBarrierCoords());
 		}
