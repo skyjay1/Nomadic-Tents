@@ -1,5 +1,7 @@
 package nomadictents.block;
 
+import java.util.function.Supplier;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -35,9 +37,9 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	public static final VoxelShape AABB_PROGRESS_1 = makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D);
 	public static final VoxelShape AABB_PROGRESS_2 = makeCuboidShape(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
 
-	private final BlockToBecome TO_BECOME;
+	private final Supplier<? extends BlockState> TO_BECOME;
 
-	public BlockTentFrame(final BlockToBecome type, final String name) {
+	public BlockTentFrame(final Supplier<? extends BlockState> type, final String name) {
 		super(Block.Properties.create(Material.WOOD).doesNotBlockMovement());
 		this.TO_BECOME = type;
 		this.setRegistryName(NomadicTents.MODID, name);
@@ -134,10 +136,10 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 
 	public boolean becomeReal(final World worldIn, final BlockPos pos, final ItemStack mallet, final PlayerEntity player, final Hand hand) {
 		mallet.damageItem(CONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
-		return !worldIn.isRemote && worldIn.setBlockState(pos, this.TO_BECOME.getBlock(), 3);
+		return !worldIn.isRemote && worldIn.setBlockState(pos, this.TO_BECOME.get(), 3);
 	}
 	
-	public BlockToBecome getEnumBlockToBecome() {
+	public Supplier<? extends BlockState> getBlockToBecome() {
 		return this.TO_BECOME;
 	}
 
@@ -172,18 +174,5 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 			}
 		}
 		return true;
-	}
-
-	public static enum BlockToBecome {
-		YURT_WALL_INNER() { public BlockState getBlock() { return Content.YURT_WALL_INNER.getDefaultState(); } }, 
-		YURT_WALL_OUTER() { public BlockState getBlock() { return Content.YURT_WALL_OUTER.getDefaultState(); } }, 
-		YURT_ROOF() { public BlockState getBlock() { return Content.YURT_ROOF.getDefaultState().with(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true)); } }, 
-		TEPEE_WALL() { public BlockState getBlock() { return Content.TEPEE_WALL_BLANK.getDefaultState(); } },
-		BEDOUIN_WALL() { public BlockState getBlock() { return Content.BEDOUIN_WALL.getDefaultState(); } },
-		BEDOUIN_ROOF() { public BlockState getBlock() { return Content.BEDOUIN_ROOF.getDefaultState(); } }, 
-		INDLU_WALL() { public BlockState getBlock() { return Content.INDLU_WALL_OUTER.getDefaultState(); } },
-		SHAMIANA_WALL() { public BlockState getBlock() { return Content.SHAMIANA_WALL_WHITE.getDefaultState(); } };
-		
-		public abstract BlockState getBlock();
 	}
 }

@@ -13,30 +13,14 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
-import nomadictents.block.BlockBarrier;
-import nomadictents.block.BlockBedouinRoof;
-import nomadictents.block.BlockBedouinWall;
-import nomadictents.block.BlockIndluWall;
-import nomadictents.block.BlockShamianaWall;
-import nomadictents.block.BlockTentDoorHGM;
-import nomadictents.block.BlockTentDoorSML;
-import nomadictents.block.BlockTentFrame;
-import nomadictents.block.BlockTentFrame.BlockToBecome;
-import nomadictents.block.BlockTepeeWall;
-import nomadictents.block.BlockUnbreakable;
-import nomadictents.block.BlockYurtRoof;
-import nomadictents.block.BlockYurtWall;
-import nomadictents.block.TileEntityTentDoor;
+import nomadictents.block.*;
 import nomadictents.crafting.RecipeUpgradeColor;
 import nomadictents.crafting.RecipeUpgradeDepth;
 import nomadictents.crafting.RecipeUpgradeWidth;
 import nomadictents.dimension.BiomeTent;
 import nomadictents.init.Content;
 import nomadictents.init.NomadicTents;
-import nomadictents.item.ItemDepthUpgrade;
-import nomadictents.item.ItemMallet;
-import nomadictents.item.ItemSuperMallet;
-import nomadictents.item.ItemTent;
+import nomadictents.item.*;
 
 public class CommonProxy {
 
@@ -90,13 +74,13 @@ public class CommonProxy {
 		);
 		// frame blocks
 		event.getRegistry().registerAll(
-			new BlockTentFrame(BlockToBecome.YURT_WALL_OUTER, "frame_yurt_wall"),
-			new BlockTentFrame(BlockToBecome.YURT_ROOF, "frame_yurt_roof"),
-			new BlockTentFrame(BlockToBecome.TEPEE_WALL, "frame_tepee_wall"),
-			new BlockTentFrame(BlockToBecome.BEDOUIN_WALL, "frame_bed_wall"),
-			new BlockTentFrame(BlockToBecome.BEDOUIN_ROOF, "frame_bed_roof"),
-			new BlockTentFrame(BlockToBecome.INDLU_WALL, "frame_indlu_wall"),
-			new BlockTentFrame(BlockToBecome.SHAMIANA_WALL, "frame_shamiana_wall")				
+			new BlockTentFrame(() -> Content.YURT_WALL_OUTER.getDefaultState(), "frame_yurt_wall"),
+			new BlockTentFrame(() -> Content.YURT_ROOF.getDefaultState().with(BlockYurtRoof.OUTSIDE, Boolean.valueOf(true)), "frame_yurt_roof"),
+			new BlockTentFrame(() -> Content.TEPEE_WALL_BLANK.getDefaultState(), "frame_tepee_wall"),
+			new BlockTentFrame(() -> Content.BEDOUIN_WALL.getDefaultState(), "frame_bed_wall"),
+			new BlockTentFrame(() -> Content.BEDOUIN_ROOF.getDefaultState(), "frame_bed_roof"),
+			new BlockTentFrame(() -> Content.INDLU_WALL_OUTER.getDefaultState(), "frame_indlu_wall"),
+			new BlockTentFrame(() -> Content.SHAMIANA_WALL_WHITE.getDefaultState(), "frame_shamiana_wall")				
 		);
 		
 		// cosmetic blocks
