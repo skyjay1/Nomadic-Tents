@@ -1,5 +1,8 @@
 package nomadictents.event;
 
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -43,5 +46,26 @@ public class ClientTentEventHandler {
 				NomadicTents.LOGGER.error(e.getMessage());
 			}
 		});
+	}
+	
+	@SubscribeEvent
+	public static void clientSetup(final net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
+	  NomadicTents.LOGGER.debug(NomadicTents.MODID + ": RegisterRenderType");
+	  DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+      try {
+        registerRenderCutout(Content.FRAME_BEDOUIN_ROOF, Content.FRAME_BEDOUIN_WALL, Content.FRAME_INDLU_WALL,
+            Content.FRAME_SHAMIANA_WALL, Content.FRAME_TEPEE_WALL, Content.FRAME_YURT_ROOF, Content.FRAME_YURT_WALL);
+      } catch(final Exception e) {
+        // print exception
+        NomadicTents.LOGGER.error("Caught exception while registering RenderType");
+        NomadicTents.LOGGER.error(e.getMessage());
+      }
+	  });
+	}
+	
+	private static void registerRenderCutout(final Block... blocks) {
+	  for(final Block b : blocks) {
+	    RenderTypeLookup.setRenderLayer(b, RenderType.getCutout());
+	  }
 	}
 }

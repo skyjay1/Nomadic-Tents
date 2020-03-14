@@ -126,8 +126,11 @@ public class BlockTentFrame extends BlockUnbreakable implements IFrameBlock {
 	}
 
 	public boolean becomeReal(final World worldIn, final BlockPos pos, final ItemStack mallet, final PlayerEntity player, final Hand hand) {
-		mallet.damageItem(CONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
-		return !worldIn.isRemote && worldIn.setBlockState(pos, this.getBlockToBecome(), 3);
+		if(!worldIn.isRemote && worldIn.setBlockState(pos, this.getBlockToBecome(), 3)) {
+		  mallet.damageItem(CONSTRUCT_DAMAGE, player, c -> c.sendBreakAnimation(hand));
+		  return true;
+		}
+		return false;
 	}
 	
 	public BlockState getBlockToBecome() {
