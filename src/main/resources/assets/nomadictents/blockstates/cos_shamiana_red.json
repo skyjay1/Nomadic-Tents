@@ -1,6 +1,0 @@
-{
-    "variants": {
-        "pattern=false": { "model": "nomadictents:block/shamiana_red"},
-		"pattern=true": { "model": "nomadictents:block/shamiana_red_pattern"}
-    }
-}
