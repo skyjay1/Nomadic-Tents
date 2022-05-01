@@ -10,7 +10,7 @@ public class TentDepth {
 
     public static int get(final ItemStack stack) {
         if(stack.hasTag()) {
-            return stack.getTag().getInt(TentItem.DEPTH);
+            return stack.getTag().getInt(TentItem.LAYERS);
         }
         return 0;
     }

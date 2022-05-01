@@ -9,10 +9,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public final class TentConfig {
 
-	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-	public static final TentConfig CONFIG = new TentConfig(BUILDER);
-	public static final ForgeConfigSpec SPEC = BUILDER.build();
-
 	// Dimension behavior configs
 	public final ForgeConfigSpec.ConfigValue<String> RESPAWN_DIMENSION;
 	public final ForgeConfigSpec.BooleanValue ALLOW_SLEEP_TENT_DIM;

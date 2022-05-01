@@ -1,0 +1,8 @@
+{
+	"variants": {
+		"half=top,outside=false": { "model": "nomadictents:block/yurt_wall_inside_top"},
+		"half=bottom,outside=false": { "model": "nomadictents:block/yurt_wall_inside_bottom"},
+		"half=top,outside=true": { "model": "nomadictents:block/yurt_wall_outside_top"},
+		"half=bottom,outside=true": { "model": "nomadictents:block/yurt_wall_outside_bottom"}
+	}
+}

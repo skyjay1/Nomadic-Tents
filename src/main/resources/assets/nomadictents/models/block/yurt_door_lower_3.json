@@ -1,6 +1,0 @@
-{
-    "parent": "nomadictents:block/door_nonfull",
-    "textures": {
-        "t": "nomadictents:blocks/yurt_door_lower_3"
-    }
-}

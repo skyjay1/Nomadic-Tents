@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_column",
+    "textures": {
+        "end": "nomadictents:block/blank_tepee_wall",
+        "side": "nomadictents:block/golem_tepee_wall"
+    }
+}

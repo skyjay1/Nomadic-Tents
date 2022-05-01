@@ -1,12 +1,12 @@
 {
     "parent": "block/cube",
     "textures": {
-        "down": "nomadictents:blocks/yurt_roof_inner_0",
-        "up": "nomadictents:blocks/yurt_roof_upper",
-        "north": "nomadictents:blocks/yurt_roof_inner_0",
-        "south": "nomadictents:blocks/yurt_roof_inner_0",
-        "west": "nomadictents:blocks/yurt_roof_upper",
-        "east": "nomadictents:blocks/yurt_roof_upper",
-        "particle": "nomadictents:blocks/yurt_roof_upper"
+        "down": "nomadictents:block/yurt_roof_inside",
+        "up": "nomadictents:block/yurt_roof_top",
+        "north": "nomadictents:block/yurt_roof_inside",
+        "south": "nomadictents:block/yurt_roof_inside",
+        "west": "nomadictents:block/yurt_roof_top",
+        "east": "nomadictents:block/yurt_roof_top",
+        "particle": "nomadictents:block/yurt_roof_top"
     }
 }

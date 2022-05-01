@@ -1,7 +1,0 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "nomadictents:blocks/indlu_wall_inner",
-        "particle": "nomadictents:blocks/indlu_wall_inner"
-    }
-}

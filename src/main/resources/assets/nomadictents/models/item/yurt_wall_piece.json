@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "nomadictents:items/yurt_wall_piece"
+        "layer0": "nomadictents:item/yurt_wall_piece"
     }
 }

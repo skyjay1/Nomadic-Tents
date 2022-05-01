@@ -1,6 +1,0 @@
-{
-    "parent": "nomadictents:block/door_nonfull",
-    "textures": {
-        "t": "nomadictents:blocks/bed_door_upper_2"
-    }
-}

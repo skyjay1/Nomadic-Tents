@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "down": "nomadictents:block/yurt_wall_inside_top",
+        "up": "nomadictents:block/yurt_roof_top",
+        "north": "nomadictents:block/yurt_wall_outside_top",
+        "south": "nomadictents:block/yurt_wall_outside_top",
+        "west": "nomadictents:block/yurt_wall_outside_top",
+        "east": "nomadictents:block/yurt_wall_outside_top",
+        "particle": "nomadictents:block/yurt_wall_outside_top"
+    }
+}

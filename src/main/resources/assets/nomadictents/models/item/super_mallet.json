@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "nomadictents:items/super_mallet"
+        "layer0": "nomadictents:item/super_mallet"
     }
 }

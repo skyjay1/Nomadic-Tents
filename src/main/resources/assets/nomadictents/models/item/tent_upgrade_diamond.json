@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "nomadictents:items/upgrade_diamond"
+        "layer0": "nomadictents:item/upgrade_diamond"
     }
 }
