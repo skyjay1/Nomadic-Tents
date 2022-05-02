@@ -3,6 +3,7 @@ package nomadictents.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -20,6 +21,8 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import nomadictents.NomadicTents;
+import nomadictents.item.MalletItem;
+import nomadictents.structure.TentPlacer;
 import nomadictents.tileentity.TentDoorTileEntity;
 
 import javax.annotation.Nullable;
@@ -91,9 +94,18 @@ public class TentDoorBlock extends TentBlock {
             TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
             // DEBUG
             // log info
-            NomadicTents.LOGGER.debug("tentDoor: owner=" + Optional.ofNullable(tentDoor.getOwner())
+            NomadicTents.LOGGER.debug("tentDoor: "
                     + " tent=" + tentDoor.getTent()
+                    + " dir=" + tentDoor.getDirection()
                     + " spawnpoint=" + tentDoor.getSpawnpoint());
+            // remove tent
+            if(player.getItemInHand(hand).getItem() instanceof MalletItem) {
+                TentPlacer.getInstance().removeTent(level, doorPos, tentDoor.getTent().getType(), tentDoor.getTent().getSize(), tentDoor.getDirection());
+                ItemEntity item = player.spawnAtLocation(tentDoor.getTent().asItem());
+                if(item != null) {
+                    item.setNoPickUpDelay();
+                }
+            }
 
             return ActionResultType.SUCCESS;
         }

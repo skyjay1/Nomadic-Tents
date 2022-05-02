@@ -3,12 +3,11 @@ package nomadictents.tileentity;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Vector3d;
 import nomadictents.NTRegistry;
 import nomadictents.util.Tent;
-import nomadictents.util.TentLayers;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
@@ -17,6 +16,7 @@ import java.util.UUID;
 public class TentDoorTileEntity extends TileEntity {
 
     private static final String TENT = "tent";
+    private static final String DIRECTION = "direction";
 
     private static final String SPAWNPOINT = "spawnpoint";
     private static final String SPAWN_ROTATION = "spawn_rot";
@@ -24,6 +24,7 @@ public class TentDoorTileEntity extends TileEntity {
     private static final String OWNER = "owner";
 
     private Tent tent = new Tent(0, TentType.YURT, TentSize.TINY);
+    private Direction direction = Direction.NORTH;
 
     private Vector3d spawnpoint = Vector3d.ZERO;
     private float spawnRot;
@@ -38,6 +39,8 @@ public class TentDoorTileEntity extends TileEntity {
         // save tent
         CompoundNBT tentTag = tent.serializeNBT();
         tag.put(TENT, tentTag);
+        // save direction
+        tag.putString(DIRECTION, direction.getSerializedName());
         // save spawn dimension
         // TODO
         if(spawnpoint != Vector3d.ZERO) {
@@ -63,6 +66,8 @@ public class TentDoorTileEntity extends TileEntity {
         // load tent
         CompoundNBT tentTag = tag.getCompound(TENT);
         this.tent = new Tent(tentTag);
+        // load direction
+        this.direction = Direction.byName(tag.getString(DIRECTION));
         // load spawn dimension
         // TODO
         if(tag.contains(SPAWNPOINT)) {
@@ -89,6 +94,14 @@ public class TentDoorTileEntity extends TileEntity {
     public void setTent(Tent tent) {
         this.tent = tent;
         this.setChanged();
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public Vector3d getSpawnpoint() {

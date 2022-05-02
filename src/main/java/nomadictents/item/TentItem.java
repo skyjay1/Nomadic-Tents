@@ -13,6 +13,7 @@ import net.minecraft.item.UseAction;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -41,6 +42,7 @@ import java.util.List;
 public class TentItem extends Item {
 
     private static final String DOOR = "door";
+    private static final String DIRECTION = "direction";
 
     private final TentType type;
     private final TentSize size;
@@ -79,8 +81,9 @@ public class TentItem extends Item {
             if(canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
                 // place door frame
                 context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Constants.BlockFlags.DEFAULT);
-                // remember the door position
+                // remember the door position and player direction
                 context.getItemInHand().getOrCreateTag().put(DOOR, NBTUtil.writeBlockPos(placePos));
+                context.getItemInHand().getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
                 // begin using the item
                 if(context.getPlayer() != null) {
                     context.getPlayer().startUsingItem(context.getHand());
@@ -95,8 +98,9 @@ public class TentItem extends Item {
     @Override
     public void releaseUsing(ItemStack stack, World level, LivingEntity entity, int duration) {
         // locate door frame
-        if(stack.hasTag() && stack.getTag().contains(DOOR)) {
+        if(stack.hasTag() && stack.getTag().contains(DOOR) && stack.getTag().contains(DIRECTION)) {
             BlockPos pos = NBTUtil.readBlockPos(stack.getTag().getCompound(DOOR));
+            Direction direction = Direction.byName(stack.getTag().getString(DIRECTION));
             if(level.isLoaded(pos)) {
                 // detect door frame
                 BlockState state = level.getBlockState(pos);
@@ -104,10 +108,10 @@ public class TentItem extends Item {
                     int progress = state.getValue(FrameBlock.PROGRESS);
                     if (entity instanceof PlayerEntity && progress == FrameBlock.MAX_PROGRESS) {
                         // place tent
-                        placeTent(stack, level, pos, entity.getDirection(), (PlayerEntity) entity);
+                        placeTent(stack, level, pos, direction, (PlayerEntity) entity);
                     } else {
                         // cancel tent
-                        level.setBlock(pos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.BLOCK_UPDATE);
+                        cancelTent(stack, level, pos);
                     }
                 }
             }
@@ -133,22 +137,27 @@ public class TentItem extends Item {
             entity.releaseUsingItem();
             return;
         }
+        // determine tent direction
+        Direction direction = entity.getDirection();
+        if(stack.getOrCreateTag().contains(DIRECTION)) {
+            direction = Direction.byName(stack.getTag().getString(DIRECTION));
+        }
         // update door frame progress stages
         int progress = state.getValue(FrameBlock.PROGRESS);
         if(progress == FrameBlock.MAX_PROGRESS) {
             // determine if position is valid
-            if(entity instanceof PlayerEntity && canPlaceTent(level, pos, entity.getDirection())) {
+            if(entity instanceof PlayerEntity && canPlaceTent(level, pos, direction)) {
                 // place tent
-                placeTent(stack, level, pos, entity.getDirection(), (PlayerEntity) entity);
+                placeTent(stack, level, pos, direction, (PlayerEntity) entity);
                 entity.releaseUsingItem();
                 return;
             } else {
                 // remove door frame
-                level.setBlock(pos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.DEFAULT);
+                cancelTent(stack, level, pos);
             }
         }
         // increment progress
-        int next = progress + 1;
+        int next = progress + 2;
         level.setBlock(pos, state.setValue(FrameBlock.PROGRESS, Math.min(next, FrameBlock.MAX_PROGRESS)), Constants.BlockFlags.BLOCK_UPDATE);
     }
 
@@ -175,10 +184,19 @@ public class TentItem extends Item {
         TentPlacer tentPlacer = TentPlacer.getInstance();
         if(tentPlacer.placeTentFrame(level, clickedPos, this.type, this.size, direction)) {
             // update door
-            TentPlacer.setupDoor(level, clickedPos, Tent.from(stack, type, size), owner);
+            TentPlacer.setupDoor(level, clickedPos, direction, Tent.from(stack, type, size), owner);
             // remove tent from inventory
             stack.shrink(1);
         }
+    }
+
+    private void cancelTent(ItemStack stack, World level, BlockPos clickedPos) {
+        // remove door frame
+        BlockState state = level.getBlockState(clickedPos);
+        level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.DEFAULT);
+        // remove NBT data
+        stack.getOrCreateTag().remove(DOOR);
+        stack.getTag().remove(DIRECTION);
     }
 
     public static BlockRayTraceResult clipFrom(final LivingEntity player, final double range) {

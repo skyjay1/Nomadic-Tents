@@ -223,7 +223,7 @@ public final class NTRegistry {
         public static void register(final RegistryEvent.Register<TileEntityType<?>> event) {
             // create a set of blocks that can use the tile entity
             Set<Block> doorBlocks = new HashSet<>();
-            for(Map<TentSize, Supplier<BlockState>> doorMap : TentPlacer.DOORS.values()) {
+            for(Map<TentType, Supplier<BlockState>> doorMap : TentPlacer.DOORS.values()) {
                 for(Supplier<BlockState> supplier : doorMap.values()) {
                     doorBlocks.add(supplier.get().getBlock());
                 }

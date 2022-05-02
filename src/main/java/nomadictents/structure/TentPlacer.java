@@ -268,13 +268,14 @@ public final class TentPlacer {
         }
 
         // set up template placement settings
-        Rotation rotation = Rotation.NONE; // TODO
-        BlockPos origin = door; // TODO
+        Rotation rotation = toRotation(direction);
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getX() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         PlacementSettings placement = new PlacementSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
                 .addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_AND_AIR)
+                .addProcessor(TepeeStructureProcessor.TEPEE_PROCESSOR)
                 .addProcessor(insideTentProcessor);
         // place the template
         if(!template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT)) {
@@ -314,8 +315,8 @@ public final class TentPlacer {
         }
 
         // set up template placement settings
-        Rotation rotation = Rotation.NONE; // TODO
-        BlockPos origin = door; // TODO
+        Rotation rotation = toRotation(direction);
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getX() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         PlacementSettings placement = new PlacementSettings()
@@ -329,6 +330,7 @@ public final class TentPlacer {
         }
 
         // place doors
+        NomadicTents.LOGGER.debug("Placing door for dir " + direction + " with state " + doorState);
         level.setBlock(door, doorState, Constants.BlockFlags.DEFAULT);
 
         return true;
@@ -346,8 +348,8 @@ public final class TentPlacer {
             return false;
         }
 
-        Rotation rotation = Rotation.NONE; // TODO
-        BlockPos origin = door; // TODO
+        Rotation rotation = toRotation(direction);
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getX() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
 
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
@@ -358,12 +360,13 @@ public final class TentPlacer {
         return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
     }
 
-    public static void setupDoor(final World level, final BlockPos pos, final Tent tent, @Nullable final PlayerEntity owner) {
+    public static void setupDoor(final World level, final BlockPos pos, Direction direction, final Tent tent, @Nullable final PlayerEntity owner) {
         TileEntity blockEntity = level.getBlockEntity(pos);
         if(blockEntity instanceof TentDoorTileEntity) {
             TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
             // set up tile entity fields
             tentDoor.setTent(tent);
+            tentDoor.setDirection(direction);
             if(owner != null) {
                 tentDoor.setOwner(PlayerEntity.createPlayerUUID(owner.getName().getContents()));
             }
@@ -424,8 +427,9 @@ public final class TentPlacer {
                     + " " + type.getSerializedName());
             return null;
         }
+        NomadicTents.LOGGER.debug("Calculating door for direction " + direction + " with axis " + direction.getAxis());
         BlockState doorState = doors.get(type).get();
-        doorState.setValue(TentDoorBlock.AXIS, direction.getAxis());
+        doorState = doorState.setValue(TentDoorBlock.AXIS, direction.getAxis());
         return doorState;
     }
 
@@ -443,5 +447,15 @@ public final class TentPlacer {
         }
         NomadicTents.LOGGER.warn("Failed to locate frame block target for " + id);
         return frame;
+    }
+
+    public static Rotation toRotation(Direction dir) {
+        switch (dir) {
+            case DOWN: case UP: case EAST: default:
+                return Rotation.NONE;
+            case WEST: return Rotation.CLOCKWISE_180;
+            case NORTH: return Rotation.COUNTERCLOCKWISE_90;
+            case SOUTH: return Rotation.CLOCKWISE_90;
+        }
     }
 }
