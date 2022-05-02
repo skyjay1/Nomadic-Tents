@@ -2,23 +2,38 @@ package nomadictents;
 
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTier;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.gen.feature.template.IStructureProcessorType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ObjectHolder;
-import nomadictents.block.FrameBlockDoor;
-import nomadictents.block.FrameBlockWall;
+import nomadictents.block.FrameBlock;
+import nomadictents.block.TentDoorBlock;
 import nomadictents.block.TepeeBlock;
 import nomadictents.block.YurtRoofBlock;
 import nomadictents.block.YurtWallBlock;
+import nomadictents.item.MalletItem;
 import nomadictents.item.TentItem;
+import nomadictents.structure.TentPlacer;
+import nomadictents.structure.TepeeStructureProcessor;
+import nomadictents.tileentity.TentDoorTileEntity;
 import nomadictents.util.TentType;
 import nomadictents.util.TentSize;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public final class NTRegistry {
 
@@ -78,17 +93,44 @@ public final class NTRegistry {
         public static final Block YURT_WALL = null;
         @ObjectHolder("yurt_roof")
         public static final Block YURT_ROOF = null;
+        
+        @ObjectHolder("tiny_yurt_door")
+        public static final Block TINY_YURT_DOOR = null;
+        @ObjectHolder("small_yurt_door")
+        public static final Block SMALL_YURT_DOOR = null;
+        @ObjectHolder("medium_yurt_door")
+        public static final Block MEDIUM_YURT_DOOR = null;
+        @ObjectHolder("large_yurt_door")
+        public static final Block LARGE_YURT_DOOR = null;
+        @ObjectHolder("giant_yurt_door")
+        public static final Block GIANT_YURT_DOOR = null;
+        @ObjectHolder("mega_yurt_door")
+        public static final Block MEGA_YURT_DOOR = null;
+
+        @ObjectHolder("tiny_tepee_door")
+        public static final Block TINY_TEPEE_DOOR = null;
+        @ObjectHolder("small_tepee_door")
+        public static final Block SMALL_TEPEE_DOOR = null;
+        @ObjectHolder("medium_tepee_door")
+        public static final Block MEDIUM_TEPEE_DOOR = null;
+        @ObjectHolder("large_tepee_door")
+        public static final Block LARGE_TEPEE_DOOR = null;
+        @ObjectHolder("giant_tepee_door")
+        public static final Block GIANT_TEPEE_DOOR = null;
+        @ObjectHolder("mega_tepee_door")
+        public static final Block MEGA_TEPEE_DOOR = null;
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Block> event) {
             // register frame blocks
             // door frames
-            event.getRegistry().register(new FrameBlockDoor(AbstractBlock.Properties.of(Material.WOOD))
-                .setRegistryName(MODID, "door_frame"));
+            event.getRegistry().register(new FrameBlock(AbstractBlock.Properties.of(Material.WOOD))
+                    .setRegistryName(MODID, "door_frame")
+            );
             // wall/roof frames
-            for(FrameBlockWall.Type type : FrameBlockWall.Type.values()) {
-                event.getRegistry().register(new FrameBlockWall(type, AbstractBlock.Properties.of(Material.WOOD))
-                        .setRegistryName(MODID, type.getSerializedName() + "_frame"));
+            for(ResourceLocation id : TentPlacer.FRAME_TO_BLOCK.keySet()) {
+                event.getRegistry().register(new FrameBlock(AbstractBlock.Properties.of(Material.WOOD))
+                        .setRegistryName(id));
             }
 
             // register yurt blocks
@@ -104,6 +146,14 @@ public final class NTRegistry {
                 event.getRegistry().register(new TepeeBlock(type, AbstractBlock.Properties.of(Material.WOOL, MaterialColor.TERRACOTTA_WHITE))
                         .setRegistryName(MODID, type.getSerializedName() + "_tepee_wall"));
             }
+
+            // register door blocks
+            for(TentType type : TentType.values()) {
+                for(TentSize width : TentSize.values()) {
+                    event.getRegistry().register(new TentDoorBlock(AbstractBlock.Properties.of(Material.WOOL))
+                            .setRegistryName(MODID, width.getSerializedName() + "_" + type.getSerializedName() + "_door"));
+                }
+            }
         }
     }
 
@@ -115,6 +165,13 @@ public final class NTRegistry {
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Item> event) {
+
+            event.getRegistry().registerAll(
+                new MalletItem(ItemTier.IRON, false, new Item.Properties().tab(TAB))
+                    .setRegistryName(MODID, "mallet"),
+                new MalletItem(ItemTier.DIAMOND, true, new Item.Properties().tab(TAB))
+                    .setRegistryName(MODID, "golden_mallet")
+            );
 
             // register tents
             for(TentType type : TentType.values()) {
@@ -145,8 +202,38 @@ public final class NTRegistry {
         }
     }
 
+    public static final class ProcessorReg {
+        public static IStructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
+
+        @SubscribeEvent
+        public static void onSetup(FMLCommonSetupEvent event) {
+            TEPEE_PROCESSOR = IStructureProcessorType.register(
+                    MODID + ":tepee_processor",
+                    TepeeStructureProcessor.CODEC);
+        }
+    }
+
+    @ObjectHolder(MODID)
     public static final class TileEntityReg {
 
+        @ObjectHolder("tent_door")
+        public static final TileEntityType<?> TENT_DOOR = null;
+
+        @SubscribeEvent
+        public static void register(final RegistryEvent.Register<TileEntityType<?>> event) {
+            // create a set of blocks that can use the tile entity
+            Set<Block> doorBlocks = new HashSet<>();
+            for(Map<TentSize, Supplier<BlockState>> doorMap : TentPlacer.DOORS.values()) {
+                for(Supplier<BlockState> supplier : doorMap.values()) {
+                    doorBlocks.add(supplier.get().getBlock());
+                }
+            }
+            // create the tile entity type
+            TileEntityType<TentDoorTileEntity> tentDoorType = TileEntityType.Builder.of(TentDoorTileEntity::new,
+                    doorBlocks.toArray(new Block[0])).build(null);
+            // register the tile entity type
+            event.getRegistry().register(tentDoorType.setRegistryName(NomadicTents.MODID, "tent_door"));
+        }
     }
 
     public static final class RecipeReg {

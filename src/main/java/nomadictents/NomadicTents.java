@@ -26,13 +26,14 @@ public class NomadicTents {
 	
 	public NomadicTents() {
 		// register and load config
-		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SPEC);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, SPEC);
 		// registry handlers
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTRegistry.BlockReg.class);
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTRegistry.ItemReg.class);
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTRegistry.RecipeReg.class);
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTRegistry.DimensionReg.class);
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTRegistry.TileEntityReg.class);
+		FMLJavaModLoadingContext.get().getModEventBus().register(NTRegistry.ProcessorReg.class);
 		// event handlers
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTEvents.ModHandler.class);
 		MinecraftForge.EVENT_BUS.register(NTEvents.ForgeHandler.class);

@@ -4,6 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,7 +12,7 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.item.UseAction;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -29,6 +30,8 @@ import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 import nomadictents.block.FrameBlock;
+import nomadictents.structure.TentPlacer;
+import nomadictents.util.Tent;
 import nomadictents.util.TentType;
 import nomadictents.util.TentSize;
 
@@ -37,19 +40,15 @@ import java.util.List;
 
 public class TentItem extends Item {
 
-    public static final String TYPE = "tent";
-    public static final String SIZE = "size";
-    public static final String LAYERS = "layers";
-
     private static final String DOOR = "door";
 
     private final TentType type;
-    private final TentSize width;
+    private final TentSize size;
 
     public TentItem(TentType type, TentSize width, Properties properties) {
         super(properties);
         this.type = type;
-        this.width = width;
+        this.size = width;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -77,7 +76,7 @@ public class TentItem extends Item {
             if(replace.getMaterial() != Material.AIR && !replace.getMaterial().isLiquid()) {
                 return ActionResultType.FAIL;
             }
-            if(canPlaceTent(context.getLevel(), placePos)) {
+            if(canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
                 // place door frame
                 context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Constants.BlockFlags.DEFAULT);
                 // remember the door position
@@ -103,9 +102,9 @@ public class TentItem extends Item {
                 BlockState state = level.getBlockState(pos);
                 if(NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
                     int progress = state.getValue(FrameBlock.PROGRESS);
-                    if (progress == FrameBlock.MAX_PROGRESS) {
+                    if (entity instanceof PlayerEntity && progress == FrameBlock.MAX_PROGRESS) {
                         // place tent
-                        placeTent(stack, level, pos);
+                        placeTent(stack, level, pos, entity.getDirection(), (PlayerEntity) entity);
                     } else {
                         // cancel tent
                         level.setBlock(pos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.BLOCK_UPDATE);
@@ -138,9 +137,9 @@ public class TentItem extends Item {
         int progress = state.getValue(FrameBlock.PROGRESS);
         if(progress == FrameBlock.MAX_PROGRESS) {
             // determine if position is valid
-            if(canPlaceTent(level, pos)) {
+            if(entity instanceof PlayerEntity && canPlaceTent(level, pos, entity.getDirection())) {
                 // place tent
-                placeTent(stack, level, pos);
+                placeTent(stack, level, pos, entity.getDirection(), (PlayerEntity) entity);
                 entity.releaseUsingItem();
                 return;
             } else {
@@ -164,13 +163,22 @@ public class TentItem extends Item {
         return stack;
     }
 
-    private boolean canPlaceTent(World level, BlockPos startPos) {
-        return true;
+    private boolean canPlaceTent(World level, BlockPos startPos, Direction direction) {
+        // TODO templates are not available client-side, maybe we should send packet instead
+        TentPlacer tentPlacer = TentPlacer.getInstance();
+        return tentPlacer.canPlaceTentFrame(level, startPos, this.type, this.size, direction);
     }
 
-    private void placeTent(ItemStack stack, World level, BlockPos clickedPos) {
-        NomadicTents.LOGGER.debug("Placing a tent at " + clickedPos);
+    private void placeTent(ItemStack stack, World level, BlockPos clickedPos, Direction direction, @Nullable PlayerEntity owner) {
+        NomadicTents.LOGGER.debug("Placing a tent at " + clickedPos + " facing " + direction);
         level.destroyBlock(clickedPos, false);
+        TentPlacer tentPlacer = TentPlacer.getInstance();
+        if(tentPlacer.placeTentFrame(level, clickedPos, this.type, this.size, direction)) {
+            // update door
+            TentPlacer.setupDoor(level, clickedPos, Tent.from(stack, type, size), owner);
+            // remove tent from inventory
+            stack.shrink(1);
+        }
     }
 
     public static BlockRayTraceResult clipFrom(final LivingEntity player, final double range) {

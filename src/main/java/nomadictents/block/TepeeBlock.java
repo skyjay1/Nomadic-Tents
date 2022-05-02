@@ -2,6 +2,8 @@ package nomadictents.block;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
+import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.state.properties.Half;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -10,8 +12,10 @@ import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class TepeeBlock extends TentBlock {
@@ -25,9 +29,20 @@ public class TepeeBlock extends TentBlock {
 
     public void onPlace(BlockState stateIn, World level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if(this.type == Type.BLANK) {
-            // TODO: scan nearby blocks for a door
-            if(level.random.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
-                level.setBlock(pos, getRandomSymbol(level.random), Constants.BlockFlags.DEFAULT);
+            // locate nearby door
+            Random rand = level.random;
+            BlockPos door = locateDoor(level, pos);
+            if(door != null) {
+                rand = new Random(door.hashCode());
+                // replace block with psuedo-random pattern
+                if(pos.getY() - door.getY() % 2 == 0) {
+                    level.setBlock(pos, getRandomPattern(rand), Constants.BlockFlags.DEFAULT);
+                    return;
+                }
+            }
+            // replace block with psuedo-random symbol
+            if(rand.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
+                level.setBlock(pos, getRandomSymbol(rand), Constants.BlockFlags.DEFAULT);
             }
         }
     }
@@ -40,6 +55,55 @@ public class TepeeBlock extends TentBlock {
     public static BlockState getRandomSymbol(final Random rand) {
         int index = rand.nextInt(TepeeBlock.Type.SYMBOLS.size());
         return TepeeBlock.Type.SYMBOLS.get(index).getBlock();
+    }
+
+    /**
+     * Traces all connected ITepeeBlock blocks (frames and tepee walls) until it
+     * finds the lower door of the tepee.
+     *
+     * @param world the world
+     * @param pos   BlockPos to begin searching from
+     * @return BlockPos of lower tepee door if found, otherwise null
+     **/
+    private static BlockPos locateDoor(World world, BlockPos pos) {
+        Set<BlockPos> checked = new HashSet<>();
+        while (pos != null && !(world.getBlockState(pos).getBlock() instanceof TentDoorBlock)) {
+            pos = locateTepeeBlockExcluding(world, checked, pos);
+        }
+        if (null == pos) {
+            return null;
+        }
+        boolean lower = world.getBlockState(pos).getValue(TentDoorBlock.HALF) == DoubleBlockHalf.LOWER;
+        return lower ? pos : pos.below(1);
+    }
+
+    /**
+     * Searches a 3x3x3 box for a TepeeBlock that has not been added to the list already.
+     *
+     * @param worldIn the world
+     * @param exclude list of BlockPos already checked
+     * @param pos center of the 3x3x3 box
+     **/
+    private static BlockPos locateTepeeBlockExcluding(World worldIn, Set<BlockPos> exclude, BlockPos pos) {
+        int radius = 1;
+        // favor blocks below this one (on average, tepee blocks are above the door)
+        for (int y = -radius; y <= radius; y++) {
+            for (int x = -radius; x <= radius; x++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos checkPos = pos.offset(x, y, z);
+                    if (!exclude.contains(checkPos)) {
+                        BlockState stateAt = worldIn.getBlockState(checkPos);
+                        if (stateAt.getBlock() instanceof TepeeBlock
+                                || stateAt.getBlock() instanceof FrameBlock
+                                || stateAt.getBlock() instanceof TentDoorBlock) {
+                            exclude.add(checkPos);
+                            return checkPos;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 

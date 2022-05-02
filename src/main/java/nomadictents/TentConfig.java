@@ -19,7 +19,6 @@ public final class TentConfig {
 	public final ForgeConfigSpec.BooleanValue ENABLE_WEATHER;
 //	public final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_BLACKLIST;
 	// Player permissions
-	public final ForgeConfigSpec.BooleanValue SUPER_MALLET_CREATIVE_ONLY;
 	public final ForgeConfigSpec.BooleanValue OWNER_ENTRANCE;
 	public final ForgeConfigSpec.BooleanValue OWNER_PICKUP;
 	public final ForgeConfigSpec.BooleanValue ALLOW_PLAYER_COLLIDE;
@@ -85,9 +84,6 @@ public final class TentConfig {
 		builder.pop();
 		// begin section 'permissions'
 		builder.push("permissions");
-		SUPER_MALLET_CREATIVE_ONLY = builder
-				.comment("When true, only Creative-mode players can use the Super Tent Mallet")
-				.define("Super Mallet Creative Only", false);
 		OWNER_ENTRANCE = builder.comment("When true, only the player who placed the tent can enter it")
 				.define("Owner-Only Entrance", false);
 		OWNER_PICKUP = builder.comment("When true, only the player who placed the tent can pick it up")

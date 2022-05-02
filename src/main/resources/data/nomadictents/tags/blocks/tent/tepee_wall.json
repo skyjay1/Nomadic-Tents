@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "nomadictents:blank_tepee_wall",
+    "nomadictents:channel_tepee_wall",
+    "nomadictents:creeper_tepee_wall",
+    "nomadictents:dreamcatcher_tepee_wall",
+    "nomadictents:eagle_tepee_wall",
+    "nomadictents:golem_tepee_wall",
+    "nomadictents:hope_tepee_wall",
+    "nomadictents:magic_tepee_wall",
+    "nomadictents:radial_tepee_wall",
+    "nomadictents:rain_tepee_wall",
+    "nomadictents:space_tepee_wall",
+    "nomadictents:sun_tepee_wall",
+    "nomadictents:triforce_tepee_wall",
+    "nomadictents:wedge_tepee_wall",
+    "nomadictents:zigzag_tepee_wall"
+  ]
+}

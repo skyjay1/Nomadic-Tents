@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "nomadictents:yurt_wall",
+    "nomadictents:yurt_roof",
+    "#nomadictents:tent/tepee_wall"
+  ]
+}
