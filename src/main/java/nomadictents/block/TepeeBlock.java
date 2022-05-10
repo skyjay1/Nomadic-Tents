@@ -2,6 +2,7 @@ package nomadictents.block;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.state.properties.Half;
 import net.minecraft.util.IStringSerializable;
@@ -11,6 +12,7 @@ import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -27,20 +29,30 @@ public class TepeeBlock extends TentBlock {
         this.type = type;
     }
 
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext p_196258_1_) {
+        NomadicTents.LOGGER.debug("tepee: getStateForPlacement");
+        return super.getStateForPlacement(p_196258_1_);
+    }
+
+    @Override
     public void onPlace(BlockState stateIn, World level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        NomadicTents.LOGGER.debug("tepee: onPlace");
         if(this.type == Type.BLANK) {
             // locate nearby door
             Random rand = level.random;
             BlockPos door = locateDoor(level, pos);
             if(door != null) {
-                rand = new Random(door.hashCode());
                 // replace block with psuedo-random pattern
-                if(pos.getY() - door.getY() % 2 == 0) {
+                int dy = pos.getY() - door.getY();
+                if(dy % 2 == 0) {
+                    rand = new Random(door.above(dy).hashCode());
                     level.setBlock(pos, getRandomPattern(rand), Constants.BlockFlags.DEFAULT);
                     return;
                 }
             }
-            // replace block with psuedo-random symbol
+            // replace block with random symbol
             if(rand.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
                 level.setBlock(pos, getRandomSymbol(rand), Constants.BlockFlags.DEFAULT);
             }

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "SIS",
+   "SBS",
+   "SIS"],
+  "key": {
+   "I": {
+        "item": "minecraft:diamond"
+      },
+   "B": {
+        "item": "minecraft:diamond_block"
+      },
+	"S": {
+		"item": "minecraft:stick"
+	  }
+  },
+  "result": {
+    "item": "nomadictents:diamond_crossbeams",
+    "count": 1
+  }
+}

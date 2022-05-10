@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "FSF",
+   "FSF",
+   "FSF"],
+  "key": {
+    "F": {
+        "item": "minecraft:rabbit_hide"
+      },
+	"S": {
+		"item": "minecraft:stick"
+	  }
+  },
+  "result": {
+    "item": "nomadictents:tepee_section",
+    "count": 1
+  }
+}

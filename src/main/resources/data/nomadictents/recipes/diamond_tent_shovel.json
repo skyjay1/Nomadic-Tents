@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   " CS",
+   " KC",
+   "E  "],
+  "key": {
+    "S": {
+        "item": "minecraft:diamond"
+      },
+	"E": {
+        "item": "minecraft:emerald"
+    },
+	"K": {
+		"item": "minecraft:stick"
+	  },
+	"C": {
+		"item": "nomadictents:tent_canvas"
+	  }
+  },
+  "result": {
+    "item": "nomadictents:diamond_tent_shovel",
+    "count": 1
+  }
+}

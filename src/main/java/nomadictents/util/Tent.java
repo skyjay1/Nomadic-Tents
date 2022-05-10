@@ -5,6 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.NomadicTents;
@@ -81,6 +82,11 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
             return from(stack, type, size);
         }
         return from(stack, TentType.YURT, TentSize.TINY);
+    }
+
+    public static BlockPos calculatePos(final int id) {
+        // TODO do we need to change anything here?
+        return new BlockPos(0, 64, 0);
     }
 
     /**

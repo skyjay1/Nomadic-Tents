@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "FSF",
+   "FSF",
+   "FSF"],
+  "key": {
+    "F": { "tag": "minecraft:leaves" },
+	"S": { "item": "minecraft:stick" }
+  },
+  "result": {
+    "item": "nomadictents:indlu_section",
+    "count": 1
+  }
+}

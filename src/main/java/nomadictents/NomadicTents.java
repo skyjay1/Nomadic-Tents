@@ -1,7 +1,11 @@
 package nomadictents;
 
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import nomadictents.dimension.EmptyChunkGenerator;
 import nomadictents.event.NTEvents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,6 +41,8 @@ public class NomadicTents {
 		// event handlers
 		FMLJavaModLoadingContext.get().getModEventBus().register(NTEvents.ModHandler.class);
 		MinecraftForge.EVENT_BUS.register(NTEvents.ForgeHandler.class);
+		// other handlers
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(NomadicTents::setup);
 		// client-side registry
 		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
 			try {
@@ -46,5 +52,12 @@ public class NomadicTents {
 				LOGGER.error("Caught exception while registering Client-Side event handler\n" + e.getMessage());
 			}
 		});	
+	}
+
+	public static void setup(final FMLCommonSetupEvent event) {
+		// register chunk generator
+		event.enqueueWork(() -> {
+			Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(MODID, "empty"), EmptyChunkGenerator.CODEC);
+		});
 	}
 }

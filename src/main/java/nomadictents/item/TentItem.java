@@ -65,8 +65,16 @@ public class TentItem extends Item {
 
     @Override
     public ActionResultType useOn(ItemUseContext context) {
-        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+        // begin using the item
+        if(context.getPlayer() != null) {
+            context.getPlayer().startUsingItem(context.getHand());
+        }
+        // client should not run anything else
+        if(context.getLevel().isClientSide) {
+            return ActionResultType.SUCCESS;
+        }
         // add door frame
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if(!NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
             // determine placement position
             BlockPos placePos = context.getClickedPos();
@@ -84,10 +92,7 @@ public class TentItem extends Item {
                 // remember the door position and player direction
                 context.getItemInHand().getOrCreateTag().put(DOOR, NBTUtil.writeBlockPos(placePos));
                 context.getItemInHand().getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
-                // begin using the item
-                if(context.getPlayer() != null) {
-                    context.getPlayer().startUsingItem(context.getHand());
-                }
+
                 return ActionResultType.SUCCESS;
             }
         }
@@ -96,7 +101,15 @@ public class TentItem extends Item {
     }
 
     @Override
+    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+        return super.onItemUseFirst(stack, context);
+    }
+
+    @Override
     public void releaseUsing(ItemStack stack, World level, LivingEntity entity, int duration) {
+        if(level.isClientSide) {
+            return;
+        }
         // locate door frame
         if(stack.hasTag() && stack.getTag().contains(DOOR) && stack.getTag().contains(DIRECTION)) {
             BlockPos pos = NBTUtil.readBlockPos(stack.getTag().getCompound(DOOR));
@@ -121,7 +134,7 @@ public class TentItem extends Item {
     @Override
     public void onUseTick(World level, LivingEntity entity, ItemStack stack, int duration) {
         // delay between updates
-        if(duration % 5 != 1) {
+        if(level.isClientSide || duration % 5 != 1) {
             return;
         }
         // locate selected block
@@ -173,18 +186,15 @@ public class TentItem extends Item {
     }
 
     private boolean canPlaceTent(World level, BlockPos startPos, Direction direction) {
-        // TODO templates are not available client-side, maybe we should send packet instead
         TentPlacer tentPlacer = TentPlacer.getInstance();
         return tentPlacer.canPlaceTentFrame(level, startPos, this.type, this.size, direction);
     }
 
     private void placeTent(ItemStack stack, World level, BlockPos clickedPos, Direction direction, @Nullable PlayerEntity owner) {
-        NomadicTents.LOGGER.debug("Placing a tent at " + clickedPos + " facing " + direction);
+        Tent tent = Tent.from(stack, this.type, this.size);
         level.destroyBlock(clickedPos, false);
         TentPlacer tentPlacer = TentPlacer.getInstance();
-        if(tentPlacer.placeTentFrame(level, clickedPos, this.type, this.size, direction)) {
-            // update door
-            TentPlacer.setupDoor(level, clickedPos, direction, Tent.from(stack, type, size), owner);
+        if(tentPlacer.placeTentFrameWithDoor(level, clickedPos, tent, direction, owner)) {
             // remove tent from inventory
             stack.shrink(1);
         }

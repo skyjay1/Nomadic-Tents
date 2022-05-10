@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
@@ -14,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.template.AlwaysTrueRuleTest;
@@ -47,10 +49,10 @@ import java.util.function.Supplier;
 
 public final class TentPlacer {
 
-    private static TentPlacer instance;
-
-
+    public static final Direction TENT_DIRECTION = Direction.EAST;
     private static final String MODID = NomadicTents.MODID;
+
+    private static TentPlacer instance;
 
     /**
      * Nested map where keys = {TentSize, TentType} and value = {Structure ID}
@@ -129,7 +131,7 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "blank_tepee_wall"), () -> NTRegistry.BlockReg.TEPEE_WALL_FRAME.defaultBlockState())
             .build();
 
-    // instance fields that rely on events being resolved before they can be initialized
+    // instance fields that rely on registries being resolved before they can be initialized
     private final RuleTest barrierTest;
     private final RuleTest tentBlockTest;
     private final RuleTest tepeeWallTest;
@@ -224,22 +226,83 @@ public final class TentPlacer {
      * @return true if the tent frame can be placed at this position
      */
     public boolean canPlaceTentFrame(final World level, final BlockPos door, final TentType type, final TentSize size, final Direction direction) {
-        return true;
-        /*
         // determine the size of tent to place frames
         TentSize useSize = getOverworldSize(size);
         // determine template to use
         Template template = getTemplate(level, type, useSize);
         if(null == template) {
+            NomadicTents.LOGGER.debug("Failed to load template");
             return false;
         }
 
         // TODO check all tent blocks in the template
         // If the relative position of any tent block is obstructed (not replaceable and not door frame), return false
 
-        return true;*/
+        return true;
     }
 
+    /**
+     * Places a new tent or upgrades an existing one, then updates the tent door
+     * @param level the world
+     * @param door the door position
+     * @param tent the tent information
+     * @param sourceLevel the player previous world
+     * @param sourceVec the player previous location
+     * @param sourceRot the player previous rotation
+     * @return true if the tent was placed or upgraded successfully
+     */
+    public boolean placeOrUpgradeTent(final World level, final BlockPos door, final Tent tent,
+                             final ServerWorld sourceLevel, final Vector3d sourceVec, final float sourceRot) {
+        boolean success = false;
+        // TODO check for tent door and upgrades
+        // place tent for the first time
+        if(placeTent(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION)) {
+            success = true;
+            // place or upgrade platform
+            // TODO allow upgrade platform
+            placePlatform(level, door, tent.getType(), tent.getSize(), tent.getLayers());
+        }
+        // update tile entity
+        if(success) {
+            // apply fields to tile entity
+            TileEntity blockEntity = level.getBlockEntity(door);
+            if(blockEntity instanceof TentDoorTileEntity) {
+                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+                // set up tile entity fields
+                tentDoor.setSpawnpoint(sourceLevel, sourceVec);
+                tentDoor.setSpawnRot(sourceRot);
+                tentDoor.setTent(tent);
+            }
+        }
+        return success;
+    }
+
+    /**
+     * Places a tent frame in the world and updates block entity information in the door
+     * @param level the world
+     * @param door the door position
+     * @param tent the tent information
+     * @param direction the tent direction
+     * @param owner the tent owner, if any
+     * @return true if the tent was placed successfully
+     */
+    public boolean placeTentFrameWithDoor(final World level, final BlockPos door, final Tent tent, final Direction direction, @Nullable final PlayerEntity owner) {
+        boolean success = placeTentFrame(level, door, tent.getType(), tent.getSize(), direction);
+        // update door
+        if(success) {
+            TileEntity blockEntity = level.getBlockEntity(door);
+            if(blockEntity instanceof TentDoorTileEntity) {
+                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+                // set up tile entity fields
+                tentDoor.setTent(tent);
+                tentDoor.setDirection(direction);
+                if(owner != null) {
+                    tentDoor.setOwner(PlayerEntity.createPlayerUUID(owner.getName().getContents()));
+                }
+            }
+        }
+        return success;
+    }
 
     /**
      * Places a tent structure in the world
@@ -269,7 +332,7 @@ public final class TentPlacer {
 
         // set up template placement settings
         Rotation rotation = toRotation(direction);
-        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getX() / 2).rotate(rotation));
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         PlacementSettings placement = new PlacementSettings()
@@ -316,7 +379,7 @@ public final class TentPlacer {
 
         // set up template placement settings
         Rotation rotation = toRotation(direction);
-        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getX() / 2).rotate(rotation));
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         PlacementSettings placement = new PlacementSettings()
@@ -330,7 +393,6 @@ public final class TentPlacer {
         }
 
         // place doors
-        NomadicTents.LOGGER.debug("Placing door for dir " + direction + " with state " + doorState);
         level.setBlock(door, doorState, Constants.BlockFlags.DEFAULT);
 
         return true;
@@ -349,7 +411,7 @@ public final class TentPlacer {
         }
 
         Rotation rotation = toRotation(direction);
-        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getX() / 2).rotate(rotation));
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
 
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
@@ -360,17 +422,47 @@ public final class TentPlacer {
         return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
     }
 
-    public static void setupDoor(final World level, final BlockPos pos, Direction direction, final Tent tent, @Nullable final PlayerEntity owner) {
-        TileEntity blockEntity = level.getBlockEntity(pos);
-        if(blockEntity instanceof TentDoorTileEntity) {
-            TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
-            // set up tile entity fields
-            tentDoor.setTent(tent);
-            tentDoor.setDirection(direction);
-            if(owner != null) {
-                tentDoor.setOwner(PlayerEntity.createPlayerUUID(owner.getName().getContents()));
+    public boolean placePlatform(final World level, final BlockPos door, final TentType type, final TentSize size, final int layers) {
+        // ensure server side
+        if(level.isClientSide || !(level instanceof ServerWorld)) {
+            return false;
+        }
+        IServerWorld serverLevel = (ServerWorld) level;
+        // determine template to use
+        Template template = getTemplate(level, type, size);
+        if(null == template) {
+            return false;
+        }
+
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, -1, -template.getSize().getZ() / 2));
+        int width = template.getSize().getX();
+        BlockState rigidDirt = NTRegistry.BlockReg.RIGID_DIRT.defaultBlockState();
+        BlockState dirt = NomadicTents.CONFIG.getFloorBlock().defaultBlockState();
+
+        // place dirt in a square at this location
+        BlockPos p;
+        boolean rigid;
+        BlockState state;
+        for(int x = 0; x < width; x++) {
+            for(int z = 0; z < width; z++) {
+                // determine block location
+                p = origin.offset(x, 0, z);
+                // determine which block state to place
+                rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
+                if(rigid) {
+                    state = rigidDirt;
+                } else {
+                    state = dirt;
+                }
+                // place in a column at this location
+                // TODO allow upgrade layers by replacing previous rigid dirt with regular dirt
+                for(int y = 0, l = layers + 1; y < l; y++) {
+                    level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                }
+                level.setBlock(p.below(layers + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
             }
         }
+        return true;
     }
 
     /**
@@ -427,7 +519,6 @@ public final class TentPlacer {
                     + " " + type.getSerializedName());
             return null;
         }
-        NomadicTents.LOGGER.debug("Calculating door for direction " + direction + " with axis " + direction.getAxis());
         BlockState doorState = doors.get(type).get();
         doorState = doorState.setValue(TentDoorBlock.AXIS, direction.getAxis());
         return doorState;

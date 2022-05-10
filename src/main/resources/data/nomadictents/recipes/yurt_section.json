@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "FSF",
+   "FSF"],
+  "key": {
+    "F": {
+        "item": "nomadictents:tent_canvas"
+      },
+	"S": {
+		"item": "minecraft:stick"
+	  }
+  },
+  "result": {
+    "item": "nomadictents:yurt_section",
+    "count": 1
+  }
+}

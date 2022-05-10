@@ -1,16 +1,31 @@
 package nomadictents.tileentity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.Dimension;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import nomadictents.NTRegistry;
+import nomadictents.NomadicTents;
+import nomadictents.TentSaveData;
+import nomadictents.dimension.DimensionFactory;
+import nomadictents.dimension.DynamicDimensionHelper;
+import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class TentDoorTileEntity extends TileEntity {
@@ -24,8 +39,9 @@ public class TentDoorTileEntity extends TileEntity {
     private static final String OWNER = "owner";
 
     private Tent tent = new Tent(0, TentType.YURT, TentSize.TINY);
-    private Direction direction = Direction.NORTH;
+    private Direction direction = TentPlacer.TENT_DIRECTION;
 
+    private ResourceLocation spawnDimension = Dimension.OVERWORLD.location();
     private Vector3d spawnpoint = Vector3d.ZERO;
     private float spawnRot;
     private UUID owner;
@@ -42,7 +58,7 @@ public class TentDoorTileEntity extends TileEntity {
         // save direction
         tag.putString(DIRECTION, direction.getSerializedName());
         // save spawn dimension
-        // TODO
+        tag.putString(SPAWN_DIMENSION, spawnDimension.toString());
         if(spawnpoint != Vector3d.ZERO) {
             // save spawnpoint
             CompoundNBT spawnpointTag = new CompoundNBT();
@@ -69,7 +85,7 @@ public class TentDoorTileEntity extends TileEntity {
         // load direction
         this.direction = Direction.byName(tag.getString(DIRECTION));
         // load spawn dimension
-        // TODO
+        this.spawnDimension = ResourceLocation.tryParse(tag.getString(SPAWN_DIMENSION));
         if(tag.contains(SPAWNPOINT)) {
             // load spawnpoint
             CompoundNBT spawnpointTag = tag.getCompound(SPAWNPOINT);
@@ -84,6 +100,44 @@ public class TentDoorTileEntity extends TileEntity {
         // load owner
         if(tag.contains(OWNER)) {
             this.owner = tag.getUUID(OWNER);
+        }
+    }
+
+    public void onEnter(final LivingEntity entity) {
+        // ensure server side
+        if(entity.level.isClientSide || null == entity.getServer()) {
+            return;
+        }
+        MinecraftServer server = entity.getServer();
+        // determine current level
+        ResourceLocation source = entity.level.dimension().location();
+        // if current dimension has mod id, we are inside the tent
+        boolean insideTent = NomadicTents.MODID.equals(source.getNamespace());
+
+        if(insideTent) {
+            // teleport to source dimension and position
+            // get or create target level
+            TentSaveData tentSaveData = TentSaveData.get(server);
+            RegistryKey<World> world = tentSaveData.getOrCreateKey(server, this.tent.getId());
+            ServerWorld targetLevel = DynamicDimensionHelper.getOrCreateWorld(server, world, DimensionFactory::createDimension);
+            // teleport entity to target level
+            if(targetLevel != null) {
+                // TODO allow entity teleport, not just player
+                if(entity instanceof ServerPlayerEntity) {
+                    DynamicDimensionHelper.sendPlayerToTent((ServerPlayerEntity) entity, targetLevel, this.tent);
+                }
+            }
+        } else {
+            // teleport to tent dimension
+            RegistryKey<World> world = RegistryKey.create(Registry.DIMENSION_REGISTRY, this.spawnDimension);
+            ServerWorld targetLevel = server.getLevel(world);
+            // teleport entity to target level
+            if(targetLevel != null) {
+                // TODO allow entity teleport, not just player
+                if(entity instanceof ServerPlayerEntity) {
+                    DynamicDimensionHelper.sendPlayerToDimension((ServerPlayerEntity) entity, targetLevel, this.spawnpoint);
+                }
+            }
         }
     }
 
@@ -108,7 +162,20 @@ public class TentDoorTileEntity extends TileEntity {
         return spawnpoint;
     }
 
-    public void setSpawnpoint(Vector3d spawnpoint) {
+    public ResourceLocation getSpawnDimensionKey() {
+        return spawnDimension;
+    }
+
+    @Nullable
+    public ServerWorld getSpawnDimension() {
+        if(this.level != null && !this.level.isClientSide) {
+            return this.level.getServer().getLevel(RegistryKey.create(Registry.DIMENSION_REGISTRY, this.spawnDimension));
+        }
+        return null;
+    }
+
+    public void setSpawnpoint(World world, Vector3d spawnpoint) {
+        this.spawnDimension = world.dimension().location();
         this.spawnpoint = spawnpoint;
         this.setChanged();
     }

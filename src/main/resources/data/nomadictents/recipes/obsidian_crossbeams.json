@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+   "SBS",
+   "SBS",
+   "SBS"],
+  "key": {
+   "B": {
+        "item": "minecraft:obsidian"
+      },
+	"S": {
+		"item": "minecraft:stick"
+	  }
+  },
+  "result": {
+    "item": "nomadictents:obsidian_crossbeams",
+    "count": 1
+  }
+}

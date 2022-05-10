@@ -3,6 +3,7 @@ package nomadictents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
@@ -18,6 +19,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.FrameBlock;
+import nomadictents.block.TentBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.TepeeBlock;
 import nomadictents.block.YurtRoofBlock;
@@ -48,6 +50,9 @@ public final class NTRegistry {
 
     @ObjectHolder(MODID)
     public static final class BlockReg {
+
+        @ObjectHolder("rigid_dirt")
+        public static final Block RIGID_DIRT = null;
 
         @ObjectHolder("door_frame")
         public static final Block DOOR_FRAME = null;
@@ -122,38 +127,55 @@ public final class NTRegistry {
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Block> event) {
-            // register frame blocks
-            // door frames
-            event.getRegistry().register(new FrameBlock(AbstractBlock.Properties.of(Material.WOOD))
-                    .setRegistryName(MODID, "door_frame")
+            // register door frames
+            event.getRegistry().register(new FrameBlock(AbstractBlock.Properties
+                    .of(Material.BARRIER, MaterialColor.WOOD)
+                    .sound(SoundType.WOOD))
+                .setRegistryName(MODID, "door_frame")
             );
-            // wall/roof frames
+            // register wall/roof frames
             for(ResourceLocation id : TentPlacer.FRAME_TO_BLOCK.keySet()) {
-                event.getRegistry().register(new FrameBlock(AbstractBlock.Properties.of(Material.WOOD))
-                        .setRegistryName(id));
+                event.getRegistry().register(new FrameBlock(AbstractBlock.Properties
+                        .of(Material.BARRIER, MaterialColor.WOOD)
+                        .sound(SoundType.WOOD))
+                    .setRegistryName(id));
             }
 
             // register yurt blocks
             event.getRegistry().registerAll(
-                    new YurtWallBlock(AbstractBlock.Properties.of(Material.WOOL))
-                            .setRegistryName(MODID, "yurt_wall"),
-                    new YurtRoofBlock(AbstractBlock.Properties.of(Material.WOOL))
-                            .setRegistryName(MODID, "yurt_roof")
-            );
+                    new YurtWallBlock(AbstractBlock.Properties
+                            .of(Material.BARRIER, MaterialColor.WOOL)
+                            .sound(SoundType.WOOL))
+                        .setRegistryName(MODID, "yurt_wall"),
+                    new YurtRoofBlock(AbstractBlock.Properties
+                            .of(Material.BARRIER, MaterialColor.WOOL)
+                            .sound(SoundType.WOOL))
+                        .setRegistryName(MODID, "yurt_roof"));
 
             // register tepee blocks
             for(final TepeeBlock.Type type : TepeeBlock.Type.values()) {
-                event.getRegistry().register(new TepeeBlock(type, AbstractBlock.Properties.of(Material.WOOL, MaterialColor.TERRACOTTA_WHITE))
-                        .setRegistryName(MODID, type.getSerializedName() + "_tepee_wall"));
+                event.getRegistry().register(new TepeeBlock(type, AbstractBlock.Properties
+                        .of(Material.BARRIER, MaterialColor.TERRACOTTA_WHITE)
+                        .sound(SoundType.WOOL))
+                    .setRegistryName(MODID, type.getSerializedName() + "_tepee_wall"));
             }
 
             // register door blocks
             for(TentType type : TentType.values()) {
                 for(TentSize width : TentSize.values()) {
-                    event.getRegistry().register(new TentDoorBlock(AbstractBlock.Properties.of(Material.WOOL))
-                            .setRegistryName(MODID, width.getSerializedName() + "_" + type.getSerializedName() + "_door"));
+                    event.getRegistry().register(new TentDoorBlock(AbstractBlock.Properties
+                            .of(Material.BARRIER, MaterialColor.WOOL)
+                            .sound(SoundType.WOOL))
+                        .setRegistryName(MODID, width.getSerializedName() + "_" + type.getSerializedName() + "_door"));
                 }
             }
+
+            // register other blocks
+            event.getRegistry().register(new TentBlock(AbstractBlock.Properties
+                    .of(Material.BARRIER, MaterialColor.DIRT)
+                    .sound(SoundType.GRAVEL))
+                .setRegistryName(MODID, "rigid_dirt"));
+
         }
     }
 
@@ -171,6 +193,24 @@ public final class NTRegistry {
                     .setRegistryName(MODID, "mallet"),
                 new MalletItem(ItemTier.DIAMOND, true, new Item.Properties().tab(TAB))
                     .setRegistryName(MODID, "golden_mallet")
+            );
+
+            // register crafting items
+            event.getRegistry().registerAll(
+                new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "tent_canvas"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "yurt_section"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "tepee_section"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "indlu_section"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "bedouin_section"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "shamiyana_section"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "golden_crossbeams"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "obsidian_crossbeams"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "diamond_crossbeams"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "stone_tent_shovel"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "iron_tent_shovel"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "golden_tent_shovel"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "obsidian_tent_shovel"),
+                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "diamond_tent_shovel")
             );
 
             // register tents

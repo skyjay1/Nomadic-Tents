@@ -2,6 +2,7 @@ package nomadictents.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.IItemTier;
 import net.minecraft.item.Item;
@@ -10,13 +11,19 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.block.FrameBlock;
 import nomadictents.structure.TentPlacer;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class MalletItem extends Item {
 
@@ -25,6 +32,11 @@ public class MalletItem extends Item {
 	public MalletItem(IItemTier material, boolean isInstant, Item.Properties properties) {
 		super(properties.durability(material.getUses()));
 		this.isInstant = isInstant;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public void appendHoverText(ItemStack stack, @Nullable World level, List<ITextComponent> list, ITooltipFlag flag) {
+		list.add(new TranslationTextComponent(getDescriptionId() + ".tooltip").withStyle(TextFormatting.GRAY));
 	}
 
 	@Override

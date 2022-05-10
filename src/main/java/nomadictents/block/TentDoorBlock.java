@@ -98,15 +98,17 @@ public class TentDoorBlock extends TentBlock {
                     + " tent=" + tentDoor.getTent()
                     + " dir=" + tentDoor.getDirection()
                     + " spawnpoint=" + tentDoor.getSpawnpoint());
-            // remove tent
+            // remove tent when player is holding a mallet
             if(player.getItemInHand(hand).getItem() instanceof MalletItem) {
                 TentPlacer.getInstance().removeTent(level, doorPos, tentDoor.getTent().getType(), tentDoor.getTent().getSize(), tentDoor.getDirection());
                 ItemEntity item = player.spawnAtLocation(tentDoor.getTent().asItem());
                 if(item != null) {
                     item.setNoPickUpDelay();
                 }
+                return ActionResultType.SUCCESS;
             }
-
+            // normal door interaction when not holding a mallet
+            tentDoor.onEnter(player);
             return ActionResultType.SUCCESS;
         }
         return super.use(state, level, pos, player, hand, raytraceResult);
