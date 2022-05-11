@@ -30,6 +30,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
+import nomadictents.TentSaveData;
 import nomadictents.block.FrameBlock;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
@@ -56,6 +57,10 @@ public class TentItem extends Item {
     @OnlyIn(Dist.CLIENT)
     public void appendHoverText(ItemStack stack, @Nullable World level, List<ITextComponent> list, ITooltipFlag flag) {
         list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip").withStyle(TextFormatting.GRAY));
+        if(flag.isAdvanced()) {
+            int id = stack.getOrCreateTag().getInt(Tent.ID);
+            list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip.id", id).withStyle(TextFormatting.GRAY, TextFormatting.ITALIC));
+        }
     }
 
     @Override
@@ -94,6 +99,8 @@ public class TentItem extends Item {
                 context.getItemInHand().getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
 
                 return ActionResultType.SUCCESS;
+            } else {
+                // TODO message
             }
         }
 
@@ -191,7 +198,18 @@ public class TentItem extends Item {
     }
 
     private void placeTent(ItemStack stack, World level, BlockPos clickedPos, Direction direction, @Nullable PlayerEntity owner) {
+        if(level.isClientSide() || null == level.getServer()) {
+            return;
+        }
+        // ensure tent ID exists
+        if(!stack.getOrCreateTag().contains(Tent.ID) || stack.getOrCreateTag().getInt(Tent.ID) == 0) {
+            TentSaveData tentSaveData = TentSaveData.get(level.getServer());
+            int tentId = tentSaveData.getNextTentId();
+            stack.getOrCreateTag().putInt(Tent.ID, tentId);
+        }
+        // create tent wrapper
         Tent tent = Tent.from(stack, this.type, this.size);
+        // place the tent
         level.destroyBlock(clickedPos, false);
         TentPlacer tentPlacer = TentPlacer.getInstance();
         if(tentPlacer.placeTentFrameWithDoor(level, clickedPos, tent, direction, owner)) {
@@ -206,7 +224,7 @@ public class TentItem extends Item {
         level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.DEFAULT);
         // remove NBT data
         stack.getOrCreateTag().remove(DOOR);
-        stack.getTag().remove(DIRECTION);
+        stack.getOrCreateTag().remove(DIRECTION);
     }
 
     public static BlockRayTraceResult clipFrom(final LivingEntity player, final double range) {

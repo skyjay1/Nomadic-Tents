@@ -24,18 +24,19 @@ public class TepeeStructureProcessor extends StructureProcessor {
     @Override
     public Template.BlockInfo process(IWorldReader level, BlockPos rawPos, BlockPos pos, Template.BlockInfo rawBlockInfo, Template.BlockInfo blockInfo, PlacementSettings placementSettings, @Nullable Template template) {
         // process blank tepee wall
-        if (rawBlockInfo.state.getBlock() == NTRegistry.BlockReg.BLANK_TEPEE_WALL) {
+        BlockPos p = blockInfo.pos;
+        if (blockInfo.state.getBlock() == NTRegistry.BlockReg.BLANK_TEPEE_WALL) {
             // random pattern using block position as seed
-            if (rawPos.getY() % 2 == 0) {
-                Random rand = new Random(rawPos.getY());
-                return new Template.BlockInfo(rawPos, TepeeBlock.getRandomPattern(rand), null);
+            if (p.getY() % 2 == 0) {
+                Random rand = new Random(p.getY() + pos.hashCode());
+                return new Template.BlockInfo(p, TepeeBlock.getRandomPattern(rand), null);
             }
             // random design using existing seeded random
             if (placementSettings.getRandom(null).nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
-                return new Template.BlockInfo(rawPos, TepeeBlock.getRandomSymbol(placementSettings.getRandom(null)), null);
+                return new Template.BlockInfo(p, TepeeBlock.getRandomSymbol(placementSettings.getRandom(null)), null);
             }
         }
-        return super.process(level, rawPos, pos, rawBlockInfo, blockInfo, placementSettings, template);
+        return blockInfo;
     }
 
     @Override

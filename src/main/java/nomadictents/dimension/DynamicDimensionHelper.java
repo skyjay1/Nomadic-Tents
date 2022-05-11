@@ -7,7 +7,10 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Dimension;
@@ -21,7 +24,9 @@ import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.IServerConfiguration;
 import net.minecraft.world.storage.SaveFormat.LevelSave;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.world.WorldEvent;
+import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 
@@ -38,21 +43,45 @@ public class DynamicDimensionHelper
 	// helper for sending a given player to another dimension
 	// for static dimensions (from datapacks, etc) use MinecraftServer::getWorld to get the world object
 	// for dynamic dimensions (mystcrafty) use DynamicDimensionHelper.getOrCreateWorld to get the target world
-	public static void sendPlayerToTent(ServerPlayerEntity serverPlayer, ServerWorld targetWorld, Tent tent) {
+	public static void enterTent(Entity entity, ServerWorld targetWorld, Tent tent) {
 		// determine target position
 		BlockPos targetPos = Tent.calculatePos(tent.getId());
 		Vector3d targetVec = Vector3d.atBottomCenterOf(targetPos.relative(TentPlacer.TENT_DIRECTION, 1));
 		float targetRot = TentPlacer.TENT_DIRECTION.toYRot();
 		// ensure destination chunk is loaded before we put the player in it
-		targetWorld.getChunk(new BlockPos(targetVec));
+		targetWorld.getChunk(targetPos);
 		// place tent at location
-		TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, serverPlayer.getLevel(), serverPlayer.position(), serverPlayer.yRot);
-		// teleport the player
-		serverPlayer.teleportTo(targetWorld, targetVec.x(), targetVec.y(), targetVec.z(), targetRot, serverPlayer.xRot);
+		TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, (ServerWorld)entity.level, entity.position(), entity.yRot);
+		// teleport the entity
+		if(entity instanceof ServerPlayerEntity) {
+			((ServerPlayerEntity) entity).teleportTo(targetWorld, targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.xRot);
+			entity.setPortalCooldown();
+		} else {
+			// create teleporter to align with tent direction
+			ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, TentPlacer.TENT_DIRECTION);
+			entity.changeDimension(targetWorld, teleporter);
+		}
 	}
 
-	public static void sendPlayerToDimension(ServerPlayerEntity serverPlayer, ServerWorld targetWorld, Vector3d targetVec) {
+	public static void exitTent(Entity entity, ServerWorld targetWorld, Vector3d targetVec, float targetRot) {
+		// add 180 degrees to target rotation
+		targetRot = MathHelper.wrapDegrees(targetRot + 180.0F);
+		// ensure destination chunk is loaded before we put the player in it
+		targetWorld.getChunk(new BlockPos(targetVec));
+		if(entity instanceof ServerPlayerEntity) {
+			((ServerPlayerEntity) entity).teleportTo(targetWorld, targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.xRot);
+			entity.setPortalCooldown();
+		} else {
+			// create teleporter to align opposite to tent direction
+			ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, Direction.fromYRot(targetRot));
+			entity.changeDimension(targetWorld, teleporter);
+		}
+	}
 
+	public static boolean isInsideTent(final World level) {
+		ResourceLocation source = level.dimension().location();
+		// if current dimension has mod id, we are inside the tent
+		return NomadicTents.MODID.equals(source.getNamespace());
 	}
 
 	/**

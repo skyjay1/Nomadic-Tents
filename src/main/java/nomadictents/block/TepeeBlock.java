@@ -4,11 +4,9 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.state.properties.Half;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 
@@ -31,32 +29,25 @@ public class TepeeBlock extends TentBlock {
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext p_196258_1_) {
-        NomadicTents.LOGGER.debug("tepee: getStateForPlacement");
-        return super.getStateForPlacement(p_196258_1_);
-    }
-
-    @Override
-    public void onPlace(BlockState stateIn, World level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        NomadicTents.LOGGER.debug("tepee: onPlace");
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
         if(this.type == Type.BLANK) {
             // locate nearby door
-            Random rand = level.random;
-            BlockPos door = locateDoor(level, pos);
+            Random rand = context.getLevel().random;
+            BlockPos door = locateDoor(context.getLevel(), context.getClickedPos());
             if(door != null) {
                 // replace block with psuedo-random pattern
-                int dy = pos.getY() - door.getY();
+                int dy = context.getClickedPos().getY() - door.getY();
                 if(dy % 2 == 0) {
                     rand = new Random(door.above(dy).hashCode());
-                    level.setBlock(pos, getRandomPattern(rand), Constants.BlockFlags.DEFAULT);
-                    return;
+                    return getRandomPattern(rand);
                 }
             }
             // replace block with random symbol
             if(rand.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
-                level.setBlock(pos, getRandomSymbol(rand), Constants.BlockFlags.DEFAULT);
+                return getRandomSymbol(rand);
             }
         }
+        return super.getStateForPlacement(context);
     }
 
     public static BlockState getRandomPattern(final Random rand) {

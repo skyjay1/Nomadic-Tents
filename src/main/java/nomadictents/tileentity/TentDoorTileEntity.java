@@ -1,7 +1,10 @@
 package nomadictents.tileentity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -10,6 +13,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Dimension;
@@ -26,6 +30,7 @@ import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 public class TentDoorTileEntity extends TileEntity {
@@ -103,42 +108,113 @@ public class TentDoorTileEntity extends TileEntity {
         }
     }
 
-    public void onEnter(final LivingEntity entity) {
+    /**
+     * @param entity an entity
+     * @return TentDoorReason.ALLOW if the entity can enter, otherwise a reason they cannot enter
+     */
+    public TentDoorResult canEnter(final Entity entity) {
+        // prevent null or client-side logic
+        if(null == entity || entity.level.isClientSide()) {
+            return TentDoorResult.DENY_OTHER;
+        }
+        // player-only conditions
+        if(entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
+            // prevent non-owners if enabled
+            if(NomadicTents.CONFIG.OWNER_ONLY_ENTER.get() && !player.isCreative() && !isOwner(player)) {
+                return TentDoorResult.DENY_NOT_OWNER;
+            }
+            // prevent when near monsters if enabled
+            if(NomadicTents.CONFIG.ENTER_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
+                    && monstersNearby((PlayerEntity) entity)) {
+                return TentDoorResult.DENY_MONSTERS;
+            }
+        }
+        // prevent riding/passenger or invalid entities
+        if(entity.isPassenger() || entity.isVehicle() || !entity.canChangeDimensions()) {
+            return TentDoorResult.DENY_OTHER;
+        }
+        // prevent specific entities
+        if(entity.getType() == EntityType.ENDERMAN || entity.getType() == EntityType.SHULKER) {
+            return TentDoorResult.DENY_OTHER;
+        }
+        // prevent when tent is incomplete (skip this check when inside tent)
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        TentPlacer tentPlacer = TentPlacer.getInstance();
+        if(!insideTent && !tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), this.tent.getSize(), this.direction)) {
+            return TentDoorResult.DENY_INCOMPLETE;
+        }
+        return TentDoorResult.ALLOW;
+    }
+
+    /**
+     * @param entity an entity
+     * @return TentDoorReason.ALLOW if the entity can enter, otherwise a reason they cannot enter
+     */
+    public TentDoorResult canRemove(final LivingEntity entity) {
+        // prevent null or client-side logic
+        if(null == entity || entity.level.isClientSide()) {
+            return TentDoorResult.DENY_OTHER;
+        }
+        // player-only conditions
+        if(entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
+            // prevent non-owners if enabled
+            if(NomadicTents.CONFIG.OWNER_ONLY_PICKUP.get() && !player.isCreative() && !isOwner(player)) {
+                return TentDoorResult.DENY_NOT_OWNER;
+            }
+            // prevent when near monsters if enabled
+            if(NomadicTents.CONFIG.PICKUP_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
+                    && monstersNearby((PlayerEntity) entity)) {
+                return TentDoorResult.DENY_MONSTERS;
+            }
+        }
+        // prevent when tent is incomplete (skip this check when inside tent)
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        TentPlacer tentPlacer = TentPlacer.getInstance();
+        if(!insideTent && !tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), this.tent.getSize(), this.direction)) {
+            return TentDoorResult.DENY_INCOMPLETE;
+        }
+        return TentDoorResult.ALLOW;
+    }
+
+    public void onEnter(final Entity entity) {
         // ensure server side
         if(entity.level.isClientSide || null == entity.getServer()) {
             return;
         }
         MinecraftServer server = entity.getServer();
-        // determine current level
-        ResourceLocation source = entity.level.dimension().location();
-        // if current dimension has mod id, we are inside the tent
-        boolean insideTent = NomadicTents.MODID.equals(source.getNamespace());
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
 
         if(insideTent) {
-            // teleport to source dimension and position
-            // get or create target level
-            TentSaveData tentSaveData = TentSaveData.get(server);
-            RegistryKey<World> world = tentSaveData.getOrCreateKey(server, this.tent.getId());
-            ServerWorld targetLevel = DynamicDimensionHelper.getOrCreateWorld(server, world, DimensionFactory::createDimension);
-            // teleport entity to target level
+            NomadicTents.LOGGER.debug("leave tent");
+            // teleport to spawn dimension and position
+            ServerWorld targetLevel = getSpawnDimension();
             if(targetLevel != null) {
-                // TODO allow entity teleport, not just player
-                if(entity instanceof ServerPlayerEntity) {
-                    DynamicDimensionHelper.sendPlayerToTent((ServerPlayerEntity) entity, targetLevel, this.tent);
-                }
+                DynamicDimensionHelper.exitTent(entity, targetLevel, this.spawnpoint, this.spawnRot);
             }
         } else {
+            NomadicTents.LOGGER.debug("enter tent");
             // teleport to tent dimension
-            RegistryKey<World> world = RegistryKey.create(Registry.DIMENSION_REGISTRY, this.spawnDimension);
-            ServerWorld targetLevel = server.getLevel(world);
-            // teleport entity to target level
+            TentSaveData tentSaveData = TentSaveData.get(server);
+            // get or create target level
+            RegistryKey<World> world = tentSaveData.getOrCreateKey(server, this.tent.getId());
+            ServerWorld targetLevel = DynamicDimensionHelper.getOrCreateWorld(server, world, DimensionFactory::createDimension);
+            // teleport entity to tent dimension
             if(targetLevel != null) {
-                // TODO allow entity teleport, not just player
-                if(entity instanceof ServerPlayerEntity) {
-                    DynamicDimensionHelper.sendPlayerToDimension((ServerPlayerEntity) entity, targetLevel, this.spawnpoint);
-                }
+                DynamicDimensionHelper.enterTent(entity, targetLevel, this.tent);
             }
         }
+    }
+
+    /**
+     * @param player a player
+     * @return true if there are monsters within 8 blocks of the entity
+     */
+    private boolean monstersNearby(PlayerEntity player) {
+        final AxisAlignedBB box = new AxisAlignedBB(this.worldPosition).inflate(8.0D, 5.0D, 8.0D);
+        List<MonsterEntity> list = player.level.getEntitiesOfClass(MonsterEntity.class, box, e -> e.isPreventingPlayerRest(player));
+        return !list.isEmpty();
     }
 
     public Tent getTent() {
@@ -156,6 +232,7 @@ public class TentDoorTileEntity extends TileEntity {
 
     public void setDirection(Direction direction) {
         this.direction = direction;
+        this.setChanged();
     }
 
     public Vector3d getSpawnpoint() {
@@ -202,6 +279,40 @@ public class TentDoorTileEntity extends TileEntity {
         if(null == owner) {
             return true;
         }
-        return owner.equals(PlayerEntity.createPlayerUUID(player.getName().getContents()));
+        return owner.equals(player.getUUID());
+    }
+
+    public static enum TentDoorResult {
+        ALLOW(""),
+        DENY_INCOMPLETE("incomplete"),
+        DENY_NOT_OWNER("not_owner"),
+        DENY_MONSTERS("monsters"),
+        DENY_OTHER("");
+
+        private final String translationKey;
+        private final String enterTranslationKey;
+        private final String removeTranslationKey;
+
+        private TentDoorResult(final String translationKey) {
+            this.translationKey = translationKey;
+            this.enterTranslationKey = "tent.enter.deny." + translationKey;
+            this.removeTranslationKey = "tent.remove.deny." + translationKey;
+        }
+
+        public boolean isAllow() {
+            return this == ALLOW;
+        }
+
+        public String getEnterTranslationKey() {
+            return enterTranslationKey;
+        }
+
+        public String getRemoveTranslationKey() {
+            return removeTranslationKey;
+        }
+
+        public boolean hasMessage() {
+            return !translationKey.isEmpty();
+        }
     }
 }

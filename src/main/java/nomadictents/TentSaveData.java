@@ -22,11 +22,14 @@ public class TentSaveData extends WorldSavedData {
 	private static final String _Y = ".Y";
 	private static final String _Z = ".Z";
 
+	private static final String S_TENT_ID = "tentid";
 	private static final String S_TENTS = "tents";
 	private static final String S_ID = "id";
 	private static final String S_UUID = "uuid";
 
 	private Map<Integer, UUID> tentIdMap = new HashMap<>();
+
+	private int tentId;
 
 	//private Map<UUID, BlockPos> prevSpawnMap = new HashMap<>();
 
@@ -49,6 +52,9 @@ public class TentSaveData extends WorldSavedData {
 			UUID uuid = entryTag.getUUID(S_UUID);
 			tentIdMap.put(id, uuid);
 		}
+		tentId = nbt.getInt(S_TENT_ID);
+		// DEBUG
+		NomadicTents.LOGGER.debug("load: id map: " + tentIdMap.toString());
 
 		// read spawn map
 		/*final ListNBT tagList = nbt.getList(KEY_SPAWNS, 9);
@@ -76,6 +82,11 @@ public class TentSaveData extends WorldSavedData {
 			tagList.add(entryTag);
 		}
 		nbt.put(S_TENTS, tagList);
+		// write tent id
+		nbt.putInt(S_TENT_ID, tentId);
+		// DEBUG
+		NomadicTents.LOGGER.debug("save: id map: " + tentIdMap.toString());
+
 
 		// write spawn map
 		/*final ListNBT tagList = new ListNBT();
@@ -106,6 +117,7 @@ public class TentSaveData extends WorldSavedData {
 			} while (server.levelKeys().contains(worldKey));
 			// add uuid to the map
 			tentIdMap.put(tentId, uuid);
+			this.setDirty();
 		}
 		// fetch UUID from the map
 		return tentIdMap.get(tentId);
@@ -115,6 +127,15 @@ public class TentSaveData extends WorldSavedData {
 		UUID uuid = getOrCreateUuid(server, tentId);
 		ResourceLocation dimension = new ResourceLocation(NomadicTents.MODID, uuid.toString());
 		return RegistryKey.create(Registry.DIMENSION_REGISTRY, dimension);
+	}
+
+	public int getNextTentId() {
+		this.setDirty();
+		return ++tentId;
+	}
+
+	public int getCurrentTentId() {
+		return tentId;
 	}
 	
 

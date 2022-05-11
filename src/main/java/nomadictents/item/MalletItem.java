@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.IItemTier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,6 +12,8 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -49,7 +52,7 @@ public class MalletItem extends Item {
 			}
 			// instant
 			if(isInstant) {
-				useInstant(context.getItemInHand(), context.getLevel(), state, context.getClickedPos(), context.getPlayer());
+				useInstant(context.getItemInHand(), context.getLevel(), state, context.getClickedPos(), context);
 				return ActionResultType.SUCCESS;
 			}
 			// interact with frame block
@@ -63,6 +66,7 @@ public class MalletItem extends Item {
 				}
 				// place target block
 				BlockState target = TentPlacer.getFrameTarget(state, context.getLevel(), context.getClickedPos());
+				target = target.getBlock().getStateForPlacement(new BlockItemUseContext(context));
 				context.getLevel().setBlock(context.getClickedPos(), target, Constants.BlockFlags.DEFAULT);
 			} else {
 				// increase progress
@@ -82,13 +86,15 @@ public class MalletItem extends Item {
 		return 2;
 	}
 
-	private void useInstant(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, @Nullable final PlayerEntity player) {
+	private void useInstant(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, ItemUseContext context) {
 		// place target block
 		BlockState target = TentPlacer.getFrameTarget(state, level, pos);
+		BlockRayTraceResult targetRayTrace = new BlockRayTraceResult(Vector3d.atCenterOf(pos), context.getClickedFace(), pos, true);
+		ItemUseContext targetContext = new ItemUseContext(context.getLevel(), context.getPlayer(), context.getHand(), stack, targetRayTrace);
 		level.setBlock(pos, target, Constants.BlockFlags.DEFAULT);
 		// use durability
-		if(null != player) {
-			stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+		if(null != context.getPlayer()) {
+			stack.hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(context.getHand()));
 		}
 		// scan nearby area (including diagonals) and call this method for each frame found
 		for (int i = -1; i < 2; i++) {
@@ -97,7 +103,7 @@ public class MalletItem extends Item {
 					BlockPos curPos = pos.offset(i, j, k);
 					BlockState current = level.getBlockState(curPos);
 					if (current.getBlock() instanceof FrameBlock) {
-						useInstant(stack, level, current, curPos, player);
+						useInstant(stack, level, current, curPos, context);
 					}
 				}
 			}

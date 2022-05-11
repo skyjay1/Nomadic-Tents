@@ -188,6 +188,7 @@ public final class NTRegistry {
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Item> event) {
 
+            // register tools
             event.getRegistry().registerAll(
                 new MalletItem(ItemTier.IRON, false, new Item.Properties().tab(TAB))
                     .setRegistryName(MODID, "mallet"),
@@ -213,16 +214,22 @@ public final class NTRegistry {
                     new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "diamond_tent_shovel")
             );
 
-            // register tents
+            // create tent item properties
+            Item.Properties props = new Item.Properties().tab(TAB).stacksTo(1);
+            if(NomadicTents.CONFIG.TENT_FIREPROOF.get()) {
+                props = props.fireResistant();
+            }
+            // register tents for each type and size
             for(TentType type : TentType.values()) {
                 for(TentSize width : TentSize.values()) {
-                    event.getRegistry().register(new TentItem(type, width, new Item.Properties().tab(TAB).stacksTo(1))
+                    event.getRegistry().register(new TentItem(type, width, props)
                             .setRegistryName(MODID, width.getSerializedName() + "_" + type.getSerializedName()));
                 }
             }
 
             // register item blocks
             event.getRegistry().registerAll(
+                itemBlock(BlockReg.RIGID_DIRT),
                 itemBlock(BlockReg.YURT_WALL), itemBlock(BlockReg.YURT_ROOF),
                 itemBlock(BlockReg.BLANK_TEPEE_WALL), itemBlock(BlockReg.CHANNEL_TEPEE_WALL),
                 itemBlock(BlockReg.CREEPER_TEPEE_WALL), itemBlock(BlockReg.DREAMCATCHER_TEPEE_WALL),

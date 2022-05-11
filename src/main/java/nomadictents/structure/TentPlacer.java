@@ -2,6 +2,7 @@ package nomadictents.structure;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -42,8 +43,12 @@ import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
 import javax.annotation.Nullable;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -138,6 +143,11 @@ public final class TentPlacer {
     private final RuleStructureProcessor removeTentBlockProcessor;
     private final RuleStructureProcessor frameBlockProcessor;
     private final RuleStructureProcessor insideTentProcessor;
+    private final RuleStructureProcessor tentToDirtProcessor;
+    /**
+     * Map where keys = {TentSize,TentType} and value = {Relative block positions}
+     */
+    private final Map<TentSize, Map<TentType, Set<BlockPos>>> templatePositions = new EnumMap<>(TentSize.class);
 
     public TentPlacer() {
         ITag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
@@ -154,10 +164,10 @@ public final class TentPlacer {
                         .add(new RuleEntry(tentBlockTest, AlwaysTrueRuleTest.INSTANCE, Blocks.AIR.defaultBlockState()))
                         .build());
 
-        // create rule entry builder for *tent block to frame* processor
+        // create rule entry builder for "tent block to frame" processor
         ImmutableList.Builder<RuleEntry> frameBlocksBuilder = new ImmutableList.Builder<RuleEntry>()
                 .add(new RuleEntry(new BlockMatchRuleTest(NTRegistry.BlockReg.YURT_WALL), AlwaysTrueRuleTest.INSTANCE, NTRegistry.BlockReg.YURT_WALL_FRAME.defaultBlockState()));
-        // iterate over registered *block to frame* values and add each one
+        // iterate over registered "block to frame" values and add each one
         for(Map.Entry<ResourceLocation, Supplier<BlockState>> entry : BLOCK_TO_FRAME.entrySet()) {
             Block tentBlock = ForgeRegistries.BLOCKS.getValue(entry.getKey());
             if(tentBlock != null) {
@@ -167,13 +177,18 @@ public final class TentPlacer {
         // create processor to replace tent blocks with correct frame
         frameBlockProcessor = new RuleStructureProcessor(frameBlocksBuilder.build());
 
-        // create processor to set *inside* properties for tent blocks
+        // create processor to set "inside" properties for tent blocks
         insideTentProcessor = new RuleStructureProcessor(
                 new ImmutableList.Builder<RuleEntry>()
                         .add(new RuleEntry(new BlockMatchRuleTest(NTRegistry.BlockReg.YURT_WALL), AlwaysTrueRuleTest.INSTANCE,
                                 NTRegistry.BlockReg.YURT_WALL.defaultBlockState().setValue(YurtWallBlock.OUTSIDE, false)))
                         .add(new RuleEntry(new BlockMatchRuleTest(NTRegistry.BlockReg.YURT_ROOF), AlwaysTrueRuleTest.INSTANCE,
                                 NTRegistry.BlockReg.YURT_ROOF.defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, false)))
+                        .build());
+        // create processor to replace all tent blocks with rigid dirt (this will be used to detect constructed tents)
+        tentToDirtProcessor = new RuleStructureProcessor(
+                new ImmutableList.Builder<RuleEntry>()
+                        .add(new RuleEntry(tentBlockTest, AlwaysTrueRuleTest.INSTANCE, NTRegistry.BlockReg.RIGID_DIRT.defaultBlockState()))
                         .build());
     }
 
@@ -216,7 +231,6 @@ public final class TentPlacer {
         }
     }
 
-
     /**
      * @param level the world
      * @param door the door position
@@ -231,13 +245,23 @@ public final class TentPlacer {
         // determine template to use
         Template template = getTemplate(level, type, useSize);
         if(null == template) {
-            NomadicTents.LOGGER.debug("Failed to load template");
             return false;
         }
-
-        // TODO check all tent blocks in the template
-        // If the relative position of any tent block is obstructed (not replaceable and not door frame), return false
-
+        // determine location
+        Rotation rotation = toRotation(direction);
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
+        Set<BlockPos> tentBlocks = getTentBlockPositions(level, door, type, size);
+        // check each block to make sure it is replaceable
+        BlockPos checkPos;
+        BlockState checkState;
+        for(BlockPos pos : tentBlocks) {
+            checkPos = origin.offset(pos.rotate(rotation));
+            checkState = level.getBlockState(checkPos);
+            if(!checkState.getMaterial().isReplaceable() && !checkState.is(NTRegistry.BlockReg.DOOR_FRAME)) {
+                NomadicTents.LOGGER.debug("cannot replace with frame: " + checkState + " at " + checkPos);
+                return false;
+            }
+        }
         return true;
     }
 
@@ -255,6 +279,18 @@ public final class TentPlacer {
                              final ServerWorld sourceLevel, final Vector3d sourceVec, final float sourceRot) {
         boolean success = false;
         // TODO check for tent door and upgrades
+        // whether a structure was already built here (for upgrading and door-updating purposes)
+        final boolean tentExists = level.getBlockState(door).getBlock() instanceof TentDoorBlock;
+        // the old data stored by the tent door if it exists, or the current data if no door exists
+        Tent prevTent = tent;
+        if(tentExists) {
+            TileEntity blockEntity = level.getBlockEntity(door);
+            if(blockEntity instanceof TentDoorTileEntity) {
+                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+                // set up tile entity fields
+                prevTent = tentDoor.getTent();
+            }
+        }
         // place tent for the first time
         if(placeTent(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION)) {
             success = true;
@@ -272,6 +308,7 @@ public final class TentPlacer {
                 tentDoor.setSpawnpoint(sourceLevel, sourceVec);
                 tentDoor.setSpawnRot(sourceRot);
                 tentDoor.setTent(tent);
+                NomadicTents.LOGGER.debug("updated tent door");
             }
         }
         return success;
@@ -297,7 +334,7 @@ public final class TentPlacer {
                 tentDoor.setTent(tent);
                 tentDoor.setDirection(direction);
                 if(owner != null) {
-                    tentDoor.setOwner(PlayerEntity.createPlayerUUID(owner.getName().getContents()));
+                    tentDoor.setOwner(owner.getUUID());
                 }
             }
         }
@@ -395,6 +432,44 @@ public final class TentPlacer {
         // place doors
         level.setBlock(door, doorState, Constants.BlockFlags.DEFAULT);
 
+        return true;
+    }
+
+    /**
+     * Iterates over the expected blocks for the given tent and checks if each one is complete
+     * @param level the world
+     * @param door the door position
+     * @param type the tent type
+     * @param size the tent size
+     * @param direction the tent direction
+     * @return true if the tent is complete
+     */
+    public boolean isTent(final World level, final BlockPos door, final TentType type, final TentSize size, final Direction direction) {
+        // ensure server side
+        if(level.isClientSide || !(level instanceof ServerWorld)) {
+            return false;
+        }
+        // determine template to use
+        Template template = getTemplate(level, type, size);
+        if(null == template) {
+            return false;
+        }
+        // determine positions to check
+        Rotation rotation = toRotation(direction);
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
+        Set<BlockPos> tentBlocks = getTentBlockPositions(level, door, type, size);
+        // load tent block tag
+        ITag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
+        // check each block to make sure it is in tent_wall tag (or is tent door)
+        BlockPos checkPos;
+        BlockState checkState;
+        for(BlockPos pos : tentBlocks) {
+            checkPos = origin.offset(pos.rotate(rotation));
+            checkState = level.getBlockState(checkPos);
+            if(!checkState.is(tentWallTag) && !(checkState.getBlock() instanceof TentDoorBlock)) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -497,6 +572,41 @@ public final class TentPlacer {
             NomadicTents.LOGGER.warn("Failed to locate structure template for " + structureId);
         }
         return template;
+    }
+
+    public Set<BlockPos> getTentBlockPositions(final World level, final BlockPos door, final TentType type, final TentSize size) {
+        // ensure server side
+        if(level.isClientSide || !(level instanceof ServerWorld)) {
+            return ImmutableSet.of();
+        }
+        // check if positions are added to map
+        if(templatePositions.containsKey(size) && templatePositions.get(size).containsKey(type)) {
+            return templatePositions.get(size).get(type);
+        }
+        // positions need to be calculated for the first time
+        // determine template to use
+        Template template = getTemplate(level, type, size);
+        if(null == template) {
+            return ImmutableSet.of();
+        }
+        Rotation rotation = Rotation.NONE;
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
+        PlacementSettings placement = new PlacementSettings()
+                .setRotation(rotation);
+
+        Set<BlockPos> tentBlocks = new HashSet<>();
+        // load tent block tag
+        ITag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
+        // filter the template for each block and add to a set
+        for(Block b : tentWallTag.getValues()) {
+            List<Template.BlockInfo> filtered = template.filterBlocks(origin, placement, b, false);
+            for(Template.BlockInfo blockInfo : filtered) {
+                tentBlocks.add(blockInfo.pos);
+            }
+        }
+        // add positions to the map
+        templatePositions.computeIfAbsent(size, s -> new EnumMap<>(TentType.class)).put(type, ImmutableSet.copyOf(tentBlocks));
+        return tentBlocks;
     }
 
     /**
