@@ -91,6 +91,7 @@ public class MalletItem extends Item {
 		BlockState target = TentPlacer.getFrameTarget(state, level, pos);
 		BlockRayTraceResult targetRayTrace = new BlockRayTraceResult(Vector3d.atCenterOf(pos), context.getClickedFace(), pos, true);
 		ItemUseContext targetContext = new ItemUseContext(context.getLevel(), context.getPlayer(), context.getHand(), stack, targetRayTrace);
+		target = target.getBlock().getStateForPlacement(new BlockItemUseContext(targetContext));
 		level.setBlock(pos, target, Constants.BlockFlags.DEFAULT);
 		// use durability
 		if(null != context.getPlayer()) {

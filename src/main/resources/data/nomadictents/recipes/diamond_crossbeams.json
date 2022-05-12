@@ -12,7 +12,7 @@
         "item": "minecraft:diamond_block"
       },
 	"S": {
-		"item": "minecraft:stick"
+        "tag": "forge:rods/wooden"
 	  }
   },
   "result": {

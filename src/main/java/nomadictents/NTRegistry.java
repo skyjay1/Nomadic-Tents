@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTier;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.feature.template.IStructureProcessorType;
@@ -26,6 +27,10 @@ import nomadictents.block.YurtRoofBlock;
 import nomadictents.block.YurtWallBlock;
 import nomadictents.item.MalletItem;
 import nomadictents.item.TentItem;
+import nomadictents.item.TentShovelItem;
+import nomadictents.recipe.TentColorRecipe;
+import nomadictents.recipe.TentLayerRecipe;
+import nomadictents.recipe.TentSizeRecipe;
 import nomadictents.structure.TentPlacer;
 import nomadictents.structure.TepeeStructureProcessor;
 import nomadictents.tileentity.TentDoorTileEntity;
@@ -207,11 +212,11 @@ public final class NTRegistry {
                     new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "golden_crossbeams"),
                     new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "obsidian_crossbeams"),
                     new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "diamond_crossbeams"),
-                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "stone_tent_shovel"),
-                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "iron_tent_shovel"),
-                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "golden_tent_shovel"),
-                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "obsidian_tent_shovel"),
-                    new Item(new Item.Properties().tab(TAB)).setRegistryName(MODID, "diamond_tent_shovel")
+                    new TentShovelItem(new Item.Properties().tab(TAB)).setRegistryName(MODID, "stone_tent_shovel"),
+                    new TentShovelItem(new Item.Properties().tab(TAB)).setRegistryName(MODID, "iron_tent_shovel"),
+                    new TentShovelItem(new Item.Properties().tab(TAB)).setRegistryName(MODID, "golden_tent_shovel"),
+                    new TentShovelItem(new Item.Properties().tab(TAB)).setRegistryName(MODID, "obsidian_tent_shovel"),
+                    new TentShovelItem(new Item.Properties().tab(TAB)).setRegistryName(MODID, "diamond_tent_shovel")
             );
 
             // create tent item properties
@@ -283,8 +288,26 @@ public final class NTRegistry {
         }
     }
 
+    @ObjectHolder(MODID)
     public static final class RecipeReg {
 
+        @ObjectHolder(TentSizeRecipe.Serializer.CATEGORY)
+        public static final IRecipeSerializer<TentSizeRecipe> TENT_SIZE_RECIPE_SERIALIZER = null;
+
+        @ObjectHolder(TentLayerRecipe.Serializer.CATEGORY)
+        public static final IRecipeSerializer<TentLayerRecipe> TENT_LAYER_RECIPE_SERIALIZER = null;
+
+        @ObjectHolder(TentColorRecipe.Serializer.CATEGORY)
+        public static final IRecipeSerializer<TentColorRecipe> TENT_COLOR_RECIPE_SERIALIZER = null;
+
+        @SubscribeEvent
+        public static void register(final RegistryEvent.Register<IRecipeSerializer<?>> event) {
+            event.getRegistry().registerAll(
+                new TentSizeRecipe.Serializer().setRegistryName(MODID, TentSizeRecipe.Serializer.CATEGORY),
+                new TentLayerRecipe.Serializer().setRegistryName(MODID, TentLayerRecipe.Serializer.CATEGORY),
+                new TentColorRecipe.Serializer().setRegistryName(MODID, TentColorRecipe.Serializer.CATEGORY)
+            );
+        }
     }
 
     public static final class DimensionReg {

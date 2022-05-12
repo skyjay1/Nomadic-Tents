@@ -1,0 +1,16 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "CWC",
+    "WWW",
+    "WTW"],
+  "key": {
+    "W": { "item": "nomadictents:tepee_section" },
+    "C": { "item": "nomadictents:diamond_crossbeams" },
+    "T": { "item": "nomadictents:giant_tepee" }
+  },
+  "result": {
+    "item": "nomadictents:mega_tepee",
+    "count": 1
+  }
+}

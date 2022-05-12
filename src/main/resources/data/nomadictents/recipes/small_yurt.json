@@ -1,0 +1,14 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    " W ",
+    "WTW"],
+  "key": {
+    "W": { "item": "nomadictents:yurt_section" },
+    "T": { "item": "nomadictents:tiny_yurt" }
+  },
+  "result": {
+    "item": "nomadictents:small_yurt",
+    "count": 1
+  }
+}

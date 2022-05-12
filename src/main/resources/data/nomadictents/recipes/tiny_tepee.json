@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " W ",
+    "WWW",
+    "W W"],
+  "key": {
+    "W": { "item": "nomadictents:tepee_section" }
+  },
+  "result": {
+    "item": "nomadictents:tiny_tepee",
+    "count": 1
+  }
+}

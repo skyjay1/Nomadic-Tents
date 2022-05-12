@@ -34,6 +34,7 @@ import nomadictents.TentSaveData;
 import nomadictents.block.FrameBlock;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
+import nomadictents.util.TentLayers;
 import nomadictents.util.TentType;
 import nomadictents.util.TentSize;
 
@@ -56,10 +57,15 @@ public class TentItem extends Item {
 
     @OnlyIn(Dist.CLIENT)
     public void appendHoverText(ItemStack stack, @Nullable World level, List<ITextComponent> list, ITooltipFlag flag) {
-        list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip").withStyle(TextFormatting.GRAY));
-        if(flag.isAdvanced()) {
+        list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
+        if(flag.isAdvanced() || net.minecraft.client.gui.screen.Screen.hasShiftDown()) {
+            // layer tooltip
+            byte layers = stack.getOrCreateTag().getByte(Tent.LAYERS);
+            byte maxLayers = TentLayers.getMaxLayers(this.size);
+            list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip.layer", layers, maxLayers).withStyle(TextFormatting.GRAY));
+            // ID tooltip
             int id = stack.getOrCreateTag().getInt(Tent.ID);
-            list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip.id", id).withStyle(TextFormatting.GRAY, TextFormatting.ITALIC));
+            list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip.id", id).withStyle(TextFormatting.GRAY));
         }
     }
 
@@ -100,7 +106,10 @@ public class TentItem extends Item {
 
                 return ActionResultType.SUCCESS;
             } else {
-                // TODO message
+                // send message
+                if(context.getPlayer() != null) {
+                    context.getPlayer().displayClientMessage(new TranslationTextComponent("tent.build.deny.space"), true);
+                }
             }
         }
 
@@ -174,6 +183,10 @@ public class TentItem extends Item {
             } else {
                 // remove door frame
                 cancelTent(stack, level, pos);
+                // send message
+                if(entity instanceof PlayerEntity) {
+                    ((PlayerEntity)entity).displayClientMessage(new TranslationTextComponent("tent.build.deny.space"), true);
+                }
             }
         }
         // increment progress
@@ -192,11 +205,25 @@ public class TentItem extends Item {
         return stack;
     }
 
+    /**
+     * @param level the world
+     * @param startPos the tent door position
+     * @param direction the tent direction
+     * @return true if the player can place a tent at the given location
+     */
     private boolean canPlaceTent(World level, BlockPos startPos, Direction direction) {
         TentPlacer tentPlacer = TentPlacer.getInstance();
         return tentPlacer.canPlaceTentFrame(level, startPos, this.type, this.size, direction);
     }
 
+    /**
+     * Places a tent at the given location. If the tent does not have an ID, registers a new ID.
+     * @param stack the tent item stack
+     * @param level the world
+     * @param clickedPos the door position
+     * @param direction the tent direction
+     * @param owner the player who placed the tent
+     */
     private void placeTent(ItemStack stack, World level, BlockPos clickedPos, Direction direction, @Nullable PlayerEntity owner) {
         if(level.isClientSide() || null == level.getServer()) {
             return;
@@ -218,10 +245,18 @@ public class TentItem extends Item {
         }
     }
 
+    /**
+     * Removes the door frame if one is currently in progress
+     * @param stack the tent item stack
+     * @param level the world
+     * @param clickedPos the position of the door frame, if any
+     */
     private void cancelTent(ItemStack stack, World level, BlockPos clickedPos) {
         // remove door frame
         BlockState state = level.getBlockState(clickedPos);
-        level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.DEFAULT);
+        if(state.is(NTRegistry.BlockReg.DOOR_FRAME)) {
+            level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.DEFAULT);
+        }
         // remove NBT data
         stack.getOrCreateTag().remove(DOOR);
         stack.getOrCreateTag().remove(DIRECTION);

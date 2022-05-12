@@ -45,7 +45,7 @@ public class TentSaveData extends WorldSavedData {
 	@Override
 	public void load(CompoundNBT nbt) {
 		tentIdMap.clear();
-		final ListNBT tagList = nbt.getList(S_TENTS, 9);
+		final ListNBT tagList = nbt.getList(S_TENTS, 10);
 		for(int i = 0, l = tagList.size(); i < l; i++) {
 			CompoundNBT entryTag = tagList.getCompound(i);
 			int id = entryTag.getInt(S_ID);
@@ -53,8 +53,6 @@ public class TentSaveData extends WorldSavedData {
 			tentIdMap.put(id, uuid);
 		}
 		tentId = nbt.getInt(S_TENT_ID);
-		// DEBUG
-		NomadicTents.LOGGER.debug("load: id map: " + tentIdMap.toString());
 
 		// read spawn map
 		/*final ListNBT tagList = nbt.getList(KEY_SPAWNS, 9);
@@ -84,8 +82,6 @@ public class TentSaveData extends WorldSavedData {
 		nbt.put(S_TENTS, tagList);
 		// write tent id
 		nbt.putInt(S_TENT_ID, tentId);
-		// DEBUG
-		NomadicTents.LOGGER.debug("save: id map: " + tentIdMap.toString());
 
 
 		// write spawn map

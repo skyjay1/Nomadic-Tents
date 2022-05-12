@@ -1,0 +1,16 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "C C",
+    " W ",
+    "WTW"],
+  "key": {
+    "W": { "item": "nomadictents:yurt_section" },
+    "C": { "item": "nomadictents:golden_crossbeams" },
+    "T": { "item": "nomadictents:medium_yurt" }
+  },
+  "result": {
+    "item": "nomadictents:large_yurt",
+    "count": 1
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    " W ",
+    "WWW",
+    "WTW"],
+  "key": {
+    "W": { "item": "nomadictents:tepee_section" },
+    "T": { "item": "nomadictents:small_tepee" }
+  },
+  "result": {
+    "item": "nomadictents:medium_tepee",
+    "count": 1
+  }
+}

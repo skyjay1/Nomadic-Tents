@@ -117,6 +117,11 @@ public class TentDoorTileEntity extends TileEntity {
         if(null == entity || entity.level.isClientSide()) {
             return TentDoorResult.DENY_OTHER;
         }
+        // always allow use when inside a tent
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        if(insideTent) {
+            return TentDoorResult.ALLOW;
+        }
         // player-only conditions
         if(entity instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) entity;
@@ -139,9 +144,8 @@ public class TentDoorTileEntity extends TileEntity {
             return TentDoorResult.DENY_OTHER;
         }
         // prevent when tent is incomplete (skip this check when inside tent)
-        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
         TentPlacer tentPlacer = TentPlacer.getInstance();
-        if(!insideTent && !tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), this.tent.getSize(), this.direction)) {
+        if(!tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), TentPlacer.getOverworldSize(this.tent.getSize()), this.direction)) {
             return TentDoorResult.DENY_INCOMPLETE;
         }
         return TentDoorResult.ALLOW;
@@ -154,6 +158,11 @@ public class TentDoorTileEntity extends TileEntity {
     public TentDoorResult canRemove(final LivingEntity entity) {
         // prevent null or client-side logic
         if(null == entity || entity.level.isClientSide()) {
+            return TentDoorResult.DENY_OTHER;
+        }
+        // prevent remove in tent dimension
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        if(insideTent) {
             return TentDoorResult.DENY_OTHER;
         }
         // player-only conditions
@@ -169,10 +178,9 @@ public class TentDoorTileEntity extends TileEntity {
                 return TentDoorResult.DENY_MONSTERS;
             }
         }
-        // prevent when tent is incomplete (skip this check when inside tent)
-        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        // prevent when tent is incomplete
         TentPlacer tentPlacer = TentPlacer.getInstance();
-        if(!insideTent && !tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), this.tent.getSize(), this.direction)) {
+        if(!tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), TentPlacer.getOverworldSize(this.tent.getSize()), this.direction)) {
             return TentDoorResult.DENY_INCOMPLETE;
         }
         return TentDoorResult.ALLOW;

@@ -1,0 +1,18 @@
+{
+  "type": "nomadictents:tent_layer",
+  "pattern": [
+    "DBD",
+    "DTD",
+    "DSD"],
+  "key": {
+    "D": { "tag": "forge:dirt" },
+    "B": { "tag": "forge:storage_blocks/gold" },
+    "S": { "item": "nomadictents:golden_tent_shovel" },
+    "T": { "item": "nomadictents:giant_yurt" }
+  },
+  "result": {
+    "item": "nomadictents:giant_yurt",
+    "count": 1
+  },
+  "layer": 3
+}

@@ -112,7 +112,7 @@ public class TentDoorBlock extends TentBlock {
                 TentDoorTileEntity.TentDoorResult tentDoorResult = tentDoor.canRemove(player);
                 if(tentDoorResult.isAllow()) {
                     // remove the tent
-                    TentPlacer.getInstance().removeTent(level, doorPos, tentDoor.getTent().getType(), tentDoor.getTent().getSize(), tentDoor.getDirection());
+                    TentPlacer.getInstance().removeTent(level, doorPos, tentDoor.getTent().getType(), TentPlacer.getOverworldSize(tentDoor.getTent().getSize()), tentDoor.getDirection());
                     ItemEntity item = player.spawnAtLocation(tentDoor.getTent().asItem());
                     if(item != null) {
                         item.setNoPickUpDelay();

@@ -13,4 +13,8 @@ public class TentLayers {
         }
         return 0;
     }
+
+    public static byte getMaxLayers(final TentSize size) {
+        return (byte) Math.min(MAX, Math.max(MIN, size.ordinal()));
+    }
 }

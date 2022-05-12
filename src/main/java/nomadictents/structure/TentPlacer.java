@@ -54,6 +54,10 @@ import java.util.function.Supplier;
 
 public final class TentPlacer {
 
+    /**
+     * The direction to place tents inside a tent dimension.
+     * Left = -Z, Right = +Z, Back of tent = +X, Front of tent = -X
+     */
     public static final Direction TENT_DIRECTION = Direction.EAST;
     private static final String MODID = NomadicTents.MODID;
 
@@ -277,8 +281,6 @@ public final class TentPlacer {
      */
     public boolean placeOrUpgradeTent(final World level, final BlockPos door, final Tent tent,
                              final ServerWorld sourceLevel, final Vector3d sourceVec, final float sourceRot) {
-        boolean success = false;
-        // TODO check for tent door and upgrades
         // whether a structure was already built here (for upgrading and door-updating purposes)
         final boolean tentExists = level.getBlockState(door).getBlock() instanceof TentDoorBlock;
         // the old data stored by the tent door if it exists, or the current data if no door exists
@@ -291,27 +293,36 @@ public final class TentPlacer {
                 prevTent = tentDoor.getTent();
             }
         }
-        // place tent for the first time
-        if(placeTent(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION)) {
-            success = true;
-            // place or upgrade platform
-            // TODO allow upgrade platform
-            placePlatform(level, door, tent.getType(), tent.getSize(), tent.getLayers());
+        // whether the tent needs to be replaced (size or color is changed)
+        final boolean rebuildTent = prevTent.getSize() != tent.getSize() || prevTent.getColor() != tent.getColor();
+        // whether the platform needs to be replaced (size or layers is changed)
+        final boolean rebuildPlatform = prevTent.getSize() != tent.getSize() || prevTent.getLayers() != tent.getLayers();
+        // remove tent in preparation for new tent
+        if(rebuildTent) {
+            removeTent(level, door, prevTent.getType(), prevTent.getSize(), TENT_DIRECTION);
         }
-        // update tile entity
-        if(success) {
-            // apply fields to tile entity
-            TileEntity blockEntity = level.getBlockEntity(door);
-            if(blockEntity instanceof TentDoorTileEntity) {
-                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
-                // set up tile entity fields
-                tentDoor.setSpawnpoint(sourceLevel, sourceVec);
-                tentDoor.setSpawnRot(sourceRot);
-                tentDoor.setTent(tent);
-                NomadicTents.LOGGER.debug("updated tent door");
-            }
+        // place new tent
+        if(!tentExists || rebuildTent) {
+            placeTent(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION);
         }
-        return success;
+        // place platform
+        if(!tentExists) {
+            placePlatform(level, door, tent.getType(), tent.getSize(), tent.getLayers(), true);
+        }
+        // rebuild platform
+        if(tentExists && rebuildPlatform) {
+            upgradePlatform(level, door, tent.getType(), prevTent.getSize(), tent.getSize(), prevTent.getLayers(), tent.getLayers());
+        }
+        // update door
+        TileEntity blockEntity = level.getBlockEntity(door);
+        if(blockEntity instanceof TentDoorTileEntity) {
+            TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+            // set up tile entity fields
+            tentDoor.setSpawnpoint(sourceLevel, sourceVec);
+            tentDoor.setSpawnRot(sourceRot);
+            tentDoor.setTent(tent);
+        }
+        return true;
     }
 
     /**
@@ -473,6 +484,15 @@ public final class TentPlacer {
         return true;
     }
 
+    /**
+     * Replaces tent blocks with air
+     * @param level the world
+     * @param door the door position
+     * @param type the tent type
+     * @param size the tent size
+     * @param direction the tent facing direction
+     * @return true if the tent was successfully removed
+     */
     public boolean removeTent(final World level, final BlockPos door, final TentType type, final TentSize size, final Direction direction) {
         // ensure server side
         if(level.isClientSide || !(level instanceof ServerWorld)) {
@@ -497,12 +517,11 @@ public final class TentPlacer {
         return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
     }
 
-    public boolean placePlatform(final World level, final BlockPos door, final TentType type, final TentSize size, final int layers) {
+    public boolean placePlatform(final World level, final BlockPos door, final TentType type, final TentSize size, final int layers, boolean fill) {
         // ensure server side
         if(level.isClientSide || !(level instanceof ServerWorld)) {
             return false;
         }
-        IServerWorld serverLevel = (ServerWorld) level;
         // determine template to use
         Template template = getTemplate(level, type, size);
         if(null == template) {
@@ -524,19 +543,119 @@ public final class TentPlacer {
                 p = origin.offset(x, 0, z);
                 // determine which block state to place
                 rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
-                if(rigid) {
-                    state = rigidDirt;
-                } else {
-                    state = dirt;
-                }
+                state = rigid ? rigidDirt : dirt;
                 // place in a column at this location
-                // TODO allow upgrade layers by replacing previous rigid dirt with regular dirt
-                for(int y = 0, l = layers + 1; y < l; y++) {
-                    level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                if(rigid || fill) {
+                    for (int y = 0, l = layers + 1; y < l; y++) {
+                        level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                    }
                 }
                 level.setBlock(p.below(layers + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
             }
         }
+        return true;
+    }
+
+    public boolean upgradePlatform(final World level, final BlockPos door, final TentType type,
+                                   final TentSize sizeOld, final TentSize sizeNew,
+                                   final int layersOld, final int layersNew) {
+        // ensure server side
+        if(level.isClientSide || !(level instanceof ServerWorld)) {
+            return false;
+        }
+        // determine template to use
+        Template templateOld = getTemplate(level, type, sizeOld);
+        Template templateNew = getTemplate(level, type, sizeNew);
+        if(null == templateOld || null == templateNew) {
+            return false;
+        }
+
+        int widthOld = templateOld.getSize().getX();
+        int widthNew = templateNew.getSize().getX();
+        // the difference in width for each side (half the total difference)
+        int dwidth = (widthNew - widthOld) / 2;
+
+        boolean upgradeSize = sizeOld != sizeNew;
+        boolean upgradeLayers = layersOld != layersNew;
+
+        BlockState rigidDirt = NTRegistry.BlockReg.RIGID_DIRT.defaultBlockState();
+        BlockState dirt = NomadicTents.CONFIG.getFloorBlock().defaultBlockState();
+
+        // place new
+        if(upgradeSize) {
+            BlockPos origin = door.offset(BlockPos.ZERO.offset(0, -1, -templateNew.getSize().getZ() / 2));
+
+            // iterate over each block and remove rigid dirt
+            BlockPos p;
+/*            for(int x = 0; x < widthOld; x++) {
+                for(int z = 0; z < widthOld; z++) {
+                    // determine block location
+                    p = origin.offset(x, 0, z);
+                    // determine if block must be replaced
+                    if(level.getBlockState(p).is(rigidDirt.getBlock())) {
+                        // replace rigid dirt with dirt in column
+                        for(int y = 0, l = layersOld + 1; y < l; y++) {
+                            level.setBlock(p.below(y), dirt, Constants.BlockFlags.DEFAULT);
+                        }
+                    }
+                }
+            }*/
+
+            // place dirt in a square at this location
+            boolean rigid;
+            boolean fill = true;
+            BlockState state;
+            for(int x = 0; x < widthNew; x++) {
+                for(int z = 0; z < widthNew; z++) {
+                    // determine block location
+                    p = origin.offset(x, 0, z);
+                    // skip locations that existed in old platform that are not rigid dirt
+                    if((z > dwidth && z < widthNew - dwidth) && (x < widthOld)
+                        && !level.getBlockState(p).is(rigidDirt.getBlock())) {
+                        continue;
+                    }
+                    // determine which block state to place
+                    rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
+                    state = rigid ? rigidDirt : dirt;
+                    // place in a column at this location
+                    if(rigid || fill) {
+                        for (int y = 0, l = layersOld + 1; y < l; y++) {
+                            level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                        }
+                    }
+                    level.setBlock(p.below(layersOld + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
+                }
+            }
+        }
+
+        // replace rigid dirt with dirt for each new layer
+        if(upgradeLayers) {
+            BlockPos origin = door.offset(BlockPos.ZERO.offset(0, -1, -templateNew.getSize().getZ() / 2));
+
+            // place dirt in a square at this location
+            BlockPos p;
+            boolean rigid;
+            BlockState state;
+            for(int x = 0; x < widthNew; x++) {
+                for(int z = 0; z < widthNew; z++) {
+                    // determine block location
+                    p = origin.offset(x, 0, z);
+                    // determine which block state to place
+                    rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
+                    if(rigid) {
+                        state = rigidDirt;
+                    } else {
+                        state = dirt;
+                    }
+                    // place in a column at this location
+                    for(int y = layersOld + 1, l = layersNew + 1; y < l; y++) {
+                        level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                    }
+                    level.setBlock(p.below(layersNew + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
+                }
+            }
+        }
+
         return true;
     }
 
