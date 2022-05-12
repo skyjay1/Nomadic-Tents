@@ -1,0 +1,6 @@
+{
+	"variants": {
+		"outside=false": { "model": "nomadictents:block/indlu_wall_inside"},
+		"outside=true": { "model": "nomadictents:block/indlu_wall_outside"}
+	}
+}

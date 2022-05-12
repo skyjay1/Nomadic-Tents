@@ -84,8 +84,11 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
         return from(stack, TentType.YURT, TentSize.TINY);
     }
 
+    /**
+     * @param id the tent ID
+     * @return the block position of the tent door inside a tent
+     */
     public static BlockPos calculatePos(final int id) {
-        // TODO do we need to change anything here?
         return new BlockPos(0, 64, 0);
     }
 

@@ -6,7 +6,7 @@
    "FSF"],
   "key": {
     "F": { "tag": "minecraft:leaves" },
-	"S": { "item": "minecraft:stick" }
+	"S": { "tag": "forge:rods/wooden" }
   },
   "result": {
     "item": "nomadictents:indlu_section",

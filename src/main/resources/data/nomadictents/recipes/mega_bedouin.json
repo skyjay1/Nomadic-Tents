@@ -1,0 +1,16 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "CWC",
+    "WTW",
+    "WWW"],
+  "key": {
+    "W": { "item": "nomadictents:bedouin_section" },
+    "C": { "item": "nomadictents:diamond_crossbeams" },
+    "T": { "item": "nomadictents:giant_bedouin" }
+  },
+  "result": {
+    "item": "nomadictents:mega_bedouin",
+    "count": 1
+  }
+}

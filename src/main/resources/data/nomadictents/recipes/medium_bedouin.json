@@ -1,0 +1,15 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    " W ",
+    "WTW",
+    "WWW"],
+  "key": {
+    "W": { "item": "nomadictents:bedouin_section" },
+    "T": { "item": "nomadictents:small_bedouin" }
+  },
+  "result": {
+    "item": "nomadictents:medium_bedouin",
+    "count": 1
+  }
+}

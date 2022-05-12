@@ -1,0 +1,35 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "uncolored": "nomadictents:block/indlu_wall_frame",
+    "colored_top": "nomadictents:block/indlu_wall_top",
+    "colored_side": "nomadictents:block/indlu_wall_top",
+    "particle": "#uncolored"
+  },
+  "elements": [
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down":  { "tintindex": 0, "texture": "#colored_top", "cullface": "down" },
+        "up":    { "tintindex": 0, "texture": "#colored_top", "cullface": "up" },
+        "north": { "tintindex": 0, "texture": "#colored_side", "cullface": "north" },
+        "south": { "tintindex": 0, "texture": "#colored_side", "cullface": "south" },
+        "west":  { "tintindex": 0, "texture": "#colored_side", "cullface": "west" },
+        "east":  { "tintindex": 0, "texture": "#colored_side", "cullface": "east" }
+      }
+    },
+    {
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "down":  { "texture": "#uncolored", "cullface": "down" },
+        "up":    { "texture": "#uncolored", "cullface": "up" },
+        "north": { "texture": "#uncolored", "cullface": "north" },
+        "south": { "texture": "#uncolored", "cullface": "south" },
+        "west":  { "texture": "#uncolored", "cullface": "west" },
+        "east":  { "texture": "#uncolored", "cullface": "east" }
+      }
+    }
+  ]
+}

@@ -34,6 +34,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
+import nomadictents.block.IndluWallBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.YurtRoofBlock;
 import nomadictents.block.YurtWallBlock;
@@ -64,62 +65,44 @@ public final class TentPlacer {
     private static TentPlacer instance;
 
     /**
-     * Nested map where keys = {TentSize, TentType} and value = {Structure ID}
-     */
-    public static final Map<TentSize, Map<TentType, ResourceLocation>> STRUCTURES = new ImmutableMap.Builder<TentSize, Map<TentType, ResourceLocation>>()
-            .put(TentSize.TINY, new ImmutableMap.Builder<TentType, ResourceLocation>()
-                    .put(TentType.TEPEE, new ResourceLocation(MODID, "tent/tiny_tepee"))
-                    .put(TentType.YURT, new ResourceLocation(MODID, "tent/tiny_yurt"))
-                    .build())
-            .put(TentSize.SMALL, new ImmutableMap.Builder<TentType, ResourceLocation>()
-                    .put(TentType.TEPEE, new ResourceLocation(MODID, "tent/small_tepee"))
-                    .put(TentType.YURT, new ResourceLocation(MODID, "tent/small_yurt"))
-                    .build())
-            .put(TentSize.MEDIUM, new ImmutableMap.Builder<TentType, ResourceLocation>()
-                    .put(TentType.TEPEE, new ResourceLocation(MODID, "tent/medium_tepee"))
-                    .put(TentType.YURT, new ResourceLocation(MODID, "tent/medium_yurt"))
-                    .build())
-            .put(TentSize.LARGE, new ImmutableMap.Builder<TentType, ResourceLocation>()
-                    .put(TentType.TEPEE, new ResourceLocation(MODID, "tent/large_tepee"))
-                    .put(TentType.YURT, new ResourceLocation(MODID, "tent/large_yurt"))
-                    .build())
-            .put(TentSize.GIANT, new ImmutableMap.Builder<TentType, ResourceLocation>()
-                    .put(TentType.TEPEE, new ResourceLocation(MODID, "tent/giant_tepee"))
-                    .put(TentType.YURT, new ResourceLocation(MODID, "tent/giant_yurt"))
-                    .build())
-            .put(TentSize.MEGA, new ImmutableMap.Builder<TentType, ResourceLocation>()
-                    .put(TentType.TEPEE, new ResourceLocation(MODID, "tent/mega_tepee"))
-                    .put(TentType.YURT, new ResourceLocation(MODID, "tent/mega_yurt"))
-                    .build())
-            .build();
-
-    /**
      * Nested map where keys = {TentSize,TentType} and value = {Door BlockState Supplier}
      */
     public static final Map<TentSize, Map<TentType, Supplier<BlockState>>> DOORS = new ImmutableMap.Builder<TentSize, Map<TentType, Supplier<BlockState>>>()
             .put(TentSize.TINY, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.TINY_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.TINY_YURT_DOOR.defaultBlockState())
+                    .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.TINY_BEDOUIN_DOOR.defaultBlockState())
+                    .put(TentType.INDLU, () -> NTRegistry.BlockReg.TINY_INDLU_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.SMALL, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.SMALL_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.SMALL_YURT_DOOR.defaultBlockState())
+                    .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.SMALL_BEDOUIN_DOOR.defaultBlockState())
+                    .put(TentType.INDLU, () -> NTRegistry.BlockReg.SMALL_INDLU_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.MEDIUM, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.MEDIUM_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.MEDIUM_YURT_DOOR.defaultBlockState())
+                    .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.MEDIUM_BEDOUIN_DOOR.defaultBlockState())
+                    .put(TentType.INDLU, () -> NTRegistry.BlockReg.MEDIUM_INDLU_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.LARGE, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.LARGE_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.LARGE_YURT_DOOR.defaultBlockState())
+                    .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.LARGE_BEDOUIN_DOOR.defaultBlockState())
+                    .put(TentType.INDLU, () -> NTRegistry.BlockReg.LARGE_INDLU_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.GIANT, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.GIANT_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.GIANT_YURT_DOOR.defaultBlockState())
+                    .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.GIANT_BEDOUIN_DOOR.defaultBlockState())
+                    .put(TentType.INDLU, () -> NTRegistry.BlockReg.GIANT_INDLU_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.MEGA, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.MEGA_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.MEGA_YURT_DOOR.defaultBlockState())
+                    .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.MEGA_BEDOUIN_DOOR.defaultBlockState())
+                    .put(TentType.INDLU, () -> NTRegistry.BlockReg.MEGA_INDLU_DOOR.defaultBlockState())
                     .build())
             .build();
     /**
@@ -129,6 +112,9 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "yurt_wall_frame"), outside -> NTRegistry.BlockReg.YURT_WALL.defaultBlockState().setValue(YurtWallBlock.OUTSIDE, outside))
             .put(new ResourceLocation(MODID, "yurt_roof_frame"), outside -> NTRegistry.BlockReg.YURT_ROOF.defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, outside))
             .put(new ResourceLocation(MODID, "tepee_wall_frame"), outside -> NTRegistry.BlockReg.BLANK_TEPEE_WALL.defaultBlockState())
+            .put(new ResourceLocation(MODID, "bedouin_wall_frame"), outside -> NTRegistry.BlockReg.BEDOUIN_WALL.defaultBlockState())
+            .put(new ResourceLocation(MODID, "bedouin_roof_frame"), outside -> NTRegistry.BlockReg.BEDOUIN_ROOF.defaultBlockState())
+            .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTRegistry.BlockReg.INDLU_WALL.defaultBlockState())
             .build();
 
     /**
@@ -138,6 +124,9 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "yurt_wall"), () -> NTRegistry.BlockReg.YURT_WALL_FRAME.defaultBlockState())
             .put(new ResourceLocation(MODID, "yurt_roof"), () -> NTRegistry.BlockReg.YURT_ROOF_FRAME.defaultBlockState())
             .put(new ResourceLocation(MODID, "blank_tepee_wall"), () -> NTRegistry.BlockReg.TEPEE_WALL_FRAME.defaultBlockState())
+            .put(new ResourceLocation(MODID, "bedouin_wall"), () -> NTRegistry.BlockReg.BEDOUIN_WALL_FRAME.defaultBlockState())
+            .put(new ResourceLocation(MODID, "bedouin_roof"), () -> NTRegistry.BlockReg.BEDOUIN_ROOF_FRAME.defaultBlockState())
+            .put(new ResourceLocation(MODID, "indlu_wall"), () -> NTRegistry.BlockReg.INDLU_WALL_FRAME.defaultBlockState())
             .build();
 
     // instance fields that rely on registries being resolved before they can be initialized
@@ -188,6 +177,8 @@ public final class TentPlacer {
                                 NTRegistry.BlockReg.YURT_WALL.defaultBlockState().setValue(YurtWallBlock.OUTSIDE, false)))
                         .add(new RuleEntry(new BlockMatchRuleTest(NTRegistry.BlockReg.YURT_ROOF), AlwaysTrueRuleTest.INSTANCE,
                                 NTRegistry.BlockReg.YURT_ROOF.defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, false)))
+                        .add(new RuleEntry(new BlockMatchRuleTest(NTRegistry.BlockReg.INDLU_WALL), AlwaysTrueRuleTest.INSTANCE,
+                                NTRegistry.BlockReg.INDLU_WALL.defaultBlockState().setValue(IndluWallBlock.OUTSIDE, false)))
                         .build());
         // create processor to replace all tent blocks with rigid dirt (this will be used to detect constructed tents)
         tentToDirtProcessor = new RuleStructureProcessor(
@@ -262,7 +253,6 @@ public final class TentPlacer {
             checkPos = origin.offset(pos.rotate(rotation));
             checkState = level.getBlockState(checkPos);
             if(!checkState.getMaterial().isReplaceable() && !checkState.is(NTRegistry.BlockReg.DOOR_FRAME)) {
-                NomadicTents.LOGGER.debug("cannot replace with frame: " + checkState + " at " + checkPos);
                 return false;
             }
         }
@@ -517,6 +507,17 @@ public final class TentPlacer {
         return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
     }
 
+    /**
+     * Places dirt and rigid dirt in a platform underneath a tent. The tent must exist in the world.
+     * At least one layer of regular dirt will be placed, with additional layers for each upgrade.
+     * @param level the world
+     * @param door the door position
+     * @param type the tent type
+     * @param size the tent size
+     * @param layers the number of layer upgrades
+     * @param fill true to fill harvestable space with dirt
+     * @return true if the platform was created successfully
+     */
     public boolean placePlatform(final World level, final BlockPos door, final TentType type, final TentSize size, final int layers, boolean fill) {
         // ensure server side
         if(level.isClientSide || !(level instanceof ServerWorld)) {
@@ -556,6 +557,18 @@ public final class TentPlacer {
         return true;
     }
 
+    /**
+     * Places dirt and rigid dirt in a platform underneath a newly upgraded tent. The tent must exist in the world.
+     * Use this method if the platform was already built but needs to be changed.
+     * @param level the world
+     * @param door the door position
+     * @param type the tent type
+     * @param sizeOld the previous tent size
+     * @param sizeNew the new tent size
+     * @param layersOld the previous number of layer upgrades
+     * @param layersNew the new number of layer upgrades
+     * @return if the platform was upgraded successfully
+     */
     public boolean upgradePlatform(final World level, final BlockPos door, final TentType type,
                                    final TentSize sizeOld, final TentSize sizeNew,
                                    final int layersOld, final int layersNew) {
@@ -585,25 +598,9 @@ public final class TentPlacer {
         if(upgradeSize) {
             BlockPos origin = door.offset(BlockPos.ZERO.offset(0, -1, -templateNew.getSize().getZ() / 2));
 
-            // iterate over each block and remove rigid dirt
-            BlockPos p;
-/*            for(int x = 0; x < widthOld; x++) {
-                for(int z = 0; z < widthOld; z++) {
-                    // determine block location
-                    p = origin.offset(x, 0, z);
-                    // determine if block must be replaced
-                    if(level.getBlockState(p).is(rigidDirt.getBlock())) {
-                        // replace rigid dirt with dirt in column
-                        for(int y = 0, l = layersOld + 1; y < l; y++) {
-                            level.setBlock(p.below(y), dirt, Constants.BlockFlags.DEFAULT);
-                        }
-                    }
-                }
-            }*/
-
             // place dirt in a square at this location
             boolean rigid;
-            boolean fill = true;
+            BlockPos p;
             BlockState state;
             for(int x = 0; x < widthNew; x++) {
                 for(int z = 0; z < widthNew; z++) {
@@ -618,7 +615,7 @@ public final class TentPlacer {
                     rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
                     state = rigid ? rigidDirt : dirt;
                     // place in a column at this location
-                    if(rigid || fill) {
+                    if(rigid) {
                         for (int y = 0, l = layersOld + 1; y < l; y++) {
                             level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
                         }
@@ -656,7 +653,7 @@ public final class TentPlacer {
             }
         }
 
-        return true;
+        return upgradeSize || upgradeLayers;
     }
 
     /**
@@ -671,24 +668,13 @@ public final class TentPlacer {
         if(null == level.getServer()) {
             return null;
         }
-        // ensure valid tent type
-        if(!STRUCTURES.containsKey(size)) {
-            NomadicTents.LOGGER.warn("No structure is registered for tent size " + size.getSerializedName());
-            return null;
-        }
-        // ensure valid tent size
-        Map<TentType, ResourceLocation> structures = STRUCTURES.get(size);
-        if(!structures.containsKey(type)) {
-            NomadicTents.LOGGER.warn("No structure is registered for tent type " + size.getSerializedName()
-                    + " " + type.getSerializedName());
-            return null;
-        }
         // determine structure to use
-        ResourceLocation structureId = structures.get(type);
+        String templateName = "tent/" + size.getSerializedName() + "_" + type.getSerializedName();
+        ResourceLocation templateId = new ResourceLocation(NomadicTents.MODID, templateName);
         TemplateManager templateManager = level.getServer().getStructureManager();
-        Template template = templateManager.get(structureId);
+        Template template = templateManager.get(templateId);
         if(null == template) {
-            NomadicTents.LOGGER.warn("Failed to locate structure template for " + structureId);
+            NomadicTents.LOGGER.warn("Failed to load tent template for " + templateId);
         }
         return template;
     }

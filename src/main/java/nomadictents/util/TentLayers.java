@@ -5,7 +5,6 @@ import net.minecraft.item.ItemStack;
 public class TentLayers {
 
     public static final byte MIN = 0;
-    public static final byte MAX = 5;
 
     public static byte get(final ItemStack stack) {
         if(stack.hasTag()) {
@@ -15,6 +14,6 @@ public class TentLayers {
     }
 
     public static byte getMaxLayers(final TentSize size) {
-        return (byte) Math.min(MAX, Math.max(MIN, size.ordinal()));
+        return (byte) Math.max(MIN, size.ordinal());
     }
 }

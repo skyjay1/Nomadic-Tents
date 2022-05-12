@@ -11,11 +11,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
 import nomadictents.util.Tent;
-
-import java.util.function.Predicate;
+import nomadictents.util.TentLayers;
 
 public class TentLayerRecipe extends ShapedRecipe {
 
@@ -23,8 +23,40 @@ public class TentLayerRecipe extends ShapedRecipe {
 
     public TentLayerRecipe(ResourceLocation recipeId, final ItemStack outputItem, final byte layer,
                            final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
-        super(recipeId, Serializer.CATEGORY, width, height, recipeItemsIn, outputItem);
+        super(recipeId, Serializer.CATEGORY, width, height,
+                recipeItemsWithLayer(recipeItemsIn, (byte) Math.max(TentLayers.MIN, layer - 1)),
+                outputItemWithLayer(outputItem, layer));
         this.layer = layer;
+    }
+
+    private static ItemStack outputItemWithLayer(final ItemStack itemStack, final byte layer) {
+        itemStack.getOrCreateTag().putByte(Tent.LAYERS, layer);
+        return itemStack;
+    }
+
+    private static NonNullList<Ingredient> recipeItemsWithLayer(final NonNullList<Ingredient> recipeItemsIn, final byte layer) {
+        for(int i = 0, l = recipeItemsIn.size(); i < l; i++) {
+            ItemStack[] itemStackArray = recipeItemsIn.get(i).getItems();
+            for(ItemStack itemStack : itemStackArray) {
+                if(itemStack.getItem() instanceof TentItem) {
+                    itemStack.getOrCreateTag().putByte(Tent.LAYERS, layer);
+                }
+            }
+        }
+        return recipeItemsIn;
+    }
+
+    @Override
+    public boolean matches(CraftingInventory craftingInventory, World level) {
+        if(super.matches(craftingInventory, level)) {
+            // locate input tent
+            ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
+            if(!tent.isEmpty()) {
+                // ensure tent layer is one less than target layer
+                return !tent.isEmpty() && tent.getOrCreateTag().getByte(Tent.LAYERS) == (this.layer - 1);
+            }
+        }
+        return false;
     }
 
     @Override

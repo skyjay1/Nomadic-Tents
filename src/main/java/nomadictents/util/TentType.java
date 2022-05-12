@@ -6,7 +6,9 @@ import net.minecraft.util.IStringSerializable;
 
 public enum TentType implements IStringSerializable {
     YURT("yurt"),
-    TEPEE("tepee");
+    TEPEE("tepee"),
+    BEDOUIN("bedouin"),
+    INDLU("indlu");
 
     public static final Codec<TentType> CODEC = Codec.STRING.comapFlatMap(TentType::getByName, TentType::getSerializedName).stable();
 

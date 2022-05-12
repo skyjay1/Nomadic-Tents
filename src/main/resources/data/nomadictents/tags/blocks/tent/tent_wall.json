@@ -3,6 +3,9 @@
   "values": [
     "nomadictents:yurt_wall",
     "nomadictents:yurt_roof",
-    "#nomadictents:tent/tepee_wall"
+    "#nomadictents:tent/tepee_wall",
+    "nomadictents:bedouin_wall",
+    "nomadictents:bedouin_roof",
+    "nomadictents:indlu_wall"
   ]
 }

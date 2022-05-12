@@ -1,0 +1,16 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "CWC",
+    "WTW",
+    "WWW"],
+  "key": {
+    "W": { "item": "nomadictents:indlu_section" },
+    "C": { "item": "nomadictents:obsidian_crossbeams" },
+    "T": { "item": "nomadictents:large_indlu" }
+  },
+  "result": {
+    "item": "nomadictents:giant_indlu",
+    "count": 1
+  }
+}

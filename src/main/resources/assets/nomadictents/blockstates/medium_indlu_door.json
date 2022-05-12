@@ -1,0 +1,8 @@
+{
+	"variants": {
+		"axis=x,half=upper": { "model": "nomadictents:block/medium_indlu_door_upper"},
+		"axis=x,half=lower": { "model": "nomadictents:block/medium_indlu_door_lower"},
+		"axis=z,half=upper": { "model": "nomadictents:block/medium_indlu_door_upper", "y": 90},
+		"axis=z,half=lower": { "model": "nomadictents:block/medium_indlu_door_lower", "y": 90}
+	}
+}

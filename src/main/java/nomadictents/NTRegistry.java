@@ -20,6 +20,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.FrameBlock;
+import nomadictents.block.IndluWallBlock;
+import nomadictents.block.QuarterTentBlock;
 import nomadictents.block.TentBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.TepeeBlock;
@@ -67,6 +69,12 @@ public final class NTRegistry {
         public static final Block YURT_WALL_FRAME = null;
         @ObjectHolder("yurt_roof_frame")
         public static final Block YURT_ROOF_FRAME = null;
+        @ObjectHolder("bedouin_wall_frame")
+        public static final Block BEDOUIN_WALL_FRAME = null;
+        @ObjectHolder("bedouin_roof_frame")
+        public static final Block BEDOUIN_ROOF_FRAME = null;
+        @ObjectHolder("indlu_wall_frame")
+        public static final Block INDLU_WALL_FRAME = null;
 
         @ObjectHolder("blank_tepee_wall")
         public static final Block BLANK_TEPEE_WALL = null;
@@ -103,6 +111,14 @@ public final class NTRegistry {
         public static final Block YURT_WALL = null;
         @ObjectHolder("yurt_roof")
         public static final Block YURT_ROOF = null;
+
+        @ObjectHolder("bedouin_wall")
+        public static final Block BEDOUIN_WALL = null;
+        @ObjectHolder("bedouin_roof")
+        public static final Block BEDOUIN_ROOF = null;
+
+        @ObjectHolder("indlu_wall")
+        public static final Block INDLU_WALL = null;
         
         @ObjectHolder("tiny_yurt_door")
         public static final Block TINY_YURT_DOOR = null;
@@ -130,6 +146,32 @@ public final class NTRegistry {
         @ObjectHolder("mega_tepee_door")
         public static final Block MEGA_TEPEE_DOOR = null;
 
+        @ObjectHolder("tiny_bedouin_door")
+        public static final Block TINY_BEDOUIN_DOOR = null;
+        @ObjectHolder("small_bedouin_door")
+        public static final Block SMALL_BEDOUIN_DOOR = null;
+        @ObjectHolder("medium_bedouin_door")
+        public static final Block MEDIUM_BEDOUIN_DOOR = null;
+        @ObjectHolder("large_bedouin_door")
+        public static final Block LARGE_BEDOUIN_DOOR = null;
+        @ObjectHolder("giant_bedouin_door")
+        public static final Block GIANT_BEDOUIN_DOOR = null;
+        @ObjectHolder("mega_bedouin_door")
+        public static final Block MEGA_BEDOUIN_DOOR = null;
+
+        @ObjectHolder("tiny_indlu_door")
+        public static final Block TINY_INDLU_DOOR = null;
+        @ObjectHolder("small_indlu_door")
+        public static final Block SMALL_INDLU_DOOR = null;
+        @ObjectHolder("medium_indlu_door")
+        public static final Block MEDIUM_INDLU_DOOR = null;
+        @ObjectHolder("large_indlu_door")
+        public static final Block LARGE_INDLU_DOOR = null;
+        @ObjectHolder("giant_indlu_door")
+        public static final Block GIANT_INDLU_DOOR = null;
+        @ObjectHolder("mega_indlu_door")
+        public static final Block MEGA_INDLU_DOOR = null;
+
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Block> event) {
             // register door frames
@@ -153,7 +195,7 @@ public final class NTRegistry {
                             .sound(SoundType.WOOL))
                         .setRegistryName(MODID, "yurt_wall"),
                     new YurtRoofBlock(AbstractBlock.Properties
-                            .of(Material.BARRIER, MaterialColor.WOOL)
+                            .of(Material.BARRIER, MaterialColor.COLOR_LIGHT_BLUE)
                             .sound(SoundType.WOOL))
                         .setRegistryName(MODID, "yurt_roof"));
 
@@ -164,6 +206,26 @@ public final class NTRegistry {
                         .sound(SoundType.WOOL))
                     .setRegistryName(MODID, type.getSerializedName() + "_tepee_wall"));
             }
+
+            // register bedouin blocks
+            event.getRegistry().registerAll(
+                    new QuarterTentBlock(AbstractBlock.Properties
+                            .of(Material.BARRIER, MaterialColor.COLOR_BROWN)
+                            .sound(SoundType.WOOL))
+                            .setRegistryName(MODID, "bedouin_wall"),
+                    new TentBlock(AbstractBlock.Properties
+                            .of(Material.BARRIER, MaterialColor.COLOR_BROWN)
+                            .sound(SoundType.WOOL))
+                            .setRegistryName(MODID, "bedouin_roof"));
+
+            // register indlu blocks
+            event.getRegistry().registerAll(
+                    new IndluWallBlock(AbstractBlock.Properties
+                            .of(Material.BARRIER, MaterialColor.GRASS)
+                            .noOcclusion()
+                            .isViewBlocking((b, r, p) -> false)
+                            .sound(SoundType.GRASS))
+                            .setRegistryName(MODID, "indlu_wall"));
 
             // register door blocks
             for(TentType type : TentType.values()) {
@@ -189,6 +251,9 @@ public final class NTRegistry {
 
         @ObjectHolder("tiny_yurt")
         public static final Item TINY_YURT = null;
+
+        @ObjectHolder("indlu_wall")
+        public static final Item INDLU_WALL = null;
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Item> event) {
@@ -244,13 +309,28 @@ public final class NTRegistry {
                 itemBlock(BlockReg.SPACE_TEPEE_WALL), itemBlock(BlockReg.SUN_TEPEE_WALL),
                 itemBlock(BlockReg.TRIFORCE_TEPEE_WALL), itemBlock(BlockReg.WEDGE_TEPEE_WALL),
                 itemBlock(BlockReg.ZIGZAG_TEPEE_WALL),
-                itemBlock(BlockReg.DOOR_FRAME), itemBlock(BlockReg.YURT_WALL_FRAME),
-                itemBlock(BlockReg.YURT_ROOF_FRAME), itemBlock(BlockReg.TEPEE_WALL_FRAME)
+                itemBlock(BlockReg.BEDOUIN_WALL), itemBlock(BlockReg.BEDOUIN_ROOF),
+                itemBlock(BlockReg.INDLU_WALL)
             );
+            
+            // register wall/roof frames
+            event.getRegistry().register(itemBlock(BlockReg.DOOR_FRAME, false));
+            for(Supplier<BlockState> blockStateSupplier : TentPlacer.BLOCK_TO_FRAME.values()) {
+                Block frameBlock = blockStateSupplier.get().getBlock();
+                event.getRegistry().register(itemBlock(frameBlock, false));
+            }
         }
-
+        
         private static BlockItem itemBlock(final Block base) {
-            BlockItem ib = new BlockItem(base, new Item.Properties().tab(TAB));
+            return itemBlock(base, true);
+        }
+        
+        private static BlockItem itemBlock(final Block base, final boolean group) {
+            Item.Properties props = new Item.Properties();
+            if(group) {
+                props = props.tab(TAB);
+            }
+            BlockItem ib = new BlockItem(base, props);
             ib.setRegistryName(base.getRegistryName());
             return ib;
         }

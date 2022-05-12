@@ -1,0 +1,6 @@
+{
+    "parent": "nomadictents:block/door_nonfull",
+    "textures": {
+        "door": "nomadictents:block/large_bedouin_door_upper"
+    }
+}

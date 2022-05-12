@@ -1,0 +1,12 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"north": "nomadictents:block/bedouin_roof",
+		"south": "nomadictents:block/bedouin_roof",
+		"east": "nomadictents:block/bedouin_roof",
+		"west": "nomadictents:block/bedouin_roof",
+		"up": "nomadictents:block/bedouin_roof",
+		"down": "nomadictents:block/bedouin_roof_bottom",
+		"particle": "nomadictents:block/bedouin_roof"
+	}
+}
