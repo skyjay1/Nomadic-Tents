@@ -121,15 +121,15 @@
     "item.nomadictents.tent.tooltip": "Use to place a tent",
 	"item.nomadictents.tent.tooltip.id": "Tent ID: %s",
     "item.nomadictents.tent.tooltip.layer": "Layer Upgrades: %s / %s",
-    "chat.no_teleport": "Teleporting is not allowed inside your tent",
+    "tent.teleport.deny": "You can not teleport inside a tent",
     "tent.build.deny.space": "There is not enough space for a tent",
+    "tent.build.deny.dimension": "You can not build a tent in this dimension",
+    "tent.build.deny.inside_tent": "You can not build a tent inside a tent",
     "tent.enter.deny.incomplete": "The tent is not complete",
     "tent.enter.deny.not_owner": "You do not own this tent",
 	"tent.enter.deny.monsters": "You may not enter now; there are monsters nearby",
     "tent.remove.deny.incomplete": "The tent is not complete",
     "tent.remove.deny.not_owner": "You do not own this tent",
     "tent.remove.deny.monsters": "You may not remove this tent; there are monsters nearby",
-    "hwyla.progress": "Progress: %s",
-    "jei.upgrade_size": "Upgrade Tent Size",
-    "jei.upgrade_layer": "Upgrade Tent Layers"
+    "hwyla.progress": "Progress: %s"
 }

@@ -4,18 +4,26 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.Dimension;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -24,6 +32,7 @@ import nomadictents.NomadicTents;
 import nomadictents.TentSaveData;
 import nomadictents.dimension.DimensionFactory;
 import nomadictents.dimension.DynamicDimensionHelper;
+import nomadictents.item.MalletItem;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 import nomadictents.util.TentSize;
@@ -34,6 +43,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class TentDoorTileEntity extends TileEntity {
+
+    public static final String TENT_COPY_TOOL = "TentCopyTool";
 
     private static final String TENT = "tent";
     private static final String DIRECTION = "direction";
@@ -53,6 +64,83 @@ public class TentDoorTileEntity extends TileEntity {
 
     public TentDoorTileEntity() {
         super(NTRegistry.TileEntityReg.TENT_DOOR);
+    }
+
+    /**
+     * Delegated from {@link nomadictents.block.TentDoorBlock#use(BlockState, World, BlockPos, PlayerEntity, Hand, BlockRayTraceResult)}
+     * @param state the door block
+     * @param level the level
+     * @param pos the door position
+     * @param player the player that is using the block
+     * @param hand the player hand
+     * @return an action result type to indicate how the block was used
+     */
+    public ActionResultType use(BlockState state, World level, BlockPos pos, PlayerEntity player, Hand hand) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        // copy tent when player is holding tent copy tool
+        if(heldItem.hasTag() && heldItem.getTag().contains(TENT_COPY_TOOL)
+            && (!NomadicTents.CONFIG.COPY_CREATIVE_ONLY.get() || player.isCreative())) {
+            // create tent itemstack at player location
+            ItemEntity item = player.spawnAtLocation(this.getTent().asItem());
+            if(item != null) {
+                item.setNoPickUpDelay();
+            }
+            return ActionResultType.SUCCESS;
+        }
+        // remove tent when player is holding a mallet
+        if(heldItem.getItem() instanceof MalletItem) {
+            // check if player can remove tent
+            TentDoorTileEntity.TentDoorResult tentDoorResult = this.canRemove(player);
+            if(tentDoorResult.isAllow()) {
+                // remove the tent
+                TentPlacer.getInstance().removeTent(level, pos, this.getTent().getType(), TentPlacer.getOverworldSize(this.getTent().getSize()), this.getDirection());
+                // create tent itemstack at player location
+                ItemEntity item = player.spawnAtLocation(this.getTent().asItem());
+                if(item != null) {
+                    item.setNoPickUpDelay();
+                }
+            } else if(tentDoorResult.hasMessage()) {
+                // display message to explain why the tent cannot be removed
+                player.displayClientMessage(new TranslationTextComponent(tentDoorResult.getRemoveTranslationKey()), true);
+            }
+            return ActionResultType.SUCCESS;
+        }
+        // enter door when not holding a mallet
+        TentDoorTileEntity.TentDoorResult tentDoorResult = this.canEnter(player);
+        if(tentDoorResult.isAllow()) {
+            this.onEnter(player);
+        } else if(tentDoorResult.hasMessage()) {
+            // display message to explain why the tent cannot be entered
+            player.displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
+        }
+        return ActionResultType.SUCCESS;
+    }
+
+    /**
+     * Delegated from {@link nomadictents.block.TentDoorBlock#entityInside(BlockState, World, BlockPos, Entity)}
+     * @param state the door block
+     * @param level the level
+     * @param pos the door position
+     * @param entity the entity that is colliding with the door block
+     */
+    public void entityInside(BlockState state, World level, BlockPos pos, Entity entity) {
+        if(entity instanceof PlayerEntity && !NomadicTents.CONFIG.PLAYERS_ENTER_ON_COLLIDE.get()) {
+            return;
+        } else if(!NomadicTents.CONFIG.NONPLAYERS_ENTER_ON_COLLIDE.get()) {
+            return;
+        }
+        // attempt to enter tent
+        TentDoorTileEntity.TentDoorResult tentDoorResult = this.canEnter(entity);
+        if(tentDoorResult.isAllow()) {
+            // move entity to prevent collision when exiting
+            BlockPos respawn = pos.relative(this.getDirection().getOpposite(), 1);
+            entity.moveTo(Vector3d.atBottomCenterOf(respawn));
+            // attempt to enter tent
+            this.onEnter(entity);
+        } else if(entity instanceof PlayerEntity && tentDoorResult.hasMessage()) {
+            // display message to explain why the tent cannot be removed
+            ((PlayerEntity)entity).displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
+        }
     }
 
     @Override
@@ -195,14 +283,12 @@ public class TentDoorTileEntity extends TileEntity {
         boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
 
         if(insideTent) {
-            NomadicTents.LOGGER.debug("leave tent");
             // teleport to spawn dimension and position
             ServerWorld targetLevel = getSpawnDimension();
             if(targetLevel != null) {
                 DynamicDimensionHelper.exitTent(entity, targetLevel, this.spawnpoint, this.spawnRot);
             }
         } else {
-            NomadicTents.LOGGER.debug("enter tent");
             // teleport to tent dimension
             TentSaveData tentSaveData = TentSaveData.get(server);
             // get or create target level
@@ -290,7 +376,7 @@ public class TentDoorTileEntity extends TileEntity {
         return owner.equals(player.getUUID());
     }
 
-    public static enum TentDoorResult {
+    public enum TentDoorResult {
         ALLOW(""),
         DENY_INCOMPLETE("incomplete"),
         DENY_NOT_OWNER("not_owner"),
@@ -301,7 +387,7 @@ public class TentDoorTileEntity extends TileEntity {
         private final String enterTranslationKey;
         private final String removeTranslationKey;
 
-        private TentDoorResult(final String translationKey) {
+        TentDoorResult(final String translationKey) {
             this.translationKey = translationKey;
             this.enterTranslationKey = "tent.enter.deny." + translationKey;
             this.removeTranslationKey = "tent.remove.deny." + translationKey;

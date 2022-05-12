@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -17,15 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import nomadictents.NomadicTents;
-import nomadictents.item.MalletItem;
-import nomadictents.structure.TentPlacer;
 import nomadictents.tileentity.TentDoorTileEntity;
 
 import javax.annotation.Nullable;
@@ -98,40 +92,9 @@ public class TentDoorBlock extends TentBlock {
         // locate block entity
         TileEntity blockEntity = level.getBlockEntity(doorPos);
         if(blockEntity instanceof TentDoorTileEntity) {
+            // delegate to block entity
             TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
-            // DEBUG
-            // log info
-            NomadicTents.LOGGER.debug("tentDoor: "
-                    + " tent=" + tentDoor.getTent()
-                    + " dir=" + tentDoor.getDirection()
-                    + " spawn=" + tentDoor.getSpawnDimensionKey()
-                    + " spawnpoint=" + tentDoor.getSpawnpoint());
-            // remove tent when player is holding a mallet
-            if(player.getItemInHand(hand).getItem() instanceof MalletItem) {
-                // check if player can remove tent
-                TentDoorTileEntity.TentDoorResult tentDoorResult = tentDoor.canRemove(player);
-                if(tentDoorResult.isAllow()) {
-                    // remove the tent
-                    TentPlacer.getInstance().removeTent(level, doorPos, tentDoor.getTent().getType(), TentPlacer.getOverworldSize(tentDoor.getTent().getSize()), tentDoor.getDirection());
-                    ItemEntity item = player.spawnAtLocation(tentDoor.getTent().asItem());
-                    if(item != null) {
-                        item.setNoPickUpDelay();
-                    }
-                } else if(tentDoorResult.hasMessage()) {
-                    // display message to explain why the tent cannot be removed
-                    player.displayClientMessage(new TranslationTextComponent(tentDoorResult.getRemoveTranslationKey()), true);
-                }
-                return ActionResultType.SUCCESS;
-            }
-            // enter door when not holding a mallet
-            TentDoorTileEntity.TentDoorResult tentDoorResult = tentDoor.canEnter(player);
-            if(tentDoorResult.isAllow()) {
-                tentDoor.onEnter(player);
-            } else if(tentDoorResult.hasMessage()) {
-                // display message to explain why the tent cannot be entered
-                player.displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
-            }
-            return ActionResultType.SUCCESS;
+            return tentDoor.use(level.getBlockState(doorPos), level, doorPos, player, hand);
         }
         return ActionResultType.SUCCESS;
     }
@@ -146,20 +109,11 @@ public class TentDoorBlock extends TentBlock {
         // locate door block entity
         TileEntity blockEntity = level.getBlockEntity(doorPos);
         if(blockEntity instanceof TentDoorTileEntity) {
+            // delegate to block entity
             TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
-            // attempt to enter tent
-            TentDoorTileEntity.TentDoorResult tentDoorResult = tentDoor.canEnter(entity);
-            if(tentDoorResult.isAllow()) {
-                // move entity to prevent collision when exiting
-                BlockPos respawn = doorPos.relative(tentDoor.getDirection().getOpposite(), 1);
-                entity.moveTo(Vector3d.atBottomCenterOf(respawn));
-                tentDoor.onEnter(entity);
-            } else if(entity instanceof PlayerEntity && tentDoorResult.hasMessage()) {
-                // display message to explain why the tent cannot be removed
-                ((PlayerEntity)entity).displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
-            }
+            tentDoor.entityInside(level.getBlockState(doorPos), level, doorPos, entity);
         }
-        super.canEntityDestroy(state, level, pos, entity);
+        super.entityInside(state, level, pos, entity);
     }
 
     @Override

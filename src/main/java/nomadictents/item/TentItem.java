@@ -32,6 +32,7 @@ import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 import nomadictents.TentSaveData;
 import nomadictents.block.FrameBlock;
+import nomadictents.dimension.DynamicDimensionHelper;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 import nomadictents.util.TentLayers;
@@ -83,6 +84,22 @@ public class TentItem extends Item {
         // client should not run anything else
         if(context.getLevel().isClientSide) {
             return ActionResultType.SUCCESS;
+        }
+        // cannot place tent inside tent
+        if(DynamicDimensionHelper.isInsideTent(context.getLevel())) {
+            // send message
+            if(context.getPlayer() != null) {
+                context.getPlayer().displayClientMessage(new TranslationTextComponent("tent.build.deny.inside_tent"), true);
+            }
+            return ActionResultType.PASS;
+        }
+        // cannot place tent inside blacklisted dimension
+        if(NomadicTents.CONFIG.isDimensionBlacklist(context.getLevel())) {
+            // send message
+            if(context.getPlayer() != null) {
+                context.getPlayer().displayClientMessage(new TranslationTextComponent("tent.build.deny.dimension"), true);
+            }
+            return ActionResultType.PASS;
         }
         // add door frame
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());

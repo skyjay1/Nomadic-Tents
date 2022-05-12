@@ -243,7 +243,9 @@ public final class NTRegistry {
                 itemBlock(BlockReg.RADIAL_TEPEE_WALL), itemBlock(BlockReg.RAIN_TEPEE_WALL),
                 itemBlock(BlockReg.SPACE_TEPEE_WALL), itemBlock(BlockReg.SUN_TEPEE_WALL),
                 itemBlock(BlockReg.TRIFORCE_TEPEE_WALL), itemBlock(BlockReg.WEDGE_TEPEE_WALL),
-                itemBlock(BlockReg.ZIGZAG_TEPEE_WALL)
+                itemBlock(BlockReg.ZIGZAG_TEPEE_WALL),
+                itemBlock(BlockReg.DOOR_FRAME), itemBlock(BlockReg.YURT_WALL_FRAME),
+                itemBlock(BlockReg.YURT_ROOF_FRAME), itemBlock(BlockReg.TEPEE_WALL_FRAME)
             );
         }
 

@@ -30,6 +30,8 @@ import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.BiFunction;
@@ -40,9 +42,13 @@ import java.util.function.BiFunction;
  */
 public class DynamicDimensionHelper
 {
-	// helper for sending a given player to another dimension
-	// for static dimensions (from datapacks, etc) use MinecraftServer::getWorld to get the world object
-	// for dynamic dimensions (mystcrafty) use DynamicDimensionHelper.getOrCreateWorld to get the target world
+	/**
+	 * Called when an entity enters a tent. Loads the tent dimension and any upgrades,
+	 * then places the entity inside the tent.
+	 * @param entity the entity
+	 * @param targetWorld the tent dimension
+	 * @param tent the tent information
+	 */
 	public static void enterTent(Entity entity, ServerWorld targetWorld, Tent tent) {
 		// determine target position
 		BlockPos targetPos = Tent.calculatePos(tent.getId());
@@ -53,35 +59,72 @@ public class DynamicDimensionHelper
 		// place tent at location
 		TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, (ServerWorld)entity.level, entity.position(), entity.yRot);
 		// teleport the entity
-		if(entity instanceof ServerPlayerEntity) {
-			((ServerPlayerEntity) entity).teleportTo(targetWorld, targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.xRot);
-			entity.setPortalCooldown();
-		} else {
-			// create teleporter to align with tent direction
-			ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, TentPlacer.TENT_DIRECTION);
-			entity.changeDimension(targetWorld, teleporter);
-		}
+		sendToDimension(entity, targetWorld, targetVec, targetRot);
 	}
 
+	/**
+	 * Called when an entity exits a tent. Loads the respawn dimension and places the entity at the respawn point.
+	 * @param entity the entity
+	 * @param targetWorld the respawn dimension
+	 * @param targetVec the respawn point
+	 * @param targetRot the respawn rotation
+	 */
 	public static void exitTent(Entity entity, ServerWorld targetWorld, Vector3d targetVec, float targetRot) {
 		// add 180 degrees to target rotation
 		targetRot = MathHelper.wrapDegrees(targetRot + 180.0F);
 		// ensure destination chunk is loaded before we put the player in it
 		targetWorld.getChunk(new BlockPos(targetVec));
-		if(entity instanceof ServerPlayerEntity) {
-			((ServerPlayerEntity) entity).teleportTo(targetWorld, targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.xRot);
-			entity.setPortalCooldown();
-		} else {
-			// create teleporter to align opposite to tent direction
-			ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, Direction.fromYRot(targetRot));
-			entity.changeDimension(targetWorld, teleporter);
-		}
+		// teleport the entity
+		sendToDimension(entity, targetWorld, targetVec, targetRot);
 	}
 
+	/**
+	 * Helper method that creates a {@link DirectTeleporter} to send the entity directly to the given dimension
+	 * and coordinates.
+	 * @param entity the entity
+	 * @param targetWorld the dimension
+	 * @param targetVec the location
+	 * @param targetRot the entity rotY
+	 */
+	private static void sendToDimension(Entity entity, ServerWorld targetWorld, Vector3d targetVec, float targetRot) {
+		// ensure destination chunk is loaded before we put the player in it
+		targetWorld.getChunk(new BlockPos(targetVec));
+		// teleport the entity
+		ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, targetRot, TentPlacer.TENT_DIRECTION);
+		entity.changeDimension(targetWorld, teleporter);
+		// portal cooldown
+		entity.setPortalCooldown();
+	}
+
+	/**
+	 * @param level a world
+	 * @return true if the world is a tent (the namespace is {@link NomadicTents#MODID})
+	 */
 	public static boolean isInsideTent(final World level) {
-		ResourceLocation source = level.dimension().location();
+		return isInsideTent(level.dimension().location());
+	}
+
+	/**
+	 * @param dimensionId a world dimension ID
+	 * @return true if the world is a tent (the namespace is {@link NomadicTents#MODID})
+	 */
+	public static boolean isInsideTent(final ResourceLocation dimensionId) {
 		// if current dimension has mod id, we are inside the tent
-		return NomadicTents.MODID.equals(source.getNamespace());
+		return NomadicTents.MODID.equals(dimensionId.getNamespace());
+	}
+
+	/**
+	 * @param server the minecraft server
+	 * @return a list of all dimensions that are tents according to {@link #isInsideTent(ResourceLocation)}
+	 */
+	public static List<RegistryKey<World>> getTents(final MinecraftServer server) {
+		List<RegistryKey<World>> list = new ArrayList<>();
+		for(RegistryKey<World> world : server.levelKeys()) {
+			if(DynamicDimensionHelper.isInsideTent(world.location())) {
+				list.add(world);
+			}
+		}
+		return list;
 	}
 
 	/**
