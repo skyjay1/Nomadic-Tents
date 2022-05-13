@@ -7,6 +7,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -22,6 +23,7 @@ import net.minecraftforge.registries.ObjectHolder;
 import nomadictents.block.FrameBlock;
 import nomadictents.block.IndluWallBlock;
 import nomadictents.block.QuarterTentBlock;
+import nomadictents.block.ShamiyanaWallBlock;
 import nomadictents.block.TentBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.TepeeBlock;
@@ -119,6 +121,39 @@ public final class NTRegistry {
 
         @ObjectHolder("indlu_wall")
         public static final Block INDLU_WALL = null;
+
+        @ObjectHolder("black_shamiyana_wall")
+        public static final Block BLACK_SHAMIYANA_WALL = null;
+        @ObjectHolder("blue_shamiyana_wall")
+        public static final Block BLUE_SHAMIYANA_WALL = null;
+        @ObjectHolder("brown_shamiyana_wall")
+        public static final Block BROWN_SHAMIYANA_WALL = null;
+        @ObjectHolder("cyan_shamiyana_wall")
+        public static final Block CYAN_SHAMIYANA_WALL = null;
+        @ObjectHolder("gray_shamiyana_wall")
+        public static final Block GRAY_SHAMIYANA_WALL = null;
+        @ObjectHolder("green_shamiyana_wall")
+        public static final Block GREEN_SHAMIYANA_WALL = null;
+        @ObjectHolder("light_blue_shamiyana_wall")
+        public static final Block LIGHT_BLUE_SHAMIYANA_WALL = null;
+        @ObjectHolder("lime_shamiyana_wall")
+        public static final Block LIME_SHAMIYANA_WALL = null;
+        @ObjectHolder("magenta_shamiyana_wall")
+        public static final Block MAGENTA_SHAMIYANA_WALL = null;
+        @ObjectHolder("orange_shamiyana_wall")
+        public static final Block ORANGE_SHAMIYANA_WALL = null;
+        @ObjectHolder("pink_shamiyana_wall")
+        public static final Block PINK_SHAMIYANA_WALL = null;
+        @ObjectHolder("purple_shamiyana_wall")
+        public static final Block PURPLE_SHAMIYANA_WALL = null;
+        @ObjectHolder("red_shamiyana_wall")
+        public static final Block RED_SHAMIYANA_WALL = null;
+        @ObjectHolder("light_gray_shamiyana_wall")
+        public static final Block LIGHT_GRAY_SHAMIYANA_WALL = null;
+        @ObjectHolder("white_shamiyana_wall")
+        public static final Block WHITE_SHAMIYANA_WALL = null;
+        @ObjectHolder("yellow_shamiyana_wall")
+        public static final Block YELLOW_SHAMIYANA_WALL = null;
         
         @ObjectHolder("tiny_yurt_door")
         public static final Block TINY_YURT_DOOR = null;
@@ -171,6 +206,19 @@ public final class NTRegistry {
         public static final Block GIANT_INDLU_DOOR = null;
         @ObjectHolder("mega_indlu_door")
         public static final Block MEGA_INDLU_DOOR = null;
+
+        @ObjectHolder("tiny_shamiyana_door")
+        public static final Block TINY_SHAMIYANA_DOOR = null;
+        @ObjectHolder("small_shamiyana_door")
+        public static final Block SMALL_SHAMIYANA_DOOR = null;
+        @ObjectHolder("medium_shamiyana_door")
+        public static final Block MEDIUM_SHAMIYANA_DOOR = null;
+        @ObjectHolder("large_shamiyana_door")
+        public static final Block LARGE_SHAMIYANA_DOOR = null;
+        @ObjectHolder("giant_shamiyana_door")
+        public static final Block GIANT_SHAMIYANA_DOOR = null;
+        @ObjectHolder("mega_shamiyana_door")
+        public static final Block MEGA_SHAMIYANA_DOOR = null;
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Block> event) {
@@ -227,6 +275,15 @@ public final class NTRegistry {
                             .sound(SoundType.GRASS))
                             .setRegistryName(MODID, "indlu_wall"));
 
+            // register shamiyana blocks
+            for(DyeColor color : DyeColor.values()) {
+                event.getRegistry().register(
+                        new ShamiyanaWallBlock(color, AbstractBlock.Properties
+                                .of(Material.BARRIER, color.getMaterialColor())
+                                .sound(SoundType.WOOL))
+                                .setRegistryName(MODID, color.getSerializedName() + "_shamiyana_wall"));
+            }
+
             // register door blocks
             for(TentType type : TentType.values()) {
                 for(TentSize width : TentSize.values()) {
@@ -254,6 +311,19 @@ public final class NTRegistry {
 
         @ObjectHolder("indlu_wall")
         public static final Item INDLU_WALL = null;
+
+        @ObjectHolder("tiny_shamiyana")
+        public static final Item TINY_SHAMIYANA = null;
+        @ObjectHolder("small_shamiyana")
+        public static final Item SMALL_SHAMIYANA = null;
+        @ObjectHolder("medium_shamiyana")
+        public static final Item MEDIUM_SHAMIYANA = null;
+        @ObjectHolder("large_shamiyana")
+        public static final Item LARGE_SHAMIYANA = null;
+        @ObjectHolder("giant_shamiyana")
+        public static final Item GIANT_SHAMIYANA = null;
+        @ObjectHolder("mega_shamiyana")
+        public static final Item MEGA_SHAMIYANA = null;
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Item> event) {
@@ -301,17 +371,21 @@ public final class NTRegistry {
             event.getRegistry().registerAll(
                 itemBlock(BlockReg.RIGID_DIRT),
                 itemBlock(BlockReg.YURT_WALL), itemBlock(BlockReg.YURT_ROOF),
-                itemBlock(BlockReg.BLANK_TEPEE_WALL), itemBlock(BlockReg.CHANNEL_TEPEE_WALL),
-                itemBlock(BlockReg.CREEPER_TEPEE_WALL), itemBlock(BlockReg.DREAMCATCHER_TEPEE_WALL),
-                itemBlock(BlockReg.EAGLE_TEPEE_WALL), itemBlock(BlockReg.GOLEM_TEPEE_WALL),
-                itemBlock(BlockReg.HOPE_TEPEE_WALL), itemBlock(BlockReg.MAGIC_TEPEE_WALL),
-                itemBlock(BlockReg.RADIAL_TEPEE_WALL), itemBlock(BlockReg.RAIN_TEPEE_WALL),
-                itemBlock(BlockReg.SPACE_TEPEE_WALL), itemBlock(BlockReg.SUN_TEPEE_WALL),
-                itemBlock(BlockReg.TRIFORCE_TEPEE_WALL), itemBlock(BlockReg.WEDGE_TEPEE_WALL),
-                itemBlock(BlockReg.ZIGZAG_TEPEE_WALL),
                 itemBlock(BlockReg.BEDOUIN_WALL), itemBlock(BlockReg.BEDOUIN_ROOF),
                 itemBlock(BlockReg.INDLU_WALL)
             );
+
+            // register tepee item blocks
+            for(TepeeBlock.Type type : TepeeBlock.Type.values()) {
+                Block tepeeBlock = type.getBlock().getBlock();
+                event.getRegistry().register(itemBlock(tepeeBlock));
+            }
+
+            // register shamiyana item blocks
+            for(Supplier<BlockState> blockStateSupplier : TentPlacer.SHAMIYANA_WALLS.values()) {
+                Block wallBlock = blockStateSupplier.get().getBlock();
+                event.getRegistry().register(itemBlock(wallBlock));
+            }
             
             // register wall/roof frames
             event.getRegistry().register(itemBlock(BlockReg.DOOR_FRAME, false));

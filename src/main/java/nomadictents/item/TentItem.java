@@ -1,11 +1,14 @@
 package nomadictents.item;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.CauldronBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
@@ -59,6 +62,11 @@ public class TentItem extends Item {
     @OnlyIn(Dist.CLIENT)
     public void appendHoverText(ItemStack stack, @Nullable World level, List<ITextComponent> list, ITooltipFlag flag) {
         list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
+        if(this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
+            DyeColor color = DyeColor.byName(stack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE);
+            String translationKey = "item.minecraft.firework_star." + color.getSerializedName();
+            list.add(new TranslationTextComponent(translationKey));
+        }
         if(flag.isAdvanced() || net.minecraft.client.gui.screen.Screen.hasShiftDown()) {
             // layer tooltip
             byte layers = stack.getOrCreateTag().getByte(Tent.LAYERS);
@@ -77,6 +85,17 @@ public class TentItem extends Item {
 
     @Override
     public ActionResultType useOn(ItemUseContext context) {
+        // determine block and item
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+        ItemStack itemStack = context.getItemInHand();
+        // attempt to remove color from tent
+        if(state.is(Blocks.CAULDRON) && state.getValue(CauldronBlock.LEVEL) > 0
+            && itemStack.getOrCreateTag().contains(Tent.COLOR)
+            && DyeColor.byName(itemStack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE) != DyeColor.WHITE) {
+            // change color to white
+            itemStack.getOrCreateTag().putString(Tent.COLOR, DyeColor.WHITE.getSerializedName());
+            return ActionResultType.SUCCESS;
+        }
         // begin using the item
         if(context.getPlayer() != null) {
             context.getPlayer().startUsingItem(context.getHand());
@@ -102,7 +121,6 @@ public class TentItem extends Item {
             return ActionResultType.PASS;
         }
         // add door frame
-        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         if(!NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
             // determine placement position
             BlockPos placePos = context.getClickedPos();
@@ -118,8 +136,8 @@ public class TentItem extends Item {
                 // place door frame
                 context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Constants.BlockFlags.DEFAULT);
                 // remember the door position and player direction
-                context.getItemInHand().getOrCreateTag().put(DOOR, NBTUtil.writeBlockPos(placePos));
-                context.getItemInHand().getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
+                itemStack.getOrCreateTag().put(DOOR, NBTUtil.writeBlockPos(placePos));
+                itemStack.getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
 
                 return ActionResultType.SUCCESS;
             } else {

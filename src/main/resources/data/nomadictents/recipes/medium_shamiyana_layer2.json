@@ -1,0 +1,18 @@
+{
+  "type": "nomadictents:tent_layer",
+  "pattern": [
+    "DBD",
+    "DTD",
+    "DSD"],
+  "key": {
+    "D": { "tag": "forge:dirt" },
+    "B": { "tag": "forge:storage_blocks/iron" },
+    "S": { "item": "nomadictents:iron_tent_shovel" },
+    "T": { "item": "nomadictents:medium_shamiyana" }
+  },
+  "result": {
+    "item": "nomadictents:medium_shamiyana",
+    "count": 1
+  },
+  "layer": 2
+}

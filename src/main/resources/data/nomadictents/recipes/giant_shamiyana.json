@@ -1,0 +1,16 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "C C",
+    "WWW",
+    "WTW"],
+  "key": {
+    "W": { "item": "nomadictents:shamiyana_section" },
+    "C": { "item": "nomadictents:obsidian_crossbeams" },
+    "T": { "item": "nomadictents:large_shamiyana" }
+  },
+  "result": {
+    "item": "nomadictents:giant_shamiyana",
+    "count": 1
+  }
+}

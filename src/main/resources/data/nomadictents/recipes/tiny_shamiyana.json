@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WWW",
+    "W W"],
+  "key": {
+    "W": { "item": "nomadictents:shamiyana_section" }
+  },
+  "result": {
+    "item": "nomadictents:tiny_shamiyana",
+    "count": 1
+  }
+}

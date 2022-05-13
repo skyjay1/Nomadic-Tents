@@ -1,0 +1,14 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "WWW",
+    "WTW"],
+  "key": {
+    "W": { "item": "nomadictents:shamiyana_section" },
+    "T": { "item": "nomadictents:tiny_shamiyana" }
+  },
+  "result": {
+    "item": "nomadictents:small_shamiyana",
+    "count": 1
+  }
+}

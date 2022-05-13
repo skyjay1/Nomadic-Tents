@@ -8,7 +8,8 @@ public enum TentType implements IStringSerializable {
     YURT("yurt"),
     TEPEE("tepee"),
     BEDOUIN("bedouin"),
-    INDLU("indlu");
+    INDLU("indlu"),
+    SHAMIYANA("shamiyana");
 
     public static final Codec<TentType> CODEC = Codec.STRING.comapFlatMap(TentType::getByName, TentType::getSerializedName).stable();
 

@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
 import nomadictents.util.Tent;
@@ -22,8 +23,43 @@ public class TentColorRecipe extends ShapedRecipe {
 
     public TentColorRecipe(ResourceLocation recipeId, final ItemStack outputItem, final DyeColor color,
                            final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
-        super(recipeId, Serializer.CATEGORY, width, height, recipeItemsIn, outputItem);
+        super(recipeId, Serializer.CATEGORY, width, height, recipeItemsWithColor(recipeItemsIn, DyeColor.WHITE), outputItemWithColor(outputItem, color));
         this.color = color;
+    }
+
+    private static ItemStack outputItemWithColor(final ItemStack itemStack, final DyeColor color) {
+        itemStack.getOrCreateTag().putString(Tent.COLOR, color.getSerializedName());
+        return itemStack;
+    }
+
+    private static NonNullList<Ingredient> recipeItemsWithColor(final NonNullList<Ingredient> recipeItemsIn, final DyeColor color) {
+        for(int i = 0, l = recipeItemsIn.size(); i < l; i++) {
+            ItemStack[] itemStackArray = recipeItemsIn.get(i).getItems();
+            for(ItemStack itemStack : itemStackArray) {
+                if(itemStack.getItem() instanceof TentItem) {
+                    // change input tent color to the given color
+                    itemStack.getOrCreateTag().putString(Tent.COLOR, color.getSerializedName());
+                }
+            }
+        }
+        return recipeItemsIn;
+    }
+
+    @Override
+    public boolean matches(CraftingInventory craftingInventory, World level) {
+        if(super.matches(craftingInventory, level)) {
+            // always match when output color is white
+            if(this.color == DyeColor.WHITE) {
+                return true;
+            }
+            // locate input tent
+            ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
+            if(!tent.isEmpty()) {
+                // ensure input tent color is white
+                return DyeColor.byName(tent.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE) == DyeColor.WHITE;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -32,9 +68,10 @@ public class TentColorRecipe extends ShapedRecipe {
 
         // locate input tent
         ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
-        // copy input NBT to result with layer information
+        // copy input NBT to result with color information
         if(!tent.isEmpty()) {
-            CompoundNBT tag = tent.getOrCreateTag().copy();
+            result = tent.copy();
+            CompoundNBT tag = result.getOrCreateTag();
             tag.putString(Tent.COLOR, this.color.getSerializedName());
             result.setTag(tag);
         }

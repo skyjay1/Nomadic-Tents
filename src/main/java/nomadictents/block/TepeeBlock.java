@@ -61,13 +61,14 @@ public class TepeeBlock extends TentBlock {
     }
 
     /**
-     * Traces all connected ITepeeBlock blocks (frames and tepee walls) until it
+     * Traces all connected Tepee blocks (frames and tepee walls) until it
      * finds the lower door of the tepee.
      *
      * @param world the world
      * @param pos   BlockPos to begin searching from
      * @return BlockPos of lower tepee door if found, otherwise null
      **/
+    @Nullable
     private static BlockPos locateDoor(World world, BlockPos pos) {
         Set<BlockPos> checked = new HashSet<>();
         while (pos != null && !(world.getBlockState(pos).getBlock() instanceof TentDoorBlock)) {

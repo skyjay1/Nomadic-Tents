@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+   "textures": {
+		"north": "nomadictents:block/brown_shamiyana_pattern",
+		"south": "nomadictents:block/brown_shamiyana_pattern",
+		"east": "nomadictents:block/brown_shamiyana_pattern",
+		"west": "nomadictents:block/brown_shamiyana_pattern",
+		"up": "nomadictents:block/brown_shamiyana_wall",
+		"down": "nomadictents:block/brown_shamiyana_wall",
+		"particle": "nomadictents:block/brown_shamiyana_wall"
+    }
+}

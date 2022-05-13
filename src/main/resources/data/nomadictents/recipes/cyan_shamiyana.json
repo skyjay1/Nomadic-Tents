@@ -1,0 +1,16 @@
+{
+  "type": "nomadictents:tent_color",
+  "pattern": [
+    "DDD",
+    "DTD",
+    "DDD"],
+  "key": {
+    "D": { "tag": "forge:dyes/cyan" },
+    "T": { "tag": "nomadictents:shamiyana" }
+  },
+  "result": {
+    "item": "nomadictents:tiny_shamiyana",
+    "count": 1
+  },
+  "color": "cyan"
+}

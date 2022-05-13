@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "nomadictents:tiny_shamiyana",
+    "nomadictents:small_shamiyana",
+    "nomadictents:medium_shamiyana",
+    "nomadictents:large_shamiyana",
+    "nomadictents:giant_shamiyana",
+    "nomadictents:mega_shamiyana"
+  ]
+}

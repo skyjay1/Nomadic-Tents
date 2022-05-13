@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "pattern=false": { "model": "nomadictents:block/gray_shamiyana_wall"},
+		"pattern=true": { "model": "nomadictents:block/gray_shamiyana_pattern"}
+    }
+}

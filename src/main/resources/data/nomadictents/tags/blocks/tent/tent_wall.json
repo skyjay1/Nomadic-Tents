@@ -6,6 +6,7 @@
     "#nomadictents:tent/tepee_wall",
     "nomadictents:bedouin_wall",
     "nomadictents:bedouin_roof",
-    "nomadictents:indlu_wall"
+    "nomadictents:indlu_wall",
+    "#nomadictents:tent/shamiyana_wall"
   ]
 }

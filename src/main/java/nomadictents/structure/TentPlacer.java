@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeColor;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.tileentity.TileEntity;
@@ -73,38 +74,45 @@ public final class TentPlacer {
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.TINY_YURT_DOOR.defaultBlockState())
                     .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.TINY_BEDOUIN_DOOR.defaultBlockState())
                     .put(TentType.INDLU, () -> NTRegistry.BlockReg.TINY_INDLU_DOOR.defaultBlockState())
+                    .put(TentType.SHAMIYANA, () -> NTRegistry.BlockReg.TINY_SHAMIYANA_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.SMALL, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.SMALL_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.SMALL_YURT_DOOR.defaultBlockState())
                     .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.SMALL_BEDOUIN_DOOR.defaultBlockState())
                     .put(TentType.INDLU, () -> NTRegistry.BlockReg.SMALL_INDLU_DOOR.defaultBlockState())
+                    .put(TentType.SHAMIYANA, () -> NTRegistry.BlockReg.SMALL_SHAMIYANA_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.MEDIUM, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.MEDIUM_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.MEDIUM_YURT_DOOR.defaultBlockState())
                     .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.MEDIUM_BEDOUIN_DOOR.defaultBlockState())
                     .put(TentType.INDLU, () -> NTRegistry.BlockReg.MEDIUM_INDLU_DOOR.defaultBlockState())
+                    .put(TentType.SHAMIYANA, () -> NTRegistry.BlockReg.MEDIUM_SHAMIYANA_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.LARGE, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.LARGE_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.LARGE_YURT_DOOR.defaultBlockState())
                     .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.LARGE_BEDOUIN_DOOR.defaultBlockState())
                     .put(TentType.INDLU, () -> NTRegistry.BlockReg.LARGE_INDLU_DOOR.defaultBlockState())
+                    .put(TentType.SHAMIYANA, () -> NTRegistry.BlockReg.LARGE_SHAMIYANA_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.GIANT, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.GIANT_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.GIANT_YURT_DOOR.defaultBlockState())
                     .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.GIANT_BEDOUIN_DOOR.defaultBlockState())
                     .put(TentType.INDLU, () -> NTRegistry.BlockReg.GIANT_INDLU_DOOR.defaultBlockState())
+                    .put(TentType.SHAMIYANA, () -> NTRegistry.BlockReg.GIANT_SHAMIYANA_DOOR.defaultBlockState())
                     .build())
             .put(TentSize.MEGA, new ImmutableMap.Builder<TentType, Supplier<BlockState>>()
                     .put(TentType.TEPEE, () -> NTRegistry.BlockReg.MEGA_TEPEE_DOOR.defaultBlockState())
                     .put(TentType.YURT, () -> NTRegistry.BlockReg.MEGA_YURT_DOOR.defaultBlockState())
                     .put(TentType.BEDOUIN, () -> NTRegistry.BlockReg.MEGA_BEDOUIN_DOOR.defaultBlockState())
                     .put(TentType.INDLU, () -> NTRegistry.BlockReg.MEGA_INDLU_DOOR.defaultBlockState())
+                    .put(TentType.SHAMIYANA, () -> NTRegistry.BlockReg.MEGA_SHAMIYANA_DOOR.defaultBlockState())
                     .build())
             .build();
+
     /**
      * Map where keys = {Frame Block ID} and value = {Function that accepts boolean "outside" and returns Tent Block}
      */
@@ -127,6 +135,27 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "bedouin_wall"), () -> NTRegistry.BlockReg.BEDOUIN_WALL_FRAME.defaultBlockState())
             .put(new ResourceLocation(MODID, "bedouin_roof"), () -> NTRegistry.BlockReg.BEDOUIN_ROOF_FRAME.defaultBlockState())
             .put(new ResourceLocation(MODID, "indlu_wall"), () -> NTRegistry.BlockReg.INDLU_WALL_FRAME.defaultBlockState())
+            .build();
+
+    /**
+     * Map where keys = {DyeColor} and value = {Shamiyana Block Supplier}
+     */
+    public static final Map<DyeColor, Supplier<BlockState>> SHAMIYANA_WALLS = new ImmutableMap.Builder<DyeColor, Supplier<BlockState>>()
+            .put(DyeColor.BLACK, () -> NTRegistry.BlockReg.BLACK_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.BLUE, () -> NTRegistry.BlockReg.BLUE_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.BROWN, () -> NTRegistry.BlockReg.BROWN_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.CYAN, () -> NTRegistry.BlockReg.CYAN_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.GRAY, () -> NTRegistry.BlockReg.GRAY_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.GREEN, () -> NTRegistry.BlockReg.GREEN_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.LIGHT_BLUE, () -> NTRegistry.BlockReg.LIGHT_BLUE_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.LIME, () -> NTRegistry.BlockReg.LIME_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.MAGENTA, () -> NTRegistry.BlockReg.MAGENTA_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.ORANGE, () -> NTRegistry.BlockReg.ORANGE_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.PINK, () -> NTRegistry.BlockReg.PINK_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.PURPLE, () -> NTRegistry.BlockReg.PURPLE_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.RED, () -> NTRegistry.BlockReg.RED_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.WHITE, () -> NTRegistry.BlockReg.WHITE_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.YELLOW, () -> NTRegistry.BlockReg.YELLOW_SHAMIYANA_WALL.defaultBlockState())
             .build();
 
     // instance fields that rely on registries being resolved before they can be initialized

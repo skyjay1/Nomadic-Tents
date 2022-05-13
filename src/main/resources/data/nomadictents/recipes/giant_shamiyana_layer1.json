@@ -1,0 +1,18 @@
+{
+  "type": "nomadictents:tent_layer",
+  "pattern": [
+    "DBD",
+    "DTD",
+    "DSD"],
+  "key": {
+    "D": { "tag": "forge:dirt" },
+    "B": { "tag": "minecraft:stone_crafting_materials" },
+    "S": { "item": "nomadictents:stone_tent_shovel" },
+    "T": { "item": "nomadictents:giant_shamiyana" }
+  },
+  "result": {
+    "item": "nomadictents:giant_shamiyana",
+    "count": 1
+  },
+  "layer": 1
+}

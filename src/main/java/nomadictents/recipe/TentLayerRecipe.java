@@ -53,7 +53,7 @@ public class TentLayerRecipe extends ShapedRecipe {
             ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
             if(!tent.isEmpty()) {
                 // ensure tent layer is one less than target layer
-                return !tent.isEmpty() && tent.getOrCreateTag().getByte(Tent.LAYERS) == (this.layer - 1);
+                return tent.getOrCreateTag().getByte(Tent.LAYERS) == (this.layer - 1);
             }
         }
         return false;
