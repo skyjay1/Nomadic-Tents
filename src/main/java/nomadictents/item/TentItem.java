@@ -94,6 +94,9 @@ public class TentItem extends Item {
             && DyeColor.byName(itemStack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE) != DyeColor.WHITE) {
             // change color to white
             itemStack.getOrCreateTag().putString(Tent.COLOR, DyeColor.WHITE.getSerializedName());
+            // reduce water level
+            state = state.setValue(CauldronBlock.LEVEL, state.getValue(CauldronBlock.LEVEL) - 1);
+            context.getLevel().setBlock(context.getClickedPos(), state, Constants.BlockFlags.BLOCK_UPDATE);
             return ActionResultType.SUCCESS;
         }
         // begin using the item

@@ -114,7 +114,7 @@ public final class TentPlacer {
             .build();
 
     /**
-     * Map where keys = {Frame Block ID} and value = {Function that accepts boolean "outside" and returns Tent Block}
+     * Map where keys = {Frame Block ID} and value = {Function with boolean "outside" that returns Tent Block}
      */
     public static final Map<ResourceLocation, Function<Boolean, BlockState>> FRAME_TO_BLOCK = new ImmutableMap.Builder<ResourceLocation, Function<Boolean, BlockState>>()
             .put(new ResourceLocation(MODID, "yurt_wall_frame"), outside -> NTRegistry.BlockReg.YURT_WALL.defaultBlockState().setValue(YurtWallBlock.OUTSIDE, outside))
@@ -123,6 +123,7 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "bedouin_wall_frame"), outside -> NTRegistry.BlockReg.BEDOUIN_WALL.defaultBlockState())
             .put(new ResourceLocation(MODID, "bedouin_roof_frame"), outside -> NTRegistry.BlockReg.BEDOUIN_ROOF.defaultBlockState())
             .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTRegistry.BlockReg.INDLU_WALL.defaultBlockState())
+            .put(new ResourceLocation(MODID, "shamiyana_wall_frame"), outside -> NTRegistry.BlockReg.WHITE_SHAMIYANA_WALL.defaultBlockState())
             .build();
 
     /**
@@ -135,6 +136,7 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "bedouin_wall"), () -> NTRegistry.BlockReg.BEDOUIN_WALL_FRAME.defaultBlockState())
             .put(new ResourceLocation(MODID, "bedouin_roof"), () -> NTRegistry.BlockReg.BEDOUIN_ROOF_FRAME.defaultBlockState())
             .put(new ResourceLocation(MODID, "indlu_wall"), () -> NTRegistry.BlockReg.INDLU_WALL_FRAME.defaultBlockState())
+            .put(new ResourceLocation(MODID, "white_shamiyana_wall"), () -> NTRegistry.BlockReg.SHAMIYANA_WALL_FRAME.defaultBlockState())
             .build();
 
     /**
@@ -148,6 +150,7 @@ public final class TentPlacer {
             .put(DyeColor.GRAY, () -> NTRegistry.BlockReg.GRAY_SHAMIYANA_WALL.defaultBlockState())
             .put(DyeColor.GREEN, () -> NTRegistry.BlockReg.GREEN_SHAMIYANA_WALL.defaultBlockState())
             .put(DyeColor.LIGHT_BLUE, () -> NTRegistry.BlockReg.LIGHT_BLUE_SHAMIYANA_WALL.defaultBlockState())
+            .put(DyeColor.LIGHT_GRAY, () -> NTRegistry.BlockReg.LIGHT_GRAY_SHAMIYANA_WALL.defaultBlockState())
             .put(DyeColor.LIME, () -> NTRegistry.BlockReg.LIME_SHAMIYANA_WALL.defaultBlockState())
             .put(DyeColor.MAGENTA, () -> NTRegistry.BlockReg.MAGENTA_SHAMIYANA_WALL.defaultBlockState())
             .put(DyeColor.ORANGE, () -> NTRegistry.BlockReg.ORANGE_SHAMIYANA_WALL.defaultBlockState())
@@ -158,14 +161,35 @@ public final class TentPlacer {
             .put(DyeColor.YELLOW, () -> NTRegistry.BlockReg.YELLOW_SHAMIYANA_WALL.defaultBlockState())
             .build();
 
+    /**
+     * Map where keys = {DyeColor} and value = {Shamiyana Structure Processor}
+     */
+    public static final Map<DyeColor, ShamiyanaStructureProcessor> SHAMIYANA_PROCESSORS = new ImmutableMap.Builder<DyeColor, ShamiyanaStructureProcessor>()
+            .put(DyeColor.BLACK, new ShamiyanaStructureProcessor(DyeColor.BLACK))
+            .put(DyeColor.BLUE, new ShamiyanaStructureProcessor(DyeColor.BLUE))
+            .put(DyeColor.BROWN, new ShamiyanaStructureProcessor(DyeColor.BROWN))
+            .put(DyeColor.CYAN, new ShamiyanaStructureProcessor(DyeColor.CYAN))
+            .put(DyeColor.GRAY, new ShamiyanaStructureProcessor(DyeColor.GRAY))
+            .put(DyeColor.GREEN, new ShamiyanaStructureProcessor(DyeColor.GREEN))
+            .put(DyeColor.LIGHT_BLUE, new ShamiyanaStructureProcessor(DyeColor.LIGHT_BLUE))
+            .put(DyeColor.LIGHT_GRAY, new ShamiyanaStructureProcessor(DyeColor.LIGHT_GRAY))
+            .put(DyeColor.LIME, new ShamiyanaStructureProcessor(DyeColor.LIME))
+            .put(DyeColor.MAGENTA, new ShamiyanaStructureProcessor(DyeColor.MAGENTA))
+            .put(DyeColor.ORANGE, new ShamiyanaStructureProcessor(DyeColor.ORANGE))
+            .put(DyeColor.PINK, new ShamiyanaStructureProcessor(DyeColor.PINK))
+            .put(DyeColor.PURPLE, new ShamiyanaStructureProcessor(DyeColor.PURPLE))
+            .put(DyeColor.RED, new ShamiyanaStructureProcessor(DyeColor.RED))
+            .put(DyeColor.WHITE, new ShamiyanaStructureProcessor(DyeColor.WHITE))
+            .put(DyeColor.YELLOW, new ShamiyanaStructureProcessor(DyeColor.YELLOW))
+            .build();
+
     // instance fields that rely on registries being resolved before they can be initialized
     private final RuleTest barrierTest;
     private final RuleTest tentBlockTest;
-    private final RuleTest tepeeWallTest;
     private final RuleStructureProcessor removeTentBlockProcessor;
     private final RuleStructureProcessor frameBlockProcessor;
     private final RuleStructureProcessor insideTentProcessor;
-    private final RuleStructureProcessor tentToDirtProcessor;
+
     /**
      * Map where keys = {TentSize,TentType} and value = {Relative block positions}
      */
@@ -178,7 +202,6 @@ public final class TentPlacer {
         // initialize rule tests
         barrierTest = new BlockMatchRuleTest(Blocks.BARRIER);
         tentBlockTest = new TagMatchRuleTest(tentWallTag);
-        tepeeWallTest = new TagMatchRuleTest(tepeeWallTag);
         // create processor to replace barriers and tent blocks with air
         removeTentBlockProcessor = new RuleStructureProcessor(
                 new ImmutableList.Builder<RuleEntry>()
@@ -208,11 +231,6 @@ public final class TentPlacer {
                                 NTRegistry.BlockReg.YURT_ROOF.defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, false)))
                         .add(new RuleEntry(new BlockMatchRuleTest(NTRegistry.BlockReg.INDLU_WALL), AlwaysTrueRuleTest.INSTANCE,
                                 NTRegistry.BlockReg.INDLU_WALL.defaultBlockState().setValue(IndluWallBlock.OUTSIDE, false)))
-                        .build());
-        // create processor to replace all tent blocks with rigid dirt (this will be used to detect constructed tents)
-        tentToDirtProcessor = new RuleStructureProcessor(
-                new ImmutableList.Builder<RuleEntry>()
-                        .add(new RuleEntry(tentBlockTest, AlwaysTrueRuleTest.INSTANCE, NTRegistry.BlockReg.RIGID_DIRT.defaultBlockState()))
                         .build());
     }
 
@@ -322,7 +340,7 @@ public final class TentPlacer {
         }
         // place new tent
         if(!tentExists || rebuildTent) {
-            placeTent(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION);
+            placeTent(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION, tent.getColor());
         }
         // place platform
         if(!tentExists) {
@@ -378,9 +396,11 @@ public final class TentPlacer {
      * @param type the tent type
      * @param size the tent size
      * @param direction the facing direction of the tent
+     * @param color the color of the tent, if any
      * @return true if the tent was placed successfully
      */
-    public boolean placeTent(final World level, final BlockPos door, final TentType type, final TentSize size, final Direction direction) {
+    public boolean placeTent(final World level, final BlockPos door, final TentType type, final TentSize size,
+                             final Direction direction, @Nullable DyeColor color) {
         // ensure server side
         if(level.isClientSide || !(level instanceof ServerWorld)) {
             return false;
@@ -407,6 +427,9 @@ public final class TentPlacer {
                 .addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_AND_AIR)
                 .addProcessor(TepeeStructureProcessor.TEPEE_PROCESSOR)
                 .addProcessor(insideTentProcessor);
+        if(color != null) {
+            placement.addProcessor(SHAMIYANA_PROCESSORS.get(color));
+        }
         // place the template
         if(!template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT)) {
             return false;
@@ -644,10 +667,8 @@ public final class TentPlacer {
                     rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
                     state = rigid ? rigidDirt : dirt;
                     // place in a column at this location
-                    if(rigid) {
-                        for (int y = 0, l = layersOld + 1; y < l; y++) {
-                            level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
-                        }
+                    for (int y = 0, l = layersOld + 1; y < l; y++) {
+                        level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
                     }
                     level.setBlock(p.below(layersOld + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
                 }

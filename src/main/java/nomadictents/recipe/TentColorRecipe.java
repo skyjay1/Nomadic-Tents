@@ -1,7 +1,6 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
-import com.mojang.realmsclient.util.JsonUtils;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
@@ -96,7 +95,10 @@ public class TentColorRecipe extends ShapedRecipe {
         public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             // read the recipe from shapeless recipe serializer
             final ShapedRecipe recipe = super.fromJson(recipeId, json);
-            final String sColor = JsonUtils.getStringOr("color", json, "");
+            String sColor = "";
+            if(json.has("color")) {
+                sColor = json.get("color").getAsString();
+            }
             final DyeColor color = DyeColor.byName(sColor, DyeColor.WHITE);
             return new TentColorRecipe(recipeId, recipe.getResultItem(), color,
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());

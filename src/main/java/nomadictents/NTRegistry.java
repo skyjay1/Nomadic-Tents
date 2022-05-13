@@ -35,6 +35,7 @@ import nomadictents.item.TentShovelItem;
 import nomadictents.recipe.TentColorRecipe;
 import nomadictents.recipe.TentLayerRecipe;
 import nomadictents.recipe.TentSizeRecipe;
+import nomadictents.structure.ShamiyanaStructureProcessor;
 import nomadictents.structure.TentPlacer;
 import nomadictents.structure.TepeeStructureProcessor;
 import nomadictents.tileentity.TentDoorTileEntity;
@@ -77,6 +78,8 @@ public final class NTRegistry {
         public static final Block BEDOUIN_ROOF_FRAME = null;
         @ObjectHolder("indlu_wall_frame")
         public static final Block INDLU_WALL_FRAME = null;
+        @ObjectHolder("shamiyana_wall_frame")
+        public static final Block SHAMIYANA_WALL_FRAME = null;
 
         @ObjectHolder("blank_tepee_wall")
         public static final Block BLANK_TEPEE_WALL = null;
@@ -412,12 +415,18 @@ public final class NTRegistry {
 
     public static final class ProcessorReg {
         public static IStructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
+        public static IStructureProcessorType<ShamiyanaStructureProcessor> SHAMIYANA_PROCESSOR;
 
         @SubscribeEvent
         public static void onSetup(FMLCommonSetupEvent event) {
+            // register tepee processor
             TEPEE_PROCESSOR = IStructureProcessorType.register(
                     MODID + ":tepee_processor",
                     TepeeStructureProcessor.CODEC);
+            // register shamiyana processor
+            SHAMIYANA_PROCESSOR = IStructureProcessorType.register(
+                    MODID + ":shamiyana_processor",
+                    ShamiyanaStructureProcessor.CODEC);
         }
     }
 

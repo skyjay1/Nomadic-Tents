@@ -16,7 +16,6 @@ import nomadictents.tileentity.TentDoorTileEntity;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 public class ShamiyanaWallBlock extends TentBlock {
@@ -41,12 +40,13 @@ public class ShamiyanaWallBlock extends TentBlock {
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
         BlockState state = super.getStateForPlacement(context);
-        boolean pattern = state.getValue(PATTERN) || (context.getPlayer() != null && context.getPlayer().isCrouching());
+        boolean pattern = state.getValue(PATTERN);
         if(this.color == DyeColor.WHITE) {
             // locate nearby door
             BlockPos door = locateDoor(context.getLevel(), context.getClickedPos());
             if(door != null) {
                 // determine if this block should have pattern
+                NomadicTents.LOGGER.debug("clickedY=" + context.getClickedPos().getY() + ", doorY=" + door.getY());
                 pattern = (context.getClickedPos().getY() - door.getY()) % 3 == 0;
                 // get door block entity
                 TileEntity blockEntity = context.getLevel().getBlockEntity(door);

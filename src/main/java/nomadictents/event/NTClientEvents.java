@@ -34,6 +34,7 @@ public final class NTClientEvents {
                 RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.BEDOUIN_WALL_FRAME, RenderType.cutout());
                 RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.BEDOUIN_ROOF_FRAME, RenderType.cutout());
                 RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.INDLU_WALL_FRAME, RenderType.cutout());
+                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.SHAMIYANA_WALL_FRAME, RenderType.cutout());
                 RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.INDLU_WALL, RenderType.cutout());
             });
         }

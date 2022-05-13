@@ -1,7 +1,6 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
-import com.mojang.realmsclient.util.JsonUtils;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -92,8 +91,11 @@ public class TentLayerRecipe extends ShapedRecipe {
         public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             // read the recipe from shapeless recipe serializer
             final ShapedRecipe recipe = super.fromJson(recipeId, json);
-            final byte layer = (byte) JsonUtils.getIntOr("layer", json, 0);
-            return new TentLayerRecipe(recipeId, recipe.getResultItem(), layer,
+            byte bLayer = 0;
+            if(json.has("layer")) {
+                bLayer = json.get("layer").getAsByte();
+            }
+            return new TentLayerRecipe(recipeId, recipe.getResultItem(), bLayer,
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 
