@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.NomadicTents;
+import nomadictents.structure.TentPlacer;
 
 import javax.annotation.Nullable;
 
@@ -89,7 +90,7 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
      * @return the block position of the tent door inside a tent
      */
     public static BlockPos calculatePos(final int id) {
-        return new BlockPos(0, 64, 0);
+        return new BlockPos(0, TentPlacer.TENT_Y, 0);
     }
 
     /**

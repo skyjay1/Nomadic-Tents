@@ -25,7 +25,7 @@ public class NomadicTents {
 	public static final Logger LOGGER = LogManager.getFormatterLogger(MODID);
 
 	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-	public static final TentConfig CONFIG = new TentConfig(BUILDER);
+	public static final NTConfig CONFIG = new NTConfig(BUILDER);
 	public static final ForgeConfigSpec SPEC = BUILDER.build();
 	
 	public NomadicTents() {

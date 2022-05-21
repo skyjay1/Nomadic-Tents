@@ -61,6 +61,8 @@ public final class TentPlacer {
      * Left = -Z, Right = +Z, Back of tent = +X, Front of tent = -X
      */
     public static final Direction TENT_DIRECTION = Direction.EAST;
+    /** The Y-position of tents inside a tent dimension **/
+    public static final int TENT_Y = 64;
     private static final String MODID = NomadicTents.MODID;
 
     private static TentPlacer instance;
@@ -122,7 +124,7 @@ public final class TentPlacer {
             .put(new ResourceLocation(MODID, "tepee_wall_frame"), outside -> NTRegistry.BlockReg.BLANK_TEPEE_WALL.defaultBlockState())
             .put(new ResourceLocation(MODID, "bedouin_wall_frame"), outside -> NTRegistry.BlockReg.BEDOUIN_WALL.defaultBlockState())
             .put(new ResourceLocation(MODID, "bedouin_roof_frame"), outside -> NTRegistry.BlockReg.BEDOUIN_ROOF.defaultBlockState())
-            .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTRegistry.BlockReg.INDLU_WALL.defaultBlockState())
+            .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTRegistry.BlockReg.INDLU_WALL.defaultBlockState().setValue(IndluWallBlock.OUTSIDE, outside))
             .put(new ResourceLocation(MODID, "shamiyana_wall_frame"), outside -> NTRegistry.BlockReg.WHITE_SHAMIYANA_WALL.defaultBlockState())
             .build();
 
@@ -186,6 +188,7 @@ public final class TentPlacer {
     // instance fields that rely on registries being resolved before they can be initialized
     private final RuleTest barrierTest;
     private final RuleTest tentBlockTest;
+    private final RuleStructureProcessor removeBarrierProcessor;
     private final RuleStructureProcessor removeTentBlockProcessor;
     private final RuleStructureProcessor frameBlockProcessor;
     private final RuleStructureProcessor insideTentProcessor;
@@ -197,17 +200,18 @@ public final class TentPlacer {
 
     public TentPlacer() {
         ITag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
-        ITag<Block> tepeeWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tepee_wall"));
 
         // initialize rule tests
         barrierTest = new BlockMatchRuleTest(Blocks.BARRIER);
         tentBlockTest = new TagMatchRuleTest(tentWallTag);
-        // create processor to replace barriers and tent blocks with air
+        // create processor to replace barriers with air
+        removeBarrierProcessor = new RuleStructureProcessor(
+                ImmutableList.of(new RuleEntry(barrierTest, AlwaysTrueRuleTest.INSTANCE, Blocks.AIR.defaultBlockState()))
+        );
+        // create processor to replace tent blocks with air
         removeTentBlockProcessor = new RuleStructureProcessor(
-                new ImmutableList.Builder<RuleEntry>()
-                        .add(new RuleEntry(barrierTest, AlwaysTrueRuleTest.INSTANCE, Blocks.AIR.defaultBlockState()))
-                        .add(new RuleEntry(tentBlockTest, AlwaysTrueRuleTest.INSTANCE, Blocks.AIR.defaultBlockState()))
-                        .build());
+                ImmutableList.of(new RuleEntry(tentBlockTest, AlwaysTrueRuleTest.INSTANCE, Blocks.AIR.defaultBlockState()))
+        );
 
         // create rule entry builder for "tent block to frame" processor
         ImmutableList.Builder<RuleEntry> frameBlocksBuilder = new ImmutableList.Builder<RuleEntry>()
@@ -350,6 +354,11 @@ public final class TentPlacer {
         if(tentExists && rebuildPlatform) {
             upgradePlatform(level, door, tent.getType(), prevTent.getSize(), tent.getSize(), prevTent.getLayers(), tent.getLayers());
         }
+        // place decorations
+        if((!tentExists && NomadicTents.CONFIG.TENT_DECOR_BUILD.get())
+            || (rebuildTent && NomadicTents.CONFIG.TENT_DECOR_UPGRADE.get())) {
+            placeTentDecor(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION);
+        }
         // update door
         TileEntity blockEntity = level.getBlockEntity(door);
         if(blockEntity instanceof TentDoorTileEntity) {
@@ -390,7 +399,7 @@ public final class TentPlacer {
     }
 
     /**
-     * Places a tent structure in the world
+     * Places a tent structure in the world, assumed to be a tent dimension
      * @param level the world
      * @param door the door position
      * @param type the tent type
@@ -436,8 +445,43 @@ public final class TentPlacer {
         }
         // place door blocks
         level.setBlock(door, doorState, Constants.BlockFlags.DEFAULT);
-
         return true;
+    }
+
+    /**
+     * Places decoration for a tent structure in the world
+     * @param level the world
+     * @param door the door position
+     * @param type the tent type
+     * @param size the tent size
+     * @param direction the facing direction of the tent
+     * @return true if the tent decor was placed successfully
+     */
+    public boolean placeTentDecor(final World level, final BlockPos door, final TentType type, final TentSize size,
+                             final Direction direction) {
+        // ensure server side
+        if(level.isClientSide || !(level instanceof ServerWorld)) {
+            return false;
+        }
+        IServerWorld serverLevel = (ServerWorld) level;
+        // determine template to use
+        Template template = getDecorTemplate(level, type, size);
+        if(null == template) {
+            return false;
+        }
+
+        // set up template placement settings
+        Rotation rotation = toRotation(direction);
+        BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
+        Random rand = new Random(door.hashCode());
+        MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
+        PlacementSettings placement = new PlacementSettings()
+                .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
+                .addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_AND_AIR)
+                .addProcessor(removeBarrierProcessor)
+                .addProcessor(LocStructureProcessor.REPLACE_AIR);
+        // place the template
+        return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
     }
 
     /**
@@ -555,6 +599,7 @@ public final class TentPlacer {
         PlacementSettings placement = new PlacementSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
                 .addProcessor(BlockIgnoreStructureProcessor.STRUCTURE_AND_AIR)
+                .addProcessor(removeBarrierProcessor)
                 .addProcessor(removeTentBlockProcessor);
         return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
     }
@@ -714,13 +759,37 @@ public final class TentPlacer {
      */
     @Nullable
     public static Template getTemplate(final World level, final TentType type, final TentSize size) {
+        // determine structure to use
+        String templateName = "tent/" + size.getSerializedName() + "_" + type.getSerializedName();
+        ResourceLocation templateId = new ResourceLocation(NomadicTents.MODID, templateName);
+        return getTemplate(level, templateId);
+    }
+
+    /**
+     * @param level the World
+     * @param type the tent type
+     * @param size the tent size
+     * @return the tent decor template for the given type and size
+     */
+    @Nullable
+    public static Template getDecorTemplate(final World level, final TentType type, final TentSize size) {
+        // determine structure to use
+        String templateName = "tent/decor/" + size.getSerializedName() + "_" + type.getSerializedName();
+        ResourceLocation templateId = new ResourceLocation(NomadicTents.MODID, templateName);
+        return getTemplate(level, templateId);
+    }
+
+    /**
+     * @param level the World
+     * @param templateId the template resource location
+     * @return the tent structure template with the given ID, or null if none is found
+     */
+    @Nullable
+    public static Template getTemplate(final World level, final ResourceLocation templateId) {
         // ensure server side
         if(null == level.getServer()) {
             return null;
         }
-        // determine structure to use
-        String templateName = "tent/" + size.getSerializedName() + "_" + type.getSerializedName();
-        ResourceLocation templateId = new ResourceLocation(NomadicTents.MODID, templateName);
         TemplateManager templateManager = level.getServer().getStructureManager();
         Template template = templateManager.get(templateId);
         if(null == template) {

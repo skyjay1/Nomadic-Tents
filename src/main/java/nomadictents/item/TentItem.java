@@ -16,7 +16,6 @@ import net.minecraft.item.UseAction;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
@@ -33,7 +32,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
-import nomadictents.TentSaveData;
+import nomadictents.NTSavedData;
 import nomadictents.block.FrameBlock;
 import nomadictents.dimension.DynamicDimensionHelper;
 import nomadictents.structure.TentPlacer;
@@ -268,8 +267,8 @@ public class TentItem extends Item {
         }
         // ensure tent ID exists
         if(!stack.getOrCreateTag().contains(Tent.ID) || stack.getOrCreateTag().getInt(Tent.ID) == 0) {
-            TentSaveData tentSaveData = TentSaveData.get(level.getServer());
-            int tentId = tentSaveData.getNextTentId();
+            NTSavedData ntSavedData = NTSavedData.get(level.getServer());
+            int tentId = ntSavedData.getNextTentId();
             stack.getOrCreateTag().putInt(Tent.ID, tentId);
         }
         // create tent wrapper

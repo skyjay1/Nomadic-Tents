@@ -35,6 +35,7 @@ import nomadictents.item.TentShovelItem;
 import nomadictents.recipe.TentColorRecipe;
 import nomadictents.recipe.TentLayerRecipe;
 import nomadictents.recipe.TentSizeRecipe;
+import nomadictents.structure.LocStructureProcessor;
 import nomadictents.structure.ShamiyanaStructureProcessor;
 import nomadictents.structure.TentPlacer;
 import nomadictents.structure.TepeeStructureProcessor;
@@ -416,6 +417,7 @@ public final class NTRegistry {
     public static final class ProcessorReg {
         public static IStructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
         public static IStructureProcessorType<ShamiyanaStructureProcessor> SHAMIYANA_PROCESSOR;
+        public static IStructureProcessorType<LocStructureProcessor> LOC_PROCESSOR;
 
         @SubscribeEvent
         public static void onSetup(FMLCommonSetupEvent event) {
@@ -427,6 +429,10 @@ public final class NTRegistry {
             SHAMIYANA_PROCESSOR = IStructureProcessorType.register(
                     MODID + ":shamiyana_processor",
                     ShamiyanaStructureProcessor.CODEC);
+            // register loc processor
+            LOC_PROCESSOR = IStructureProcessorType.register(
+                    MODID + ":loc_processor",
+                    LocStructureProcessor.CODEC);
         }
     }
 

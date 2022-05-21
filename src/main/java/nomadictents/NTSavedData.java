@@ -15,7 +15,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
 
-public class TentSaveData extends WorldSavedData {
+public class NTSavedData extends WorldSavedData {
 
 	private static final String S_TENT_ID = "tentid";
 	private static final String S_TENTS = "tents";
@@ -23,17 +23,16 @@ public class TentSaveData extends WorldSavedData {
 	private static final String S_UUID = "uuid";
 
 	private Map<Integer, UUID> tentIdMap = new HashMap<>();
-	private Map<UUID, BlockPos> prevSpawnMap = new HashMap<>();
 	private int tentId;
 
 
-	public TentSaveData(String s) {
+	public NTSavedData(String s) {
 		super(s);
 	}
 
-	public static TentSaveData get(MinecraftServer server) {
+	public static NTSavedData get(MinecraftServer server) {
 		return server.getLevel(World.OVERWORLD).getDataStorage()
-				.computeIfAbsent(() -> new TentSaveData(NomadicTents.MODID), NomadicTents.MODID);
+				.computeIfAbsent(() -> new NTSavedData(NomadicTents.MODID), NomadicTents.MODID);
 	}
 
 	@Override

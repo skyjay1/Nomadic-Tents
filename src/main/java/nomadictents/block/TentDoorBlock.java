@@ -79,6 +79,26 @@ public class TentDoorBlock extends TentBlock {
     }
 
     @Override
+    public void playerWillDestroy(World level, BlockPos pos, BlockState blockState, PlayerEntity player) {
+        if (!level.isClientSide) {
+            // determine block entity position
+            BlockPos doorPos = pos;
+            if(blockState.getValue(HALF) == DoubleBlockHalf.UPPER) {
+                doorPos = pos.below();
+            }
+            // locate block entity
+            TileEntity blockEntity = level.getBlockEntity(doorPos);
+            if(blockEntity instanceof TentDoorTileEntity) {
+                // delegate to block entity
+                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+                tentDoor.playerWillDestroy(level, doorPos, level.getBlockState(doorPos), player);
+            }
+        }
+
+        super.playerWillDestroy(level, pos, blockState, player);
+    }
+
+    @Override
     public ActionResultType use(BlockState state, World level, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult raytraceResult) {
         // sided success
         if(level.isClientSide()) {

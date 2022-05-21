@@ -52,7 +52,8 @@ public class DynamicDimensionHelper
 	public static void enterTent(Entity entity, ServerWorld targetWorld, Tent tent) {
 		// determine target position
 		BlockPos targetPos = Tent.calculatePos(tent.getId());
-		Vector3d targetVec = Vector3d.atBottomCenterOf(targetPos.relative(TentPlacer.TENT_DIRECTION, 1));
+		Vector3d targetVec = Vector3d.atBottomCenterOf(targetPos.relative(TentPlacer.TENT_DIRECTION, 1))
+						.add(0, 0.125D, 0);
 		float targetRot = TentPlacer.TENT_DIRECTION.toYRot();
 		// ensure destination chunk is loaded before we put the player in it
 		targetWorld.getChunk(targetPos);

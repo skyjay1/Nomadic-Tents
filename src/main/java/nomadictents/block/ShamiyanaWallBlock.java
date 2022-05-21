@@ -46,7 +46,7 @@ public class ShamiyanaWallBlock extends TentBlock {
             BlockPos door = locateDoor(context.getLevel(), context.getClickedPos());
             if(door != null) {
                 // determine if this block should have pattern
-                NomadicTents.LOGGER.debug("clickedY=" + context.getClickedPos().getY() + ", doorY=" + door.getY());
+                //NomadicTents.LOGGER.debug("clickedY=" + context.getClickedPos().getY() + ", doorY=" + door.getY());
                 pattern = (context.getClickedPos().getY() - door.getY()) % 3 == 0;
                 // get door block entity
                 TileEntity blockEntity = context.getLevel().getBlockEntity(door);

@@ -7,7 +7,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
@@ -29,7 +28,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
-import nomadictents.TentSaveData;
+import nomadictents.NTSavedData;
 import nomadictents.dimension.DimensionFactory;
 import nomadictents.dimension.DynamicDimensionHelper;
 import nomadictents.item.MalletItem;
@@ -140,6 +139,24 @@ public class TentDoorTileEntity extends TileEntity {
         } else if(entity instanceof PlayerEntity && tentDoorResult.hasMessage()) {
             // display message to explain why the tent cannot be removed
             ((PlayerEntity)entity).displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
+        }
+    }
+
+    /**
+     * When the tent door is about to be destroyed by a creative player, it drops the tent item.
+     * Suggested in issue #65
+     * @param level the level
+     * @param pos the door position
+     * @param blockState the door state
+     * @param player the player
+     */
+    public void playerWillDestroy(World level, BlockPos pos, BlockState blockState, PlayerEntity player) {
+        if (player.isCreative()) {
+            // create tent itemstack at player location
+            ItemEntity item = player.spawnAtLocation(this.getTent().asItem());
+            if(item != null) {
+                item.setNoPickUpDelay();
+            }
         }
     }
 
@@ -290,9 +307,9 @@ public class TentDoorTileEntity extends TileEntity {
             }
         } else {
             // teleport to tent dimension
-            TentSaveData tentSaveData = TentSaveData.get(server);
+            NTSavedData ntSavedData = NTSavedData.get(server);
             // get or create target level
-            RegistryKey<World> world = tentSaveData.getOrCreateKey(server, this.tent.getId());
+            RegistryKey<World> world = ntSavedData.getOrCreateKey(server, this.tent.getId());
             ServerWorld targetLevel = DynamicDimensionHelper.getOrCreateWorld(server, world, DimensionFactory::createDimension);
             // teleport entity to tent dimension
             if(targetLevel != null) {

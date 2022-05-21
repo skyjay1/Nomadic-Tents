@@ -6,7 +6,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -14,7 +13,7 @@ import nomadictents.tileentity.TentDoorTileEntity;
 
 import java.util.List;
 
-public final class TentConfig {
+public final class NTConfig {
 
 	private static final String WILDCARD = "*";
 
@@ -33,12 +32,14 @@ public final class TentConfig {
 	public final ForgeConfigSpec.BooleanValue PICKUP_WHEN_SAFE;
 
 	// other
+	public final ForgeConfigSpec.BooleanValue TENT_DECOR_BUILD;
+	public final ForgeConfigSpec.BooleanValue TENT_DECOR_UPGRADE;
 	public final ForgeConfigSpec.BooleanValue TENT_FIREPROOF;
 	public final ForgeConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
 	public final ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
 	public final ForgeConfigSpec.BooleanValue USE_ACTUAL_SIZE;
 
-	public TentConfig(final ForgeConfigSpec.Builder builder) {
+	public NTConfig(final ForgeConfigSpec.Builder builder) {
 		builder.push("dimension");
 		RESPAWN_DIMENSION = builder
 				.comment("The dimension in which players will respawn from the tent dimension as needed")
@@ -74,6 +75,10 @@ public final class TentConfig {
 				.define("pickup_when_safe", false);
 		builder.pop();
 		builder.push("other");
+		TENT_DECOR_BUILD = builder.comment("When true, tents have decorations when first built")
+						.define("tent_decor_build", true);
+		TENT_DECOR_UPGRADE = builder.comment("When true, tents have decorations when upgraded")
+						.define("tent_decor_upgrade", false);
 		TENT_FIREPROOF = builder.comment("When true, the tent item will not be destroyed if it is burned")
 				.define("tent_fireproof", false);
 		TEPEE_DECORATED_CHANCE = builder
