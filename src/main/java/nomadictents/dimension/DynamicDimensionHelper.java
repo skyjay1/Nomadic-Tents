@@ -2,6 +2,7 @@ package nomadictents.dimension;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Lifecycle;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.resources.ResourceKey;
@@ -134,14 +135,14 @@ public class DynamicDimensionHelper
 	 * Dynamic dimensions (mystcraft, etc) seem to be able to be registered at runtime with no repercussions aside from
 	 * lagging the server for a couple seconds while the world initializes.
 	 * @param server a MinecraftServer instance (you can get this from a ServerPlayerEntity or ServerWorld)
-	 * @param worldKey A RegistryKey for your world, you can make one via RegistryKey.getOrCreateKey(Registry.WORLD_KEY, yourWorldResourceLocation);
+	 * @param levelKey A RegistryKey for your world, you can make one via RegistryKey.getOrCreateKey(Registry.WORLD_KEY, yourWorldResourceLocation);
 	 * @param dimensionFactory A function that produces a new Dimension instance if necessary, given the server and dimension id<br>
 	 * (dimension ID will be the same as the world ID from worldKey)<br>
 	 * It should be assumed that intended dimension has not been created or registered yet,
 	 * so making the factory attempt to get this dimension from the server's dimension registry will fail
 	 * @return Returns a ServerWorld, creating and registering a world and dimension for it if the world does not already exist
 	 */
-	public static ServerLevel getOrCreateWorld(MinecraftServer server, ResourceKey<Level> worldKey,
+	public static ServerLevel getOrCreateWorld(MinecraftServer server, ResourceKey<Level> levelKey,
 				   BiFunction<MinecraftServer, ResourceKey<LevelStem>, LevelStem> dimensionFactory) {
 
 		// this is marked as deprecated but it's not called from anywhere and I'm not sure how old it is,
@@ -150,18 +151,13 @@ public class DynamicDimensionHelper
 		// then we'd just end up making a private-field-getter for it ourselves anyway
 		@SuppressWarnings("deprecation")
 		Map<ResourceKey<Level>, ServerLevel> map = server.forgeGetWorldMap();
+		ServerLevel existingLevel = map.get(levelKey);
 
 		// if the world already exists, return it
-		if (map.containsKey(worldKey)) {
-			return map.get(worldKey);
-		} else {
-			// for vanilla worlds, forge fires the world load event *after* the world is put into the map
-			// we'll do the same for consistency
-			// (this is why we're not just using map::computeIfAbsent)
-			ServerLevel newWorld = createAndRegisterWorldAndDimension(server, map, worldKey, dimensionFactory);
-
-			return newWorld;
+		if(null == existingLevel) {
+			return createAndRegisterWorldAndDimension(server, map, levelKey, dimensionFactory);
 		}
+		return existingLevel;
 	}
 
 	@SuppressWarnings("deprecation") // markWorldsDirty is deprecated, see below
@@ -182,28 +178,37 @@ public class DynamicDimensionHelper
 		Executor executor = server.executor;
 		LevelStorageAccess levelSave = server.storageSource;
 
-		// this is the same order server init creates these worlds:
-		// instantiate world, add border listener, add to map, fire world load event
-		// (in server init, the dimension is already in the dimension registry,
-		// that'll get registered here before the world is instantiated as well)
+		final WorldData worldData = server.getWorldData();
+		final WorldGenSettings worldGenSettings = worldData.worldGenSettings();
+		final DerivedLevelData derivedLevelData = new DerivedLevelData(worldData, worldData.overworldData());
+		// now we have everything we need to create the dimension and the level
+		// this is the same order server init creates levels:
+		// the dimensions are already registered when levels are created, we'll do that first
+		// then instantiate level, add border listener, add to map, fire world load event
 
-		WorldData serverConfig = server.getWorldData();
-		WorldGenSettings dimensionGeneratorSettings = serverConfig.worldGenSettings();
-		// this next line registers the Dimension
-		dimensionGeneratorSettings.dimensions().register(dimensionKey, dimension, Lifecycle.stable());
-		DerivedLevelData derivedWorldInfo = new DerivedLevelData(serverConfig, serverConfig.overworldData());
+		// register the actual dimension
+		Registry<LevelStem> dimensionRegistry = worldGenSettings.dimensions();
+		if (dimensionRegistry instanceof WritableRegistry<LevelStem> writableRegistry)
+		{
+			writableRegistry.register(dimensionKey, dimension, Lifecycle.stable());
+		}
+		else
+		{
+			throw new IllegalStateException(String.format("Unable to register dimension %s -- dimension registry not writable", dimensionKey.location()));
+		}
+
 		// now we have everything we need to create the world instance
 		ServerLevel newWorld = new ServerLevel(
 				server,
 				executor,
 				levelSave,
-				derivedWorldInfo,
+				derivedLevelData,
 				worldKey,
 				dimension.typeHolder(),
 				chunkListener,
 				dimension.generator(),
-				dimensionGeneratorSettings.isDebug(),
-				BiomeManager.obfuscateSeed(dimensionGeneratorSettings.seed()),
+				worldGenSettings.isDebug(),
+				BiomeManager.obfuscateSeed(worldGenSettings.seed()),
 				ImmutableList.of(),
 				false); // "tick time", true for overworld, always false for everything else
 

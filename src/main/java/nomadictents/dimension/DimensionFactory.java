@@ -23,13 +23,13 @@ public class DimensionFactory
   
 	public static LevelStem createDimension(MinecraftServer server, ResourceKey<LevelStem> key)
 	{
-		return new LevelStem(new Holder.Direct<>(getDimensionType(server)), new EmptyChunkGenerator(server));
+		return new LevelStem(getDimensionTypeHolder(server), new EmptyChunkGenerator(server));
 	}
 	
-	public static DimensionType getDimensionType(MinecraftServer server)
+	public static Holder<DimensionType> getDimensionTypeHolder(MinecraftServer server)
 	{
 		return server.registryAccess() // get dynamic registries
-			.registry(Registry.DIMENSION_TYPE_REGISTRY).get()
-				.getOrThrow(TYPE_KEY);
+			.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY)
+			.getHolderOrThrow(TYPE_KEY);
 	}
 }
