@@ -1,25 +1,17 @@
 package nomadictents.event;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.client.renderer.BiomeColors;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 import nomadictents.util.Tent;
-
-import javax.annotation.Nullable;
 
 public final class NTClientEvents {
 
@@ -49,7 +41,7 @@ public final class NTClientEvents {
                     if(tintIndex == 0) {
                         return BiomeColors.getAverageGrassColor(reader, pos);
                     }
-                    return 0xFFFFFF;
+                    return -1;
                 }, NTRegistry.BlockReg.INDLU_WALL);
             }
         }
@@ -74,7 +66,7 @@ public final class NTClientEvents {
                             // slightly lighter than pure black
                             return 0x303030;
                         }
-                        return color.getColorValue();
+                        return color.getTextColor();
                     }
                     return -1;
                 }, () -> NTRegistry.ItemReg.TINY_SHAMIYANA, NTRegistry.ItemReg.SMALL_SHAMIYANA,

@@ -3,12 +3,9 @@ package nomadictents.structure;
 import com.mojang.serialization.Codec;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.item.DyeColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.gen.feature.template.*;
 import nomadictents.NTRegistry;
-import nomadictents.block.ShamiyanaWallBlock;
 
 import javax.annotation.Nullable;
 import java.util.Random;

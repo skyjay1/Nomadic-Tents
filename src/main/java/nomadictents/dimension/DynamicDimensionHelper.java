@@ -3,12 +3,9 @@ package nomadictents.dimension;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Rotation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -58,7 +55,7 @@ public class DynamicDimensionHelper
 		// ensure destination chunk is loaded before we put the player in it
 		targetWorld.getChunk(targetPos);
 		// place tent at location
-		TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, (ServerLevel)entity.level, entity.position(), entity.yRot);
+		TentPlacer.getInstance().placeOrUpgradeTent(targetWorld, targetPos, tent, (ServerLevel)entity.level, entity.position(), entity.getYRot());
 		// teleport the entity
 		sendToDimension(entity, targetWorld, targetVec, targetRot);
 	}
@@ -193,7 +190,7 @@ public class DynamicDimensionHelper
 		WorldData serverConfig = server.getWorldData();
 		WorldGenSettings dimensionGeneratorSettings = serverConfig.worldGenSettings();
 		// this next line registers the Dimension
-		dimensionGeneratorSettings.dimensions().register(dimensionKey, dimension, Lifecycle.experimental());
+		dimensionGeneratorSettings.dimensions().register(dimensionKey, dimension, Lifecycle.stable());
 		DerivedLevelData derivedWorldInfo = new DerivedLevelData(serverConfig, serverConfig.overworldData());
 		// now we have everything we need to create the world instance
 		ServerLevel newWorld = new ServerLevel(
@@ -202,7 +199,7 @@ public class DynamicDimensionHelper
 				levelSave,
 				derivedWorldInfo,
 				worldKey,
-				dimension.type(),
+				dimension.typeHolder(),
 				chunkListener,
 				dimension.generator(),
 				dimensionGeneratorSettings.isDebug(),

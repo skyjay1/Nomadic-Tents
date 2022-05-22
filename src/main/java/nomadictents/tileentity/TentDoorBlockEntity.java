@@ -10,7 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.core.Direction;
@@ -19,7 +18,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -41,7 +40,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class TentDoorTileEntity extends BlockEntity {
+public class TentDoorBlockEntity extends BlockEntity {
 
     public static final String TENT_COPY_TOOL = "TentCopyTool";
 
@@ -61,12 +60,12 @@ public class TentDoorTileEntity extends BlockEntity {
     private float spawnRot;
     private UUID owner;
 
-    public TentDoorTileEntity() {
-        super(NTRegistry.TileEntityReg.TENT_DOOR);
+    public TentDoorBlockEntity(BlockPos pos, BlockState blockState) {
+        super(NTRegistry.TileEntityReg.TENT_DOOR, pos, blockState);
     }
 
     /**
-     * Delegated from {@link nomadictents.block.TentDoorBlock#use(BlockState, World, BlockPos, PlayerEntity, Hand, BlockRayTraceResult)}
+     * Delegated from {@link nomadictents.block.TentDoorBlock#use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)}
      * @param state the door block
      * @param level the level
      * @param pos the door position
@@ -89,7 +88,7 @@ public class TentDoorTileEntity extends BlockEntity {
         // remove tent when player is holding a mallet
         if(heldItem.getItem() instanceof MalletItem) {
             // check if player can remove tent
-            TentDoorTileEntity.TentDoorResult tentDoorResult = this.canRemove(player);
+            TentDoorBlockEntity.TentDoorResult tentDoorResult = this.canRemove(player);
             if(tentDoorResult.isAllow()) {
                 // remove the tent
                 TentPlacer.getInstance().removeTent(level, pos, this.getTent().getType(), TentPlacer.getOverworldSize(this.getTent().getSize()), this.getDirection());
@@ -105,7 +104,7 @@ public class TentDoorTileEntity extends BlockEntity {
             return InteractionResult.SUCCESS;
         }
         // enter door when not holding a mallet
-        TentDoorTileEntity.TentDoorResult tentDoorResult = this.canEnter(player);
+        TentDoorBlockEntity.TentDoorResult tentDoorResult = this.canEnter(player);
         if(tentDoorResult.isAllow()) {
             this.onEnter(player);
         } else if(tentDoorResult.hasMessage()) {
@@ -116,7 +115,7 @@ public class TentDoorTileEntity extends BlockEntity {
     }
 
     /**
-     * Delegated from {@link nomadictents.block.TentDoorBlock#entityInside(BlockState, World, BlockPos, Entity)}
+     * Delegated from {@link nomadictents.block.TentDoorBlock#entityInside(BlockState, Level, BlockPos, Entity)}
      * @param state the door block
      * @param level the level
      * @param pos the door position
@@ -129,7 +128,7 @@ public class TentDoorTileEntity extends BlockEntity {
             return;
         }
         // attempt to enter tent
-        TentDoorTileEntity.TentDoorResult tentDoorResult = this.canEnter(entity);
+        TentDoorBlockEntity.TentDoorResult tentDoorResult = this.canEnter(entity);
         if(tentDoorResult.isAllow()) {
             // move entity to prevent collision when exiting
             BlockPos respawn = pos.relative(this.getDirection().getOpposite(), 1);
@@ -161,7 +160,8 @@ public class TentDoorTileEntity extends BlockEntity {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
         // save tent
         CompoundTag tentTag = tent.serializeNBT();
         tag.put(TENT, tentTag);
@@ -183,12 +183,11 @@ public class TentDoorTileEntity extends BlockEntity {
         if(this.owner != null) {
             tag.putUUID(OWNER, owner);
         }
-        return super.save(tag);
     }
 
     @Override
-    public void load(BlockState state, CompoundTag tag) {
-        super.load(state, tag);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         // load tent
         CompoundTag tentTag = tag.getCompound(TENT);
         this.tent = new Tent(tentTag);

@@ -1,5 +1,6 @@
 package nomadictents.dimension;
 
+import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,7 +23,7 @@ public class DimensionFactory
   
 	public static LevelStem createDimension(MinecraftServer server, ResourceKey<LevelStem> key)
 	{
-		return new LevelStem(() -> getDimensionType(server), new EmptyChunkGenerator(server));
+		return new LevelStem(new Holder.Direct<>(getDimensionType(server)), new EmptyChunkGenerator(server));
 	}
 	
 	public static DimensionType getDimensionType(MinecraftServer server)

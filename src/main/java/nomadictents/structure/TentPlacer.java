@@ -3,6 +3,7 @@ package nomadictents.structure;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -31,7 +32,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
@@ -39,18 +39,13 @@ import nomadictents.block.IndluWallBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.YurtRoofBlock;
 import nomadictents.block.YurtWallBlock;
-import nomadictents.tileentity.TentDoorTileEntity;
+import nomadictents.tileentity.TentDoorBlockEntity;
 import nomadictents.util.Tent;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
 import javax.annotation.Nullable;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -199,7 +194,7 @@ public final class TentPlacer {
     private final Map<TentSize, Map<TentType, Set<BlockPos>>> templatePositions = new EnumMap<>(TentSize.class);
 
     public TentPlacer() {
-        Tag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
+        TagKey<Block> tentWallTag = BlockTags.create(new ResourceLocation(MODID, "tent/tent_wall"));
 
         // initialize rule tests
         barrierTest = new BlockMatchTest(Blocks.BARRIER);
@@ -236,19 +231,6 @@ public final class TentPlacer {
                         .add(new ProcessorRule(new BlockMatchTest(NTRegistry.BlockReg.INDLU_WALL), AlwaysTrueTest.INSTANCE,
                                 NTRegistry.BlockReg.INDLU_WALL.defaultBlockState().setValue(IndluWallBlock.OUTSIDE, false)))
                         .build());
-    }
-
-    /**
-     * Locates a block tag, or throws a NullPointerException if the tag is not found
-     * @param tagId the block tag registry name
-     * @return the block tag
-     */
-    private Tag<Block> getTagOrThrow(final ResourceLocation tagId) throws NullPointerException {
-        Tag<Block> tag = BlockTags.getAllTags().getTag(tagId);
-        if(null == tag) {
-            throw new NullPointerException("Failed to locate block tag '" + tagId + "'");
-        }
-        return tag;
     }
 
     /**
@@ -328,8 +310,8 @@ public final class TentPlacer {
         Tent prevTent = tent;
         if(tentExists) {
             BlockEntity blockEntity = level.getBlockEntity(door);
-            if(blockEntity instanceof TentDoorTileEntity) {
-                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+            if(blockEntity instanceof TentDoorBlockEntity) {
+                TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
                 // set up tile entity fields
                 prevTent = tentDoor.getTent();
             }
@@ -361,8 +343,8 @@ public final class TentPlacer {
         }
         // update door
         BlockEntity blockEntity = level.getBlockEntity(door);
-        if(blockEntity instanceof TentDoorTileEntity) {
-            TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+        if(blockEntity instanceof TentDoorBlockEntity) {
+            TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
             // set up tile entity fields
             tentDoor.setSpawnpoint(sourceLevel, sourceVec);
             tentDoor.setSpawnRot(sourceRot);
@@ -385,8 +367,8 @@ public final class TentPlacer {
         // update door
         if(success) {
             BlockEntity blockEntity = level.getBlockEntity(door);
-            if(blockEntity instanceof TentDoorTileEntity) {
-                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+            if(blockEntity instanceof TentDoorBlockEntity) {
+                TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
                 // set up tile entity fields
                 tentDoor.setTent(tent);
                 tentDoor.setDirection(direction);
@@ -430,7 +412,7 @@ public final class TentPlacer {
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
-        BoundingBox mbb = new BoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
+        BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR)
@@ -440,11 +422,11 @@ public final class TentPlacer {
             placement.addProcessor(SHAMIYANA_PROCESSORS.get(color));
         }
         // place the template
-        if(!template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT)) {
+        if(!template.placeInWorld(serverLevel, origin, origin, placement, rand, Block.UPDATE_ALL)) {
             return false;
         }
         // place door blocks
-        level.setBlock(door, doorState, Constants.BlockFlags.DEFAULT);
+        level.setBlock(door, doorState, Block.UPDATE_ALL);
         return true;
     }
 
@@ -474,14 +456,14 @@ public final class TentPlacer {
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
-        BoundingBox mbb = new BoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
+        BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR)
                 .addProcessor(removeBarrierProcessor)
                 .addProcessor(LocStructureProcessor.REPLACE_AIR);
         // place the template
-        return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
+        return template.placeInWorld(serverLevel, origin, origin, placement, rand, Block.UPDATE_ALL);
     }
 
     /**
@@ -515,19 +497,19 @@ public final class TentPlacer {
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
-        BoundingBox mbb = new BoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
+        BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR)
                 .addProcessor(new BlockIgnoreProcessor(ImmutableList.of(Blocks.BARRIER)))
                 .addProcessor(frameBlockProcessor);
         // place the template
-        if(!template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT)) {
+        if(!template.placeInWorld(serverLevel, origin, origin, placement, rand, Block.UPDATE_ALL)) {
             return false;
         }
 
         // place doors
-        level.setBlock(door, doorState, Constants.BlockFlags.DEFAULT);
+        level.setBlock(door, doorState, Block.UPDATE_ALL);
 
         return true;
     }
@@ -556,7 +538,7 @@ public final class TentPlacer {
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Set<BlockPos> tentBlocks = getTentBlockPositions(level, door, type, size);
         // load tent block tag
-        Tag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
+        TagKey<Block> tentWallTag = BlockTags.create(new ResourceLocation(MODID, "tent/tent_wall"));
         // check each block to make sure it is in tent_wall tag (or is tent door)
         BlockPos checkPos;
         BlockState checkState;
@@ -595,13 +577,13 @@ public final class TentPlacer {
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Random rand = new Random(door.hashCode());
 
-        BoundingBox mbb = new BoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
+        BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
                 .addProcessor(BlockIgnoreProcessor.STRUCTURE_AND_AIR)
                 .addProcessor(removeBarrierProcessor)
                 .addProcessor(removeTentBlockProcessor);
-        return template.placeInWorld(serverLevel, origin, origin, placement, rand, Constants.BlockFlags.DEFAULT);
+        return template.placeInWorld(serverLevel, origin, origin, placement, rand, Block.UPDATE_ALL);
     }
 
     /**
@@ -645,10 +627,10 @@ public final class TentPlacer {
                 // place in a column at this location
                 if(rigid || fill) {
                     for (int y = 0, l = layers + 1; y < l; y++) {
-                        level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                        level.setBlock(p.below(y), state, Block.UPDATE_ALL);
                     }
                 }
-                level.setBlock(p.below(layers + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
+                level.setBlock(p.below(layers + 1), rigidDirt, Block.UPDATE_ALL);
             }
         }
         return true;
@@ -713,9 +695,9 @@ public final class TentPlacer {
                     state = rigid ? rigidDirt : dirt;
                     // place in a column at this location
                     for (int y = 0, l = layersOld + 1; y < l; y++) {
-                        level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                        level.setBlock(p.below(y), state, Block.UPDATE_ALL);
                     }
-                    level.setBlock(p.below(layersOld + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
+                    level.setBlock(p.below(layersOld + 1), rigidDirt, Block.UPDATE_ALL);
                 }
             }
         }
@@ -741,9 +723,9 @@ public final class TentPlacer {
                     }
                     // place in a column at this location
                     for(int y = layersOld + 1, l = layersNew + 1; y < l; y++) {
-                        level.setBlock(p.below(y), state, Constants.BlockFlags.DEFAULT);
+                        level.setBlock(p.below(y), state, Block.UPDATE_ALL);
                     }
-                    level.setBlock(p.below(layersNew + 1), rigidDirt, Constants.BlockFlags.DEFAULT);
+                    level.setBlock(p.below(layersNew + 1), rigidDirt, Block.UPDATE_ALL);
                 }
             }
         }
@@ -791,11 +773,11 @@ public final class TentPlacer {
             return null;
         }
         StructureManager templateManager = level.getServer().getStructureManager();
-        StructureTemplate template = templateManager.get(templateId);
-        if(null == template) {
+        Optional<StructureTemplate> template = templateManager.get(templateId);
+        if(template.isEmpty()) {
             NomadicTents.LOGGER.warn("Failed to load tent template for " + templateId);
         }
-        return template;
+        return template.orElse(null);
     }
 
     public Set<BlockPos> getTentBlockPositions(final Level level, final BlockPos door, final TentType type, final TentSize size) {
@@ -820,9 +802,9 @@ public final class TentPlacer {
 
         Set<BlockPos> tentBlocks = new HashSet<>();
         // load tent block tag
-        Tag<Block> tentWallTag = getTagOrThrow(new ResourceLocation(MODID, "tent/tent_wall"));
+        TagKey<Block> tentWallTag = BlockTags.create(new ResourceLocation(MODID, "tent/tent_wall"));
         // filter the template for each block and add to a set
-        for(Block b : tentWallTag.getValues()) {
+        for(Block b : ForgeRegistries.BLOCKS.tags().getTag(tentWallTag)) {
             List<StructureTemplate.StructureBlockInfo> filtered = template.filterBlocks(origin, placement, b, false);
             for(StructureTemplate.StructureBlockInfo blockInfo : filtered) {
                 tentBlocks.add(blockInfo.pos);

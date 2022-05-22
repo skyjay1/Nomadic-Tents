@@ -27,7 +27,7 @@ public class DirectTeleporter implements ITeleporter {
         Vec3i normal = direction.getNormal();
         Vec3 targetMotion = entity.getDeltaMovement();
         targetMotion = targetMotion.multiply(normal.getX(), normal.getY(), normal.getZ());
-        return new DirectTeleporter(targetVec, targetMotion, yRot, entity.xRot);
+        return new DirectTeleporter(targetVec, targetMotion, yRot, entity.getXRot());
     }
 
     @Nullable
@@ -50,9 +50,9 @@ public class DirectTeleporter implements ITeleporter {
         entity.setDeltaMovement(targetMotion);
 
         if(entity instanceof ServerPlayer) {
-            ((ServerPlayer) entity).connection.teleport(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.xRot);
+            ((ServerPlayer) entity).connection.teleport(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.getXRot());
         } else {
-            entity.moveTo(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.xRot);
+            entity.moveTo(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.getXRot());
         }
 
         return ITeleporter.super.placeEntity(entity, currentWorld, destWorld, yaw, repositionEntity);

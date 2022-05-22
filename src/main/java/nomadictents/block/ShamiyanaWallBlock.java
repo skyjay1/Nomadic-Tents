@@ -10,15 +10,12 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
-import nomadictents.tileentity.TentDoorTileEntity;
+import nomadictents.tileentity.TentDoorBlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class ShamiyanaWallBlock extends TentBlock {
 
@@ -52,9 +49,9 @@ public class ShamiyanaWallBlock extends TentBlock {
                 pattern = (context.getClickedPos().getY() - door.getY()) % 3 == 0;
                 // get door block entity
                 BlockEntity blockEntity = context.getLevel().getBlockEntity(door);
-                if(blockEntity instanceof TentDoorTileEntity) {
+                if(blockEntity instanceof TentDoorBlockEntity) {
                     // get color information from door, if any
-                    TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+                    TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
                     DyeColor tentColor = tentDoor.getTent().getColor();
                     if(tentColor != null) {
                         state = TentPlacer.SHAMIYANA_WALLS.get(tentColor).get();

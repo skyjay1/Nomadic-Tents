@@ -10,7 +10,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -25,17 +24,19 @@ public class NTSavedData extends SavedData {
 	private Map<Integer, UUID> tentIdMap = new HashMap<>();
 	private int tentId;
 
-
-	public NTSavedData(String s) {
-		super(s);
-	}
+	public NTSavedData() { }
 
 	public static NTSavedData get(MinecraftServer server) {
 		return server.getLevel(Level.OVERWORLD).getDataStorage()
-				.computeIfAbsent(() -> new NTSavedData(NomadicTents.MODID), NomadicTents.MODID);
+				.computeIfAbsent(NTSavedData::read, NTSavedData::new, NomadicTents.MODID);
 	}
 
-	@Override
+	public static NTSavedData read(CompoundTag nbt) {
+		NTSavedData instance = new NTSavedData();
+		instance.load(nbt);
+		return instance;
+	}
+
 	public void load(CompoundTag nbt) {
 		tentIdMap.clear();
 		final ListTag tentIdTagList = nbt.getList(S_TENTS, 10);

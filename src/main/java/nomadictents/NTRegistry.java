@@ -39,7 +39,7 @@ import nomadictents.structure.LocStructureProcessor;
 import nomadictents.structure.ShamiyanaStructureProcessor;
 import nomadictents.structure.TentPlacer;
 import nomadictents.structure.TepeeStructureProcessor;
-import nomadictents.tileentity.TentDoorTileEntity;
+import nomadictents.tileentity.TentDoorBlockEntity;
 import nomadictents.util.TentType;
 import nomadictents.util.TentSize;
 
@@ -452,7 +452,7 @@ public final class NTRegistry {
                 }
             }
             // create the tile entity type
-            BlockEntityType<TentDoorTileEntity> tentDoorType = BlockEntityType.Builder.of(TentDoorTileEntity::new,
+            BlockEntityType<TentDoorBlockEntity> tentDoorType = BlockEntityType.Builder.of(TentDoorBlockEntity::new,
                     doorBlocks.toArray(new Block[0])).build(null);
             // register the tile entity type
             event.getRegistry().register(tentDoorType.setRegistryName(NomadicTents.MODID, "tent_door"));

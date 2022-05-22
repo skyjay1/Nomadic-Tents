@@ -1,8 +1,9 @@
 package nomadictents.item;
 
+import net.minecraft.core.cauldron.CauldronInteraction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,10 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 import nomadictents.NTSavedData;
@@ -44,8 +42,6 @@ import nomadictents.util.TentSize;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import net.minecraft.world.item.Item.Properties;
-
 public class TentItem extends Item {
 
     private static final String DOOR = "door";
@@ -54,13 +50,32 @@ public class TentItem extends Item {
     private final TentType type;
     private final TentSize size;
 
+    private static final CauldronInteraction WASH_TENT = (state, level, pos, player, hand, itemStack) -> {
+        // only interact when item stack has color other than white
+        if(!itemStack.hasTag() || !itemStack.getOrCreateTag().contains(Tent.COLOR)
+                || DyeColor.byName(itemStack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE) == DyeColor.WHITE) {
+            return InteractionResult.PASS;
+        }
+
+        if(!level.isClientSide) {
+            // replace item with white color information
+            ItemStack replace = itemStack.copy();
+            replace.getOrCreateTag().putString(Tent.COLOR, DyeColor.WHITE.getSerializedName());
+            player.setItemInHand(hand, replace);
+            // reduce cauldron fill level
+            LayeredCauldronBlock.lowerFillLevel(state, level, pos);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    };
+
     public TentItem(TentType type, TentSize width, Properties properties) {
         super(properties);
         this.type = type;
         this.size = width;
+
+        CauldronInteraction.WATER.put(this, WASH_TENT);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flag) {
         list.add(new TranslatableComponent("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
         if(this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
@@ -89,17 +104,6 @@ public class TentItem extends Item {
         // determine block and item
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         ItemStack itemStack = context.getItemInHand();
-        // attempt to remove color from tent
-        if(state.is(Blocks.CAULDRON) && state.getValue(CauldronBlock.LEVEL) > 0
-            && itemStack.getOrCreateTag().contains(Tent.COLOR)
-            && DyeColor.byName(itemStack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE) != DyeColor.WHITE) {
-            // change color to white
-            itemStack.getOrCreateTag().putString(Tent.COLOR, DyeColor.WHITE.getSerializedName());
-            // reduce water level
-            state = state.setValue(CauldronBlock.LEVEL, state.getValue(CauldronBlock.LEVEL) - 1);
-            context.getLevel().setBlock(context.getClickedPos(), state, Constants.BlockFlags.BLOCK_UPDATE);
-            return InteractionResult.SUCCESS;
-        }
         // begin using the item
         if(context.getPlayer() != null) {
             context.getPlayer().startUsingItem(context.getHand());
@@ -125,7 +129,7 @@ public class TentItem extends Item {
             return InteractionResult.PASS;
         }
         // add door frame
-        if(!NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
+        if(NTRegistry.BlockReg.DOOR_FRAME != state.getBlock()) {
             // determine placement position
             BlockPos placePos = context.getClickedPos();
             if(!context.getLevel().getBlockState(placePos).canBeReplaced(new BlockPlaceContext(context))) {
@@ -138,7 +142,7 @@ public class TentItem extends Item {
             }
             if(canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
                 // place door frame
-                context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Constants.BlockFlags.DEFAULT);
+                context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Block.UPDATE_ALL);
                 // remember the door position and player direction
                 itemStack.getOrCreateTag().put(DOOR, NbtUtils.writeBlockPos(placePos));
                 itemStack.getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
@@ -172,7 +176,7 @@ public class TentItem extends Item {
             if(level.isLoaded(pos)) {
                 // detect door frame
                 BlockState state = level.getBlockState(pos);
-                if(NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
+                if(NTRegistry.BlockReg.DOOR_FRAME == state.getBlock()) {
                     int progress = state.getValue(FrameBlock.PROGRESS);
                     if (entity instanceof Player && progress == FrameBlock.MAX_PROGRESS) {
                         // place tent
@@ -201,7 +205,7 @@ public class TentItem extends Item {
         // locate door frame
         BlockPos pos = result.getBlockPos();
         BlockState state = level.getBlockState(pos);
-        if(!NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
+        if(NTRegistry.BlockReg.DOOR_FRAME != state.getBlock()) {
             entity.releaseUsingItem();
             return;
         }
@@ -230,7 +234,7 @@ public class TentItem extends Item {
         }
         // increment progress
         int next = progress + 2;
-        level.setBlock(pos, state.setValue(FrameBlock.PROGRESS, Math.min(next, FrameBlock.MAX_PROGRESS)), Constants.BlockFlags.BLOCK_UPDATE);
+        level.setBlock(pos, state.setValue(FrameBlock.PROGRESS, Math.min(next, FrameBlock.MAX_PROGRESS)), Block.UPDATE_ALL);
     }
 
     @Override
@@ -294,7 +298,7 @@ public class TentItem extends Item {
         // remove door frame
         BlockState state = level.getBlockState(clickedPos);
         if(state.is(NTRegistry.BlockReg.DOOR_FRAME)) {
-            level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Constants.BlockFlags.DEFAULT);
+            level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
         }
         // remove NBT data
         stack.getOrCreateTag().remove(DOOR);
@@ -304,8 +308,8 @@ public class TentItem extends Item {
     public static BlockHitResult clipFrom(final LivingEntity player, final double range) {
         // raytrace to determine which block the player is looking at within the given range
         final Vec3 startVec = player.getEyePosition(1.0F);
-        final float pitch = (float) Math.toRadians(-player.xRot);
-        final float yaw = (float) Math.toRadians(-player.yRot);
+        final float pitch = (float) Math.toRadians(-player.getXRot());
+        final float yaw = (float) Math.toRadians(-player.getYRot());
         float cosYaw = Mth.cos(yaw - (float) Math.PI);
         float sinYaw = Mth.sin(yaw - (float) Math.PI);
         float cosPitch = -Mth.cos(pitch);

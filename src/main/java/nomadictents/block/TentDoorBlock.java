@@ -1,6 +1,7 @@
 package nomadictents.block;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.entity.Entity;
@@ -19,15 +20,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants;
-import nomadictents.tileentity.TentDoorTileEntity;
+import nomadictents.tileentity.TentDoorBlockEntity;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-
-public class TentDoorBlock extends TentBlock {
+public class TentDoorBlock extends TentBlock implements EntityBlock {
 
     public static final EnumProperty<DoubleBlockHalf> HALF = DoorBlock.HALF;
     public static final EnumProperty<Direction.Axis> AXIS = EnumProperty.create("axis",
@@ -66,7 +63,7 @@ public class TentDoorBlock extends TentBlock {
     @Override
     public void onPlace(BlockState stateIn, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (stateIn.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
-            level.setBlock(pos.above(), stateIn.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), Constants.BlockFlags.DEFAULT);
+            level.setBlock(pos.above(), stateIn.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
         }
     }
 
@@ -90,9 +87,9 @@ public class TentDoorBlock extends TentBlock {
             }
             // locate block entity
             BlockEntity blockEntity = level.getBlockEntity(doorPos);
-            if(blockEntity instanceof TentDoorTileEntity) {
+            if(blockEntity instanceof TentDoorBlockEntity) {
                 // delegate to block entity
-                TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+                TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
                 tentDoor.playerWillDestroy(level, doorPos, level.getBlockState(doorPos), player);
             }
         }
@@ -113,9 +110,9 @@ public class TentDoorBlock extends TentBlock {
         }
         // locate block entity
         BlockEntity blockEntity = level.getBlockEntity(doorPos);
-        if(blockEntity instanceof TentDoorTileEntity) {
+        if(blockEntity instanceof TentDoorBlockEntity) {
             // delegate to block entity
-            TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+            TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
             return tentDoor.use(level.getBlockState(doorPos), level, doorPos, player, hand);
         }
         return InteractionResult.SUCCESS;
@@ -130,22 +127,19 @@ public class TentDoorBlock extends TentBlock {
         }
         // locate door block entity
         BlockEntity blockEntity = level.getBlockEntity(doorPos);
-        if(blockEntity instanceof TentDoorTileEntity) {
+        if(blockEntity instanceof TentDoorBlockEntity) {
             // delegate to block entity
-            TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+            TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
             tentDoor.entityInside(level.getBlockState(doorPos), level, doorPos, entity);
         }
         super.entityInside(state, level, pos, entity);
     }
 
     @Override
-    public boolean hasTileEntity(BlockState state) {
-        return state.getValue(HALF) == DoubleBlockHalf.LOWER;
-    }
-
-    @Nullable
-    @Override
-    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-        return new TentDoorTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        if(state.getValue(HALF) == DoubleBlockHalf.LOWER) {
+            return new TentDoorBlockEntity(pos, state);
+        }
+        return null;
     }
 }

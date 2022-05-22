@@ -9,7 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
-import nomadictents.tileentity.TentDoorTileEntity;
+import nomadictents.tileentity.TentDoorBlockEntity;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public final class NTConfig {
 				.comment("When true, non-player entities can enter the tent by walking through the door")
 				.define("nonplayers_enter_on_collide", true);
 		COPY_CREATIVE_ONLY = builder.comment("When true, only Creative mode players can duplicate a tent item",
-				"(Note: this is done by clicking a tent door with any item that has NBT tag '" + TentDoorTileEntity.TENT_COPY_TOOL
+				"(Note: this is done by clicking a tent door with any item that has NBT tag '" + TentDoorBlockEntity.TENT_COPY_TOOL
 						+ "' set to true)")
 				.define("copy_creative_only", true);
 		ENTER_WHEN_SAFE = builder.comment("When true, players can only enter tents when there are no nearby monsters")
