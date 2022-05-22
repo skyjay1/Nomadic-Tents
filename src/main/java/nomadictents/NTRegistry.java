@@ -1,21 +1,21 @@
 package nomadictents;
 
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.gen.feature.template.IStructureProcessorType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -52,7 +52,7 @@ public final class NTRegistry {
 
     public static final String MODID = NomadicTents.MODID;
 
-    public static final ItemGroup TAB = new ItemGroup(MODID) {
+    public static final CreativeModeTab TAB = new CreativeModeTab(MODID) {
         @Override
         public ItemStack makeIcon() {
             return new ItemStack(ItemReg.TINY_YURT);
@@ -227,14 +227,14 @@ public final class NTRegistry {
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Block> event) {
             // register door frames
-            event.getRegistry().register(new FrameBlock(AbstractBlock.Properties
+            event.getRegistry().register(new FrameBlock(BlockBehaviour.Properties
                     .of(Material.BARRIER, MaterialColor.WOOD)
                     .sound(SoundType.WOOD))
                 .setRegistryName(MODID, "door_frame")
             );
             // register wall/roof frames
             for(ResourceLocation id : TentPlacer.FRAME_TO_BLOCK.keySet()) {
-                event.getRegistry().register(new FrameBlock(AbstractBlock.Properties
+                event.getRegistry().register(new FrameBlock(BlockBehaviour.Properties
                         .of(Material.BARRIER, MaterialColor.WOOD)
                         .sound(SoundType.WOOD))
                     .setRegistryName(id));
@@ -242,18 +242,18 @@ public final class NTRegistry {
 
             // register yurt blocks
             event.getRegistry().registerAll(
-                    new YurtWallBlock(AbstractBlock.Properties
+                    new YurtWallBlock(BlockBehaviour.Properties
                             .of(Material.BARRIER, MaterialColor.WOOL)
                             .sound(SoundType.WOOL))
                         .setRegistryName(MODID, "yurt_wall"),
-                    new YurtRoofBlock(AbstractBlock.Properties
+                    new YurtRoofBlock(BlockBehaviour.Properties
                             .of(Material.BARRIER, MaterialColor.COLOR_LIGHT_BLUE)
                             .sound(SoundType.WOOL))
                         .setRegistryName(MODID, "yurt_roof"));
 
             // register tepee blocks
             for(final TepeeBlock.Type type : TepeeBlock.Type.values()) {
-                event.getRegistry().register(new TepeeBlock(type, AbstractBlock.Properties
+                event.getRegistry().register(new TepeeBlock(type, BlockBehaviour.Properties
                         .of(Material.BARRIER, MaterialColor.TERRACOTTA_WHITE)
                         .sound(SoundType.WOOL))
                     .setRegistryName(MODID, type.getSerializedName() + "_tepee_wall"));
@@ -261,18 +261,18 @@ public final class NTRegistry {
 
             // register bedouin blocks
             event.getRegistry().registerAll(
-                    new QuarterTentBlock(AbstractBlock.Properties
+                    new QuarterTentBlock(BlockBehaviour.Properties
                             .of(Material.BARRIER, MaterialColor.COLOR_BROWN)
                             .sound(SoundType.WOOL))
                             .setRegistryName(MODID, "bedouin_wall"),
-                    new TentBlock(AbstractBlock.Properties
+                    new TentBlock(BlockBehaviour.Properties
                             .of(Material.BARRIER, MaterialColor.COLOR_BROWN)
                             .sound(SoundType.WOOL))
                             .setRegistryName(MODID, "bedouin_roof"));
 
             // register indlu blocks
             event.getRegistry().registerAll(
-                    new IndluWallBlock(AbstractBlock.Properties
+                    new IndluWallBlock(BlockBehaviour.Properties
                             .of(Material.BARRIER, MaterialColor.GRASS)
                             .noOcclusion()
                             .isViewBlocking((b, r, p) -> false)
@@ -282,7 +282,7 @@ public final class NTRegistry {
             // register shamiyana blocks
             for(DyeColor color : DyeColor.values()) {
                 event.getRegistry().register(
-                        new ShamiyanaWallBlock(color, AbstractBlock.Properties
+                        new ShamiyanaWallBlock(color, BlockBehaviour.Properties
                                 .of(Material.BARRIER, color.getMaterialColor())
                                 .sound(SoundType.WOOL))
                                 .setRegistryName(MODID, color.getSerializedName() + "_shamiyana_wall"));
@@ -291,7 +291,7 @@ public final class NTRegistry {
             // register door blocks
             for(TentType type : TentType.values()) {
                 for(TentSize width : TentSize.values()) {
-                    event.getRegistry().register(new TentDoorBlock(AbstractBlock.Properties
+                    event.getRegistry().register(new TentDoorBlock(BlockBehaviour.Properties
                             .of(Material.BARRIER, MaterialColor.WOOL)
                             .sound(SoundType.WOOL))
                         .setRegistryName(MODID, width.getSerializedName() + "_" + type.getSerializedName() + "_door"));
@@ -299,7 +299,7 @@ public final class NTRegistry {
             }
 
             // register other blocks
-            event.getRegistry().register(new TentBlock(AbstractBlock.Properties
+            event.getRegistry().register(new TentBlock(BlockBehaviour.Properties
                     .of(Material.BARRIER, MaterialColor.DIRT)
                     .sound(SoundType.GRAVEL))
                 .setRegistryName(MODID, "rigid_dirt"));
@@ -334,9 +334,9 @@ public final class NTRegistry {
 
             // register tools
             event.getRegistry().registerAll(
-                new MalletItem(ItemTier.IRON, false, new Item.Properties().tab(TAB))
+                new MalletItem(Tiers.IRON, false, new Item.Properties().tab(TAB))
                     .setRegistryName(MODID, "mallet"),
-                new MalletItem(ItemTier.DIAMOND, true, new Item.Properties().tab(TAB))
+                new MalletItem(Tiers.DIAMOND, true, new Item.Properties().tab(TAB))
                     .setRegistryName(MODID, "golden_mallet")
             );
 
@@ -415,22 +415,22 @@ public final class NTRegistry {
     }
 
     public static final class ProcessorReg {
-        public static IStructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
-        public static IStructureProcessorType<ShamiyanaStructureProcessor> SHAMIYANA_PROCESSOR;
-        public static IStructureProcessorType<LocStructureProcessor> LOC_PROCESSOR;
+        public static StructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
+        public static StructureProcessorType<ShamiyanaStructureProcessor> SHAMIYANA_PROCESSOR;
+        public static StructureProcessorType<LocStructureProcessor> LOC_PROCESSOR;
 
         @SubscribeEvent
         public static void onSetup(FMLCommonSetupEvent event) {
             // register tepee processor
-            TEPEE_PROCESSOR = IStructureProcessorType.register(
+            TEPEE_PROCESSOR = StructureProcessorType.register(
                     MODID + ":tepee_processor",
                     TepeeStructureProcessor.CODEC);
             // register shamiyana processor
-            SHAMIYANA_PROCESSOR = IStructureProcessorType.register(
+            SHAMIYANA_PROCESSOR = StructureProcessorType.register(
                     MODID + ":shamiyana_processor",
                     ShamiyanaStructureProcessor.CODEC);
             // register loc processor
-            LOC_PROCESSOR = IStructureProcessorType.register(
+            LOC_PROCESSOR = StructureProcessorType.register(
                     MODID + ":loc_processor",
                     LocStructureProcessor.CODEC);
         }
@@ -440,10 +440,10 @@ public final class NTRegistry {
     public static final class TileEntityReg {
 
         @ObjectHolder("tent_door")
-        public static final TileEntityType<?> TENT_DOOR = null;
+        public static final BlockEntityType<?> TENT_DOOR = null;
 
         @SubscribeEvent
-        public static void register(final RegistryEvent.Register<TileEntityType<?>> event) {
+        public static void register(final RegistryEvent.Register<BlockEntityType<?>> event) {
             // create a set of blocks that can use the tile entity
             Set<Block> doorBlocks = new HashSet<>();
             for(Map<TentType, Supplier<BlockState>> doorMap : TentPlacer.DOORS.values()) {
@@ -452,7 +452,7 @@ public final class NTRegistry {
                 }
             }
             // create the tile entity type
-            TileEntityType<TentDoorTileEntity> tentDoorType = TileEntityType.Builder.of(TentDoorTileEntity::new,
+            BlockEntityType<TentDoorTileEntity> tentDoorType = BlockEntityType.Builder.of(TentDoorTileEntity::new,
                     doorBlocks.toArray(new Block[0])).build(null);
             // register the tile entity type
             event.getRegistry().register(tentDoorType.setRegistryName(NomadicTents.MODID, "tent_door"));
@@ -463,16 +463,16 @@ public final class NTRegistry {
     public static final class RecipeReg {
 
         @ObjectHolder(TentSizeRecipe.Serializer.CATEGORY)
-        public static final IRecipeSerializer<TentSizeRecipe> TENT_SIZE_RECIPE_SERIALIZER = null;
+        public static final RecipeSerializer<TentSizeRecipe> TENT_SIZE_RECIPE_SERIALIZER = null;
 
         @ObjectHolder(TentLayerRecipe.Serializer.CATEGORY)
-        public static final IRecipeSerializer<TentLayerRecipe> TENT_LAYER_RECIPE_SERIALIZER = null;
+        public static final RecipeSerializer<TentLayerRecipe> TENT_LAYER_RECIPE_SERIALIZER = null;
 
         @ObjectHolder(TentColorRecipe.Serializer.CATEGORY)
-        public static final IRecipeSerializer<TentColorRecipe> TENT_COLOR_RECIPE_SERIALIZER = null;
+        public static final RecipeSerializer<TentColorRecipe> TENT_COLOR_RECIPE_SERIALIZER = null;
 
         @SubscribeEvent
-        public static void register(final RegistryEvent.Register<IRecipeSerializer<?>> event) {
+        public static void register(final RegistryEvent.Register<RecipeSerializer<?>> event) {
             event.getRegistry().registerAll(
                 new TentSizeRecipe.Serializer().setRegistryName(MODID, TentSizeRecipe.Serializer.CATEGORY),
                 new TentLayerRecipe.Serializer().setRegistryName(MODID, TentLayerRecipe.Serializer.CATEGORY),

@@ -1,15 +1,17 @@
 package nomadictents.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.Half;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class QuarterTentBlock extends DoubleTentBlock {
 
@@ -23,7 +25,7 @@ public class QuarterTentBlock extends DoubleTentBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(SIDE).add(HALF);
     }
 
@@ -36,7 +38,7 @@ public class QuarterTentBlock extends DoubleTentBlock {
      */
     @Nullable
     @Override
-    public BlockState getTentBlock(BlockState stateIn, IWorld level, BlockPos pos) {
+    public BlockState getTentBlock(BlockState stateIn, LevelAccessor level, BlockPos pos) {
         if(stateIn != null) {
             boolean above = level.getBlockState(pos.below(1)).getBlock() == this
                     && level.getBlockState(pos.below(2)).getBlock() != this;
@@ -51,7 +53,7 @@ public class QuarterTentBlock extends DoubleTentBlock {
         return null;
     }
 
-    public static enum Side implements IStringSerializable {
+    public static enum Side implements StringRepresentable {
         LEFT("left"),
         RIGHT("right");
 

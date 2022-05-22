@@ -1,31 +1,31 @@
 package nomadictents.tileentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 import nomadictents.NTSavedData;
@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class TentDoorTileEntity extends TileEntity {
+public class TentDoorTileEntity extends BlockEntity {
 
     public static final String TENT_COPY_TOOL = "TentCopyTool";
 
@@ -56,8 +56,8 @@ public class TentDoorTileEntity extends TileEntity {
     private Tent tent = new Tent(0, TentType.YURT, TentSize.TINY);
     private Direction direction = TentPlacer.TENT_DIRECTION;
 
-    private ResourceLocation spawnDimension = Dimension.OVERWORLD.location();
-    private Vector3d spawnpoint = Vector3d.ZERO;
+    private ResourceLocation spawnDimension = LevelStem.OVERWORLD.location();
+    private Vec3 spawnpoint = Vec3.ZERO;
     private float spawnRot;
     private UUID owner;
 
@@ -74,7 +74,7 @@ public class TentDoorTileEntity extends TileEntity {
      * @param hand the player hand
      * @return an action result type to indicate how the block was used
      */
-    public ActionResultType use(BlockState state, World level, BlockPos pos, PlayerEntity player, Hand hand) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
         // copy tent when player is holding tent copy tool
         if(heldItem.hasTag() && heldItem.getTag().contains(TENT_COPY_TOOL)
@@ -84,7 +84,7 @@ public class TentDoorTileEntity extends TileEntity {
             if(item != null) {
                 item.setNoPickUpDelay();
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         // remove tent when player is holding a mallet
         if(heldItem.getItem() instanceof MalletItem) {
@@ -100,9 +100,9 @@ public class TentDoorTileEntity extends TileEntity {
                 }
             } else if(tentDoorResult.hasMessage()) {
                 // display message to explain why the tent cannot be removed
-                player.displayClientMessage(new TranslationTextComponent(tentDoorResult.getRemoveTranslationKey()), true);
+                player.displayClientMessage(new TranslatableComponent(tentDoorResult.getRemoveTranslationKey()), true);
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         // enter door when not holding a mallet
         TentDoorTileEntity.TentDoorResult tentDoorResult = this.canEnter(player);
@@ -110,9 +110,9 @@ public class TentDoorTileEntity extends TileEntity {
             this.onEnter(player);
         } else if(tentDoorResult.hasMessage()) {
             // display message to explain why the tent cannot be entered
-            player.displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
+            player.displayClientMessage(new TranslatableComponent(tentDoorResult.getEnterTranslationKey()), true);
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     /**
@@ -122,8 +122,8 @@ public class TentDoorTileEntity extends TileEntity {
      * @param pos the door position
      * @param entity the entity that is colliding with the door block
      */
-    public void entityInside(BlockState state, World level, BlockPos pos, Entity entity) {
-        if(entity instanceof PlayerEntity && !NomadicTents.CONFIG.PLAYERS_ENTER_ON_COLLIDE.get()) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if(entity instanceof Player && !NomadicTents.CONFIG.PLAYERS_ENTER_ON_COLLIDE.get()) {
             return;
         } else if(!NomadicTents.CONFIG.NONPLAYERS_ENTER_ON_COLLIDE.get()) {
             return;
@@ -133,12 +133,12 @@ public class TentDoorTileEntity extends TileEntity {
         if(tentDoorResult.isAllow()) {
             // move entity to prevent collision when exiting
             BlockPos respawn = pos.relative(this.getDirection().getOpposite(), 1);
-            entity.moveTo(Vector3d.atBottomCenterOf(respawn));
+            entity.moveTo(Vec3.atBottomCenterOf(respawn));
             // attempt to enter tent
             this.onEnter(entity);
-        } else if(entity instanceof PlayerEntity && tentDoorResult.hasMessage()) {
+        } else if(entity instanceof Player && tentDoorResult.hasMessage()) {
             // display message to explain why the tent cannot be removed
-            ((PlayerEntity)entity).displayClientMessage(new TranslationTextComponent(tentDoorResult.getEnterTranslationKey()), true);
+            ((Player)entity).displayClientMessage(new TranslatableComponent(tentDoorResult.getEnterTranslationKey()), true);
         }
     }
 
@@ -150,7 +150,7 @@ public class TentDoorTileEntity extends TileEntity {
      * @param blockState the door state
      * @param player the player
      */
-    public void playerWillDestroy(World level, BlockPos pos, BlockState blockState, PlayerEntity player) {
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) {
         if (player.isCreative()) {
             // create tent itemstack at player location
             ItemEntity item = player.spawnAtLocation(this.getTent().asItem());
@@ -161,17 +161,17 @@ public class TentDoorTileEntity extends TileEntity {
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT tag) {
+    public CompoundTag save(CompoundTag tag) {
         // save tent
-        CompoundNBT tentTag = tent.serializeNBT();
+        CompoundTag tentTag = tent.serializeNBT();
         tag.put(TENT, tentTag);
         // save direction
         tag.putString(DIRECTION, direction.getSerializedName());
         // save spawn dimension
         tag.putString(SPAWN_DIMENSION, spawnDimension.toString());
-        if(spawnpoint != Vector3d.ZERO) {
+        if(spawnpoint != Vec3.ZERO) {
             // save spawnpoint
-            CompoundNBT spawnpointTag = new CompoundNBT();
+            CompoundTag spawnpointTag = new CompoundTag();
             spawnpointTag.putDouble("X", spawnpoint.x());
             spawnpointTag.putDouble("Y", spawnpoint.y());
             spawnpointTag.putDouble("Z", spawnpoint.z());
@@ -187,10 +187,10 @@ public class TentDoorTileEntity extends TileEntity {
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT tag) {
+    public void load(BlockState state, CompoundTag tag) {
         super.load(state, tag);
         // load tent
-        CompoundNBT tentTag = tag.getCompound(TENT);
+        CompoundTag tentTag = tag.getCompound(TENT);
         this.tent = new Tent(tentTag);
         // load direction
         this.direction = Direction.byName(tag.getString(DIRECTION));
@@ -198,8 +198,8 @@ public class TentDoorTileEntity extends TileEntity {
         this.spawnDimension = ResourceLocation.tryParse(tag.getString(SPAWN_DIMENSION));
         if(tag.contains(SPAWNPOINT)) {
             // load spawnpoint
-            CompoundNBT spawnpointTag = tag.getCompound(SPAWNPOINT);
-            this.spawnpoint = new Vector3d(
+            CompoundTag spawnpointTag = tag.getCompound(SPAWNPOINT);
+            this.spawnpoint = new Vec3(
                 spawnpointTag.getDouble("X"),
                 spawnpointTag.getDouble("Y"),
                 spawnpointTag.getDouble("Z")
@@ -228,15 +228,15 @@ public class TentDoorTileEntity extends TileEntity {
             return TentDoorResult.ALLOW;
         }
         // player-only conditions
-        if(entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
+        if(entity instanceof Player) {
+            Player player = (Player) entity;
             // prevent non-owners if enabled
             if(NomadicTents.CONFIG.OWNER_ONLY_ENTER.get() && !player.isCreative() && !isOwner(player)) {
                 return TentDoorResult.DENY_NOT_OWNER;
             }
             // prevent when near monsters if enabled
             if(NomadicTents.CONFIG.ENTER_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
-                    && monstersNearby((PlayerEntity) entity)) {
+                    && monstersNearby((Player) entity)) {
                 return TentDoorResult.DENY_MONSTERS;
             }
         }
@@ -271,15 +271,15 @@ public class TentDoorTileEntity extends TileEntity {
             return TentDoorResult.DENY_OTHER;
         }
         // player-only conditions
-        if(entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
+        if(entity instanceof Player) {
+            Player player = (Player) entity;
             // prevent non-owners if enabled
             if(NomadicTents.CONFIG.OWNER_ONLY_PICKUP.get() && !player.isCreative() && !isOwner(player)) {
                 return TentDoorResult.DENY_NOT_OWNER;
             }
             // prevent when near monsters if enabled
             if(NomadicTents.CONFIG.PICKUP_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
-                    && monstersNearby((PlayerEntity) entity)) {
+                    && monstersNearby((Player) entity)) {
                 return TentDoorResult.DENY_MONSTERS;
             }
         }
@@ -301,7 +301,7 @@ public class TentDoorTileEntity extends TileEntity {
 
         if(insideTent) {
             // teleport to spawn dimension and position
-            ServerWorld targetLevel = getSpawnDimension();
+            ServerLevel targetLevel = getSpawnDimension();
             if(targetLevel != null) {
                 DynamicDimensionHelper.exitTent(entity, targetLevel, this.spawnpoint, this.spawnRot);
             }
@@ -309,8 +309,8 @@ public class TentDoorTileEntity extends TileEntity {
             // teleport to tent dimension
             NTSavedData ntSavedData = NTSavedData.get(server);
             // get or create target level
-            RegistryKey<World> world = ntSavedData.getOrCreateKey(server, this.tent.getId());
-            ServerWorld targetLevel = DynamicDimensionHelper.getOrCreateWorld(server, world, DimensionFactory::createDimension);
+            ResourceKey<Level> world = ntSavedData.getOrCreateKey(server, this.tent.getId());
+            ServerLevel targetLevel = DynamicDimensionHelper.getOrCreateWorld(server, world, DimensionFactory::createDimension);
             // teleport entity to tent dimension
             if(targetLevel != null) {
                 DynamicDimensionHelper.enterTent(entity, targetLevel, this.tent);
@@ -322,9 +322,9 @@ public class TentDoorTileEntity extends TileEntity {
      * @param player a player
      * @return true if there are monsters within 8 blocks of the entity
      */
-    private boolean monstersNearby(PlayerEntity player) {
-        final AxisAlignedBB box = new AxisAlignedBB(this.worldPosition).inflate(8.0D, 5.0D, 8.0D);
-        List<MonsterEntity> list = player.level.getEntitiesOfClass(MonsterEntity.class, box, e -> e.isPreventingPlayerRest(player));
+    private boolean monstersNearby(Player player) {
+        final AABB box = new AABB(this.worldPosition).inflate(8.0D, 5.0D, 8.0D);
+        List<Monster> list = player.level.getEntitiesOfClass(Monster.class, box, e -> e.isPreventingPlayerRest(player));
         return !list.isEmpty();
     }
 
@@ -346,7 +346,7 @@ public class TentDoorTileEntity extends TileEntity {
         this.setChanged();
     }
 
-    public Vector3d getSpawnpoint() {
+    public Vec3 getSpawnpoint() {
         return spawnpoint;
     }
 
@@ -355,14 +355,14 @@ public class TentDoorTileEntity extends TileEntity {
     }
 
     @Nullable
-    public ServerWorld getSpawnDimension() {
+    public ServerLevel getSpawnDimension() {
         if(this.level != null && !this.level.isClientSide) {
-            return this.level.getServer().getLevel(RegistryKey.create(Registry.DIMENSION_REGISTRY, this.spawnDimension));
+            return this.level.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, this.spawnDimension));
         }
         return null;
     }
 
-    public void setSpawnpoint(World world, Vector3d spawnpoint) {
+    public void setSpawnpoint(Level world, Vec3 spawnpoint) {
         this.spawnDimension = world.dimension().location();
         this.spawnpoint = spawnpoint;
         this.setChanged();
@@ -386,7 +386,7 @@ public class TentDoorTileEntity extends TileEntity {
         this.setChanged();
     }
 
-    public boolean isOwner(PlayerEntity player) {
+    public boolean isOwner(Player player) {
         if(null == owner) {
             return true;
         }

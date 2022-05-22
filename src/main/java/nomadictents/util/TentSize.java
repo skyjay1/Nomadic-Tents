@@ -2,23 +2,23 @@ package nomadictents.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.ChatFormatting;
 
-public enum TentSize implements IStringSerializable {
-    TINY("tiny", TextFormatting.RED),
-    SMALL("small", TextFormatting.BLUE),
-    MEDIUM("medium", TextFormatting.DARK_GREEN),
-    LARGE("large", TextFormatting.YELLOW),
-    GIANT("giant", TextFormatting.DARK_PURPLE),
-    MEGA("mega", TextFormatting.AQUA);
+public enum TentSize implements StringRepresentable {
+    TINY("tiny", ChatFormatting.RED),
+    SMALL("small", ChatFormatting.BLUE),
+    MEDIUM("medium", ChatFormatting.DARK_GREEN),
+    LARGE("large", ChatFormatting.YELLOW),
+    GIANT("giant", ChatFormatting.DARK_PURPLE),
+    MEGA("mega", ChatFormatting.AQUA);
 
     public static final Codec<TentSize> CODEC = Codec.STRING.comapFlatMap(TentSize::getByName, TentSize::getSerializedName).stable();
 
     private final String name;
-    private final TextFormatting color;
+    private final ChatFormatting color;
 
-    TentSize(String name, TextFormatting color) {
+    TentSize(String name, ChatFormatting color) {
         this.name = name;
         this.color = color;
     }
@@ -37,7 +37,7 @@ public enum TentSize implements IStringSerializable {
         return this.name;
     }
 
-    public TextFormatting getColor() {
+    public ChatFormatting getColor() {
         return color;
     }
 }

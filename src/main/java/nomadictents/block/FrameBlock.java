@@ -1,30 +1,32 @@
 package nomadictents.block;
 
 import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.HashMap;
 
-public class FrameBlock extends Block implements IWaterLoggable {
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+
+public class FrameBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final int MAX_PROGRESS = 7;
     public static final IntegerProperty PROGRESS = IntegerProperty.create("progress", 0, MAX_PROGRESS);
@@ -32,7 +34,7 @@ public class FrameBlock extends Block implements IWaterLoggable {
 
     public static final VoxelShape AABB_PROGRESS_0 = box(0, 0, 0, 16, 4, 16);
     public static final VoxelShape AABB_PROGRESS_1 = box(0, 0, 0, 16, 8, 16);
-    public static final VoxelShape AABB_PROGRESS_2 = VoxelShapes.block();
+    public static final VoxelShape AABB_PROGRESS_2 = Shapes.block();
 
     private static final HashMap<BlockState, VoxelShape> SHAPES = new HashMap<>();
 
@@ -45,19 +47,19 @@ public class FrameBlock extends Block implements IWaterLoggable {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(WATERLOGGED).add(PROGRESS);
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         boolean water = fluidstate.getType() == Fluids.WATER;
         return super.getStateForPlacement(context).setValue(WATERLOGGED, water);
     }
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn,
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn,
                                   BlockPos currentPos, BlockPos facingPos) {
         if (stateIn.getValue(WATERLOGGED)) {
             worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
@@ -77,7 +79,7 @@ public class FrameBlock extends Block implements IWaterLoggable {
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter reader, BlockPos pos, CollisionContext context) {
         if(!SHAPES.containsKey(state)) {
             int progress = state.getValue(PROGRESS);
             if(progress <= 1) {
@@ -92,17 +94,17 @@ public class FrameBlock extends Block implements IWaterLoggable {
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getVisualShape(BlockState state, BlockGetter reader, BlockPos pos, CollisionContext context) {
         return getShape(state, reader, pos, context);
     }
 
     @Override
-    public boolean canEntityDestroy(BlockState state, IBlockReader world, BlockPos pos, Entity entity) {
+    public boolean canEntityDestroy(BlockState state, BlockGetter world, BlockPos pos, Entity entity) {
         return false;
     }
 
     @Override
-    public boolean isFlammable(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return false;
     }
 }

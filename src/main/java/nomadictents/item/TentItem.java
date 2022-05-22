@@ -1,31 +1,31 @@
 package nomadictents.item;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CauldronBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.UseAction;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CauldronBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeMod;
@@ -44,6 +44,8 @@ import nomadictents.util.TentSize;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.world.item.Item.Properties;
+
 public class TentItem extends Item {
 
     private static final String DOOR = "door";
@@ -59,21 +61,21 @@ public class TentItem extends Item {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(ItemStack stack, @Nullable World level, List<ITextComponent> list, ITooltipFlag flag) {
-        list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flag) {
+        list.add(new TranslatableComponent("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
         if(this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
             DyeColor color = DyeColor.byName(stack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE);
             String translationKey = "item.minecraft.firework_star." + color.getSerializedName();
-            list.add(new TranslationTextComponent(translationKey));
+            list.add(new TranslatableComponent(translationKey));
         }
-        if(flag.isAdvanced() || net.minecraft.client.gui.screen.Screen.hasShiftDown()) {
+        if(flag.isAdvanced() || net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             // layer tooltip
             byte layers = stack.getOrCreateTag().getByte(Tent.LAYERS);
             byte maxLayers = TentLayers.getMaxLayers(this.size);
-            list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip.layer", layers, maxLayers).withStyle(TextFormatting.GRAY));
+            list.add(new TranslatableComponent("item.nomadictents.tent.tooltip.layer", layers, maxLayers).withStyle(ChatFormatting.GRAY));
             // ID tooltip
             int id = stack.getOrCreateTag().getInt(Tent.ID);
-            list.add(new TranslationTextComponent("item.nomadictents.tent.tooltip.id", id).withStyle(TextFormatting.GRAY));
+            list.add(new TranslatableComponent("item.nomadictents.tent.tooltip.id", id).withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -83,7 +85,7 @@ public class TentItem extends Item {
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
+    public InteractionResult useOn(UseOnContext context) {
         // determine block and item
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         ItemStack itemStack = context.getItemInHand();
@@ -96,7 +98,7 @@ public class TentItem extends Item {
             // reduce water level
             state = state.setValue(CauldronBlock.LEVEL, state.getValue(CauldronBlock.LEVEL) - 1);
             context.getLevel().setBlock(context.getClickedPos(), state, Constants.BlockFlags.BLOCK_UPDATE);
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         // begin using the item
         if(context.getPlayer() != null) {
@@ -104,48 +106,48 @@ public class TentItem extends Item {
         }
         // client should not run anything else
         if(context.getLevel().isClientSide) {
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         // cannot place tent inside tent
         if(DynamicDimensionHelper.isInsideTent(context.getLevel())) {
             // send message
             if(context.getPlayer() != null) {
-                context.getPlayer().displayClientMessage(new TranslationTextComponent("tent.build.deny.inside_tent"), true);
+                context.getPlayer().displayClientMessage(new TranslatableComponent("tent.build.deny.inside_tent"), true);
             }
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
         }
         // cannot place tent inside blacklisted dimension
         if(NomadicTents.CONFIG.isDimensionBlacklist(context.getLevel())) {
             // send message
             if(context.getPlayer() != null) {
-                context.getPlayer().displayClientMessage(new TranslationTextComponent("tent.build.deny.dimension"), true);
+                context.getPlayer().displayClientMessage(new TranslatableComponent("tent.build.deny.dimension"), true);
             }
-            return ActionResultType.PASS;
+            return InteractionResult.PASS;
         }
         // add door frame
         if(!NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
             // determine placement position
             BlockPos placePos = context.getClickedPos();
-            if(!context.getLevel().getBlockState(placePos).canBeReplaced(new BlockItemUseContext(context))) {
+            if(!context.getLevel().getBlockState(placePos).canBeReplaced(new BlockPlaceContext(context))) {
                 placePos = placePos.relative(context.getClickedFace());
             }
             // determine if placement position is valid
             BlockState replace = context.getLevel().getBlockState(placePos);
             if(replace.getMaterial() != Material.AIR && !replace.getMaterial().isLiquid()) {
-                return ActionResultType.FAIL;
+                return InteractionResult.FAIL;
             }
             if(canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
                 // place door frame
                 context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Constants.BlockFlags.DEFAULT);
                 // remember the door position and player direction
-                itemStack.getOrCreateTag().put(DOOR, NBTUtil.writeBlockPos(placePos));
+                itemStack.getOrCreateTag().put(DOOR, NbtUtils.writeBlockPos(placePos));
                 itemStack.getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
 
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             } else {
                 // send message
                 if(context.getPlayer() != null) {
-                    context.getPlayer().displayClientMessage(new TranslationTextComponent("tent.build.deny.space"), true);
+                    context.getPlayer().displayClientMessage(new TranslatableComponent("tent.build.deny.space"), true);
                 }
             }
         }
@@ -154,27 +156,27 @@ public class TentItem extends Item {
     }
 
     @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         return super.onItemUseFirst(stack, context);
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, World level, LivingEntity entity, int duration) {
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int duration) {
         if(level.isClientSide) {
             return;
         }
         // locate door frame
         if(stack.hasTag() && stack.getTag().contains(DOOR) && stack.getTag().contains(DIRECTION)) {
-            BlockPos pos = NBTUtil.readBlockPos(stack.getTag().getCompound(DOOR));
+            BlockPos pos = NbtUtils.readBlockPos(stack.getTag().getCompound(DOOR));
             Direction direction = Direction.byName(stack.getTag().getString(DIRECTION));
             if(level.isLoaded(pos)) {
                 // detect door frame
                 BlockState state = level.getBlockState(pos);
                 if(NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
                     int progress = state.getValue(FrameBlock.PROGRESS);
-                    if (entity instanceof PlayerEntity && progress == FrameBlock.MAX_PROGRESS) {
+                    if (entity instanceof Player && progress == FrameBlock.MAX_PROGRESS) {
                         // place tent
-                        placeTent(stack, level, pos, direction, (PlayerEntity) entity);
+                        placeTent(stack, level, pos, direction, (Player) entity);
                     } else {
                         // cancel tent
                         cancelTent(stack, level, pos);
@@ -185,14 +187,14 @@ public class TentItem extends Item {
     }
 
     @Override
-    public void onUseTick(World level, LivingEntity entity, ItemStack stack, int duration) {
+    public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int duration) {
         // delay between updates
         if(level.isClientSide || duration % 5 != 1) {
             return;
         }
         // locate selected block
-        BlockRayTraceResult result = clipFrom(entity, entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue());
-        if(result.getType() != RayTraceResult.Type.BLOCK) {
+        BlockHitResult result = clipFrom(entity, entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue());
+        if(result.getType() != HitResult.Type.BLOCK) {
             entity.releaseUsingItem();
             return;
         }
@@ -212,17 +214,17 @@ public class TentItem extends Item {
         int progress = state.getValue(FrameBlock.PROGRESS);
         if(progress == FrameBlock.MAX_PROGRESS) {
             // determine if position is valid
-            if(entity instanceof PlayerEntity && canPlaceTent(level, pos, direction)) {
+            if(entity instanceof Player && canPlaceTent(level, pos, direction)) {
                 // place tent
-                placeTent(stack, level, pos, direction, (PlayerEntity) entity);
+                placeTent(stack, level, pos, direction, (Player) entity);
                 entity.releaseUsingItem();
                 return;
             } else {
                 // remove door frame
                 cancelTent(stack, level, pos);
                 // send message
-                if(entity instanceof PlayerEntity) {
-                    ((PlayerEntity)entity).displayClientMessage(new TranslationTextComponent("tent.build.deny.space"), true);
+                if(entity instanceof Player) {
+                    ((Player)entity).displayClientMessage(new TranslatableComponent("tent.build.deny.space"), true);
                 }
             }
         }
@@ -232,12 +234,12 @@ public class TentItem extends Item {
     }
 
     @Override
-    public UseAction getUseAnimation(ItemStack stack) {
-        return UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
     }
 
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, World level, LivingEntity entity) {
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         this.releaseUsing(stack, level, entity, 0);
         return stack;
     }
@@ -248,7 +250,7 @@ public class TentItem extends Item {
      * @param direction the tent direction
      * @return true if the player can place a tent at the given location
      */
-    private boolean canPlaceTent(World level, BlockPos startPos, Direction direction) {
+    private boolean canPlaceTent(Level level, BlockPos startPos, Direction direction) {
         TentPlacer tentPlacer = TentPlacer.getInstance();
         return tentPlacer.canPlaceTentFrame(level, startPos, this.type, this.size, direction);
     }
@@ -261,7 +263,7 @@ public class TentItem extends Item {
      * @param direction the tent direction
      * @param owner the player who placed the tent
      */
-    private void placeTent(ItemStack stack, World level, BlockPos clickedPos, Direction direction, @Nullable PlayerEntity owner) {
+    private void placeTent(ItemStack stack, Level level, BlockPos clickedPos, Direction direction, @Nullable Player owner) {
         if(level.isClientSide() || null == level.getServer()) {
             return;
         }
@@ -288,7 +290,7 @@ public class TentItem extends Item {
      * @param level the world
      * @param clickedPos the position of the door frame, if any
      */
-    private void cancelTent(ItemStack stack, World level, BlockPos clickedPos) {
+    private void cancelTent(ItemStack stack, Level level, BlockPos clickedPos) {
         // remove door frame
         BlockState state = level.getBlockState(clickedPos);
         if(state.is(NTRegistry.BlockReg.DOOR_FRAME)) {
@@ -299,16 +301,16 @@ public class TentItem extends Item {
         stack.getOrCreateTag().remove(DIRECTION);
     }
 
-    public static BlockRayTraceResult clipFrom(final LivingEntity player, final double range) {
+    public static BlockHitResult clipFrom(final LivingEntity player, final double range) {
         // raytrace to determine which block the player is looking at within the given range
-        final Vector3d startVec = player.getEyePosition(1.0F);
+        final Vec3 startVec = player.getEyePosition(1.0F);
         final float pitch = (float) Math.toRadians(-player.xRot);
         final float yaw = (float) Math.toRadians(-player.yRot);
-        float cosYaw = MathHelper.cos(yaw - (float) Math.PI);
-        float sinYaw = MathHelper.sin(yaw - (float) Math.PI);
-        float cosPitch = -MathHelper.cos(pitch);
-        float sinPitch = MathHelper.sin(pitch);
-        final Vector3d endVec = startVec.add(sinYaw * cosPitch * range, sinPitch * range, cosYaw * cosPitch * range);
-        return player.level.clip(new RayTraceContext(startVec, endVec, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, player));
+        float cosYaw = Mth.cos(yaw - (float) Math.PI);
+        float sinYaw = Mth.sin(yaw - (float) Math.PI);
+        float cosPitch = -Mth.cos(pitch);
+        float sinPitch = Mth.sin(pitch);
+        final Vec3 endVec = startVec.add(sinYaw * cosPitch * range, sinPitch * range, cosYaw * cosPitch * range);
+        return player.level.clip(new ClipContext(startVec, endVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 }

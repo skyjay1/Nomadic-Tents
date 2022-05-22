@@ -1,15 +1,15 @@
 package nomadictents.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.DyeColor;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 import nomadictents.tileentity.TentDoorTileEntity;
@@ -17,6 +17,8 @@ import nomadictents.tileentity.TentDoorTileEntity;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class ShamiyanaWallBlock extends TentBlock {
 
@@ -32,13 +34,13 @@ public class ShamiyanaWallBlock extends TentBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(PATTERN);
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         boolean pattern = state.getValue(PATTERN);
         if(this.color == DyeColor.WHITE) {
@@ -49,7 +51,7 @@ public class ShamiyanaWallBlock extends TentBlock {
                 //NomadicTents.LOGGER.debug("clickedY=" + context.getClickedPos().getY() + ", doorY=" + door.getY());
                 pattern = (context.getClickedPos().getY() - door.getY()) % 3 == 0;
                 // get door block entity
-                TileEntity blockEntity = context.getLevel().getBlockEntity(door);
+                BlockEntity blockEntity = context.getLevel().getBlockEntity(door);
                 if(blockEntity instanceof TentDoorTileEntity) {
                     // get color information from door, if any
                     TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
@@ -77,7 +79,7 @@ public class ShamiyanaWallBlock extends TentBlock {
      * @return BlockPos of lower shamiyana door if found, otherwise null
      **/
     @Nullable
-    private static BlockPos locateDoor(World world, BlockPos pos) {
+    private static BlockPos locateDoor(Level world, BlockPos pos) {
         Set<BlockPos> checked = new HashSet<>();
         while (pos != null && !(world.getBlockState(pos).getBlock() instanceof TentDoorBlock)) {
             pos = locateShamiyanaBlockExcluding(world, checked, pos);
@@ -96,7 +98,7 @@ public class ShamiyanaWallBlock extends TentBlock {
      * @param exclude list of BlockPos already checked
      * @param pos center of the 3x3x3 box
      **/
-    private static BlockPos locateShamiyanaBlockExcluding(World worldIn, Set<BlockPos> exclude, BlockPos pos) {
+    private static BlockPos locateShamiyanaBlockExcluding(Level worldIn, Set<BlockPos> exclude, BlockPos pos) {
         int radius = 1;
         // favor blocks below this one (on average, shamiyana blocks are above the door)
         for (int y = -radius; y <= radius; y++) {

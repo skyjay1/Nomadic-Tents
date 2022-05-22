@@ -1,23 +1,23 @@
 package nomadictents.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -32,18 +32,18 @@ public class MalletItem extends Item {
 
 	private final boolean isInstant;
 
-	public MalletItem(IItemTier material, boolean isInstant, Item.Properties properties) {
+	public MalletItem(Tier material, boolean isInstant, Item.Properties properties) {
 		super(properties.durability(material.getUses()));
 		this.isInstant = isInstant;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, @Nullable World level, List<ITextComponent> list, ITooltipFlag flag) {
-		list.add(new TranslationTextComponent(getDescriptionId() + ".tooltip").withStyle(TextFormatting.GRAY));
+	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flag) {
+		list.add(new TranslatableComponent(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
 	}
 
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		BlockState state = context.getLevel().getBlockState(context.getClickedPos());
 		if(state.getBlock() instanceof FrameBlock && !NTRegistry.BlockReg.DOOR_FRAME.is(state.getBlock())) {
 			// swing arm
@@ -53,7 +53,7 @@ public class MalletItem extends Item {
 			// instant
 			if(isInstant) {
 				useInstant(context.getItemInHand(), context.getLevel(), state, context.getClickedPos(), context);
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			// interact with frame block
 			int progress = state.getValue(FrameBlock.PROGRESS);
@@ -66,15 +66,15 @@ public class MalletItem extends Item {
 				}
 				// place target block
 				BlockState target = TentPlacer.getFrameTarget(state, context.getLevel(), context.getClickedPos());
-				target = target.getBlock().getStateForPlacement(new BlockItemUseContext(context));
+				target = target.getBlock().getStateForPlacement(new BlockPlaceContext(context));
 				context.getLevel().setBlock(context.getClickedPos(), target, Constants.BlockFlags.DEFAULT);
 			} else {
 				// increase progress
 				context.getLevel().setBlock(context.getClickedPos(), state.setValue(FrameBlock.PROGRESS, next), Constants.BlockFlags.BLOCK_UPDATE);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 	}
 
 	@Override
@@ -82,16 +82,16 @@ public class MalletItem extends Item {
 		return false;
 	}
 
-	private int getEffectiveness(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, @Nullable PlayerEntity player) {
+	private int getEffectiveness(final ItemStack stack, final Level level, final BlockState state, final BlockPos pos, @Nullable Player player) {
 		return 2;
 	}
 
-	private void useInstant(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, ItemUseContext context) {
+	private void useInstant(final ItemStack stack, final Level level, final BlockState state, final BlockPos pos, UseOnContext context) {
 		// place target block
 		BlockState target = TentPlacer.getFrameTarget(state, level, pos);
-		BlockRayTraceResult targetRayTrace = new BlockRayTraceResult(Vector3d.atCenterOf(pos), context.getClickedFace(), pos, true);
-		ItemUseContext targetContext = new ItemUseContext(context.getLevel(), context.getPlayer(), context.getHand(), stack, targetRayTrace);
-		target = target.getBlock().getStateForPlacement(new BlockItemUseContext(targetContext));
+		BlockHitResult targetRayTrace = new BlockHitResult(Vec3.atCenterOf(pos), context.getClickedFace(), pos, true);
+		UseOnContext targetContext = new UseOnContext(context.getLevel(), context.getPlayer(), context.getHand(), stack, targetRayTrace);
+		target = target.getBlock().getStateForPlacement(new BlockPlaceContext(targetContext));
 		level.setBlock(pos, target, Constants.BlockFlags.DEFAULT);
 		// use durability
 		if(null != context.getPlayer()) {

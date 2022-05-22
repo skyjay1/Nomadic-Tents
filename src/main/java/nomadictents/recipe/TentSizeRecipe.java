@@ -1,15 +1,15 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
 
@@ -23,14 +23,14 @@ public class TentSizeRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory craftingInventory) {
+    public ItemStack assemble(CraftingContainer craftingInventory) {
         ItemStack result = super.assemble(craftingInventory);
 
         // locate input tent
         ItemStack tent = getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
         // copy input NBT to result
         if(!tent.isEmpty()) {
-            CompoundNBT tag = tent.getOrCreateTag().copy();
+            CompoundTag tag = tent.getOrCreateTag().copy();
             result.setTag(tag);
         }
 
@@ -38,7 +38,7 @@ public class TentSizeRecipe extends ShapedRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return NTRegistry.RecipeReg.TENT_SIZE_RECIPE_SERIALIZER;
     }
 
@@ -48,7 +48,7 @@ public class TentSizeRecipe extends ShapedRecipe {
      * @param pred the predicate to match an item
      * @return the first item in the inventory that matches the predicate
      */
-    public static ItemStack getStackMatching(final CraftingInventory inv, final Predicate<ItemStack> pred) {
+    public static ItemStack getStackMatching(final CraftingContainer inv, final Predicate<ItemStack> pred) {
         for (int i = 0, l = inv.getContainerSize(); i < l; ++i) {
             final ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty() && pred.test(stack)) {
@@ -71,12 +71,12 @@ public class TentSizeRecipe extends ShapedRecipe {
         }
 
         @Override
-        public ShapedRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public ShapedRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             return super.fromNetwork(recipeId, buffer);
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, ShapedRecipe recipeIn) {
+        public void toNetwork(FriendlyByteBuf buffer, ShapedRecipe recipeIn) {
             super.toNetwork(buffer, recipeIn);
         }
     }

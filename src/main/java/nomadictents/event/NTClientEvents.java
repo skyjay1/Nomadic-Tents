@@ -2,14 +2,14 @@ package nomadictents.event;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.ItemColors;
-import net.minecraft.item.DyeColor;
+import net.minecraft.client.color.item.ItemColors;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.biome.BiomeColors;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,15 +27,15 @@ public final class NTClientEvents {
         @SubscribeEvent
         public static void onRenderTypeSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.DOOR_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.TEPEE_WALL_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.YURT_WALL_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.YURT_ROOF_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.BEDOUIN_WALL_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.BEDOUIN_ROOF_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.INDLU_WALL_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.SHAMIYANA_WALL_FRAME, RenderType.cutout());
-                RenderTypeLookup.setRenderLayer(NTRegistry.BlockReg.INDLU_WALL, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.DOOR_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.TEPEE_WALL_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.YURT_WALL_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.YURT_ROOF_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.BEDOUIN_WALL_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.BEDOUIN_ROOF_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.INDLU_WALL_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.SHAMIYANA_WALL_FRAME, RenderType.cutout());
+                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BlockReg.INDLU_WALL, RenderType.cutout());
             });
         }
 

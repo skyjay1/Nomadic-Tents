@@ -1,11 +1,11 @@
 package nomadictents.event;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
@@ -29,31 +29,31 @@ public final class NTEvents {
                 return;
             }
             // locate overworld
-            RegistryKey<World> overworldKey = NomadicTents.CONFIG.getRespawnDimension();
-            ServerWorld overworld = event.getPlayer().getServer().getLevel(overworldKey);
+            ResourceKey<Level> overworldKey = NomadicTents.CONFIG.getRespawnDimension();
+            ServerLevel overworld = event.getPlayer().getServer().getLevel(overworldKey);
             if(null == overworld) {
                 NomadicTents.LOGGER.warn("Failed to load respawn dimension '" + overworldKey.location() + "'");
                 return;
             }
             // locate tents
-            List<RegistryKey<World>> tents = DynamicDimensionHelper.getTents(event.getPlayer().getServer());
+            List<ResourceKey<Level>> tents = DynamicDimensionHelper.getTents(event.getPlayer().getServer());
             // attempt to change daytime when sleeping inside a tent
             if(event.getPlayer().isSleepingLongEnough()
                     && DynamicDimensionHelper.isInsideTent(event.getPlayer().level)
                     && overworld.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
                 // locate server worlds
-                ServerWorld tent = (ServerWorld) event.getPlayer().level;
+                ServerLevel tent = (ServerLevel) event.getPlayer().level;
                 boolean success = arePlayersSleeping(tent);
                 // check if all other players are sleeping
                 if(NomadicTents.CONFIG.SLEEPING_STRICT.get()) {
                     // check overworld players
                     success &= arePlayersSleeping(overworld);
                     // check all players in tents
-                    for(RegistryKey<World> tentKey : tents) {
+                    for(ResourceKey<Level> tentKey : tents) {
                         if(!success) {
                             break;
                         }
-                        ServerWorld t = event.getPlayer().getServer().getLevel(tentKey);
+                        ServerLevel t = event.getPlayer().getServer().getLevel(tentKey);
                         if(t != null) {
                             success &= arePlayersSleeping(t);
                         }
@@ -69,8 +69,8 @@ public final class NTEvents {
             }
 
             // sleeping anywhere should always sync tents to overworld
-            for(RegistryKey<World> tentKey : tents) {
-                ServerWorld tent = event.getPlayer().getServer().getLevel(tentKey);
+            for(ResourceKey<Level> tentKey : tents) {
+                ServerLevel tent = event.getPlayer().getServer().getLevel(tentKey);
                 if(null == tent) {
                     NomadicTents.LOGGER.warn("Failed to load tent dimension '" + tentKey.location() + "'");
                     continue;
@@ -82,11 +82,11 @@ public final class NTEvents {
             overworld.updateSleepingPlayerList();
         }
 
-        private static boolean arePlayersSleeping(ServerWorld level) {
+        private static boolean arePlayersSleeping(ServerLevel level) {
             if(level.players().isEmpty()) {
                 return true;
             }
-            for(PlayerEntity player : level.players()) {
+            for(Player player : level.players()) {
                 if(!player.isSpectator() && !player.isSleepingLongEnough()) {
                     return false;
                 }
@@ -98,13 +98,13 @@ public final class NTEvents {
         public static void onPlayerChangeDimension(final PlayerEvent.PlayerChangedDimensionEvent event) {
             if(!event.getPlayer().level.isClientSide() && DynamicDimensionHelper.isInsideTent(event.getTo().location())) {
                 // locate tent dimension
-                ServerWorld tent = event.getPlayer().getServer().getLevel(event.getTo());
+                ServerLevel tent = event.getPlayer().getServer().getLevel(event.getTo());
                 if(null == tent) {
                     return;
                 }
                 // locate overworld
-                RegistryKey<World> overworldKey = NomadicTents.CONFIG.getRespawnDimension();
-                ServerWorld overworld = event.getPlayer().getServer().getLevel(overworldKey);
+                ResourceKey<Level> overworldKey = NomadicTents.CONFIG.getRespawnDimension();
+                ServerLevel overworld = event.getPlayer().getServer().getLevel(overworldKey);
                 if(null == overworld) {
                     return;
                 }
@@ -118,7 +118,7 @@ public final class NTEvents {
         public static void onPlayerTeleportEnderPearl(final EntityTeleportEvent.EnderPearl event) {
             if(NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
                 event.setCanceled(true);
-                event.getPlayer().displayClientMessage(new TranslationTextComponent("tent.teleport.deny"), true);
+                event.getPlayer().displayClientMessage(new TranslatableComponent("tent.teleport.deny"), true);
             }
         }
 
@@ -126,8 +126,8 @@ public final class NTEvents {
         public static void onPlayerTeleportChorusFruit(final EntityTeleportEvent.ChorusFruit event) {
             if(NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
                 event.setCanceled(true);
-                if(event.getEntityLiving() instanceof PlayerEntity) {
-                    ((PlayerEntity)event.getEntityLiving()).displayClientMessage(new TranslationTextComponent("tent.teleport.deny"), true);
+                if(event.getEntityLiving() instanceof Player) {
+                    ((Player)event.getEntityLiving()).displayClientMessage(new TranslatableComponent("tent.teleport.deny"), true);
                 }
             }
         }

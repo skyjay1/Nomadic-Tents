@@ -1,29 +1,31 @@
 package nomadictents.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants;
 import nomadictents.tileentity.TentDoorTileEntity;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class TentDoorBlock extends TentBlock {
 
@@ -44,12 +46,12 @@ public class TentDoorBlock extends TentBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HALF).add(AXIS);
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter reader, BlockPos pos, CollisionContext context) {
         if(!SHAPES.containsKey(state)) {
             Direction.Axis axis = state.getValue(AXIS);
             if(axis == Direction.Axis.X) {
@@ -62,14 +64,14 @@ public class TentDoorBlock extends TentBlock {
     }
 
     @Override
-    public void onPlace(BlockState stateIn, World level, BlockPos pos, BlockState oldState, boolean isMoving) {
+    public void onPlace(BlockState stateIn, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (stateIn.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
             level.setBlock(pos.above(), stateIn.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), Constants.BlockFlags.DEFAULT);
         }
     }
 
     @Override
-    public void destroy(IWorld level, BlockPos pos, BlockState state) {
+    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
         // remove opposite half when destroyed
         if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER) {
             level.removeBlock(pos.above(), false);
@@ -79,7 +81,7 @@ public class TentDoorBlock extends TentBlock {
     }
 
     @Override
-    public void playerWillDestroy(World level, BlockPos pos, BlockState blockState, PlayerEntity player) {
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) {
         if (!level.isClientSide) {
             // determine block entity position
             BlockPos doorPos = pos;
@@ -87,7 +89,7 @@ public class TentDoorBlock extends TentBlock {
                 doorPos = pos.below();
             }
             // locate block entity
-            TileEntity blockEntity = level.getBlockEntity(doorPos);
+            BlockEntity blockEntity = level.getBlockEntity(doorPos);
             if(blockEntity instanceof TentDoorTileEntity) {
                 // delegate to block entity
                 TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
@@ -99,10 +101,10 @@ public class TentDoorBlock extends TentBlock {
     }
 
     @Override
-    public ActionResultType use(BlockState state, World level, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult raytraceResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult raytraceResult) {
         // sided success
         if(level.isClientSide()) {
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         // determine block entity position
         BlockPos doorPos = pos;
@@ -110,24 +112,24 @@ public class TentDoorBlock extends TentBlock {
             doorPos = pos.below();
         }
         // locate block entity
-        TileEntity blockEntity = level.getBlockEntity(doorPos);
+        BlockEntity blockEntity = level.getBlockEntity(doorPos);
         if(blockEntity instanceof TentDoorTileEntity) {
             // delegate to block entity
             TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
             return tentDoor.use(level.getBlockState(doorPos), level, doorPos, player, hand);
         }
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void entityInside(BlockState state, World level, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         // determine block entity position
         BlockPos doorPos = pos;
         if(state.getValue(HALF) == DoubleBlockHalf.UPPER) {
             doorPos = pos.below();
         }
         // locate door block entity
-        TileEntity blockEntity = level.getBlockEntity(doorPos);
+        BlockEntity blockEntity = level.getBlockEntity(doorPos);
         if(blockEntity instanceof TentDoorTileEntity) {
             // delegate to block entity
             TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
@@ -143,7 +145,7 @@ public class TentDoorBlock extends TentBlock {
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
         return new TentDoorTileEntity();
     }
 }

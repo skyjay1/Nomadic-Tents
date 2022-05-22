@@ -1,13 +1,15 @@
 package nomadictents.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class TentBlock extends Block {
 
@@ -21,12 +23,12 @@ public class TentBlock extends Block {
     }
 
     @Override
-    public boolean canEntityDestroy(BlockState state, IBlockReader world, BlockPos pos, Entity entity) {
+    public boolean canEntityDestroy(BlockState state, BlockGetter world, BlockPos pos, Entity entity) {
         return false;
     }
 
     @Override
-    public boolean isFlammable(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+    public boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
         return false;
     }
 

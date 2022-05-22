@@ -1,11 +1,11 @@
 package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.item.DyeColor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.gen.feature.template.*;
 import nomadictents.NTRegistry;
 import nomadictents.block.ShamiyanaWallBlock;
@@ -13,11 +13,18 @@ import nomadictents.block.ShamiyanaWallBlock;
 import javax.annotation.Nullable;
 import java.util.Random;
 
+import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+
 public class LocStructureProcessor extends StructureProcessor {
 
     public static final Codec<LocStructureProcessor> CODEC = RuleTest.CODEC.xmap(LocStructureProcessor::new, LocStructureProcessor::getLocPredicate).stable();
 
-    public static final LocStructureProcessor REPLACE_AIR = new LocStructureProcessor(new BlockMatchRuleTest(Blocks.AIR));
+    public static final LocStructureProcessor REPLACE_AIR = new LocStructureProcessor(new BlockMatchTest(Blocks.AIR));
 
     private final RuleTest locPredicate;
 
@@ -31,7 +38,7 @@ public class LocStructureProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public Template.BlockInfo process(IWorldReader level, BlockPos rawPos, BlockPos pos, Template.BlockInfo rawBlockInfo, Template.BlockInfo blockInfo, PlacementSettings placementSettings, @Nullable Template template) {
+    public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos rawPos, BlockPos pos, StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
         Random random = placementSettings.getRandom(blockInfo.pos);
         BlockState blockState = level.getBlockState(blockInfo.pos);
         // only process the block if the existing block at this location passes the rule test
@@ -42,7 +49,7 @@ public class LocStructureProcessor extends StructureProcessor {
     }
 
     @Override
-    protected IStructureProcessorType<?> getType() {
+    protected StructureProcessorType<?> getType() {
         return NTRegistry.ProcessorReg.LOC_PROCESSOR;
     }
 }

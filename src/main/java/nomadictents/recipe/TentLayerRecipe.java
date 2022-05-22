@@ -1,16 +1,16 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
 import nomadictents.util.Tent;
@@ -46,7 +46,7 @@ public class TentLayerRecipe extends ShapedRecipe {
     }
 
     @Override
-    public boolean matches(CraftingInventory craftingInventory, World level) {
+    public boolean matches(CraftingContainer craftingInventory, Level level) {
         if(super.matches(craftingInventory, level)) {
             // locate input tent
             ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
@@ -59,14 +59,14 @@ public class TentLayerRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory craftingInventory) {
+    public ItemStack assemble(CraftingContainer craftingInventory) {
         ItemStack result = super.assemble(craftingInventory);
 
         // locate input tent
         ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
         // copy input NBT to result with layer information
         if(!tent.isEmpty()) {
-            CompoundNBT tag = tent.getOrCreateTag().copy();
+            CompoundTag tag = tent.getOrCreateTag().copy();
             tag.putByte(Tent.LAYERS, layer);
             result.setTag(tag);
         }
@@ -75,7 +75,7 @@ public class TentLayerRecipe extends ShapedRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return NTRegistry.RecipeReg.TENT_LAYER_RECIPE_SERIALIZER;
     }
 
@@ -100,7 +100,7 @@ public class TentLayerRecipe extends ShapedRecipe {
         }
 
         @Override
-        public ShapedRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        public ShapedRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
             ShapedRecipe recipe = super.fromNetwork(recipeId, buffer);
             byte layer = buffer.readByte();
             return new TentLayerRecipe(recipeId, recipe.getResultItem(), layer,
@@ -108,7 +108,7 @@ public class TentLayerRecipe extends ShapedRecipe {
         }
 
         @Override
-        public void toNetwork(PacketBuffer buffer, ShapedRecipe recipeIn) {
+        public void toNetwork(FriendlyByteBuf buffer, ShapedRecipe recipeIn) {
             super.toNetwork(buffer, recipeIn);
             TentLayerRecipe recipe = (TentLayerRecipe) recipeIn;
             buffer.writeByte(recipe.layer);

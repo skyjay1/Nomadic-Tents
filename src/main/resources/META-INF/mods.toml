@@ -1,22 +1,22 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[40,)"
 license="GNU GPLv3"
 issueTrackerURL="https://github.com/skyjay1/Nomadic-Tents/issues"
 
 [[mods]]
     modId="nomadictents"
-    version="16.5.2"
+    version="18.2.0"
     displayName="Nomadic Tents"
     description='''Adds portable houses to Minecraft!'''
     [[dependencies.nomadictents]]
         modId="forge"
         mandatory=true
-        versionRange="[36.2,)"
+        versionRange="[40.1,)"
         ordering="NONE"
         side="BOTH"
     [[dependencies.nomadictents]]
         modId="minecraft"
         mandatory=true
-        versionRange="[1.16,]"
+        versionRange="[1.18,]"
         ordering="NONE"
         side="BOTH"

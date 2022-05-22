@@ -1,23 +1,23 @@
 package nomadictents.dimension;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryLookupCodec;
-import net.minecraft.world.Blockreader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.provider.SingleBiomeProvider;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.Heightmap.Type;
-import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.settings.DimensionStructuresSettings;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.world.level.NoiseColumn;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.FixedBiomeSource;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.levelgen.StructureSettings;
 import nomadictents.NomadicTents;
 
 /**
@@ -26,7 +26,7 @@ import nomadictents.NomadicTents;
  */
 public class EmptyChunkGenerator extends ChunkGenerator {
     // we can define the dimension's biome in a json at data/yourmod/worldgen/biome/your_biome
-    public static RegistryKey<Biome> TENT_BIOME = RegistryKey.create(Registry.BIOME_REGISTRY,
+    public static ResourceKey<Biome> TENT_BIOME = ResourceKey.create(Registry.BIOME_REGISTRY,
             new ResourceLocation(NomadicTents.MODID, "tent"));
 
     // this Codec will need to be registered to the chunk generator registry in Registry
@@ -52,7 +52,7 @@ public class EmptyChunkGenerator extends ChunkGenerator {
 
     // create chunk generator when dimension is loaded from the dimension registry on server init
     public EmptyChunkGenerator(Registry<Biome> biomes) {
-        super(new SingleBiomeProvider(biomes.getOrThrow(TENT_BIOME)), new DimensionStructuresSettings(false));
+        super(new FixedBiomeSource(biomes.getOrThrow(TENT_BIOME)), new StructureSettings(false));
         this.biomes = biomes;
     }
 
@@ -69,12 +69,12 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void fillFromNoise(IWorld world, StructureManager structures, IChunk chunk) {
+    public void fillFromNoise(LevelAccessor world, StructureFeatureManager structures, ChunkAccess chunk) {
 
     }
 
     @Override
-    public int getBaseHeight(int x, int z, Type heightmapType) {
+    public int getBaseHeight(int x, int z, Types heightmapType) {
         // flat chunk generator counts the solid blockstates in its list
         // debug chunk generator returns 0
         // the "normal" chunk generator generates a height via noise
@@ -83,16 +83,16 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public IBlockReader getBaseColumn(int x, int z) {
+    public BlockGetter getBaseColumn(int x, int z) {
         // flat chunk generator returns a reader over its blockstate list
         // debug chunk generator returns a reader over an empty array
         // normal chunk generator returns a column whose contents are either default block, default fluid, or air
 
-        return new Blockreader(new BlockState[0]);
+        return new NoiseColumn(new BlockState[0]);
     }
 
     @Override
-    public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, IChunk chunk) {
+    public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, ChunkAccess chunk) {
         // you can generate stuff in your world here
     }
 

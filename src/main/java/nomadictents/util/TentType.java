@@ -2,9 +2,9 @@ package nomadictents.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
 
-public enum TentType implements IStringSerializable {
+public enum TentType implements StringRepresentable {
     YURT("yurt"),
     TEPEE("tepee"),
     BEDOUIN("bedouin"),

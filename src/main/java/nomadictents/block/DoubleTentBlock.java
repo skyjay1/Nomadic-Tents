@@ -1,17 +1,19 @@
 package nomadictents.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.Half;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class DoubleTentBlock extends TentBlock {
 
@@ -24,18 +26,18 @@ public class DoubleTentBlock extends TentBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(HALF);
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         return getTentBlock(super.getStateForPlacement(context), context.getLevel(), context.getClickedPos());
     }
 
     @Override
-    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld levelIn,
+    public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor levelIn,
                                   BlockPos currentPos, BlockPos facingPos) {
         return getTentBlock(stateIn, levelIn, currentPos);
     }
@@ -48,7 +50,7 @@ public class DoubleTentBlock extends TentBlock {
      * @return the adjusted tent block state, or null if stateIn was null
      */
     @Nullable
-    public BlockState getTentBlock(BlockState stateIn, IWorld level, BlockPos pos) {
+    public BlockState getTentBlock(BlockState stateIn, LevelAccessor level, BlockPos pos) {
         if(stateIn != null) {
             boolean above = level.getBlockState(pos.below(1)).getBlock() == this
                     && level.getBlockState(pos.below(2)).getBlock() != this;

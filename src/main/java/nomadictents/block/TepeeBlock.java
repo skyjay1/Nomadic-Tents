@@ -1,12 +1,12 @@
 package nomadictents.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import nomadictents.NTRegistry;
 import nomadictents.NomadicTents;
 
@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class TepeeBlock extends TentBlock {
 
@@ -29,7 +31,7 @@ public class TepeeBlock extends TentBlock {
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         if(this.type == Type.BLANK) {
             // locate nearby door
             Random rand = context.getLevel().random;
@@ -69,7 +71,7 @@ public class TepeeBlock extends TentBlock {
      * @return BlockPos of lower tepee door if found, otherwise null
      **/
     @Nullable
-    private static BlockPos locateDoor(World world, BlockPos pos) {
+    private static BlockPos locateDoor(Level world, BlockPos pos) {
         Set<BlockPos> checked = new HashSet<>();
         while (pos != null && !(world.getBlockState(pos).getBlock() instanceof TentDoorBlock)) {
             pos = locateTepeeBlockExcluding(world, checked, pos);
@@ -88,7 +90,7 @@ public class TepeeBlock extends TentBlock {
      * @param exclude list of BlockPos already checked
      * @param pos center of the 3x3x3 box
      **/
-    private static BlockPos locateTepeeBlockExcluding(World worldIn, Set<BlockPos> exclude, BlockPos pos) {
+    private static BlockPos locateTepeeBlockExcluding(Level worldIn, Set<BlockPos> exclude, BlockPos pos) {
         int radius = 1;
         // favor blocks below this one (on average, tepee blocks are above the door)
         for (int y = -radius; y <= radius; y++) {
@@ -111,7 +113,7 @@ public class TepeeBlock extends TentBlock {
     }
 
 
-    public static enum Type implements IStringSerializable {
+    public static enum Type implements StringRepresentable {
         BLANK("blank", false, () -> NTRegistry.BlockReg.BLANK_TEPEE_WALL.defaultBlockState()),
         CHANNEL("channel", true, () -> NTRegistry.BlockReg.CHANNEL_TEPEE_WALL.defaultBlockState()),
         CREEPER("creeper", false, () -> NTRegistry.BlockReg.CREEPER_TEPEE_WALL.defaultBlockState()),

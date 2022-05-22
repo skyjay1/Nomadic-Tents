@@ -1,9 +1,11 @@
 package nomadictents.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class YurtRoofBlock extends TentBlock {
 
@@ -16,7 +18,7 @@ public class YurtRoofBlock extends TentBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(OUTSIDE);
     }
 }

@@ -1,12 +1,12 @@
 package nomadictents;
 
 import com.google.common.collect.Lists;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.tileentity.TentDoorTileEntity;
@@ -43,7 +43,7 @@ public final class NTConfig {
 		builder.push("dimension");
 		RESPAWN_DIMENSION = builder
 				.comment("The dimension in which players will respawn from the tent dimension as needed")
-				.define("overworld", World.OVERWORLD.location().toString());
+				.define("overworld", Level.OVERWORLD.location().toString());
 		RESTRICT_TELEPORT_IN_TENT = builder
 				.comment("When true, players can not teleport inside a tent")
 				.define("restrict_teleport", true);
@@ -102,19 +102,19 @@ public final class NTConfig {
 		return floor;
 	}
 
-	public RegistryKey<World> getRespawnDimension() {
+	public ResourceKey<Level> getRespawnDimension() {
 		ResourceLocation respawn = ResourceLocation.tryParse(RESPAWN_DIMENSION.get());
 		if(null == respawn) {
-			return World.OVERWORLD;
+			return Level.OVERWORLD;
 		}
-		return RegistryKey.create(Registry.DIMENSION_REGISTRY, respawn);
+		return ResourceKey.create(Registry.DIMENSION_REGISTRY, respawn);
 	}
 	
 	/**
 	 * @param level the world
 	 * @return if tents can not be placed in this world
 	 **/
-	public boolean isDimensionBlacklist(final World level) {
+	public boolean isDimensionBlacklist(final Level level) {
 		List<? extends String> blacklist = DIMENSION_BLACKLIST.get();
 		ResourceLocation id = level.dimension().location();
 		// check dimension id or mod id

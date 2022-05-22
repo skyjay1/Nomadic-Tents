@@ -8,6 +8,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
@@ -16,7 +17,8 @@ version = project.mod_version
 group = project.maven_group
 archivesBaseName = project.archives_base_name
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+//sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
@@ -77,10 +79,6 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven { // HWYLA
-        name 'tehnut'
-        url 'https://maven.tehnut.info'
-    }
     maven { // JEI
         name 'mezz'
         url 'https://dvs1.progwml6.com/files/maven'
@@ -89,9 +87,6 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
-
-	compileOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}:api")
-	runtimeOnly fg.deobf("mcp.mobius.waila:Hwyla:${hwyla_version}")
 	
 	compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 	runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")

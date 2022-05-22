@@ -1,11 +1,11 @@
 package nomadictents.util;
 
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.NomadicTents;
@@ -13,7 +13,7 @@ import nomadictents.structure.TentPlacer;
 
 import javax.annotation.Nullable;
 
-public final class Tent implements INBTSerializable<CompoundNBT> {
+public final class Tent implements INBTSerializable<CompoundTag> {
 
     public static final String ID = "id";
     public static final String TYPE = "type";
@@ -27,7 +27,7 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
     private DyeColor color;
     private int id;
 
-    public Tent(CompoundNBT nbt) {
+    public Tent(CompoundTag nbt) {
         this.deserializeNBT(nbt);
     }
 
@@ -55,7 +55,7 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
      * @return a corresponding instance of Tent
      */
     public static Tent from(ItemStack stack, TentType type, TentSize size) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         int id = tag.getInt(ID);
         byte layers = tag.getByte(LAYERS);
         DyeColor color = null;
@@ -134,8 +134,8 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putInt(ID, id);
         nbt.putString(TYPE, type.getSerializedName());
         nbt.putString(SIZE, size.getSerializedName());
@@ -147,7 +147,7 @@ public final class Tent implements INBTSerializable<CompoundNBT> {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         this.id = nbt.getInt(ID);
         this.type = TentType.getByName(nbt.getString(TYPE)).result().orElse(TentType.YURT);
         this.size = TentSize.getByName(nbt.getString(SIZE)).result().orElse(TentSize.TINY);

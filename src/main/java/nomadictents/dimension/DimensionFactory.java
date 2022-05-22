@@ -1,11 +1,11 @@
 package nomadictents.dimension;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.DimensionType;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.dimension.DimensionType;
 import nomadictents.NomadicTents;
 
 /**
@@ -17,12 +17,12 @@ import nomadictents.NomadicTents;
 // but we'll need to create instances of the chunk generator at runtime since there's no json folder for them
 public class DimensionFactory
 {
-	public static final RegistryKey<DimensionType> TYPE_KEY = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY,
+	public static final ResourceKey<DimensionType> TYPE_KEY = ResourceKey.create(Registry.DIMENSION_TYPE_REGISTRY,
 		new ResourceLocation(NomadicTents.MODID, "tent"));
   
-	public static Dimension createDimension(MinecraftServer server, RegistryKey<Dimension> key)
+	public static LevelStem createDimension(MinecraftServer server, ResourceKey<LevelStem> key)
 	{
-		return new Dimension(() -> getDimensionType(server), new EmptyChunkGenerator(server));
+		return new LevelStem(() -> getDimensionType(server), new EmptyChunkGenerator(server));
 	}
 	
 	public static DimensionType getDimensionType(MinecraftServer server)
