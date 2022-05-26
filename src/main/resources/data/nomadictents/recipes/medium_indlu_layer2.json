@@ -5,7 +5,7 @@
     "DTD",
     "DSD"],
   "key": {
-    "D": { "tag": "forge:dirt" },
+    "D": { "tag": "minecraft:dirt" },
     "B": { "tag": "forge:storage_blocks/iron" },
     "S": { "item": "nomadictents:iron_tent_shovel" },
     "T": { "item": "nomadictents:medium_indlu" }

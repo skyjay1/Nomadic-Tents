@@ -5,7 +5,7 @@
     "DTD",
     "DSD"],
   "key": {
-    "D": { "tag": "forge:dirt" },
+    "D": { "tag": "minecraft:dirt" },
     "B": { "tag": "forge:storage_blocks/gold" },
     "S": { "item": "nomadictents:golden_tent_shovel" },
     "T": { "item": "nomadictents:mega_indlu" }
