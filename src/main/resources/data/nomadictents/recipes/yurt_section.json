@@ -8,7 +8,7 @@
         "item": "nomadictents:tent_canvas"
       },
 	"S": {
-		"item": "minecraft:stick"
+		"tag": "forge:rods/wooden"
 	  }
   },
   "result": {

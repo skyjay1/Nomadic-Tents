@@ -6,10 +6,10 @@
    "FSF"],
   "key": {
     "F": {
-        "item": "minecraft:rabbit_hide"
+        "item": "minecraft:leather"
       },
 	"S": {
-		"item": "minecraft:stick"
+		"tag": "forge:rods/wooden"
 	  }
   },
   "result": {
