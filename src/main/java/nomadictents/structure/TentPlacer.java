@@ -296,7 +296,7 @@ public final class TentPlacer {
         // determine location
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Set<BlockPos> tentBlocks = getTentBlockPositions(level, door, type, size);
+        Set<BlockPos> tentBlocks = getTentBlockPositions(level, door, type, useSize);
         // check each block to make sure it is replaceable
         BlockPos checkPos;
         BlockState checkState;

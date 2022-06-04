@@ -64,7 +64,7 @@ public class TentItem extends Item {
         if(this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
             DyeColor color = DyeColor.byName(stack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE);
             String translationKey = "item.minecraft.firework_star." + color.getSerializedName();
-            list.add(new TranslationTextComponent(translationKey));
+            list.add(new TranslationTextComponent(translationKey).withStyle(TextFormatting.GRAY));
         }
         if(flag.isAdvanced() || net.minecraft.client.gui.screen.Screen.hasShiftDown()) {
             // layer tooltip
@@ -137,6 +137,8 @@ public class TentItem extends Item {
             if(canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
                 // place door frame
                 context.getLevel().setBlock(placePos, NTRegistry.BlockReg.DOOR_FRAME.defaultBlockState(), Constants.BlockFlags.DEFAULT);
+                // schedule door frame self-destruct if this is canceled for any unforseen reason
+                // TODO
                 // remember the door position and player direction
                 itemStack.getOrCreateTag().put(DOOR, NBTUtil.writeBlockPos(placePos));
                 itemStack.getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
@@ -151,11 +153,6 @@ public class TentItem extends Item {
         }
 
         return super.useOn(context);
-    }
-
-    @Override
-    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
-        return super.onItemUseFirst(stack, context);
     }
 
     @Override

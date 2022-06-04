@@ -14,6 +14,7 @@ import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -21,8 +22,13 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class FrameBlock extends Block implements IWaterLoggable {
 
@@ -104,5 +110,55 @@ public class FrameBlock extends Block implements IWaterLoggable {
     @Override
     public boolean isFlammable(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
         return false;
+    }
+
+    /**
+     * Traces all connected Tepee blocks (frames and tepee walls) until it
+     * finds the lower door of the tepee.
+     *
+     * @param world the world
+     * @param pos   BlockPos to begin searching from
+     * @return BlockPos of lower tepee door if found, otherwise null
+     **/
+    @Nullable
+    public static BlockPos locateDoor(World world, BlockPos pos, Predicate<Block> tentBlockPred) {
+        Set<BlockPos> checked = new HashSet<>();
+        while (pos != null && !(world.getBlockState(pos).getBlock() instanceof TentDoorBlock)) {
+            pos = nextBlockOrDoor(world, checked, pos, tentBlockPred);
+        }
+        if (null == pos) {
+            return null;
+        }
+        boolean lower = world.getBlockState(pos).getValue(TentDoorBlock.HALF) == DoubleBlockHalf.LOWER;
+        return lower ? pos : pos.below(1);
+    }
+
+    /**
+     * Searches a 3x3x3 box for a frame, tent block, or door that has not been added to the list already.
+     *
+     * @param worldIn the world
+     * @param exclude list of BlockPos already checked
+     * @param pos center of the 3x3x3 box
+     **/
+    public static BlockPos nextBlockOrDoor(World worldIn, Set<BlockPos> exclude, BlockPos pos, Predicate<Block> tentBlockPred) {
+        int radius = 1;
+        // favor blocks below this one (door is always on lowest layer)
+        for (int y = -radius; y <= radius; y++) {
+            for (int x = -radius; x <= radius; x++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos checkPos = pos.offset(x, y, z);
+                    if (!exclude.contains(checkPos)) {
+                        BlockState stateAt = worldIn.getBlockState(checkPos);
+                        if (stateAt.getBlock() instanceof FrameBlock
+                                || stateAt.getBlock() instanceof TentDoorBlock
+                                || tentBlockPred.test(stateAt.getBlock())) {
+                            exclude.add(checkPos);
+                            return checkPos;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

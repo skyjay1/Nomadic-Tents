@@ -22,26 +22,13 @@ public class TentColorRecipe extends ShapedRecipe {
 
     public TentColorRecipe(ResourceLocation recipeId, final ItemStack outputItem, final DyeColor color,
                            final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
-        super(recipeId, Serializer.CATEGORY, width, height, recipeItemsWithColor(recipeItemsIn, DyeColor.WHITE), outputItemWithColor(outputItem, color));
+        super(recipeId, Serializer.CATEGORY, width, height, recipeItemsIn, outputItemWithColor(outputItem, color));
         this.color = color;
     }
 
     private static ItemStack outputItemWithColor(final ItemStack itemStack, final DyeColor color) {
         itemStack.getOrCreateTag().putString(Tent.COLOR, color.getSerializedName());
         return itemStack;
-    }
-
-    private static NonNullList<Ingredient> recipeItemsWithColor(final NonNullList<Ingredient> recipeItemsIn, final DyeColor color) {
-        for(int i = 0, l = recipeItemsIn.size(); i < l; i++) {
-            ItemStack[] itemStackArray = recipeItemsIn.get(i).getItems();
-            for(ItemStack itemStack : itemStackArray) {
-                if(itemStack.getItem() instanceof TentItem) {
-                    // change input tent color to the given color
-                    itemStack.getOrCreateTag().putString(Tent.COLOR, color.getSerializedName());
-                }
-            }
-        }
-        return recipeItemsIn;
     }
 
     @Override

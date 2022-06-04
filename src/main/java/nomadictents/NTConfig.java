@@ -9,6 +9,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
+import nomadictents.block.FrameBlock;
 import nomadictents.tileentity.TentDoorTileEntity;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public final class NTConfig {
 	public final ForgeConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
 	public final ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
 	public final ForgeConfigSpec.BooleanValue USE_ACTUAL_SIZE;
+	public final ForgeConfigSpec.IntValue MALLET_EFFECTIVENESS;
 
 	public NTConfig(final ForgeConfigSpec.Builder builder) {
 		builder.push("dimension");
@@ -47,8 +49,8 @@ public final class NTConfig {
 		RESTRICT_TELEPORT_IN_TENT = builder
 				.comment("When true, players can not teleport inside a tent")
 				.define("restrict_teleport", true);
-		SLEEPING_STRICT = builder.comment(
-				"When true, players in a tent can only sleep through the night if overworld players are sleeping too")
+		SLEEPING_STRICT = builder
+				.comment("When true, players in a tent can only sleep through the night if overworld players are sleeping too")
 				.define("sleeping_strict", true);
 		DIMENSION_BLACKLIST = builder.comment("Dimensions in which tents cannot be used.",
 						"Accepts dimension id or mod id with wildcard.",
@@ -65,20 +67,23 @@ public final class NTConfig {
 		NONPLAYERS_ENTER_ON_COLLIDE = builder
 				.comment("When true, non-player entities can enter the tent by walking through the door")
 				.define("nonplayers_enter_on_collide", true);
-		COPY_CREATIVE_ONLY = builder.comment("When true, only Creative mode players can duplicate a tent item",
-				"(Note: this is done by clicking a tent door with any item that has NBT tag '" + TentDoorTileEntity.TENT_COPY_TOOL
-						+ "' set to true)")
+		COPY_CREATIVE_ONLY = builder
+				.comment("When true, only Creative mode players can duplicate a tent item",
+						"(Note: this is done by clicking a tent door with any item that has NBT tag '"
+								+ TentDoorTileEntity.TENT_COPY_TOOL + "' set to true)")
 				.define("copy_creative_only", true);
-		ENTER_WHEN_SAFE = builder.comment("When true, players can only enter tents when there are no nearby monsters")
+		ENTER_WHEN_SAFE = builder
+				.comment("When true, players can only enter tents when there are no nearby monsters")
 				.define("enter_when_safe", false);
-		PICKUP_WHEN_SAFE = builder.comment("When true, players can only remove tents when there are no nearby monsters")
+		PICKUP_WHEN_SAFE = builder
+				.comment("When true, players can only remove tents when there are no nearby monsters")
 				.define("pickup_when_safe", false);
 		builder.pop();
 		builder.push("other");
 		TENT_DECOR_BUILD = builder.comment("When true, tents have decorations when first built")
-						.define("tent_decor_build", true);
+				.define("tent_decor_build", true);
 		TENT_DECOR_UPGRADE = builder.comment("When true, tents have decorations when upgraded")
-						.define("tent_decor_upgrade", false);
+				.define("tent_decor_upgrade", false);
 		TENT_FIREPROOF = builder.comment("When true, the tent item will not be destroyed if it is burned")
 				.define("tent_fireproof", false);
 		TEPEE_DECORATED_CHANCE = builder
@@ -87,8 +92,12 @@ public final class NTConfig {
 		FLOOR_BLOCK = builder
 				.comment("Block used for harvestable layer of all tent floors")
 				.define("tent_floor", Blocks.DIRT.getRegistryName().toString());
-		USE_ACTUAL_SIZE = builder.comment("When true, tents will be the same size on the outside and inside")
+		USE_ACTUAL_SIZE = builder
+				.comment("When true, tents will be the same size on the outside and inside")
 				.define("use_actual_size", false);
+		MALLET_EFFECTIVENESS = builder
+				.comment("The number of progress stages added by one use of the tent mallet")
+				.defineInRange("mallet_effectiveness", 2, 1, FrameBlock.MAX_PROGRESS);
 		builder.pop();
 	}
 

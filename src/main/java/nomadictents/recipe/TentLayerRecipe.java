@@ -23,7 +23,7 @@ public class TentLayerRecipe extends ShapedRecipe {
     public TentLayerRecipe(ResourceLocation recipeId, final ItemStack outputItem, final byte layer,
                            final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
         super(recipeId, Serializer.CATEGORY, width, height,
-                recipeItemsWithLayer(recipeItemsIn, (byte) Math.max(TentLayers.MIN, layer - 1)),
+                recipeItemsIn,
                 outputItemWithLayer(outputItem, layer));
         this.layer = layer;
     }
@@ -31,18 +31,6 @@ public class TentLayerRecipe extends ShapedRecipe {
     private static ItemStack outputItemWithLayer(final ItemStack itemStack, final byte layer) {
         itemStack.getOrCreateTag().putByte(Tent.LAYERS, layer);
         return itemStack;
-    }
-
-    private static NonNullList<Ingredient> recipeItemsWithLayer(final NonNullList<Ingredient> recipeItemsIn, final byte layer) {
-        for(int i = 0, l = recipeItemsIn.size(); i < l; i++) {
-            ItemStack[] itemStackArray = recipeItemsIn.get(i).getItems();
-            for(ItemStack itemStack : itemStackArray) {
-                if(itemStack.getItem() instanceof TentItem) {
-                    itemStack.getOrCreateTag().putByte(Tent.LAYERS, layer);
-                }
-            }
-        }
-        return recipeItemsIn;
     }
 
     @Override

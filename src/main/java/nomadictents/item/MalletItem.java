@@ -3,6 +3,9 @@ package nomadictents.item;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.IItemTier;
@@ -22,7 +25,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 import nomadictents.NTRegistry;
+import nomadictents.NomadicTents;
 import nomadictents.block.FrameBlock;
+import nomadictents.block.ShamiyanaWallBlock;
+import nomadictents.block.TepeeBlock;
 import nomadictents.structure.TentPlacer;
 
 import javax.annotation.Nullable;
@@ -52,7 +58,17 @@ public class MalletItem extends Item {
 			}
 			// instant
 			if(isInstant) {
-				useInstant(context.getItemInHand(), context.getLevel(), state, context.getClickedPos(), context);
+				BlockPos doorPos = null;
+				Block targetBlock = TentPlacer.getFrameTarget(state, context.getLevel(), context.getClickedPos()).getBlock();
+				// locate door, if any, to further determine target block
+				if(targetBlock instanceof TepeeBlock) {
+					// search for door connected to tepee blocks and frames
+					doorPos = FrameBlock.locateDoor(context.getLevel(), context.getClickedPos(), b -> b instanceof TepeeBlock);
+				} else if(targetBlock instanceof ShamiyanaWallBlock) {
+					// search for door connected to shamiyana blocks and frames
+					doorPos = FrameBlock.locateDoor(context.getLevel(), context.getClickedPos(), b -> b instanceof ShamiyanaWallBlock);
+				}
+				useInstant(context, state, context.getClickedPos(), doorPos);
 				return ActionResultType.SUCCESS;
 			}
 			// interact with frame block
@@ -82,20 +98,34 @@ public class MalletItem extends Item {
 		return false;
 	}
 
-	private int getEffectiveness(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, @Nullable PlayerEntity player) {
-		return 2;
+	@Override
+	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+		return enchantment == Enchantments.BLOCK_EFFICIENCY || super.canApplyAtEnchantingTable(stack, enchantment);
 	}
 
-	private void useInstant(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, ItemUseContext context) {
-		// place target block
+	private int getEffectiveness(final ItemStack stack, final World level, final BlockState state, final BlockPos pos, @Nullable PlayerEntity player) {
+		// In the future we may take into account the tent type and biome, or maybe not
+		int efficiency = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY, stack);
+		return NomadicTents.CONFIG.MALLET_EFFECTIVENESS.get() + efficiency * 2;
+	}
+
+	private void useInstant(ItemUseContext context, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
+		final World level = context.getLevel();
+		// determine target block
 		BlockState target = TentPlacer.getFrameTarget(state, level, pos);
-		BlockRayTraceResult targetRayTrace = new BlockRayTraceResult(Vector3d.atCenterOf(pos), context.getClickedFace(), pos, true);
-		ItemUseContext targetContext = new ItemUseContext(context.getLevel(), context.getPlayer(), context.getHand(), stack, targetRayTrace);
-		target = target.getBlock().getStateForPlacement(new BlockItemUseContext(targetContext));
+		// locate door, if any, to further determine target block
+		if(target.getBlock() instanceof TepeeBlock) {
+			// search for door connected to tepee blocks and frames
+			target = ((TepeeBlock)target.getBlock()).getTepeeState(level, target, pos, doorPos);
+		} else if(target.getBlock() instanceof ShamiyanaWallBlock) {
+			// search for door connected to shamiyana blocks and frames
+			target = ((ShamiyanaWallBlock)target.getBlock()).getShamiyanaState(level, target, pos, doorPos);
+		}
+		// place target block
 		level.setBlock(pos, target, Constants.BlockFlags.DEFAULT);
 		// use durability
 		if(null != context.getPlayer()) {
-			stack.hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(context.getHand()));
+			context.getItemInHand().hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(context.getHand()));
 		}
 		// scan nearby area (including diagonals) and call this method for each frame found
 		for (int i = -1; i < 2; i++) {
@@ -104,7 +134,7 @@ public class MalletItem extends Item {
 					BlockPos curPos = pos.offset(i, j, k);
 					BlockState current = level.getBlockState(curPos);
 					if (current.getBlock() instanceof FrameBlock) {
-						useInstant(stack, level, current, curPos, context);
+						useInstant(context, current, curPos, doorPos);
 					}
 				}
 			}
