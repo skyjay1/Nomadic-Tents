@@ -3,7 +3,6 @@ package nomadictents.block;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -12,13 +11,9 @@ import nomadictents.NomadicTents;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Supplier;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 
 public class TepeeBlock extends TentBlock {
 
@@ -29,18 +24,23 @@ public class TepeeBlock extends TentBlock {
         this.type = type;
     }
 
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
+    /**
+     * Calculates the correct tepee state for this block
+     * @param level the level
+     * @param state the tepee block state
+     * @param pos the tepee block position
+     * @param doorPos the door block position, if any
+     * @return the correct blockstate for this position and door position
+     */
+    public BlockState getTepeeState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
         if(this.type == Type.BLANK) {
             // locate nearby door
-            Random rand = context.getLevel().random;
-            BlockPos door = locateDoor(context.getLevel(), context.getClickedPos());
-            if(door != null) {
+            Random rand = level.getRandom();
+            if(doorPos != null) {
                 // replace block with psuedo-random pattern
-                int dy = context.getClickedPos().getY() - door.getY();
+                int dy = pos.getY() - doorPos.getY();
                 if(dy % 2 == 0) {
-                    rand = new Random(door.above(dy).hashCode());
+                    rand = new Random(doorPos.above(dy).hashCode());
                     return getRandomPattern(rand);
                 }
             }
@@ -49,7 +49,19 @@ public class TepeeBlock extends TentBlock {
                 return getRandomSymbol(rand);
             }
         }
-        return super.getStateForPlacement(context);
+        return state;
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState blockState = super.getStateForPlacement(context);
+        if(this.type == Type.BLANK) {
+            // locate nearby door
+            BlockPos door = FrameBlock.locateDoor(context.getLevel(), context.getClickedPos(), b -> b instanceof TepeeBlock);
+            return getTepeeState(context.getLevel(), blockState, context.getClickedPos(), door);
+        }
+        return blockState;
     }
 
     public static BlockState getRandomPattern(final Random rand) {
@@ -61,57 +73,6 @@ public class TepeeBlock extends TentBlock {
         int index = rand.nextInt(TepeeBlock.Type.SYMBOLS.size());
         return TepeeBlock.Type.SYMBOLS.get(index).getBlock();
     }
-
-    /**
-     * Traces all connected Tepee blocks (frames and tepee walls) until it
-     * finds the lower door of the tepee.
-     *
-     * @param world the world
-     * @param pos   BlockPos to begin searching from
-     * @return BlockPos of lower tepee door if found, otherwise null
-     **/
-    @Nullable
-    private static BlockPos locateDoor(Level world, BlockPos pos) {
-        Set<BlockPos> checked = new HashSet<>();
-        while (pos != null && !(world.getBlockState(pos).getBlock() instanceof TentDoorBlock)) {
-            pos = locateTepeeBlockExcluding(world, checked, pos);
-        }
-        if (null == pos) {
-            return null;
-        }
-        boolean lower = world.getBlockState(pos).getValue(TentDoorBlock.HALF) == DoubleBlockHalf.LOWER;
-        return lower ? pos : pos.below(1);
-    }
-
-    /**
-     * Searches a 3x3x3 box for a TepeeBlock that has not been added to the list already.
-     *
-     * @param worldIn the world
-     * @param exclude list of BlockPos already checked
-     * @param pos center of the 3x3x3 box
-     **/
-    private static BlockPos locateTepeeBlockExcluding(Level worldIn, Set<BlockPos> exclude, BlockPos pos) {
-        int radius = 1;
-        // favor blocks below this one (on average, tepee blocks are above the door)
-        for (int y = -radius; y <= radius; y++) {
-            for (int x = -radius; x <= radius; x++) {
-                for (int z = -radius; z <= radius; z++) {
-                    BlockPos checkPos = pos.offset(x, y, z);
-                    if (!exclude.contains(checkPos)) {
-                        BlockState stateAt = worldIn.getBlockState(checkPos);
-                        if (stateAt.getBlock() instanceof TepeeBlock
-                                || stateAt.getBlock() instanceof FrameBlock
-                                || stateAt.getBlock() instanceof TentDoorBlock) {
-                            exclude.add(checkPos);
-                            return checkPos;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
 
     public static enum Type implements StringRepresentable {
         BLANK("blank", false, () -> NTRegistry.BlockReg.BLANK_TEPEE_WALL.defaultBlockState()),

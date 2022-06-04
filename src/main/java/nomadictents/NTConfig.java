@@ -9,6 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
+import nomadictents.block.FrameBlock;
 import nomadictents.tileentity.TentDoorBlockEntity;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public final class NTConfig {
 	public final ForgeConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
 	public final ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
 	public final ForgeConfigSpec.BooleanValue USE_ACTUAL_SIZE;
+	public final ForgeConfigSpec.IntValue MALLET_EFFECTIVENESS;
 
 	public NTConfig(final ForgeConfigSpec.Builder builder) {
 		builder.push("dimension");
@@ -89,6 +91,9 @@ public final class NTConfig {
 				.define("tent_floor", Blocks.DIRT.getRegistryName().toString());
 		USE_ACTUAL_SIZE = builder.comment("When true, tents will be the same size on the outside and inside")
 				.define("use_actual_size", false);
+		MALLET_EFFECTIVENESS = builder
+						.comment("The number of progress stages added by one use of the tent mallet")
+						.defineInRange("mallet_effectiveness", 2, 1, FrameBlock.MAX_PROGRESS);
 		builder.pop();
 	}
 
