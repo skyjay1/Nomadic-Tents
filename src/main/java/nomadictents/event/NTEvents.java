@@ -116,7 +116,7 @@ public final class NTEvents {
 
         @SubscribeEvent
         public static void onPlayerTeleportEnderPearl(final EntityTeleportEvent.EnderPearl event) {
-            if(NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
+            if(DynamicDimensionHelper.isInsideTent(event.getPlayer().level) && NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
                 event.setCanceled(true);
                 event.getPlayer().displayClientMessage(new TranslationTextComponent("tent.teleport.deny"), true);
             }
@@ -124,7 +124,7 @@ public final class NTEvents {
 
         @SubscribeEvent
         public static void onPlayerTeleportChorusFruit(final EntityTeleportEvent.ChorusFruit event) {
-            if(NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
+            if(DynamicDimensionHelper.isInsideTent(event.getEntityLiving().level) && NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
                 event.setCanceled(true);
                 if(event.getEntityLiving() instanceof PlayerEntity) {
                     ((PlayerEntity)event.getEntityLiving()).displayClientMessage(new TranslationTextComponent("tent.teleport.deny"), true);
