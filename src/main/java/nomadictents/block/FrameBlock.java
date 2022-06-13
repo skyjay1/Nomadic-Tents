@@ -43,8 +43,7 @@ public class FrameBlock extends Block implements IWaterLoggable {
     private static final HashMap<BlockState, VoxelShape> SHAPES = new HashMap<>();
 
     public FrameBlock(Properties properties) {
-        super(properties.noCollission().noDrops().sound(SoundType.WOOD)
-                .strength(-1, 3600000.0F));
+        super(properties);
         this.registerDefaultState(this.getStateDefinition().any()
                 .setValue(WATERLOGGED, false)
                 .setValue(PROGRESS, 0));
@@ -113,12 +112,12 @@ public class FrameBlock extends Block implements IWaterLoggable {
     }
 
     /**
-     * Traces all connected Tepee blocks (frames and tepee walls) until it
-     * finds the lower door of the tepee.
+     * Traces all connected blocks (frames, doors, or matching the predicate) until it
+     * finds the lower door of the tent.
      *
      * @param world the world
      * @param pos   BlockPos to begin searching from
-     * @return BlockPos of lower tepee door if found, otherwise null
+     * @return BlockPos of lower tent door if found, otherwise null
      **/
     @Nullable
     public static BlockPos locateDoor(World world, BlockPos pos, Predicate<Block> tentBlockPred) {

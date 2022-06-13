@@ -26,14 +26,15 @@ public class TepeeStructureProcessor extends StructureProcessor {
         // process blank tepee wall
         BlockPos p = blockInfo.pos;
         if (blockInfo.state.getBlock() == NTRegistry.BlockReg.BLANK_TEPEE_WALL) {
+            Random rand = placementSettings.getRandom(null);
             // random pattern using block position as seed
             if (p.getY() % 2 == 0) {
-                Random rand = new Random(p.getY() + pos.hashCode());
-                return new Template.BlockInfo(p, TepeeBlock.getRandomPattern(rand), null);
+                int randSeed = p.getY() + rand.hashCode();
+                return new Template.BlockInfo(p, TepeeBlock.getRandomPattern(new Random(randSeed)), null);
             }
             // random design using existing seeded random
-            if (placementSettings.getRandom(null).nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
-                return new Template.BlockInfo(p, TepeeBlock.getRandomSymbol(placementSettings.getRandom(null)), null);
+            if (rand.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
+                return new Template.BlockInfo(p, TepeeBlock.getRandomSymbol(rand), null);
             }
         }
         return blockInfo;

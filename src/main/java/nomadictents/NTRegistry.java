@@ -226,17 +226,19 @@ public final class NTRegistry {
 
         @SubscribeEvent
         public static void register(final RegistryEvent.Register<Block> event) {
-            // register door frames
+            // register door frame
             event.getRegistry().register(new FrameBlock(AbstractBlock.Properties
                     .of(Material.BARRIER, MaterialColor.WOOD)
-                    .sound(SoundType.WOOD))
+                    .noCollission().noDrops().sound(SoundType.WOOD)
+                    .instabreak())
                 .setRegistryName(MODID, "door_frame")
             );
             // register wall/roof frames
             for(ResourceLocation id : TentPlacer.FRAME_TO_BLOCK.keySet()) {
                 event.getRegistry().register(new FrameBlock(AbstractBlock.Properties
                         .of(Material.BARRIER, MaterialColor.WOOD)
-                        .sound(SoundType.WOOD))
+                        .noCollission().noDrops().sound(SoundType.WOOD)
+                        .strength(-1, 3600000.0F))
                     .setRegistryName(id));
             }
 

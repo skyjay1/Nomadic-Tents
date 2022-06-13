@@ -39,6 +39,7 @@ import nomadictents.block.IndluWallBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.YurtRoofBlock;
 import nomadictents.block.YurtWallBlock;
+import nomadictents.dimension.DynamicDimensionHelper;
 import nomadictents.tileentity.TentDoorTileEntity;
 import nomadictents.util.Tent;
 import nomadictents.util.TentSize;
@@ -429,7 +430,8 @@ public final class TentPlacer {
         // set up template placement settings
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Random rand = new Random(door.hashCode());
+        // random seed using door position and dimension registry name
+        Random rand = new Random(door.hashCode() + level.dimension().getRegistryName().hashCode());
         MutableBoundingBox mbb = new MutableBoundingBox(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         PlacementSettings placement = new PlacementSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
@@ -866,7 +868,7 @@ public final class TentPlacer {
      */
     public static BlockState getFrameTarget(final BlockState frame, final World level, final BlockPos pos) {
         ResourceLocation id = frame.getBlock().getRegistryName();
-        boolean outside = true; // TODO
+        boolean outside = !DynamicDimensionHelper.isInsideTent(level);
         if(FRAME_TO_BLOCK.containsKey(id)) {
             return FRAME_TO_BLOCK.get(id).apply(outside);
         }

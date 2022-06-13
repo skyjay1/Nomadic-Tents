@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.DoubleBlockHalf;
@@ -14,6 +15,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.IBlockReader;
@@ -134,6 +136,24 @@ public class TentDoorBlock extends TentBlock {
             tentDoor.entityInside(level.getBlockState(doorPos), level, doorPos, entity);
         }
         super.entityInside(state, level, pos, entity);
+    }
+
+    @Override
+    public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader level, BlockPos pos, PlayerEntity player) {
+        // determine block entity position
+        BlockPos doorPos = pos;
+        if(state.getValue(HALF) == DoubleBlockHalf.UPPER) {
+            doorPos = pos.below();
+        }
+        // locate door block entity
+        TileEntity blockEntity = level.getBlockEntity(doorPos);
+        if(blockEntity instanceof TentDoorTileEntity) {
+            // delegate to block entity
+            TentDoorTileEntity tentDoor = (TentDoorTileEntity) blockEntity;
+            return tentDoor.getTent().asItem();
+        }
+
+        return super.getPickBlock(state, target, level, pos, player);
     }
 
     @Override

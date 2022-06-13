@@ -35,10 +35,10 @@ public class ShamiyanaStructureProcessor extends StructureProcessor {
     @Nullable
     @Override
     public Template.BlockInfo process(IWorldReader level, BlockPos rawPos, BlockPos pos, Template.BlockInfo rawBlockInfo, Template.BlockInfo blockInfo, PlacementSettings placementSettings, @Nullable Template template) {
-        // process blank tepee wall
+        // process blank shamiyana wall
         BlockPos p = blockInfo.pos;
         if (blockInfo.state.getBlock() == NTRegistry.BlockReg.WHITE_SHAMIYANA_WALL) {
-            boolean pattern = /*p.getY() % 3 == 1 || */blockInfo.state.getValue(ShamiyanaWallBlock.PATTERN);
+            boolean pattern = /*p.getY() % 3 == 1 || */ blockInfo.state.getValue(ShamiyanaWallBlock.PATTERN);
             BlockState state = TentPlacer.SHAMIYANA_WALLS.get(this.color).get().setValue(ShamiyanaWallBlock.PATTERN, pattern);
             return new Template.BlockInfo(p, state, null);
         }
