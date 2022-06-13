@@ -42,7 +42,9 @@ public class TentColorRecipe extends ShapedRecipe {
             ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
             if(!tent.isEmpty()) {
                 // ensure input tent color is white
-                return DyeColor.WHITE.getSerializedName().equals(tent.getOrCreateTag().getString(Tent.COLOR));
+                String sTentColor = tent.getOrCreateTag().getString(Tent.COLOR);
+                DyeColor tentColor = DyeColor.byName(sTentColor, DyeColor.WHITE);
+                return tentColor == DyeColor.WHITE;
             }
         }
         return false;
