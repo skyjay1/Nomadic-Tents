@@ -411,7 +411,7 @@ public final class TentPlacer {
         // set up template placement settings
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Random rand = new Random(door.hashCode());
+        Random rand = new Random(door.hashCode() + level.dimension().getRegistryName().hashCode());
         BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)

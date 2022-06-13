@@ -45,8 +45,7 @@ public class FrameBlock extends Block implements SimpleWaterloggedBlock {
     private static final HashMap<BlockState, VoxelShape> SHAPES = new HashMap<>();
 
     public FrameBlock(Properties properties) {
-        super(properties.noCollission().noDrops().sound(SoundType.WOOD)
-                .strength(-1, 3600000.0F));
+        super(properties);
         this.registerDefaultState(this.getStateDefinition().any()
                 .setValue(WATERLOGGED, false)
                 .setValue(PROGRESS, 0));

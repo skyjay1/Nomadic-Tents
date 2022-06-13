@@ -40,7 +40,8 @@ public class ShamiyanaWallBlock extends TentBlock {
      * @param doorPos the door block position, if any
      * @return the correct blockstate for this position and door position
      */
-    public BlockState getShamiyanaState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
+    @Override
+    public BlockState getDoorAwareState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
         boolean pattern = state.getValue(PATTERN);
         if(this.color == DyeColor.WHITE && doorPos != null) {
             // determine if this block should have pattern
@@ -63,12 +64,8 @@ public class ShamiyanaWallBlock extends TentBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState blockState = super.getStateForPlacement(context);
-        if(this.color == DyeColor.WHITE) {
-            // locate nearby door
-            BlockPos door = FrameBlock.locateDoor(context.getLevel(), context.getClickedPos(), b -> b instanceof ShamiyanaWallBlock);
-            return getShamiyanaState(context.getLevel(), blockState, context.getClickedPos(), door);
-        }
-        return blockState;
+        boolean pattern = context.getPlayer() != null && context.getPlayer().isShiftKeyDown();
+        return blockState.setValue(PATTERN, pattern);
     }
 
     /** @return the DyeColor of this block **/

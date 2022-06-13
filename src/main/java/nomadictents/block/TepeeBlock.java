@@ -32,7 +32,8 @@ public class TepeeBlock extends TentBlock {
      * @param doorPos the door block position, if any
      * @return the correct blockstate for this position and door position
      */
-    public BlockState getTepeeState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
+    @Override
+    public BlockState getDoorAwareState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
         if(this.type == Type.BLANK) {
             // locate nearby door
             Random rand = level.getRandom();
@@ -56,11 +57,6 @@ public class TepeeBlock extends TentBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState blockState = super.getStateForPlacement(context);
-        if(this.type == Type.BLANK) {
-            // locate nearby door
-            BlockPos door = FrameBlock.locateDoor(context.getLevel(), context.getClickedPos(), b -> b instanceof TepeeBlock);
-            return getTepeeState(context.getLevel(), blockState, context.getClickedPos(), door);
-        }
         return blockState;
     }
 

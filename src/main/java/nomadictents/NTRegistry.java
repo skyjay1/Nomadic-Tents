@@ -229,15 +229,17 @@ public final class NTRegistry {
             // register door frames
             event.getRegistry().register(new FrameBlock(BlockBehaviour.Properties
                     .of(Material.BARRIER, MaterialColor.WOOD)
-                    .sound(SoundType.WOOD))
-                .setRegistryName(MODID, "door_frame")
+                    .noCollission().noDrops().sound(SoundType.WOOD)
+                    .instabreak())
+                    .setRegistryName(MODID, "door_frame")
             );
             // register wall/roof frames
             for(ResourceLocation id : TentPlacer.FRAME_TO_BLOCK.keySet()) {
                 event.getRegistry().register(new FrameBlock(BlockBehaviour.Properties
                         .of(Material.BARRIER, MaterialColor.WOOD)
-                        .sound(SoundType.WOOD))
-                    .setRegistryName(id));
+                        .noCollission().noDrops().sound(SoundType.WOOD)
+                        .strength(-1, 3600000.0F))
+                        .setRegistryName(id));
             }
 
             // register yurt blocks
