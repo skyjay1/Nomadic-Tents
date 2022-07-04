@@ -55,6 +55,6 @@ public class DirectTeleporter implements ITeleporter {
             entity.moveTo(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.getXRot());
         }
 
-        return ITeleporter.super.placeEntity(entity, currentWorld, destWorld, yaw, repositionEntity);
+        return repositionEntity.apply(false);
     }
 }
