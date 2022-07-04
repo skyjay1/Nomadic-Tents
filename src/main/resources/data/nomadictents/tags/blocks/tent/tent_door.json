@@ -1,0 +1,40 @@
+{
+  "replace": false,
+  "values": [
+    "nomadictents:tiny_yurt_door",
+    "nomadictents:tiny_tepee_door",
+    "nomadictents:tiny_bedouin_door",
+    "nomadictents:tiny_indlu_door",
+    "nomadictents:tiny_shamiyana_door",
+
+    "nomadictents:small_yurt_door",
+    "nomadictents:small_tepee_door",
+    "nomadictents:small_bedouin_door",
+    "nomadictents:small_indlu_door",
+    "nomadictents:small_shamiyana_door",
+
+    "nomadictents:medium_yurt_door",
+    "nomadictents:medium_tepee_door",
+    "nomadictents:medium_bedouin_door",
+    "nomadictents:medium_indlu_door",
+    "nomadictents:medium_shamiyana_door",
+
+    "nomadictents:large_yurt_door",
+    "nomadictents:large_tepee_door",
+    "nomadictents:large_bedouin_door",
+    "nomadictents:large_indlu_door",
+    "nomadictents:large_shamiyana_door",
+
+    "nomadictents:giant_yurt_door",
+    "nomadictents:giant_tepee_door",
+    "nomadictents:giant_bedouin_door",
+    "nomadictents:giant_indlu_door",
+    "nomadictents:giant_shamiyana_door",
+
+    "nomadictents:mega_yurt_door",
+    "nomadictents:mega_tepee_door",
+    "nomadictents:mega_bedouin_door",
+    "nomadictents:mega_indlu_door",
+    "nomadictents:mega_shamiyana_door"
+  ]
+}
