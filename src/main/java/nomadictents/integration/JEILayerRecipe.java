@@ -15,29 +15,29 @@ import java.util.function.Consumer;
 
 public class JEILayerRecipe extends CraftingCategoryExtension<TentLayerRecipe> {
 
-  private final Consumer<ItemStack> layerConsumer;
+    private final Consumer<ItemStack> layerConsumer;
 
-  public JEILayerRecipe(TentLayerRecipe recipe) {
-    super(recipe);
-    final byte layer = (byte) Math.max(0, recipe.getLayer() - 1);
-    layerConsumer = i -> {
-      if(i.getItem() instanceof TentItem) {
-        i.getOrCreateTag().putByte(Tent.LAYERS, layer);
-      }
-    };
-  }
+    public JEILayerRecipe(TentLayerRecipe recipe) {
+        super(recipe);
+        final byte layer = (byte) Math.max(0, recipe.getLayer() - 1);
+        layerConsumer = i -> {
+            if (i.getItem() instanceof TentItem) {
+                i.getOrCreateTag().putByte(Tent.LAYERS, layer);
+            }
+        };
+    }
 
-  @Override
-  public void setRecipe(IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
-    List<List<ItemStack>> inputs = recipe.getIngredients().stream()
-            .map(ingredient -> List.of(ingredient.getItems()))
-            .toList();
-    inputs.forEach(list -> list.forEach(layerConsumer));
-    ItemStack resultItem = recipe.getResultItem();
+    @Override
+    public void setRecipe(IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+        List<List<ItemStack>> inputs = recipe.getIngredients().stream()
+                .map(ingredient -> List.of(ingredient.getItems()))
+                .toList();
+        inputs.forEach(list -> list.forEach(layerConsumer));
+        ItemStack resultItem = recipe.getResultItem();
 
-    int width = getWidth();
-    int height = getHeight();
-    craftingGridHelper.setOutputs(builder, VanillaTypes.ITEM, List.of(resultItem));
-    craftingGridHelper.setInputs(builder, VanillaTypes.ITEM, inputs, width, height);
-  }
+        int width = getWidth();
+        int height = getHeight();
+        craftingGridHelper.setOutputs(builder, VanillaTypes.ITEM, List.of(resultItem));
+        craftingGridHelper.setInputs(builder, VanillaTypes.ITEM, inputs, width, height);
+    }
 }

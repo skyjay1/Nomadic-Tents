@@ -1,16 +1,16 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
@@ -33,14 +33,14 @@ public class TentColorRecipe extends ShapedRecipe {
 
     @Override
     public boolean matches(CraftingContainer craftingInventory, Level level) {
-        if(super.matches(craftingInventory, level)) {
+        if (super.matches(craftingInventory, level)) {
             // always match when output color is white
-            if(this.color == DyeColor.WHITE) {
+            if (this.color == DyeColor.WHITE) {
                 return true;
             }
             // locate input tent
             ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
-            if(!tent.isEmpty()) {
+            if (!tent.isEmpty()) {
                 // ensure input tent color is white
                 String sTentColor = tent.getOrCreateTag().getString(Tent.COLOR);
                 DyeColor tentColor = DyeColor.byName(sTentColor, DyeColor.WHITE);
@@ -57,7 +57,7 @@ public class TentColorRecipe extends ShapedRecipe {
         // locate input tent
         ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
         // copy input NBT to result with color information
-        if(!tent.isEmpty()) {
+        if (!tent.isEmpty()) {
             result = tent.copy();
             CompoundTag tag = result.getOrCreateTag();
             tag.putString(Tent.COLOR, this.color.getSerializedName());
@@ -69,7 +69,7 @@ public class TentColorRecipe extends ShapedRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return NTRegistry.RecipeReg.TENT_COLOR_RECIPE_SERIALIZER;
+        return NTRegistry.TENT_COLOR_RECIPE_SERIALIZER.get();
     }
 
     public DyeColor getColor() {
@@ -85,7 +85,7 @@ public class TentColorRecipe extends ShapedRecipe {
             // read the recipe from shapeless recipe serializer
             final ShapedRecipe recipe = super.fromJson(recipeId, json);
             String sColor = "";
-            if(json.has("color")) {
+            if (json.has("color")) {
                 sColor = json.get("color").getAsString();
             }
             final DyeColor color = DyeColor.byName(sColor, DyeColor.WHITE);

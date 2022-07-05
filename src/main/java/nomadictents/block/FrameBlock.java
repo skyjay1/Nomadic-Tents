@@ -1,36 +1,32 @@
 package nomadictents.block;
 
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-
-import javax.annotation.Nullable;
 
 public class FrameBlock extends Block implements SimpleWaterloggedBlock {
 
@@ -85,11 +81,11 @@ public class FrameBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter reader, BlockPos pos, CollisionContext context) {
-        if(!SHAPES.containsKey(state)) {
+        if (!SHAPES.containsKey(state)) {
             int progress = state.getValue(PROGRESS);
-            if(progress <= 1) {
+            if (progress <= 1) {
                 SHAPES.put(state, AABB_PROGRESS_0);
-            } else if(progress <= 3) {
+            } else if (progress <= 3) {
                 SHAPES.put(state, AABB_PROGRESS_1);
             } else {
                 SHAPES.put(state, AABB_PROGRESS_2);
@@ -139,7 +135,7 @@ public class FrameBlock extends Block implements SimpleWaterloggedBlock {
      *
      * @param worldIn the world
      * @param exclude list of BlockPos already checked
-     * @param pos center of the 3x3x3 box
+     * @param pos     center of the 3x3x3 box
      **/
     public static BlockPos nextBlockOrDoor(Level worldIn, Set<BlockPos> exclude, BlockPos pos, Predicate<Block> tentBlockPred) {
         int radius = 1;

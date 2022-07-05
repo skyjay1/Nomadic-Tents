@@ -1,5 +1,6 @@
 package nomadictents.dimension;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -8,29 +9,28 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.FixedBiomeSource;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
-import com.mojang.datafixers.util.Pair;
 import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 
@@ -55,8 +55,8 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     public static final Codec<EmptyChunkGenerator> CODEC = RecordCodecBuilder.create(builder -> builder.group(
             // the registry lookup doesn't actually serialize, so we don't need a field for it
             RegistryOps.retrieveRegistry(Registry.STRUCTURE_SET_REGISTRY).forGetter(EmptyChunkGenerator::getStructureSetRegistry),
-			      RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter(EmptyChunkGenerator::getBiomeRegistry)
-		).apply(builder, EmptyChunkGenerator::new));
+            RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter(EmptyChunkGenerator::getBiomeRegistry)
+    ).apply(builder, EmptyChunkGenerator::new));
 
     private final Registry<StructureSet> structures;
     private final Registry<Biome> biomes;
@@ -72,7 +72,7 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     // create chunk generator at runtime when dynamic dimension is created
     public EmptyChunkGenerator(MinecraftServer server) {
         this(server.registryAccess().registryOrThrow(Registry.STRUCTURE_SET_REGISTRY),
-            server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY));
+                server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY));
     }
 
     // create chunk generator when dimension is loaded from the dimension registry on server init
@@ -145,39 +145,35 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void addDebugScreenInfo(List<String> debugInfo, BlockPos pos) { }
+    public void addDebugScreenInfo(List<String> debugInfo, BlockPos pos) {
+    }
 
     @Nullable
     @Override
-    public Pair<BlockPos, Holder<ConfiguredStructureFeature<?, ?>>> findNearestMapFeature(ServerLevel level, HolderSet<ConfiguredStructureFeature<?, ?>> structures, BlockPos pos, int range, boolean skipKnownStructures)
-    {
+    public Pair<BlockPos, Holder<ConfiguredStructureFeature<?, ?>>> findNearestMapFeature(ServerLevel level, HolderSet<ConfiguredStructureFeature<?, ?>> structures, BlockPos pos, int range, boolean skipKnownStructures) {
         return null;
     }
 
     // decorate biomes with features
     @Override
-    public void applyBiomeDecoration(WorldGenLevel world, ChunkAccess chunkAccess, StructureFeatureManager structures)
-    {
+    public void applyBiomeDecoration(WorldGenLevel world, ChunkAccess chunkAccess, StructureFeatureManager structures) {
         // noop
     }
 
     @Override
-    public int getSpawnHeight(LevelHeightAccessor level)
-    {
+    public int getSpawnHeight(LevelHeightAccessor level) {
         return 1;
     }
 
     // create structures
     @Override
-    public void createStructures(RegistryAccess registries, StructureFeatureManager structures, ChunkAccess chunk, StructureManager templates, long seed)
-    {
+    public void createStructures(RegistryAccess registries, StructureFeatureManager structures, ChunkAccess chunk, StructureManager templates, long seed) {
         // no structures
     }
 
     // create structure references
     @Override
-    public void createReferences(WorldGenLevel world, StructureFeatureManager structures, ChunkAccess chunk)
-    {
+    public void createReferences(WorldGenLevel world, StructureFeatureManager structures, ChunkAccess chunk) {
         // no structures
     }
 

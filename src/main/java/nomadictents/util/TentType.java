@@ -20,8 +20,8 @@ public enum TentType implements StringRepresentable {
     }
 
     public static DataResult<TentType> getByName(String id) {
-        for(final TentType t : values()) {
-            if(t.getSerializedName().equals(id)) {
+        for (final TentType t : values()) {
+            if (t.getSerializedName().equals(id)) {
                 return DataResult.success(t);
             }
         }

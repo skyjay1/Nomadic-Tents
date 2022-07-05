@@ -7,7 +7,7 @@ public class TentLayers {
     public static final byte MIN = 0;
 
     public static byte get(final ItemStack stack) {
-        if(stack.hasTag()) {
+        if (stack.hasTag()) {
             return stack.getTag().getByte(Tent.LAYERS);
         }
         return 0;

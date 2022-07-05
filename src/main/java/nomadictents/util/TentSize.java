@@ -2,8 +2,8 @@ package nomadictents.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.util.StringRepresentable;
 import net.minecraft.ChatFormatting;
+import net.minecraft.util.StringRepresentable;
 
 public enum TentSize implements StringRepresentable {
     TINY("tiny", ChatFormatting.RED),
@@ -24,8 +24,8 @@ public enum TentSize implements StringRepresentable {
     }
 
     public static DataResult<TentSize> getByName(String id) {
-        for(final TentSize t : values()) {
-            if(t.getSerializedName().equals(id)) {
+        for (final TentSize t : values()) {
+            if (t.getSerializedName().equals(id)) {
                 return DataResult.success(t);
             }
         }

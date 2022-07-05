@@ -1,15 +1,15 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
 
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class TentSizeRecipe extends ShapedRecipe {
 
     public TentSizeRecipe(ResourceLocation recipeId, final ItemStack outputItem,
-                             final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
+                          final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
         super(recipeId, Serializer.CATEGORY, width, height, recipeItemsIn, outputItem);
     }
 
@@ -29,7 +29,7 @@ public class TentSizeRecipe extends ShapedRecipe {
         // locate input tent
         ItemStack tent = getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
         // copy input NBT to result
-        if(!tent.isEmpty()) {
+        if (!tent.isEmpty()) {
             CompoundTag tag = tent.getOrCreateTag().copy();
             result.setTag(tag);
         }
@@ -39,12 +39,13 @@ public class TentSizeRecipe extends ShapedRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return NTRegistry.RecipeReg.TENT_SIZE_RECIPE_SERIALIZER;
+        return NTRegistry.TENT_SIZE_RECIPE_SERIALIZER.get();
     }
 
     /**
      * Searches the given crafting inventory for an item
-     * @param inv the inventory
+     *
+     * @param inv  the inventory
      * @param pred the predicate to match an item
      * @return the first item in the inventory that matches the predicate
      */

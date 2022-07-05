@@ -1,21 +1,20 @@
 package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
-import nomadictents.NTRegistry;
-
-import javax.annotation.Nullable;
-import java.util.Random;
-
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import nomadictents.NTRegistry;
+
+import javax.annotation.Nullable;
+import java.util.Random;
 
 public class LocStructureProcessor extends StructureProcessor {
 
@@ -39,7 +38,7 @@ public class LocStructureProcessor extends StructureProcessor {
         Random random = placementSettings.getRandom(blockInfo.pos);
         BlockState blockState = level.getBlockState(blockInfo.pos);
         // only process the block if the existing block at this location passes the rule test
-        if(locPredicate.test(blockState, random)) {
+        if (locPredicate.test(blockState, random)) {
             return blockInfo;
         }
         return null;
@@ -47,6 +46,6 @@ public class LocStructureProcessor extends StructureProcessor {
 
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTRegistry.ProcessorReg.LOC_PROCESSOR;
+        return NTRegistry.LOC_PROCESSOR;
     }
 }

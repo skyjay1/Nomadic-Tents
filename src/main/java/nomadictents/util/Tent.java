@@ -1,11 +1,11 @@
 package nomadictents.util;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.ForgeRegistries;
 import nomadictents.NomadicTents;
@@ -49,9 +49,10 @@ public final class Tent implements INBTSerializable<CompoundTag> {
 
     /**
      * Parses the itemstack NBT to create a Tent object
+     *
      * @param stack the itemstack
-     * @param type the tent type
-     * @param size the tent size
+     * @param type  the tent type
+     * @param size  the tent size
      * @return a corresponding instance of Tent
      */
     public static Tent from(ItemStack stack, TentType type, TentSize size) {
@@ -59,7 +60,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
         int id = tag.getInt(ID);
         byte layers = tag.getByte(LAYERS);
         DyeColor color = null;
-        if(tag.contains(COLOR)) {
+        if (tag.contains(COLOR)) {
             color = DyeColor.byName(tag.getString(COLOR), DyeColor.WHITE);
         }
         return new Tent(id, type, size, layers, color);
@@ -69,13 +70,14 @@ public final class Tent implements INBTSerializable<CompoundTag> {
      * Parses the item registry name to determine TentType and TentSize,
      * then parses itemstack NBT to create a Tent object.
      * If possible, use {@link #from(ItemStack, TentType, TentSize)} instead
+     *
      * @param stack the itemstack
      * @return a corresponding instance of Tent
      */
     public static Tent from(ItemStack stack) {
         String itemName = stack.getItem().getRegistryName().toString();
         int index = itemName.indexOf("_");
-        if(index >= 0) {
+        if (index >= 0) {
             String typeName = itemName.substring(0, index);
             String sizeName = itemName.substring(index + 1);
             TentType type = TentType.getByName(typeName).result().orElse(TentType.YURT);
@@ -100,11 +102,11 @@ public final class Tent implements INBTSerializable<CompoundTag> {
         String itemName = this.size.getSerializedName() + "_" + this.type.getSerializedName();
         ResourceLocation itemId = new ResourceLocation(NomadicTents.MODID, itemName);
         Item tentItem = ForgeRegistries.ITEMS.getValue(itemId);
-        if(tentItem != null) {
+        if (tentItem != null) {
             ItemStack tentStack = new ItemStack(tentItem);
             tentStack.getOrCreateTag().putInt(ID, this.id);
             tentStack.getTag().putByte(LAYERS, this.layers);
-            if(this.color != null) {
+            if (this.color != null) {
                 tentStack.getTag().putString(COLOR, this.color.getSerializedName());
             }
             return tentStack;
@@ -140,7 +142,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
         nbt.putString(TYPE, type.getSerializedName());
         nbt.putString(SIZE, size.getSerializedName());
         nbt.putByte(LAYERS, layers);
-        if(color != null) {
+        if (color != null) {
             nbt.putString(COLOR, color.getSerializedName());
         }
         return nbt;
@@ -152,7 +154,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
         this.type = TentType.getByName(nbt.getString(TYPE)).result().orElse(TentType.YURT);
         this.size = TentSize.getByName(nbt.getString(SIZE)).result().orElse(TentSize.TINY);
         this.layers = nbt.getByte(LAYERS);
-        if(nbt.contains(COLOR)) {
+        if (nbt.contains(COLOR)) {
             this.color = DyeColor.byName(nbt.getString(COLOR), DyeColor.WHITE);
         }
     }

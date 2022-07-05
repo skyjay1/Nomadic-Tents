@@ -1,20 +1,19 @@
 package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
 import nomadictents.util.Tent;
-import nomadictents.util.TentLayers;
 
 public class TentLayerRecipe extends ShapedRecipe {
 
@@ -33,10 +32,10 @@ public class TentLayerRecipe extends ShapedRecipe {
 
     @Override
     public boolean matches(CraftingContainer craftingInventory, Level level) {
-        if(super.matches(craftingInventory, level)) {
+        if (super.matches(craftingInventory, level)) {
             // locate input tent
             ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
-            if(!tent.isEmpty()) {
+            if (!tent.isEmpty()) {
                 // ensure tent layer is one less than target layer
                 return tent.getOrCreateTag().getByte(Tent.LAYERS) == (this.layer - 1);
             }
@@ -51,7 +50,7 @@ public class TentLayerRecipe extends ShapedRecipe {
         // locate input tent
         ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
         // copy input NBT to result with layer information
-        if(!tent.isEmpty()) {
+        if (!tent.isEmpty()) {
             CompoundTag tag = tent.getOrCreateTag().copy();
             tag.putByte(Tent.LAYERS, layer);
             result.setTag(tag);
@@ -62,7 +61,7 @@ public class TentLayerRecipe extends ShapedRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return NTRegistry.RecipeReg.TENT_LAYER_RECIPE_SERIALIZER;
+        return NTRegistry.TENT_LAYER_RECIPE_SERIALIZER.get();
     }
 
     public byte getLayer() {
@@ -78,7 +77,7 @@ public class TentLayerRecipe extends ShapedRecipe {
             // read the recipe from shapeless recipe serializer
             final ShapedRecipe recipe = super.fromJson(recipeId, json);
             byte bLayer = 0;
-            if(json.has("layer")) {
+            if (json.has("layer")) {
                 bLayer = json.get("layer").getAsByte();
             }
             return new TentLayerRecipe(recipeId, recipe.getResultItem(), bLayer,

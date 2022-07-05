@@ -1,13 +1,13 @@
 package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import nomadictents.NTRegistry;
 import nomadictents.block.ShamiyanaWallBlock;
@@ -37,9 +37,9 @@ public class ShamiyanaStructureProcessor extends StructureProcessor {
     public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos rawPos, BlockPos pos, StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
         // process blank tepee wall
         BlockPos p = blockInfo.pos;
-        if (blockInfo.state.getBlock() == NTRegistry.BlockReg.WHITE_SHAMIYANA_WALL) {
+        if (blockInfo.state.getBlock() == NTRegistry.WHITE_SHAMIYANA_WALL.get()) {
             boolean pattern = /*p.getY() % 3 == 1 || */blockInfo.state.getValue(ShamiyanaWallBlock.PATTERN);
-            BlockState state = TentPlacer.SHAMIYANA_WALLS.get(this.color).get().setValue(ShamiyanaWallBlock.PATTERN, pattern);
+            BlockState state = TentPlacer.SHAMIYANA_WALLS.get(this.color).get().defaultBlockState().setValue(ShamiyanaWallBlock.PATTERN, pattern);
             return new StructureTemplate.StructureBlockInfo(p, state, null);
         }
         return blockInfo;
@@ -47,6 +47,6 @@ public class ShamiyanaStructureProcessor extends StructureProcessor {
 
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTRegistry.ProcessorReg.TEPEE_PROCESSOR;
+        return NTRegistry.TEPEE_PROCESSOR;
     }
 }

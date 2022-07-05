@@ -11,16 +11,16 @@ import nomadictents.recipe.TentLayerRecipe;
 @JeiPlugin
 public class JEIProvider implements IModPlugin {
 
-  private static final ResourceLocation UID = new ResourceLocation(NomadicTents.MODID, "jei_provider");
+    private static final ResourceLocation UID = new ResourceLocation(NomadicTents.MODID, "jei_provider");
 
-  @Override
-  public ResourceLocation getPluginUid() {
-    return UID;
-  }
+    @Override
+    public ResourceLocation getPluginUid() {
+        return UID;
+    }
 
-  @Override
-  public void registerVanillaCategoryExtensions(final IVanillaCategoryExtensionRegistration registry) {
-    registry.getCraftingCategory().addCategoryExtension(TentLayerRecipe.class, JEILayerRecipe::new);
-    registry.getCraftingCategory().addCategoryExtension(TentColorRecipe.class, JEIColorRecipe::new);
-  }
+    @Override
+    public void registerVanillaCategoryExtensions(final IVanillaCategoryExtensionRegistration registry) {
+        registry.getCraftingCategory().addCategoryExtension(TentLayerRecipe.class, JEILayerRecipe::new);
+        registry.getCraftingCategory().addCategoryExtension(TentColorRecipe.class, JEIColorRecipe::new);
+    }
 }

@@ -1,14 +1,14 @@
 package nomadictents.block;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import nomadictents.structure.TentPlacer;
 import nomadictents.tileentity.TentDoorBlockEntity;
 
@@ -34,26 +34,27 @@ public class ShamiyanaWallBlock extends TentBlock {
 
     /**
      * Calculates the correct shamiyana state for this block
-     * @param level the level
-     * @param state the shamiyana block state
-     * @param pos the shamiyana block position
+     *
+     * @param level   the level
+     * @param state   the shamiyana block state
+     * @param pos     the shamiyana block position
      * @param doorPos the door block position, if any
      * @return the correct blockstate for this position and door position
      */
     @Override
     public BlockState getDoorAwareState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
         boolean pattern = state.getValue(PATTERN);
-        if(this.color == DyeColor.WHITE && doorPos != null) {
+        if (this.color == DyeColor.WHITE && doorPos != null) {
             // determine if this block should have pattern
             pattern = (pos.getY() - doorPos.getY()) % 3 == 0;
             // get door block entity
             BlockEntity blockEntity = level.getBlockEntity(doorPos);
-            if(blockEntity instanceof TentDoorBlockEntity) {
+            if (blockEntity instanceof TentDoorBlockEntity) {
                 // get color information from door, if any
                 TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
                 DyeColor tentColor = tentDoor.getTent().getColor();
-                if(tentColor != null) {
-                    return TentPlacer.SHAMIYANA_WALLS.get(tentColor).get().setValue(PATTERN, pattern);
+                if (tentColor != null) {
+                    return TentPlacer.SHAMIYANA_WALLS.get(tentColor).get().defaultBlockState().setValue(PATTERN, pattern);
                 }
             }
         }
@@ -68,7 +69,9 @@ public class ShamiyanaWallBlock extends TentBlock {
         return blockState.setValue(PATTERN, pattern);
     }
 
-    /** @return the DyeColor of this block **/
+    /**
+     * @return the DyeColor of this block
+     **/
     public DyeColor getColor() {
         return this.color;
     }

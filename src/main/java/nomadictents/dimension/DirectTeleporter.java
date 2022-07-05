@@ -1,14 +1,13 @@
 package nomadictents.dimension;
 
-import net.minecraft.world.level.portal.PortalInfo;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.ITeleporter;
-import nomadictents.structure.TentPlacer;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -49,7 +48,7 @@ public class DirectTeleporter implements ITeleporter {
 
         entity.setDeltaMovement(targetMotion);
 
-        if(entity instanceof ServerPlayer) {
+        if (entity instanceof ServerPlayer) {
             ((ServerPlayer) entity).connection.teleport(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.getXRot());
         } else {
             entity.moveTo(targetVec.x(), targetVec.y(), targetVec.z(), targetRot, entity.getXRot());
