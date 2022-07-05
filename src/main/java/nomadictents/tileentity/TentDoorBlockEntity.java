@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -100,7 +100,7 @@ public class TentDoorBlockEntity extends BlockEntity {
                 }
             } else if (tentDoorResult.hasMessage()) {
                 // display message to explain why the tent cannot be removed
-                player.displayClientMessage(new TranslatableComponent(tentDoorResult.getRemoveTranslationKey()), true);
+                player.displayClientMessage(Component.translatable(tentDoorResult.getRemoveTranslationKey()), true);
             }
             return InteractionResult.SUCCESS;
         }
@@ -110,7 +110,7 @@ public class TentDoorBlockEntity extends BlockEntity {
             this.onEnter(player);
         } else if (tentDoorResult.hasMessage()) {
             // display message to explain why the tent cannot be entered
-            player.displayClientMessage(new TranslatableComponent(tentDoorResult.getEnterTranslationKey()), true);
+            player.displayClientMessage(Component.translatable(tentDoorResult.getEnterTranslationKey()), true);
         }
         return InteractionResult.SUCCESS;
     }
@@ -139,7 +139,7 @@ public class TentDoorBlockEntity extends BlockEntity {
             this.onEnter(entity);
         } else if (entity instanceof Player && tentDoorResult.hasMessage()) {
             // display message to explain why the tent cannot be removed
-            ((Player) entity).displayClientMessage(new TranslatableComponent(tentDoorResult.getEnterTranslationKey()), true);
+            ((Player) entity).displayClientMessage(Component.translatable(tentDoorResult.getEnterTranslationKey()), true);
         }
     }
 
@@ -296,6 +296,10 @@ public class TentDoorBlockEntity extends BlockEntity {
     public void onEnter(final Entity entity) {
         // ensure server side
         if (entity.level.isClientSide || null == entity.getServer()) {
+            return;
+        }
+        // ensure no cooldown
+        if(entity.isOnPortalCooldown()) {
             return;
         }
         MinecraftServer server = entity.getServer();

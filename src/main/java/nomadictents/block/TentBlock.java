@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 public class TentBlock extends Block {
 
     public TentBlock(Properties properties) {
-        super(properties.noDrops().strength(-1, 3600000.0F));
+        super(properties.noLootTable().strength(-1, 3600000.0F));
     }
 
     @Override

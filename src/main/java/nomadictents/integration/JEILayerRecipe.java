@@ -4,7 +4,7 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.plugins.vanilla.crafting.CraftingCategoryExtension;
+import mezz.jei.common.plugins.vanilla.crafting.CraftingCategoryExtension;
 import net.minecraft.world.item.ItemStack;
 import nomadictents.item.TentItem;
 import nomadictents.recipe.TentLayerRecipe;
@@ -37,7 +37,7 @@ public class JEILayerRecipe extends CraftingCategoryExtension<TentLayerRecipe> {
 
         int width = getWidth();
         int height = getHeight();
-        craftingGridHelper.setOutputs(builder, VanillaTypes.ITEM, List.of(resultItem));
-        craftingGridHelper.setInputs(builder, VanillaTypes.ITEM, inputs, width, height);
+        craftingGridHelper.setOutputs(builder, VanillaTypes.ITEM_STACK, List.of(resultItem));
+        craftingGridHelper.setInputs(builder, VanillaTypes.ITEM_STACK, inputs, width, height);
     }
 }

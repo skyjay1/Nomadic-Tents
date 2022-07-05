@@ -94,7 +94,7 @@ public class DynamicDimensionHelper {
         ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, targetRot, TentPlacer.TENT_DIRECTION);
         entity.changeDimension(targetWorld, teleporter);
         // portal cooldown
-        entity.setPortalCooldown();
+        entity.portalCooldown = NomadicTents.CONFIG.PORTAL_COOLDOWN.get();
     }
 
     /**
@@ -204,13 +204,13 @@ public class DynamicDimensionHelper {
                 levelSave,
                 derivedLevelData,
                 worldKey,
-                dimension.typeHolder(),
+                dimension,
                 chunkListener,
-                dimension.generator(),
                 worldGenSettings.isDebug(),
                 BiomeManager.obfuscateSeed(worldGenSettings.seed()),
                 ImmutableList.of(),
-                false); // "tick time", true for overworld, always false for everything else
+                false   // "tick time", true for overworld, always false for everything else
+        );
 
         // add world border listener
         overworld.getWorldBorder().addListener(new BorderChangeListener.DelegateBorderChangeListener(newWorld.getWorldBorder()));

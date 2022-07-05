@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
@@ -25,9 +26,9 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTes
 import net.minecraft.world.level.levelgen.structure.templatesystem.ProcessorRule;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
@@ -51,7 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -422,7 +422,7 @@ public final class TentPlacer {
         // set up template placement settings
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Random rand = new Random(door.hashCode() + level.dimension().getRegistryName().hashCode());
+        RandomSource rand = RandomSource.create(door.hashCode() + level.dimension().location().hashCode());
         BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
@@ -467,7 +467,7 @@ public final class TentPlacer {
         // set up template placement settings
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Random rand = new Random(door.hashCode());
+        RandomSource rand = RandomSource.create(door.hashCode());
         BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
@@ -509,7 +509,7 @@ public final class TentPlacer {
         // set up template placement settings
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Random rand = new Random(door.hashCode());
+        RandomSource rand = RandomSource.create(door.hashCode());
         BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
                 .setRotation(rotation).setRandom(rand).setBoundingBox(mbb)
@@ -590,7 +590,7 @@ public final class TentPlacer {
 
         Rotation rotation = toRotation(direction);
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
-        Random rand = new Random(door.hashCode());
+        RandomSource rand = RandomSource.create(door.hashCode());
 
         BoundingBox mbb = BoundingBox.fromCorners(origin.subtract(template.getSize()), origin.offset(template.getSize()));
         StructurePlaceSettings placement = new StructurePlaceSettings()
@@ -789,7 +789,7 @@ public final class TentPlacer {
         if (null == level.getServer()) {
             return null;
         }
-        StructureManager templateManager = level.getServer().getStructureManager();
+        StructureTemplateManager templateManager = level.getServer().getStructureManager();
         Optional<StructureTemplate> template = templateManager.get(templateId);
         if (template.isEmpty()) {
             NomadicTents.LOGGER.warn("Failed to load tent template for " + templateId);
@@ -864,7 +864,7 @@ public final class TentPlacer {
      * @return the block to replace the given frame block
      */
     public static BlockState getFrameTarget(final BlockState frame, final Level level, final BlockPos pos) {
-        ResourceLocation id = frame.getBlock().getRegistryName();
+        ResourceLocation id = ForgeRegistries.BLOCKS.getKey(frame.getBlock());
         boolean outside = !DynamicDimensionHelper.isInsideTent(level);
         if (FRAME_TO_BLOCK.containsKey(id)) {
             return FRAME_TO_BLOCK.get(id).apply(outside);

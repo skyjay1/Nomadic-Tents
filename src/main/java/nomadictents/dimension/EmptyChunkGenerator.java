@@ -16,21 +16,21 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 
@@ -88,24 +88,13 @@ public class EmptyChunkGenerator extends ChunkGenerator {
         return CODEC;
     }
 
-    // get chunk generator but with seed
     @Override
-    public ChunkGenerator withSeed(long seed) {
-        return this;
-    }
-
-    @Override
-    public Climate.Sampler climateSampler() {
-        return Climate.empty();
-    }
-
-    @Override
-    public void applyCarvers(WorldGenRegion region, long p_187692_, BiomeManager biomeManager, StructureFeatureManager featureManager, ChunkAccess chunkAccess, GenerationStep.Carving carvingStep) {
+    public void applyCarvers(WorldGenRegion region, long carverSeed, RandomState randomState, BiomeManager biomeManager, StructureManager featureManager, ChunkAccess chunkAccess, GenerationStep.Carving carvingStep) {
 
     }
 
     @Override
-    public void buildSurface(WorldGenRegion region, StructureFeatureManager featureManager, ChunkAccess chunkAccess) {
+    public void buildSurface(WorldGenRegion region, StructureManager featureManager, RandomState randomState, ChunkAccess chunkAccess) {
 
     }
 
@@ -120,7 +109,7 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, StructureFeatureManager structureFeatureManager, ChunkAccess chunkAccess) {
+    public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, RandomState randomState, StructureManager structureFeatureManager, ChunkAccess chunkAccess) {
         return CompletableFuture.completedFuture(chunkAccess);
     }
 
@@ -135,28 +124,28 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public int getBaseHeight(int x, int z, Types types, LevelHeightAccessor levelHeightAccessor) {
+    public int getBaseHeight(int x, int z, Types types, LevelHeightAccessor levelHeightAccessor, RandomState randomState) {
         return levelHeightAccessor.getMinBuildHeight();
     }
 
     @Override
-    public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor levelHeightAccessor) {
+    public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor levelHeightAccessor, RandomState randomState) {
         return new NoiseColumn(levelHeightAccessor.getMinBuildHeight(), new BlockState[0]);
     }
 
     @Override
-    public void addDebugScreenInfo(List<String> debugInfo, BlockPos pos) {
+    public void addDebugScreenInfo(List<String> debugInfo, RandomState randomState, BlockPos pos) {
     }
 
     @Nullable
     @Override
-    public Pair<BlockPos, Holder<ConfiguredStructureFeature<?, ?>>> findNearestMapFeature(ServerLevel level, HolderSet<ConfiguredStructureFeature<?, ?>> structures, BlockPos pos, int range, boolean skipKnownStructures) {
+    public Pair<BlockPos, Holder<Structure>> findNearestMapStructure(ServerLevel level, HolderSet<Structure> structures, BlockPos pos, int range, boolean skipKnownStructures) {
         return null;
     }
 
     // decorate biomes with features
     @Override
-    public void applyBiomeDecoration(WorldGenLevel world, ChunkAccess chunkAccess, StructureFeatureManager structures) {
+    public void applyBiomeDecoration(WorldGenLevel world, ChunkAccess chunkAccess, StructureManager structures) {
         // noop
     }
 
@@ -167,13 +156,13 @@ public class EmptyChunkGenerator extends ChunkGenerator {
 
     // create structures
     @Override
-    public void createStructures(RegistryAccess registries, StructureFeatureManager structures, ChunkAccess chunk, StructureManager templates, long seed) {
+    public void createStructures(RegistryAccess registries, RandomState randomState, StructureManager structures, ChunkAccess chunk, StructureTemplateManager templates, long seed) {
         // no structures
     }
 
     // create structure references
     @Override
-    public void createReferences(WorldGenLevel world, StructureFeatureManager structures, ChunkAccess chunk) {
+    public void createReferences(WorldGenLevel world, StructureManager structures, ChunkAccess chunk) {
         // no structures
     }
 

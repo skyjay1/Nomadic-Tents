@@ -1,6 +1,6 @@
 package nomadictents.event;
 
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -118,7 +118,7 @@ public final class NTEvents {
         public static void onPlayerTeleportEnderPearl(final EntityTeleportEvent.EnderPearl event) {
             if (DynamicDimensionHelper.isInsideTent(event.getPlayer().level) && NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
                 event.setCanceled(true);
-                event.getPlayer().displayClientMessage(new TranslatableComponent("tent.teleport.deny"), true);
+                event.getPlayer().displayClientMessage(Component.translatable("tent.teleport.deny"), true);
             }
         }
 
@@ -127,7 +127,7 @@ public final class NTEvents {
             if (DynamicDimensionHelper.isInsideTent(event.getEntityLiving().level) && NomadicTents.CONFIG.RESTRICT_TELEPORT_IN_TENT.get()) {
                 event.setCanceled(true);
                 if (event.getEntityLiving() instanceof Player) {
-                    ((Player) event.getEntityLiving()).displayClientMessage(new TranslatableComponent("tent.teleport.deny"), true);
+                    ((Player) event.getEntityLiving()).displayClientMessage(Component.translatable("tent.teleport.deny"), true);
                 }
             }
         }

@@ -75,7 +75,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
      * @return a corresponding instance of Tent
      */
     public static Tent from(ItemStack stack) {
-        String itemName = stack.getItem().getRegistryName().toString();
+        String itemName = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
         int index = itemName.indexOf("_");
         if (index >= 0) {
             String typeName = itemName.substring(0, index);

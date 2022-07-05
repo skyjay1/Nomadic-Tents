@@ -6,7 +6,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -76,21 +75,27 @@ public class TentItem extends Item {
         CauldronInteraction.WATER.put(this, WASH_TENT);
     }
 
+    @Override
+    public boolean isFireResistant() {
+        return super.isFireResistant() || NomadicTents.CONFIG.TENT_FIREPROOF.get();
+    }
+
+    @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flag) {
-        list.add(new TranslatableComponent("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
+        list.add(Component.translatable("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
         if (this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
             DyeColor color = DyeColor.byName(stack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE);
             String translationKey = "item.minecraft.firework_star." + color.getSerializedName();
-            list.add(new TranslatableComponent(translationKey));
+            list.add(Component.translatable(translationKey));
         }
         if (flag.isAdvanced() || net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             // layer tooltip
             byte layers = stack.getOrCreateTag().getByte(Tent.LAYERS);
             byte maxLayers = TentLayers.getMaxLayers(this.size);
-            list.add(new TranslatableComponent("item.nomadictents.tent.tooltip.layer", layers, maxLayers).withStyle(ChatFormatting.GRAY));
+            list.add(Component.translatable("item.nomadictents.tent.tooltip.layer", layers, maxLayers).withStyle(ChatFormatting.GRAY));
             // ID tooltip
             int id = stack.getOrCreateTag().getInt(Tent.ID);
-            list.add(new TranslatableComponent("item.nomadictents.tent.tooltip.id", id).withStyle(ChatFormatting.GRAY));
+            list.add(Component.translatable("item.nomadictents.tent.tooltip.id", id).withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -116,7 +121,7 @@ public class TentItem extends Item {
         if (DynamicDimensionHelper.isInsideTent(context.getLevel())) {
             // send message
             if (context.getPlayer() != null) {
-                context.getPlayer().displayClientMessage(new TranslatableComponent("tent.build.deny.inside_tent"), true);
+                context.getPlayer().displayClientMessage(Component.translatable("tent.build.deny.inside_tent"), true);
             }
             return InteractionResult.PASS;
         }
@@ -124,7 +129,7 @@ public class TentItem extends Item {
         if (NomadicTents.CONFIG.isDimensionBlacklist(context.getLevel())) {
             // send message
             if (context.getPlayer() != null) {
-                context.getPlayer().displayClientMessage(new TranslatableComponent("tent.build.deny.dimension"), true);
+                context.getPlayer().displayClientMessage(Component.translatable("tent.build.deny.dimension"), true);
             }
             return InteractionResult.PASS;
         }
@@ -151,7 +156,7 @@ public class TentItem extends Item {
             } else {
                 // send message
                 if (context.getPlayer() != null) {
-                    context.getPlayer().displayClientMessage(new TranslatableComponent("tent.build.deny.space"), true);
+                    context.getPlayer().displayClientMessage(Component.translatable("tent.build.deny.space"), true);
                 }
             }
         }
@@ -228,7 +233,7 @@ public class TentItem extends Item {
                 cancelTent(stack, level, pos);
                 // send message
                 if (entity instanceof Player) {
-                    ((Player) entity).displayClientMessage(new TranslatableComponent("tent.build.deny.space"), true);
+                    ((Player) entity).displayClientMessage(Component.translatable("tent.build.deny.space"), true);
                 }
             }
         }

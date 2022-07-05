@@ -2,6 +2,7 @@ package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
@@ -26,11 +27,11 @@ public class TepeeStructureProcessor extends StructureProcessor {
         // process blank tepee wall
         BlockPos p = blockInfo.pos;
         if (blockInfo.state.getBlock() == NTRegistry.BLANK_TEPEE_WALL.get()) {
-            Random rand = placementSettings.getRandom(null);
+            RandomSource rand = placementSettings.getRandom(null);
             // random pattern using block position as seed
             if (p.getY() % 2 == 0) {
                 int randSeed = p.getY() + rand.hashCode();
-                return new StructureTemplate.StructureBlockInfo(p, TepeeBlock.getRandomPattern(new Random(randSeed)), null);
+                return new StructureTemplate.StructureBlockInfo(p, TepeeBlock.getRandomPattern(RandomSource.create(randSeed)), null);
             }
             // random design using existing seeded random
             if (rand.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {

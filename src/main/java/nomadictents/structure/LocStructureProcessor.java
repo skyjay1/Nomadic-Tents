@@ -2,6 +2,7 @@ package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +36,7 @@ public class LocStructureProcessor extends StructureProcessor {
     @Nullable
     @Override
     public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos rawPos, BlockPos pos, StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
-        Random random = placementSettings.getRandom(blockInfo.pos);
+        RandomSource random = placementSettings.getRandom(blockInfo.pos);
         BlockState blockState = level.getBlockState(blockInfo.pos);
         // only process the block if the existing block at this location passes the rule test
         if (locPredicate.test(blockState, random)) {

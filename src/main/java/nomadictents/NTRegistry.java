@@ -104,15 +104,11 @@ public final class NTRegistry {
     }
 
     private static void registerItems() {
-        // create tent item properties
-        final Item.Properties props = new Item.Properties().tab(TAB).stacksTo(1);
-        if (NomadicTents.CONFIG.TENT_FIREPROOF.get()) {
-            props.fireResistant();
-        }
         // register tents for each type and size
         for (TentType type : TentType.values()) {
             for (TentSize width : TentSize.values()) {
-                ITEMS.register(width.getSerializedName() + "_" + type.getSerializedName(), () -> new TentItem(type, width, props));
+                ITEMS.register(width.getSerializedName() + "_" + type.getSerializedName(), () ->
+                        new TentItem(type, width, new Item.Properties().tab(TAB).stacksTo(1)));
             }
         }
         // register crafting items
@@ -235,7 +231,7 @@ public final class NTRegistry {
         return BLOCKS.register(name, () ->
                 new FrameBlock(BlockBehaviour.Properties.of(Material.BARRIER, MaterialColor.WOOD)
                         .strength(-1.0F, 3600000.8F)
-                        .noCollission().noDrops().sound(SoundType.WOOD)));
+                        .noCollission().noLootTable().sound(SoundType.WOOD)));
     }
 
     private static RegistryObject<BlockItem> registerItemBlock(final String name, final Supplier<? extends Block> blockSupplier) {

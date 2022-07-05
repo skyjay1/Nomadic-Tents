@@ -20,6 +20,7 @@ public final class NTConfig {
 
     // Dimension behavior configs
     public final ForgeConfigSpec.ConfigValue<String> RESPAWN_DIMENSION;
+    public final ForgeConfigSpec.IntValue PORTAL_COOLDOWN;
     public final ForgeConfigSpec.BooleanValue RESTRICT_TELEPORT_IN_TENT;
     public final ForgeConfigSpec.BooleanValue SLEEPING_STRICT;
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_BLACKLIST;
@@ -46,6 +47,9 @@ public final class NTConfig {
         RESPAWN_DIMENSION = builder
                 .comment("The dimension in which players will respawn from the tent dimension as needed")
                 .define("overworld", Level.OVERWORLD.location().toString());
+        PORTAL_COOLDOWN = builder
+                .comment("The number of ticks before an entity can use a tent door again")
+                .defineInRange("portal_cooldown", 60, 1, 300);
         RESTRICT_TELEPORT_IN_TENT = builder
                 .comment("When true, players can not teleport inside a tent")
                 .define("restrict_teleport", true);
@@ -88,7 +92,7 @@ public final class NTConfig {
                 .defineInRange("tepee_design_chance", 35, 0, 100);
         FLOOR_BLOCK = builder
                 .comment("Block used for harvestable layer of all tent floors")
-                .define("tent_floor", Blocks.DIRT.getRegistryName().toString());
+                .define("tent_floor", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT).toString());
         USE_ACTUAL_SIZE = builder.comment("When true, tents will be the same size on the outside and inside")
                 .define("use_actual_size", false);
         MALLET_EFFECTIVENESS = builder

@@ -3,6 +3,7 @@ package nomadictents.block;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -40,12 +41,12 @@ public class TepeeBlock extends TentBlock {
     public BlockState getDoorAwareState(final Level level, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {
         if (this.type == Type.BLANK) {
             // locate nearby door
-            Random rand = level.getRandom();
+            RandomSource rand = level.getRandom();
             if (doorPos != null) {
                 // replace block with psuedo-random pattern
                 int dy = pos.getY() - doorPos.getY();
                 if (dy % 2 == 0) {
-                    rand = new Random(doorPos.above(dy).hashCode());
+                    rand = RandomSource.create(doorPos.above(dy).hashCode());
                     return getRandomPattern(rand);
                 }
             }
@@ -64,12 +65,12 @@ public class TepeeBlock extends TentBlock {
         return blockState;
     }
 
-    public static BlockState getRandomPattern(final Random rand) {
+    public static BlockState getRandomPattern(final RandomSource rand) {
         int index = rand.nextInt(TepeeBlock.Type.PATTERNS.size());
         return TepeeBlock.Type.PATTERNS.get(index).getBlockState();
     }
 
-    public static BlockState getRandomSymbol(final Random rand) {
+    public static BlockState getRandomSymbol(final RandomSource rand) {
         int index = rand.nextInt(TepeeBlock.Type.SYMBOLS.size());
         return TepeeBlock.Type.SYMBOLS.get(index).getBlockState();
     }
