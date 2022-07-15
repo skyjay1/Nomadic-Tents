@@ -1,5 +1,6 @@
 {
   "parent": "block/cube_all",
+  "render_type": "minecraft:cutout",
   "textures": {
     "uncolored": "nomadictents:block/indlu_wall_frame",
     "colored_top": "nomadictents:block/indlu_wall_top",

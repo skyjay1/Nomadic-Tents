@@ -23,7 +23,7 @@ import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
@@ -222,7 +222,7 @@ public class DynamicDimensionHelper {
         server.markWorldsDirty();
 
         // fire world load event
-        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(newWorld)); // event isn't cancellable
+        MinecraftForge.EVENT_BUS.post(new LevelEvent.Load(newWorld)); // event isn't cancellable
 
         return newWorld;
     }

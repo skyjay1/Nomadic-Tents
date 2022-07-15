@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -21,25 +21,9 @@ import nomadictents.util.Tent;
 public final class NTClientEvents {
 
     public static final class ModHandler {
-        @SubscribeEvent
-        public static void onRenderTypeSetup(FMLClientSetupEvent event) {
-            event.enqueueWork(() -> {
-                // register frame blocks as cutout render type
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.DOOR_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.TEPEE_WALL_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.YURT_WALL_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.YURT_ROOF_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BEDOUIN_WALL_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.BEDOUIN_ROOF_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.INDLU_WALL_FRAME.get(), RenderType.cutout());
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.SHAMIYANA_WALL_FRAME.get(), RenderType.cutout());
-                // register other block render types
-                ItemBlockRenderTypes.setRenderLayer(NTRegistry.INDLU_WALL.get(), RenderType.cutout());
-            });
-        }
 
         @SubscribeEvent
-        public static void onRegisterBlockColors(ColorHandlerEvent.Block event) {
+        public static void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
             NomadicTents.LOGGER.debug("RegisterBlockColorHandler");
             BlockColors blockColors = event.getBlockColors();
             if (blockColors != null) {
@@ -54,7 +38,7 @@ public final class NTClientEvents {
         }
 
         @SubscribeEvent
-        public static void onRegisterItemColors(ColorHandlerEvent.Item event) {
+        public static void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
             NomadicTents.LOGGER.debug("RegisterItemColorHandler");
             ItemColors itemColors = event.getItemColors();
             if (itemColors != null) {

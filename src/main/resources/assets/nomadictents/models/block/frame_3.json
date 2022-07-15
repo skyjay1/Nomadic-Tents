@@ -1,5 +1,6 @@
 {
     "parent": "block/crop",
+    "render_type": "minecraft:cutout",
     "textures": {
         "crop": "nomadictents:block/frame_3"
     }

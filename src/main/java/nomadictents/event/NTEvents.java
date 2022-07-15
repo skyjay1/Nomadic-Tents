@@ -25,24 +25,24 @@ public final class NTEvents {
 
         @SubscribeEvent
         public static void onPlayerWake(final PlayerWakeUpEvent event) {
-            if (event.getPlayer().level.isClientSide()) {
+            if (event.getEntity().level.isClientSide()) {
                 return;
             }
             // locate overworld
             ResourceKey<Level> overworldKey = NomadicTents.CONFIG.getRespawnDimension();
-            ServerLevel overworld = event.getPlayer().getServer().getLevel(overworldKey);
+            ServerLevel overworld = event.getEntity().getServer().getLevel(overworldKey);
             if (null == overworld) {
                 NomadicTents.LOGGER.warn("Failed to load respawn dimension '" + overworldKey.location() + "'");
                 return;
             }
             // locate tents
-            List<ResourceKey<Level>> tents = DynamicDimensionHelper.getTents(event.getPlayer().getServer());
+            List<ResourceKey<Level>> tents = DynamicDimensionHelper.getTents(event.getEntity().getServer());
             // attempt to change daytime when sleeping inside a tent
-            if (event.getPlayer().isSleepingLongEnough()
-                    && DynamicDimensionHelper.isInsideTent(event.getPlayer().level)
+            if (event.getEntity().isSleepingLongEnough()
+                    && DynamicDimensionHelper.isInsideTent(event.getEntity().level)
                     && overworld.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
                 // locate server worlds
-                ServerLevel tent = (ServerLevel) event.getPlayer().level;
+                ServerLevel tent = (ServerLevel) event.getEntity().level;
                 boolean success = arePlayersSleeping(tent);
                 // check if all other players are sleeping
                 if (NomadicTents.CONFIG.SLEEPING_STRICT.get()) {
@@ -53,7 +53,7 @@ public final class NTEvents {
                         if (!success) {
                             break;
                         }
-                        ServerLevel t = event.getPlayer().getServer().getLevel(tentKey);
+                        ServerLevel t = event.getEntity().getServer().getLevel(tentKey);
                         if (t != null) {
                             success &= arePlayersSleeping(t);
                         }
@@ -70,7 +70,7 @@ public final class NTEvents {
 
             // sleeping anywhere should always sync tents to overworld
             for (ResourceKey<Level> tentKey : tents) {
-                ServerLevel tent = event.getPlayer().getServer().getLevel(tentKey);
+                ServerLevel tent = event.getEntity().getServer().getLevel(tentKey);
                 if (null == tent) {
                     NomadicTents.LOGGER.warn("Failed to load tent dimension '" + tentKey.location() + "'");
                     continue;
@@ -96,15 +96,15 @@ public final class NTEvents {
 
         @SubscribeEvent
         public static void onPlayerChangeDimension(final PlayerEvent.PlayerChangedDimensionEvent event) {
-            if (!event.getPlayer().level.isClientSide() && DynamicDimensionHelper.isInsideTent(event.getTo().location())) {
+            if (!event.getEntity().level.isClientSide() && DynamicDimensionHelper.isInsideTent(event.getTo().location())) {
                 // locate tent dimension
-                ServerLevel tent = event.getPlayer().getServer().getLevel(event.getTo());
+                ServerLevel tent = event.getEntity().getServer().getLevel(event.getTo());
                 if (null == tent) {
                     return;
                 }
                 // locate overworld
                 ResourceKey<Level> overworldKey = NomadicTents.CONFIG.getRespawnDimension();
-                ServerLevel overworld = event.getPlayer().getServer().getLevel(overworldKey);
+                ServerLevel overworld = event.getEntity().getServer().getLevel(overworldKey);
                 if (null == overworld) {
                     return;
                 }
