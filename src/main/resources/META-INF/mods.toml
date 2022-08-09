@@ -5,13 +5,13 @@ issueTrackerURL="https://github.com/skyjay1/Nomadic-Tents/issues"
 
 [[mods]]
     modId="nomadictents"
-    version="19.1.0"
+    version="19.1.1"
     displayName="Nomadic Tents"
     description='''Adds portable houses to Minecraft!'''
     [[dependencies.nomadictents]]
         modId="forge"
         mandatory=true
-        versionRange="[42,)"
+        versionRange="[42.0.9,)"
         ordering="NONE"
         side="BOTH"
     [[dependencies.nomadictents]]

@@ -87,7 +87,7 @@ public final class NTEvents {
                 return true;
             }
             for (Player player : level.players()) {
-                if (!player.isSpectator() && !player.isSleepingLongEnough()) {
+                if (!player.isSpectator() && player.isAlive() && !player.isSleeping()) {
                     return false;
                 }
             }
