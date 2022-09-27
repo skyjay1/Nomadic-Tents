@@ -36,9 +36,7 @@ public class JEIColorRecipe extends CraftingCategoryExtension<TentColorRecipe> {
         inputs.forEach(list -> list.forEach(COLOR_TO_WHITE));
         ItemStack resultItem = recipe.getResultItem();
 
-        int width = getWidth();
-        int height = getHeight();
-        craftingGridHelper.setOutputs(builder, VanillaTypes.ITEM_STACK, List.of(resultItem));
-        craftingGridHelper.setInputs(builder, VanillaTypes.ITEM_STACK, inputs, width, height);
+        craftingGridHelper.createAndSetInputs(builder, VanillaTypes.ITEM_STACK, inputs, getWidth(), getHeight());
+        craftingGridHelper.createAndSetOutputs(builder, VanillaTypes.ITEM_STACK, List.of(resultItem));
     }
 }
