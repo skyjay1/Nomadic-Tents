@@ -1,5 +1,7 @@
 {
-	"variants": {
-		"": { "model": "nomadictents:block/magic_tepee_wall"}
-	}
+  "variants": {
+    "": {
+      "model": "nomadictents:block/magic_tepee_wall"
+    }
+  }
 }

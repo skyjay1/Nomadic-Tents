@@ -2,7 +2,7 @@ package nomadictents.tileentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -25,12 +25,12 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import nomadictents.NTRegistry;
+import nomadictents.NTConfig;
 import nomadictents.NTSavedData;
-import nomadictents.NomadicTents;
 import nomadictents.dimension.DimensionFactory;
 import nomadictents.dimension.DynamicDimensionHelper;
 import nomadictents.item.MalletItem;
+import nomadictents.registries.NTBlockEntityRegistry;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 import nomadictents.util.TentSize;
@@ -61,7 +61,7 @@ public class TentDoorBlockEntity extends BlockEntity {
     private UUID owner;
 
     public TentDoorBlockEntity(BlockPos pos, BlockState blockState) {
-        super(NTRegistry.TENT_BLOCK_ENTITY.get(), pos, blockState);
+        super(NTBlockEntityRegistry.TENT_BLOCK_ENTITY.get(), pos, blockState);
     }
 
     /**
@@ -78,7 +78,7 @@ public class TentDoorBlockEntity extends BlockEntity {
         ItemStack heldItem = player.getItemInHand(hand);
         // copy tent when player is holding tent copy tool
         if (heldItem.hasTag() && heldItem.getTag().contains(TENT_COPY_TOOL)
-                && (!NomadicTents.CONFIG.COPY_CREATIVE_ONLY.get() || player.isCreative())) {
+                && (!NTConfig.CONFIG.COPY_CREATIVE_ONLY.get() || player.isCreative())) {
             // create tent itemstack at player location
             ItemEntity item = player.spawnAtLocation(this.getTent().asItem());
             if (item != null) {
@@ -124,9 +124,9 @@ public class TentDoorBlockEntity extends BlockEntity {
      * @param entity the entity that is colliding with the door block
      */
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (entity instanceof Player && !NomadicTents.CONFIG.PLAYERS_ENTER_ON_COLLIDE.get()) {
+        if (entity instanceof Player && !NTConfig.CONFIG.PLAYERS_ENTER_ON_COLLIDE.get()) {
             return;
-        } else if (!NomadicTents.CONFIG.NONPLAYERS_ENTER_ON_COLLIDE.get()) {
+        } else if (!NTConfig.CONFIG.NONPLAYERS_ENTER_ON_COLLIDE.get()) {
             return;
         }
         // attempt to enter tent
@@ -221,11 +221,11 @@ public class TentDoorBlockEntity extends BlockEntity {
      */
     public TentDoorResult canEnter(final Entity entity) {
         // prevent null or client-side logic
-        if (null == entity || entity.level.isClientSide()) {
+        if (null == entity || entity.level().isClientSide()) {
             return TentDoorResult.DENY_OTHER;
         }
         // always allow use when inside a tent
-        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level());
         if (insideTent) {
             return TentDoorResult.ALLOW;
         }
@@ -233,11 +233,11 @@ public class TentDoorBlockEntity extends BlockEntity {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             // prevent non-owners if enabled
-            if (NomadicTents.CONFIG.OWNER_ONLY_ENTER.get() && !player.isCreative() && !isOwner(player)) {
+            if (NTConfig.CONFIG.OWNER_ONLY_ENTER.get() && !player.isCreative() && !isOwner(player)) {
                 return TentDoorResult.DENY_NOT_OWNER;
             }
             // prevent when near monsters if enabled
-            if (NomadicTents.CONFIG.ENTER_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
+            if (NTConfig.CONFIG.ENTER_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
                     && monstersNearby((Player) entity)) {
                 return TentDoorResult.DENY_MONSTERS;
             }
@@ -252,7 +252,7 @@ public class TentDoorBlockEntity extends BlockEntity {
         }
         // prevent when tent is incomplete (skip this check when inside tent)
         TentPlacer tentPlacer = TentPlacer.getInstance();
-        if (!tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), TentPlacer.getOverworldSize(this.tent.getSize()), this.direction)) {
+        if (!tentPlacer.isTent(entity.level(), this.worldPosition, this.tent.getType(), TentPlacer.getOverworldSize(this.tent.getSize()), this.direction)) {
             return TentDoorResult.DENY_INCOMPLETE;
         }
         return TentDoorResult.ALLOW;
@@ -264,11 +264,11 @@ public class TentDoorBlockEntity extends BlockEntity {
      */
     public TentDoorResult canRemove(final LivingEntity entity) {
         // prevent null or client-side logic
-        if (null == entity || entity.level.isClientSide()) {
+        if (null == entity || entity.level().isClientSide()) {
             return TentDoorResult.DENY_OTHER;
         }
         // prevent remove in tent dimension
-        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level());
         if (insideTent) {
             return TentDoorResult.DENY_OTHER;
         }
@@ -276,18 +276,18 @@ public class TentDoorBlockEntity extends BlockEntity {
         if (entity instanceof Player) {
             Player player = (Player) entity;
             // prevent non-owners if enabled
-            if (NomadicTents.CONFIG.OWNER_ONLY_PICKUP.get() && !player.isCreative() && !isOwner(player)) {
+            if (NTConfig.CONFIG.OWNER_ONLY_PICKUP.get() && !player.isCreative() && !isOwner(player)) {
                 return TentDoorResult.DENY_NOT_OWNER;
             }
             // prevent when near monsters if enabled
-            if (NomadicTents.CONFIG.PICKUP_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
+            if (NTConfig.CONFIG.PICKUP_WHEN_SAFE.get() && !entity.isSpectator() && !player.isCreative()
                     && monstersNearby((Player) entity)) {
                 return TentDoorResult.DENY_MONSTERS;
             }
         }
         // prevent when tent is incomplete
         TentPlacer tentPlacer = TentPlacer.getInstance();
-        if (!tentPlacer.isTent(entity.level, this.worldPosition, this.tent.getType(), TentPlacer.getOverworldSize(this.tent.getSize()), this.direction)) {
+        if (!tentPlacer.isTent(entity.level(), this.worldPosition, this.tent.getType(), TentPlacer.getOverworldSize(this.tent.getSize()), this.direction)) {
             return TentDoorResult.DENY_INCOMPLETE;
         }
         return TentDoorResult.ALLOW;
@@ -295,15 +295,15 @@ public class TentDoorBlockEntity extends BlockEntity {
 
     public void onEnter(final Entity entity) {
         // ensure server side
-        if (entity.level.isClientSide || null == entity.getServer()) {
+        if (entity.level().isClientSide || null == entity.getServer()) {
             return;
         }
         // ensure no cooldown
-        if(entity.isOnPortalCooldown()) {
+        if (entity.isOnPortalCooldown()) {
             return;
         }
         MinecraftServer server = entity.getServer();
-        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level);
+        boolean insideTent = DynamicDimensionHelper.isInsideTent(entity.level());
 
         if (insideTent) {
             // teleport to spawn dimension and position
@@ -330,7 +330,7 @@ public class TentDoorBlockEntity extends BlockEntity {
      */
     private boolean monstersNearby(Player player) {
         final AABB box = new AABB(this.worldPosition).inflate(8.0D, 5.0D, 8.0D);
-        List<Monster> list = player.level.getEntitiesOfClass(Monster.class, box, e -> e.isPreventingPlayerRest(player));
+        List<Monster> list = player.level().getEntitiesOfClass(Monster.class, box, e -> e.isPreventingPlayerRest(player));
         return !list.isEmpty();
     }
 
@@ -363,7 +363,7 @@ public class TentDoorBlockEntity extends BlockEntity {
     @Nullable
     public ServerLevel getSpawnDimension() {
         if (this.level != null && !this.level.isClientSide) {
-            return this.level.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, this.spawnDimension));
+            return this.level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, this.spawnDimension));
         }
         return null;
     }

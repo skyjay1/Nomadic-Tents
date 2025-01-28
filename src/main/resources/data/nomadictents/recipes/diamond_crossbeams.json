@@ -1,19 +1,20 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-   "SIS",
-   "SBS",
-   "SIS"],
+    "SIS",
+    "SBS",
+    "SIS"
+  ],
   "key": {
-   "I": {
-        "item": "minecraft:diamond"
-      },
-   "B": {
-        "item": "minecraft:diamond_block"
-      },
-	"S": {
-        "tag": "forge:rods/wooden"
-	  }
+    "I": {
+      "item": "minecraft:diamond"
+    },
+    "B": {
+      "item": "minecraft:diamond_block"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
   },
   "result": {
     "item": "nomadictents:diamond_crossbeams",

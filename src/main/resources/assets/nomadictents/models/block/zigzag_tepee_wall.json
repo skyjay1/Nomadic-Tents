@@ -1,7 +1,7 @@
 {
-    "parent": "minecraft:block/cube_column",
-    "textures": {
-        "end": "nomadictents:block/blank_tepee_wall",
-        "side": "nomadictents:block/zigzag_tepee_wall"
-    }
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "nomadictents:block/blank_tepee_wall",
+    "side": "nomadictents:block/zigzag_tepee_wall"
+  }
 }

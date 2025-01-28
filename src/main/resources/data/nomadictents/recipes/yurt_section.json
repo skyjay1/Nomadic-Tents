@@ -1,15 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-   "FSF",
-   "FSF"],
+    "FSF",
+    "FSF"
+  ],
   "key": {
     "F": {
-        "item": "nomadictents:tent_canvas"
-      },
-	"S": {
-		"tag": "forge:rods/wooden"
-	  }
+      "item": "nomadictents:tent_canvas"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
   },
   "result": {
     "item": "nomadictents:yurt_section",

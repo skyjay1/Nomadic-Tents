@@ -3,10 +3,15 @@
   "pattern": [
     "DDD",
     "DTD",
-    "DDD"],
+    "DDD"
+  ],
   "key": {
-    "D": { "tag": "forge:dyes/black" },
-    "T": { "tag": "nomadictents:shamiyana" }
+    "D": {
+      "tag": "forge:dyes/black"
+    },
+    "T": {
+      "tag": "nomadictents:shamiyana"
+    }
   },
   "result": {
     "item": "nomadictents:tiny_shamiyana",

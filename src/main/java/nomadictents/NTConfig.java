@@ -1,7 +1,7 @@
 package nomadictents;
 
 import com.google.common.collect.Lists;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -15,6 +15,9 @@ import nomadictents.tileentity.TentDoorBlockEntity;
 import java.util.List;
 
 public final class NTConfig {
+
+    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    public static final NTConfig CONFIG = new NTConfig(BUILDER);
 
     private static final String WILDCARD = "*";
 
@@ -41,6 +44,8 @@ public final class NTConfig {
     public final ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
     public final ForgeConfigSpec.BooleanValue USE_ACTUAL_SIZE;
     public final ForgeConfigSpec.IntValue MALLET_EFFECTIVENESS;
+
+    public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public NTConfig(final ForgeConfigSpec.Builder builder) {
         builder.push("dimension");
@@ -118,7 +123,7 @@ public final class NTConfig {
         if (null == respawn) {
             return Level.OVERWORLD;
         }
-        return ResourceKey.create(Registry.DIMENSION_REGISTRY, respawn);
+        return ResourceKey.create(Registries.DIMENSION, respawn);
     }
 
     /**

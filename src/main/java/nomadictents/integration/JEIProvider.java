@@ -11,7 +11,7 @@ import nomadictents.recipe.TentLayerRecipe;
 @JeiPlugin
 public class JEIProvider implements IModPlugin {
 
-    private static final ResourceLocation UID = new ResourceLocation(NomadicTents.MODID, "jei_provider");
+    private static final ResourceLocation UID = new ResourceLocation(NomadicTents.MOD_ID, "jei_provider");
 
     @Override
     public ResourceLocation getPluginUid() {

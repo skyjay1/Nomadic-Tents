@@ -22,21 +22,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
-import nomadictents.NTRegistry;
+import nomadictents.NTConfig;
 import nomadictents.NTSavedData;
-import nomadictents.NomadicTents;
 import nomadictents.block.FrameBlock;
 import nomadictents.dimension.DynamicDimensionHelper;
+import nomadictents.registries.NTBlockRegistry;
 import nomadictents.structure.TentPlacer;
 import nomadictents.util.Tent;
 import nomadictents.util.TentLayers;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -77,11 +77,11 @@ public class TentItem extends Item {
 
     @Override
     public boolean isFireResistant() {
-        return super.isFireResistant() || NomadicTents.CONFIG.TENT_FIREPROOF.get();
+        return super.isFireResistant() || NTConfig.CONFIG.TENT_FIREPROOF.get();
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> list, @NotNull TooltipFlag flag) {
         list.add(Component.translatable("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
         if (this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
             DyeColor color = DyeColor.byName(stack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE);
@@ -100,10 +100,11 @@ public class TentItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(@NotNull ItemStack stack) {
         return 7200;
     }
 
+    @NotNull
     @Override
     public InteractionResult useOn(UseOnContext context) {
         // determine block and item
@@ -126,7 +127,7 @@ public class TentItem extends Item {
             return InteractionResult.PASS;
         }
         // cannot place tent inside blacklisted dimension
-        if (NomadicTents.CONFIG.isDimensionBlacklist(context.getLevel())) {
+        if (NTConfig.CONFIG.isDimensionBlacklist(context.getLevel())) {
             // send message
             if (context.getPlayer() != null) {
                 context.getPlayer().displayClientMessage(Component.translatable("tent.build.deny.dimension"), true);
@@ -134,7 +135,7 @@ public class TentItem extends Item {
             return InteractionResult.PASS;
         }
         // add door frame
-        if (NTRegistry.DOOR_FRAME.get() != state.getBlock()) {
+        if (NTBlockRegistry.DOOR_FRAME.get() != state.getBlock()) {
             // determine placement position
             BlockPos placePos = context.getClickedPos();
             if (!context.getLevel().getBlockState(placePos).canBeReplaced(new BlockPlaceContext(context))) {
@@ -142,12 +143,12 @@ public class TentItem extends Item {
             }
             // determine if placement position is valid
             BlockState replace = context.getLevel().getBlockState(placePos);
-            if (replace.getMaterial() != Material.AIR && !replace.getMaterial().isLiquid()) {
+            if (!replace.canBeReplaced()) {
                 return InteractionResult.FAIL;
             }
             if (canPlaceTent(context.getLevel(), placePos, context.getHorizontalDirection())) {
                 // place door frame
-                context.getLevel().setBlock(placePos, NTRegistry.DOOR_FRAME.get().defaultBlockState(), Block.UPDATE_ALL);
+                context.getLevel().setBlock(placePos, NTBlockRegistry.DOOR_FRAME.get().defaultBlockState(), Block.UPDATE_ALL);
                 // remember the door position and player direction
                 itemStack.getOrCreateTag().put(DOOR, NbtUtils.writeBlockPos(placePos));
                 itemStack.getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
@@ -170,7 +171,7 @@ public class TentItem extends Item {
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int duration) {
+    public void releaseUsing(@NotNull ItemStack stack, Level level, @NotNull LivingEntity entity, int duration) {
         if (level.isClientSide) {
             return;
         }
@@ -181,7 +182,7 @@ public class TentItem extends Item {
             if (level.isLoaded(pos)) {
                 // detect door frame
                 BlockState state = level.getBlockState(pos);
-                if (NTRegistry.DOOR_FRAME.get() == state.getBlock()) {
+                if (NTBlockRegistry.DOOR_FRAME.get() == state.getBlock()) {
                     int progress = state.getValue(FrameBlock.PROGRESS);
                     if (entity instanceof Player && progress == FrameBlock.MAX_PROGRESS) {
                         // place tent
@@ -196,13 +197,13 @@ public class TentItem extends Item {
     }
 
     @Override
-    public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int duration) {
+    public void onUseTick(Level level, @NotNull LivingEntity entity, @NotNull ItemStack stack, int duration) {
         // delay between updates
         if (level.isClientSide || duration % 5 != 1) {
             return;
         }
         // locate selected block
-        BlockHitResult result = clipFrom(entity, entity.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue());
+        BlockHitResult result = clipFrom(entity, entity.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue());
         if (result.getType() != HitResult.Type.BLOCK) {
             entity.releaseUsingItem();
             return;
@@ -210,7 +211,7 @@ public class TentItem extends Item {
         // locate door frame
         BlockPos pos = result.getBlockPos();
         BlockState state = level.getBlockState(pos);
-        if (NTRegistry.DOOR_FRAME.get() != state.getBlock()) {
+        if (NTBlockRegistry.DOOR_FRAME.get() != state.getBlock()) {
             entity.releaseUsingItem();
             return;
         }
@@ -242,13 +243,15 @@ public class TentItem extends Item {
         level.setBlock(pos, state.setValue(FrameBlock.PROGRESS, Math.min(next, FrameBlock.MAX_PROGRESS)), Block.UPDATE_ALL);
     }
 
+    @NotNull
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
+    public UseAnim getUseAnimation(@NotNull ItemStack stack) {
         return UseAnim.BOW;
     }
 
+    @NotNull
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+    public ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, @NotNull LivingEntity entity) {
         this.releaseUsing(stack, level, entity, 0);
         return stack;
     }
@@ -304,7 +307,7 @@ public class TentItem extends Item {
     private void cancelTent(ItemStack stack, Level level, BlockPos clickedPos) {
         // remove door frame
         BlockState state = level.getBlockState(clickedPos);
-        if (state.is(NTRegistry.DOOR_FRAME.get())) {
+        if (state.is(NTBlockRegistry.DOOR_FRAME.get())) {
             level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
         }
         // remove NBT data
@@ -322,6 +325,6 @@ public class TentItem extends Item {
         float cosPitch = -Mth.cos(pitch);
         float sinPitch = Mth.sin(pitch);
         final Vec3 endVec = startVec.add(sinYaw * cosPitch * range, sinPitch * range, cosYaw * cosPitch * range);
-        return player.level.clip(new ClipContext(startVec, endVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+        return player.level().clip(new ClipContext(startVec, endVec, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 }

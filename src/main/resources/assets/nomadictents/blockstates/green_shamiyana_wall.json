@@ -1,9 +1,17 @@
 {
-    "variants": {
-        "pattern=false": { "model": "nomadictents:block/green_shamiyana_wall"},
-        "pattern=true": [
-          { "model": "nomadictents:block/green_shamiyana_pattern", "weight": 3 },
-          { "model": "nomadictents:block/green_shamiyana_pattern2", "weight": 1 }
-        ]
-    }
+  "variants": {
+    "pattern=false": {
+      "model": "nomadictents:block/green_shamiyana_wall"
+    },
+    "pattern=true": [
+      {
+        "model": "nomadictents:block/green_shamiyana_pattern",
+        "weight": 3
+      },
+      {
+        "model": "nomadictents:block/green_shamiyana_pattern2",
+        "weight": 1
+      }
+    ]
+  }
 }

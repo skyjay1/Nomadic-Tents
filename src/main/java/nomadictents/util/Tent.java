@@ -100,7 +100,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
      */
     public ItemStack asItem() {
         String itemName = this.size.getSerializedName() + "_" + this.type.getSerializedName();
-        ResourceLocation itemId = new ResourceLocation(NomadicTents.MODID, itemName);
+        ResourceLocation itemId = new ResourceLocation(NomadicTents.MOD_ID, itemName);
         Item tentItem = ForgeRegistries.ITEMS.getValue(itemId);
         if (tentItem != null) {
             ItemStack tentStack = new ItemStack(tentItem);
