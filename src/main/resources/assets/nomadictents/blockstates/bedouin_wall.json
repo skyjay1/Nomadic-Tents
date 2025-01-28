@@ -1,8 +1,16 @@
 {
-	"variants": {
-		"half=top,side=left": { "model": "nomadictents:block/bedouin_wall_left_top"},
-		"half=bottom,side=left": { "model": "nomadictents:block/bedouin_wall_left_bottom"},
-		"half=top,side=right": { "model": "nomadictents:block/bedouin_wall_right_top"},
-		"half=bottom,side=right": { "model": "nomadictents:block/bedouin_wall_right_bottom"}
-	}
+  "variants": {
+    "half=top,side=left": {
+      "model": "nomadictents:block/bedouin_wall_left_top"
+    },
+    "half=bottom,side=left": {
+      "model": "nomadictents:block/bedouin_wall_left_bottom"
+    },
+    "half=top,side=right": {
+      "model": "nomadictents:block/bedouin_wall_right_top"
+    },
+    "half=bottom,side=right": {
+      "model": "nomadictents:block/bedouin_wall_right_bottom"
+    }
+  }
 }

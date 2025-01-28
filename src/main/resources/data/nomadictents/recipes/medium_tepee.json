@@ -3,10 +3,15 @@
   "pattern": [
     " W ",
     "WWW",
-    "WTW"],
+    "WTW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:tepee_section" },
-    "T": { "item": "nomadictents:small_tepee" }
+    "W": {
+      "item": "nomadictents:tepee_section"
+    },
+    "T": {
+      "item": "nomadictents:small_tepee"
+    }
   },
   "result": {
     "item": "nomadictents:medium_tepee",

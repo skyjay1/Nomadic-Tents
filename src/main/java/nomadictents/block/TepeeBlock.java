@@ -11,12 +11,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import nomadictents.NTConfig;
 import nomadictents.NomadicTents;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 
 public class TepeeBlock extends TentBlock {
@@ -51,7 +52,7 @@ public class TepeeBlock extends TentBlock {
                 }
             }
             // replace block with random symbol
-            if (rand.nextInt(100) < NomadicTents.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
+            if (rand.nextInt(100) < NTConfig.CONFIG.TEPEE_DECORATED_CHANCE.get()) {
                 return getRandomSymbol(rand);
             }
         }
@@ -60,9 +61,8 @@ public class TepeeBlock extends TentBlock {
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        BlockState blockState = super.getStateForPlacement(context);
-        return blockState;
+    public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
+        return super.getStateForPlacement(context);
     }
 
     public static BlockState getRandomPattern(final RandomSource rand) {
@@ -76,21 +76,21 @@ public class TepeeBlock extends TentBlock {
     }
 
     public enum Type implements StringRepresentable {
-        BLANK("blank", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "blank_tepee_wall"), ForgeRegistries.BLOCKS)),
-        CHANNEL("channel", true, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "channel_tepee_wall"), ForgeRegistries.BLOCKS)),
-        CREEPER("creeper", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "creeper_tepee_wall"), ForgeRegistries.BLOCKS)),
-        DREAMCATCHER("dreamcatcher", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "dreamcatcher_tepee_wall"), ForgeRegistries.BLOCKS)),
-        EAGLE("eagle", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "eagle_tepee_wall"), ForgeRegistries.BLOCKS)),
-        GOLEM("golem", true, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "golem_tepee_wall"), ForgeRegistries.BLOCKS)),
-        HOPE("hope", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "hope_tepee_wall"), ForgeRegistries.BLOCKS)),
-        MAGIC("magic", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "magic_tepee_wall"), ForgeRegistries.BLOCKS)),
-        RADIAL("radial", true, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "radial_tepee_wall"), ForgeRegistries.BLOCKS)),
-        RAIN("rain", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "rain_tepee_wall"), ForgeRegistries.BLOCKS)),
-        SPACE("space", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "space_tepee_wall"), ForgeRegistries.BLOCKS)),
-        SUN("sun", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "sun_tepee_wall"), ForgeRegistries.BLOCKS)),
-        TRIFORCE("triforce", false, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "triforce_tepee_wall"), ForgeRegistries.BLOCKS)),
-        WEDGE("wedge", true, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "wedge_tepee_wall"), ForgeRegistries.BLOCKS)),
-        ZIGZAG("zigzag", true, RegistryObject.create(new ResourceLocation(NomadicTents.MODID, "zigzag_tepee_wall"), ForgeRegistries.BLOCKS));
+        BLANK("blank", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "blank_tepee_wall"), ForgeRegistries.BLOCKS)),
+        CHANNEL("channel", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "channel_tepee_wall"), ForgeRegistries.BLOCKS)),
+        CREEPER("creeper", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "creeper_tepee_wall"), ForgeRegistries.BLOCKS)),
+        DREAMCATCHER("dreamcatcher", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "dreamcatcher_tepee_wall"), ForgeRegistries.BLOCKS)),
+        EAGLE("eagle", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "eagle_tepee_wall"), ForgeRegistries.BLOCKS)),
+        GOLEM("golem", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "golem_tepee_wall"), ForgeRegistries.BLOCKS)),
+        HOPE("hope", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "hope_tepee_wall"), ForgeRegistries.BLOCKS)),
+        MAGIC("magic", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "magic_tepee_wall"), ForgeRegistries.BLOCKS)),
+        RADIAL("radial", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "radial_tepee_wall"), ForgeRegistries.BLOCKS)),
+        RAIN("rain", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "rain_tepee_wall"), ForgeRegistries.BLOCKS)),
+        SPACE("space", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "space_tepee_wall"), ForgeRegistries.BLOCKS)),
+        SUN("sun", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "sun_tepee_wall"), ForgeRegistries.BLOCKS)),
+        TRIFORCE("triforce", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "triforce_tepee_wall"), ForgeRegistries.BLOCKS)),
+        WEDGE("wedge", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "wedge_tepee_wall"), ForgeRegistries.BLOCKS)),
+        ZIGZAG("zigzag", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "zigzag_tepee_wall"), ForgeRegistries.BLOCKS));
 
         private final String name;
         private final boolean isPattern;
@@ -118,6 +118,7 @@ public class TepeeBlock extends TentBlock {
             return block.get().defaultBlockState();
         }
 
+        @NotNull
         @Override
         public String getSerializedName() {
             return this.name;

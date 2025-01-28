@@ -3,11 +3,18 @@
   "pattern": [
     "CWC",
     "WTW",
-    "WWW"],
+    "WWW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:indlu_section" },
-    "C": { "item": "nomadictents:golden_crossbeams" },
-    "T": { "item": "nomadictents:medium_indlu" }
+    "W": {
+      "item": "nomadictents:indlu_section"
+    },
+    "C": {
+      "item": "nomadictents:golden_crossbeams"
+    },
+    "T": {
+      "item": "nomadictents:medium_indlu"
+    }
   },
   "result": {
     "item": "nomadictents:large_indlu",

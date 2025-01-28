@@ -1,22 +1,23 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-   " CS",
-   " KC",
-   "E  "],
+    " CS",
+    " KC",
+    "E  "
+  ],
   "key": {
     "S": {
-        "item": "minecraft:iron_ingot"
-      },
-	"E": {
-        "item": "minecraft:emerald"
+      "item": "minecraft:iron_ingot"
     },
-	"K": {
-		"item": "minecraft:stick"
-	  },
-	"C": {
-		"item": "nomadictents:tent_canvas"
-	  }
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "K": {
+      "item": "minecraft:stick"
+    },
+    "C": {
+      "item": "nomadictents:tent_canvas"
+    }
   },
   "result": {
     "item": "nomadictents:iron_tent_shovel",

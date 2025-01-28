@@ -3,12 +3,21 @@
   "pattern": [
     "DBD",
     "DTD",
-    "DSD"],
+    "DSD"
+  ],
   "key": {
-    "D": { "tag": "minecraft:dirt" },
-    "B": { "tag": "minecraft:stone_crafting_materials" },
-    "S": { "item": "nomadictents:stone_tent_shovel" },
-    "T": { "item": "nomadictents:mega_indlu" }
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "B": {
+      "tag": "minecraft:stone_crafting_materials"
+    },
+    "S": {
+      "item": "nomadictents:stone_tent_shovel"
+    },
+    "T": {
+      "item": "nomadictents:mega_indlu"
+    }
   },
   "result": {
     "item": "nomadictents:mega_indlu",

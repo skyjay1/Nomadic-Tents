@@ -9,8 +9,10 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import nomadictents.NTRegistry;
+import nomadictents.NTStructureProcessorsRegistry;
 import nomadictents.block.ShamiyanaWallBlock;
+import nomadictents.registries.NTBlockRegistry;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -34,19 +36,20 @@ public class ShamiyanaStructureProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos rawPos, BlockPos pos, StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
+    public StructureTemplate.StructureBlockInfo process(@NotNull LevelReader level, @NotNull BlockPos rawPos, @NotNull BlockPos pos, @NotNull StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, @NotNull StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
         // process blank tepee wall
-        BlockPos p = blockInfo.pos;
-        if (blockInfo.state.getBlock() == NTRegistry.WHITE_SHAMIYANA_WALL.get()) {
-            boolean pattern = /*p.getY() % 3 == 1 || */blockInfo.state.getValue(ShamiyanaWallBlock.PATTERN);
+        BlockPos p = blockInfo.pos();
+        if (blockInfo.state().getBlock() == NTBlockRegistry.WHITE_SHAMIYANA_WALL.get()) {
+            boolean pattern = /*p.getY() % 3 == 1 || */ blockInfo.state().getValue(ShamiyanaWallBlock.PATTERN);
             BlockState state = TentPlacer.SHAMIYANA_WALLS.get(this.color).get().defaultBlockState().setValue(ShamiyanaWallBlock.PATTERN, pattern);
             return new StructureTemplate.StructureBlockInfo(p, state, null);
         }
         return blockInfo;
     }
 
+    @NotNull
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTRegistry.TEPEE_PROCESSOR;
+        return NTStructureProcessorsRegistry.TEPEE_PROCESSOR;
     }
 }

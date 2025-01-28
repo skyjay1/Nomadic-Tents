@@ -3,11 +3,18 @@
   "pattern": [
     "C C",
     "WWW",
-    "WTW"],
+    "WTW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:shamiyana_section" },
-    "C": { "item": "nomadictents:golden_crossbeams" },
-    "T": { "item": "nomadictents:medium_shamiyana" }
+    "W": {
+      "item": "nomadictents:shamiyana_section"
+    },
+    "C": {
+      "item": "nomadictents:golden_crossbeams"
+    },
+    "T": {
+      "item": "nomadictents:medium_shamiyana"
+    }
   },
   "result": {
     "item": "nomadictents:large_shamiyana",

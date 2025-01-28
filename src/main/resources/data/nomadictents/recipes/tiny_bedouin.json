@@ -3,9 +3,12 @@
   "pattern": [
     " W ",
     "W W",
-    "WWW"],
+    "WWW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:bedouin_section" }
+    "W": {
+      "item": "nomadictents:bedouin_section"
+    }
   },
   "result": {
     "item": "nomadictents:tiny_bedouin",

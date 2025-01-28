@@ -1,5 +1,7 @@
 {
-	"variants": {
-		"": { "model": "nomadictents:block/bedouin_roof"}
-	}
+  "variants": {
+    "": {
+      "model": "nomadictents:block/bedouin_roof"
+    }
+  }
 }

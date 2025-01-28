@@ -3,11 +3,18 @@
   "pattern": [
     "CWC",
     "WWW",
-    "WTW"],
+    "WTW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:tepee_section" },
-    "C": { "item": "nomadictents:diamond_crossbeams" },
-    "T": { "item": "nomadictents:giant_tepee" }
+    "W": {
+      "item": "nomadictents:tepee_section"
+    },
+    "C": {
+      "item": "nomadictents:diamond_crossbeams"
+    },
+    "T": {
+      "item": "nomadictents:giant_tepee"
+    }
   },
   "result": {
     "item": "nomadictents:mega_tepee",

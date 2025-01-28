@@ -1,5 +1,7 @@
 {
-	"variants": {
-		"": { "model": "nomadictents:block/triforce_tepee_wall"}
-	}
+  "variants": {
+    "": {
+      "model": "nomadictents:block/triforce_tepee_wall"
+    }
+  }
 }

@@ -1,6 +1,10 @@
 {
-    "variants": {
-        "pattern=false": { "model": "nomadictents:block/black_shamiyana_wall"},
-		"pattern=true": { "model": "nomadictents:block/black_shamiyana_pattern"}
+  "variants": {
+    "pattern=false": {
+      "model": "nomadictents:block/black_shamiyana_wall"
+    },
+    "pattern=true": {
+      "model": "nomadictents:block/black_shamiyana_pattern"
     }
+  }
 }

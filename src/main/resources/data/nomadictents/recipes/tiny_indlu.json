@@ -3,9 +3,12 @@
   "pattern": [
     " W ",
     "W W",
-    "WWW"],
+    "WWW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:indlu_section" }
+    "W": {
+      "item": "nomadictents:indlu_section"
+    }
   },
   "result": {
     "item": "nomadictents:tiny_indlu",
