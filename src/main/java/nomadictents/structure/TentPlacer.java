@@ -30,17 +30,18 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import nomadictents.NTRegistry;
+import nomadictents.NTConfig;
 import nomadictents.NomadicTents;
 import nomadictents.block.IndluWallBlock;
 import nomadictents.block.TentDoorBlock;
 import nomadictents.block.YurtRoofBlock;
 import nomadictents.block.YurtWallBlock;
 import nomadictents.dimension.DynamicDimensionHelper;
+import nomadictents.registries.NTBlockRegistry;
 import nomadictents.tileentity.TentDoorBlockEntity;
 import nomadictents.util.Tent;
 import nomadictents.util.TentSize;
@@ -67,7 +68,7 @@ public final class TentPlacer {
      * The Y-position of tents inside a tent dimension
      **/
     public static final int TENT_Y = 64;
-    private static final String MODID = NomadicTents.MODID;
+    private static final String MODID = NomadicTents.MOD_ID;
 
     private static TentPlacer instance;
 
@@ -123,13 +124,13 @@ public final class TentPlacer {
      * Map where keys = {Frame Block ID} and value = {Function with boolean "outside" that returns Tent Block}
      */
     public static final Map<ResourceLocation, Function<Boolean, BlockState>> FRAME_TO_BLOCK = new ImmutableMap.Builder<ResourceLocation, Function<Boolean, BlockState>>()
-            .put(new ResourceLocation(MODID, "yurt_wall_frame"), outside -> NTRegistry.YURT_WALL.get().defaultBlockState().setValue(YurtWallBlock.OUTSIDE, outside))
-            .put(new ResourceLocation(MODID, "yurt_roof_frame"), outside -> NTRegistry.YURT_ROOF.get().defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, outside))
-            .put(new ResourceLocation(MODID, "tepee_wall_frame"), outside -> NTRegistry.BLANK_TEPEE_WALL.get().defaultBlockState())
-            .put(new ResourceLocation(MODID, "bedouin_wall_frame"), outside -> NTRegistry.BEDOUIN_WALL.get().defaultBlockState())
-            .put(new ResourceLocation(MODID, "bedouin_roof_frame"), outside -> NTRegistry.BEDOUIN_ROOF.get().defaultBlockState())
-            .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTRegistry.INDLU_WALL.get().defaultBlockState().setValue(IndluWallBlock.OUTSIDE, outside))
-            .put(new ResourceLocation(MODID, "shamiyana_wall_frame"), outside -> NTRegistry.WHITE_SHAMIYANA_WALL.get().defaultBlockState())
+            .put(new ResourceLocation(MODID, "yurt_wall_frame"), outside -> NTBlockRegistry.YURT_WALL.get().defaultBlockState().setValue(YurtWallBlock.OUTSIDE, outside))
+            .put(new ResourceLocation(MODID, "yurt_roof_frame"), outside -> NTBlockRegistry.YURT_ROOF.get().defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, outside))
+            .put(new ResourceLocation(MODID, "tepee_wall_frame"), outside -> NTBlockRegistry.BLANK_TEPEE_WALL.get().defaultBlockState())
+            .put(new ResourceLocation(MODID, "bedouin_wall_frame"), outside -> NTBlockRegistry.BEDOUIN_WALL.get().defaultBlockState())
+            .put(new ResourceLocation(MODID, "bedouin_roof_frame"), outside -> NTBlockRegistry.BEDOUIN_ROOF.get().defaultBlockState())
+            .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTBlockRegistry.INDLU_WALL.get().defaultBlockState().setValue(IndluWallBlock.OUTSIDE, outside))
+            .put(new ResourceLocation(MODID, "shamiyana_wall_frame"), outside -> NTBlockRegistry.WHITE_SHAMIYANA_WALL.get().defaultBlockState())
             .build();
 
     /**
@@ -232,12 +233,12 @@ public final class TentPlacer {
         // create processor to set "inside" properties for tent blocks
         insideTentProcessor = new RuleProcessor(
                 new ImmutableList.Builder<ProcessorRule>()
-                        .add(new ProcessorRule(new BlockMatchTest(NTRegistry.YURT_WALL.get()), AlwaysTrueTest.INSTANCE,
-                                NTRegistry.YURT_WALL.get().defaultBlockState().setValue(YurtWallBlock.OUTSIDE, false)))
-                        .add(new ProcessorRule(new BlockMatchTest(NTRegistry.YURT_ROOF.get()), AlwaysTrueTest.INSTANCE,
-                                NTRegistry.YURT_ROOF.get().defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, false)))
-                        .add(new ProcessorRule(new BlockMatchTest(NTRegistry.INDLU_WALL.get()), AlwaysTrueTest.INSTANCE,
-                                NTRegistry.INDLU_WALL.get().defaultBlockState().setValue(IndluWallBlock.OUTSIDE, false)))
+                        .add(new ProcessorRule(new BlockMatchTest(NTBlockRegistry.YURT_WALL.get()), AlwaysTrueTest.INSTANCE,
+                                NTBlockRegistry.YURT_WALL.get().defaultBlockState().setValue(YurtWallBlock.OUTSIDE, false)))
+                        .add(new ProcessorRule(new BlockMatchTest(NTBlockRegistry.YURT_ROOF.get()), AlwaysTrueTest.INSTANCE,
+                                NTBlockRegistry.YURT_ROOF.get().defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, false)))
+                        .add(new ProcessorRule(new BlockMatchTest(NTBlockRegistry.INDLU_WALL.get()), AlwaysTrueTest.INSTANCE,
+                                NTBlockRegistry.INDLU_WALL.get().defaultBlockState().setValue(IndluWallBlock.OUTSIDE, false)))
                         .build());
     }
 
@@ -256,7 +257,7 @@ public final class TentPlacer {
      * @return the tent size when built in the overworld
      */
     public static TentSize getOverworldSize(final TentSize original) {
-        if (NomadicTents.CONFIG.USE_ACTUAL_SIZE.get()) {
+        if (NTConfig.CONFIG.USE_ACTUAL_SIZE.get()) {
             return original;
         }
         // determine the size of tent to place frames
@@ -293,7 +294,7 @@ public final class TentPlacer {
         for (BlockPos pos : tentBlocks) {
             checkPos = origin.offset(pos.rotate(rotation));
             checkState = level.getBlockState(checkPos);
-            if (!checkState.getMaterial().isReplaceable() && !checkState.is(NTRegistry.DOOR_FRAME.get())) {
+            if (!checkState.canBeReplaced() && !checkState.is(NTBlockRegistry.DOOR_FRAME.get())) {
                 return false;
             }
         }
@@ -346,8 +347,8 @@ public final class TentPlacer {
             upgradePlatform(level, door, tent.getType(), prevTent.getSize(), tent.getSize(), prevTent.getLayers(), tent.getLayers());
         }
         // place decorations
-        if ((!tentExists && NomadicTents.CONFIG.TENT_DECOR_BUILD.get())
-                || (rebuildTent && NomadicTents.CONFIG.TENT_DECOR_UPGRADE.get())) {
+        if ((!tentExists && NTConfig.CONFIG.TENT_DECOR_BUILD.get())
+                || (rebuildTent && NTConfig.CONFIG.TENT_DECOR_UPGRADE.get())) {
             placeTentDecor(level, door, tent.getType(), tent.getSize(), TENT_DIRECTION);
         }
         // update door
@@ -626,8 +627,8 @@ public final class TentPlacer {
 
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, -1, -template.getSize().getZ() / 2));
         int width = template.getSize().getX();
-        BlockState rigidDirt = NTRegistry.RIGID_DIRT.get().defaultBlockState();
-        BlockState dirt = NomadicTents.CONFIG.getFloorBlock().defaultBlockState();
+        BlockState rigidDirt = NTBlockRegistry.RIGID_DIRT.get().defaultBlockState();
+        BlockState dirt = NTConfig.CONFIG.getFloorBlock().defaultBlockState();
 
         // place dirt in a square at this location
         BlockPos p;
@@ -638,7 +639,7 @@ public final class TentPlacer {
                 // determine block location
                 p = origin.offset(x, 0, z);
                 // determine which block state to place
-                rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
+                rigid = level.getBlockState(p.above()).getPistonPushReaction() == PushReaction.BLOCK;
                 state = rigid ? rigidDirt : dirt;
                 // place in a column at this location
                 if (rigid || fill) {
@@ -687,8 +688,8 @@ public final class TentPlacer {
         boolean upgradeSize = sizeOld != sizeNew;
         boolean upgradeLayers = layersOld != layersNew;
 
-        BlockState rigidDirt = NTRegistry.RIGID_DIRT.get().defaultBlockState();
-        BlockState dirt = NomadicTents.CONFIG.getFloorBlock().defaultBlockState();
+        BlockState rigidDirt = NTBlockRegistry.RIGID_DIRT.get().defaultBlockState();
+        BlockState dirt = NTConfig.CONFIG.getFloorBlock().defaultBlockState();
 
         // place new
         if (upgradeSize) {
@@ -708,7 +709,7 @@ public final class TentPlacer {
                         continue;
                     }
                     // determine which block state to place
-                    rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
+                    rigid = level.getBlockState(p.above()).getPistonPushReaction() == PushReaction.BLOCK;
                     state = rigid ? rigidDirt : dirt;
                     // place in a column at this location
                     for (int y = 0, l = layersOld + 1; y < l; y++) {
@@ -732,7 +733,7 @@ public final class TentPlacer {
                     // determine block location
                     p = origin.offset(x, 0, z);
                     // determine which block state to place
-                    rigid = level.getBlockState(p.above()).getMaterial() == Material.BARRIER;
+                    rigid = level.getBlockState(p.above()).getPistonPushReaction() == PushReaction.BLOCK;
                     if (rigid) {
                         state = rigidDirt;
                     } else {
@@ -760,7 +761,7 @@ public final class TentPlacer {
     public static StructureTemplate getTemplate(final Level level, final TentType type, final TentSize size) {
         // determine structure to use
         String templateName = "tent/" + size.getSerializedName() + "_" + type.getSerializedName();
-        ResourceLocation templateId = new ResourceLocation(NomadicTents.MODID, templateName);
+        ResourceLocation templateId = new ResourceLocation(NomadicTents.MOD_ID, templateName);
         return getTemplate(level, templateId);
     }
 
@@ -774,7 +775,7 @@ public final class TentPlacer {
     public static StructureTemplate getDecorTemplate(final Level level, final TentType type, final TentSize size) {
         // determine structure to use
         String templateName = "tent/decor/" + size.getSerializedName() + "_" + type.getSerializedName();
-        ResourceLocation templateId = new ResourceLocation(NomadicTents.MODID, templateName);
+        ResourceLocation templateId = new ResourceLocation(NomadicTents.MOD_ID, templateName);
         return getTemplate(level, templateId);
     }
 
@@ -824,7 +825,7 @@ public final class TentPlacer {
         for (Block b : ForgeRegistries.BLOCKS.tags().getTag(tentWallTag)) {
             List<StructureTemplate.StructureBlockInfo> filtered = template.filterBlocks(origin, placement, b, false);
             for (StructureTemplate.StructureBlockInfo blockInfo : filtered) {
-                tentBlocks.add(blockInfo.pos);
+                tentBlocks.add(blockInfo.pos());
             }
         }
         // add positions to the map

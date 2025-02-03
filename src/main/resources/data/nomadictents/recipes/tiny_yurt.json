@@ -2,9 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     " W ",
-    "W W"],
+    "W W"
+  ],
   "key": {
-    "W": { "item": "nomadictents:yurt_section" }
+    "W": {
+      "item": "nomadictents:yurt_section"
+    }
   },
   "result": {
     "item": "nomadictents:tiny_yurt",

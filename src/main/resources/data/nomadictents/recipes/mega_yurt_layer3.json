@@ -3,12 +3,21 @@
   "pattern": [
     "DBD",
     "DTD",
-    "DSD"],
+    "DSD"
+  ],
   "key": {
-    "D": { "tag": "minecraft:dirt" },
-    "B": { "tag": "forge:storage_blocks/gold" },
-    "S": { "item": "nomadictents:golden_tent_shovel" },
-    "T": { "item": "nomadictents:mega_yurt" }
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "B": {
+      "tag": "forge:storage_blocks/gold"
+    },
+    "S": {
+      "item": "nomadictents:golden_tent_shovel"
+    },
+    "T": {
+      "item": "nomadictents:mega_yurt"
+    }
   },
   "result": {
     "item": "nomadictents:mega_yurt",

@@ -3,11 +3,18 @@
   "pattern": [
     "C C",
     " W ",
-    "WTW"],
+    "WTW"
+  ],
   "key": {
-    "W": { "item": "nomadictents:yurt_section" },
-    "C": { "item": "nomadictents:obsidian_crossbeams" },
-    "T": { "item": "nomadictents:large_yurt" }
+    "W": {
+      "item": "nomadictents:yurt_section"
+    },
+    "C": {
+      "item": "nomadictents:obsidian_crossbeams"
+    },
+    "T": {
+      "item": "nomadictents:large_yurt"
+    }
   },
   "result": {
     "item": "nomadictents:giant_yurt",

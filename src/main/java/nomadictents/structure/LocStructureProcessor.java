@@ -12,10 +12,10 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import nomadictents.NTRegistry;
+import nomadictents.NTStructureProcessorsRegistry;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class LocStructureProcessor extends StructureProcessor {
 
@@ -35,9 +35,9 @@ public class LocStructureProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos rawPos, BlockPos pos, StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
-        RandomSource random = placementSettings.getRandom(blockInfo.pos);
-        BlockState blockState = level.getBlockState(blockInfo.pos);
+    public StructureTemplate.StructureBlockInfo process(LevelReader level, @NotNull BlockPos rawPos, @NotNull BlockPos pos, StructureTemplate.@NotNull StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
+        RandomSource random = placementSettings.getRandom(blockInfo.pos());
+        BlockState blockState = level.getBlockState(blockInfo.pos());
         // only process the block if the existing block at this location passes the rule test
         if (locPredicate.test(blockState, random)) {
             return blockInfo;
@@ -45,8 +45,9 @@ public class LocStructureProcessor extends StructureProcessor {
         return null;
     }
 
+    @NotNull
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTRegistry.LOC_PROCESSOR;
+        return NTStructureProcessorsRegistry.LOC_PROCESSOR;
     }
 }

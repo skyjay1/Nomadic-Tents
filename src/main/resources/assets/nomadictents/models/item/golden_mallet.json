@@ -1,6 +1,6 @@
 {
-    "parent": "item/handheld",
-    "textures": {
-        "layer0": "nomadictents:item/golden_mallet"
-    }
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "nomadictents:item/golden_mallet"
+  }
 }

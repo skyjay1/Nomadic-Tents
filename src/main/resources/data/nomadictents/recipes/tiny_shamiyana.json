@@ -2,9 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "WWW",
-    "W W"],
+    "W W"
+  ],
   "key": {
-    "W": { "item": "nomadictents:shamiyana_section" }
+    "W": {
+      "item": "nomadictents:shamiyana_section"
+    }
   },
   "result": {
     "item": "nomadictents:tiny_shamiyana",

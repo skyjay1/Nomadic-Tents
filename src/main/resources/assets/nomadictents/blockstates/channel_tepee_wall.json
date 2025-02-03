@@ -1,5 +1,7 @@
 {
-	"variants": {
-		"": { "model": "nomadictents:block/channel_tepee_wall"}
-	}
+  "variants": {
+    "": {
+      "model": "nomadictents:block/channel_tepee_wall"
+    }
+  }
 }

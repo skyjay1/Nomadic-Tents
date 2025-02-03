@@ -2,16 +2,19 @@ package nomadictents.recipe;
 
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import nomadictents.NTRegistry;
 import nomadictents.item.TentItem;
+import nomadictents.registries.NTRecipeRegistry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
@@ -19,12 +22,13 @@ public class TentSizeRecipe extends ShapedRecipe {
 
     public TentSizeRecipe(ResourceLocation recipeId, final ItemStack outputItem,
                           final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
-        super(recipeId, Serializer.CATEGORY, width, height, recipeItemsIn, outputItem);
+        super(recipeId, Serializer.CATEGORY, CraftingBookCategory.BUILDING, width, height, recipeItemsIn, outputItem);
     }
 
+    @NotNull
     @Override
-    public ItemStack assemble(CraftingContainer craftingInventory) {
-        ItemStack result = super.assemble(craftingInventory);
+    public ItemStack assemble(@NotNull CraftingContainer craftingInventory, @NotNull RegistryAccess access) {
+        ItemStack result = super.assemble(craftingInventory, access);
 
         // locate input tent
         ItemStack tent = getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
@@ -37,9 +41,10 @@ public class TentSizeRecipe extends ShapedRecipe {
         return result;
     }
 
+    @NotNull
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return NTRegistry.TENT_SIZE_RECIPE_SERIALIZER.get();
+        return NTRecipeRegistry.TENT_SIZE_RECIPE_SERIALIZER.get();
     }
 
     /**
@@ -63,21 +68,23 @@ public class TentSizeRecipe extends ShapedRecipe {
 
         public static final String CATEGORY = "tent_size";
 
+        @NotNull
         @Override
-        public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+        public ShapedRecipe fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
             // read the recipe from shapeless recipe serializer
             final ShapedRecipe recipe = super.fromJson(recipeId, json);
-            return new TentSizeRecipe(recipeId, recipe.getResultItem(),
+            return new TentSizeRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY),
                     recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
         }
 
+        @NotNull
         @Override
-        public ShapedRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+        public ShapedRecipe fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
             return super.fromNetwork(recipeId, buffer);
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buffer, ShapedRecipe recipeIn) {
+        public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull ShapedRecipe recipeIn) {
             super.toNetwork(buffer, recipeIn);
         }
     }

@@ -15,10 +15,10 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import nomadictents.NTRegistry;
-import nomadictents.NomadicTents;
+import nomadictents.NTConfig;
 import nomadictents.block.FrameBlock;
 import nomadictents.block.TentBlock;
+import nomadictents.registries.NTBlockRegistry;
 import nomadictents.structure.TentPlacer;
 
 import javax.annotation.Nullable;
@@ -45,7 +45,7 @@ public class MalletItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-        if (state.getBlock() instanceof FrameBlock && state.getBlock() != NTRegistry.DOOR_FRAME.get()) {
+        if (state.getBlock() instanceof FrameBlock && state.getBlock() != NTBlockRegistry.DOOR_FRAME.get()) {
             // swing arm
             if (context.getPlayer() != null) {
                 context.getPlayer().swing(context.getHand());
@@ -93,7 +93,7 @@ public class MalletItem extends Item {
     private int getEffectiveness(final ItemStack stack, final Level level, final BlockState state, final BlockPos pos, @Nullable Player player) {
         // In the future we may take into account the tent type and biome, or maybe not
         int efficiency = stack.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY);
-        return NomadicTents.CONFIG.MALLET_EFFECTIVENESS.get() + efficiency * 2;
+        return NTConfig.CONFIG.MALLET_EFFECTIVENESS.get() + efficiency * 2;
     }
 
     private void useInstant(UseOnContext context, final BlockState state, final BlockPos pos, @Nullable final BlockPos doorPos) {

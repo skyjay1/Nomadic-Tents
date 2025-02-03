@@ -1,6 +1,6 @@
 package nomadictents;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceKey;
@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class NTSavedData extends SavedData {
 
     public static NTSavedData get(MinecraftServer server) {
         return server.getLevel(Level.OVERWORLD).getDataStorage()
-                .computeIfAbsent(NTSavedData::read, NTSavedData::new, NomadicTents.MODID);
+                .computeIfAbsent(NTSavedData::read, NTSavedData::new, NomadicTents.MOD_ID);
     }
 
     public static NTSavedData read(CompoundTag nbt) {
@@ -50,8 +51,9 @@ public class NTSavedData extends SavedData {
         tentId = nbt.getInt(S_TENT_ID);
     }
 
+    @NotNull
     @Override
-    public CompoundTag save(CompoundTag nbt) {
+    public CompoundTag save(@NotNull CompoundTag nbt) {
         // write tent map
         final ListTag tagList = new ListTag();
         for (final Entry<Integer, UUID> entry : tentIdMap.entrySet()) {
@@ -75,8 +77,8 @@ public class NTSavedData extends SavedData {
             ResourceKey<Level> worldKey;
             do {
                 uuid = UUID.randomUUID();
-                dimension = new ResourceLocation(NomadicTents.MODID, uuid.toString());
-                worldKey = ResourceKey.create(Registry.DIMENSION_REGISTRY, dimension);
+                dimension = new ResourceLocation(NomadicTents.MOD_ID, uuid.toString());
+                worldKey = ResourceKey.create(Registries.DIMENSION, dimension);
             } while (server.levelKeys().contains(worldKey));
             // add uuid to the map
             tentIdMap.put(tentId, uuid);
@@ -88,8 +90,8 @@ public class NTSavedData extends SavedData {
 
     public ResourceKey<Level> getOrCreateKey(final MinecraftServer server, final int tentId) {
         UUID uuid = getOrCreateUuid(server, tentId);
-        ResourceLocation dimension = new ResourceLocation(NomadicTents.MODID, uuid.toString());
-        return ResourceKey.create(Registry.DIMENSION_REGISTRY, dimension);
+        ResourceLocation dimension = new ResourceLocation(NomadicTents.MOD_ID, uuid.toString());
+        return ResourceKey.create(Registries.DIMENSION, dimension);
     }
 
     public int getNextTentId() {

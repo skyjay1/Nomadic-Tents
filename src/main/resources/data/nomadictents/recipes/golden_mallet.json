@@ -1,19 +1,20 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-   " IS",
-   " CI",
-   "S  "],
+    " IS",
+    " CI",
+    "S  "
+  ],
   "key": {
     "I": {
-        "item": "minecraft:gold_block"
-      },
-	"S": {
-		"item": "minecraft:stick"
-	  },
-	"C": {
-		"item": "nomadictents:tent_canvas"
-	  }
+      "item": "minecraft:gold_block"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "C": {
+      "item": "nomadictents:tent_canvas"
+    }
   },
   "result": {
     "item": "nomadictents:golden_mallet",

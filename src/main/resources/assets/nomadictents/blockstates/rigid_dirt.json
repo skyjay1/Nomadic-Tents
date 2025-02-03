@@ -1,5 +1,7 @@
 {
-	"variants": {
-		"": { "model": "nomadictents:block/rigid_dirt"}
-	}
+  "variants": {
+    "": {
+      "model": "nomadictents:block/rigid_dirt"
+    }
+  }
 }
