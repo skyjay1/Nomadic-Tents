@@ -2,6 +2,7 @@ package nomadictents;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -23,9 +24,15 @@ public class NomadicTents {
     public static final String MOD_ID = "nomadictents";
     public static final Logger LOGGER = LogManager.getFormatterLogger(MOD_ID);
 
-    public NomadicTents(FMLJavaModLoadingContext context) {
-        IEventBus bus = context.getModEventBus();
-        context.registerConfig(ModConfig.Type.COMMON, NTConfig.SPEC);
+    public NomadicTents() {
+        ModLoadingContext modContext = ModLoadingContext.get();
+        FMLJavaModLoadingContext fmlcontext = FMLJavaModLoadingContext.get();
+        IEventBus bus = fmlcontext.getModEventBus();
+        IEventBus fmlBus = MinecraftForge.EVENT_BUS;
+
+
+
+        modContext.registerConfig(ModConfig.Type.COMMON, NTConfig.SPEC);
 
         NTItemRegistry.init(bus);
         NTBlockRegistry.init(bus);
@@ -33,7 +40,7 @@ public class NomadicTents {
         NTCreativeTabRegistry.init(bus);
         NTRecipeRegistry.init(bus);
 
-        context.getModEventBus().addListener(NTStructureProcessorRegistry::setupProcessors);
+        bus.addListener(NTStructureProcessorRegistry::setupProcessors);
 
         // event handlers
         MinecraftForge.EVENT_BUS.register(NTEvents.ForgeHandler.class);
@@ -41,10 +48,10 @@ public class NomadicTents {
         // client-side registry
         if (FMLEnvironment.dist.isClient()) {
             try {
-                context.getModEventBus().register(NTClientEvents.ModHandler.class);
-            } catch (final Exception e) {
+                bus.register(NTClientEvents.ModHandler.class);
+            } catch (final Exception exception) {
                 LOGGER.error("Caught exception while registering Client-Side event handler:");
-                LOGGER.error(e.getMessage());
+                LOGGER.error(exception.getMessage());
             }
         }
     }
