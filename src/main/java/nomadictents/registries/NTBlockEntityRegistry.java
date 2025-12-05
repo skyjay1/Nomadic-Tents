@@ -2,8 +2,7 @@ package nomadictents.registries;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
 import nomadictents.structure.TentPlacer;
 import nomadictents.tileentity.TentDoorBlockEntity;
 import nomadictents.util.TentType;
@@ -20,7 +19,7 @@ public class NTBlockEntityRegistry {
     }
 
     // Block entities
-    public static final RegistryObject<BlockEntityType<TentDoorBlockEntity>> TENT_BLOCK_ENTITY
+    public static final Supplier<BlockEntityType<TentDoorBlockEntity>> TENT_BLOCK_ENTITY
             = RegUtils.BLOCK_ENTITIES.register("tent_door", () -> {
         // create a set of blocks that can use the tile entity
         Set<Block> doorBlocks = new HashSet<>();

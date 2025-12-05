@@ -1,11 +1,11 @@
 package nomadictents;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
 import nomadictents.event.NTClientEvents;
 import nomadictents.event.NTEvents;
 import nomadictents.registries.NTBlockEntityRegistry;
@@ -23,25 +23,24 @@ public class NomadicTents {
     public static final String MOD_ID = "nomadictents";
     public static final Logger LOGGER = LogManager.getFormatterLogger(MOD_ID);
 
-    public NomadicTents(FMLJavaModLoadingContext context) {
-        IEventBus bus = context.getModEventBus();
-        context.registerConfig(ModConfig.Type.COMMON, NTConfig.SPEC);
+    public NomadicTents(IEventBus modBus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.COMMON, NTConfig.SPEC);
 
-        NTItemRegistry.init(bus);
-        NTBlockRegistry.init(bus);
-        NTBlockEntityRegistry.init(bus);
-        NTCreativeTabRegistry.init(bus);
-        NTRecipeRegistry.init(bus);
+        NTItemRegistry.init(modBus);
+        NTBlockRegistry.init(modBus);
+        NTBlockEntityRegistry.init(modBus);
+        NTCreativeTabRegistry.init(modBus);
+        NTRecipeRegistry.init(modBus);
 
-        context.getModEventBus().addListener(NTStructureProcessorRegistry::setupProcessors);
+        modBus.addListener(NTStructureProcessorRegistry::setupProcessors);
 
         // event handlers
-        MinecraftForge.EVENT_BUS.register(NTEvents.ForgeHandler.class);
+        NeoForge.EVENT_BUS.register(NTEvents.ForgeHandler.class);
 
         // client-side registry
         if (FMLEnvironment.dist.isClient()) {
             try {
-                context.getModEventBus().register(NTClientEvents.ModHandler.class);
+                modBus.register(NTClientEvents.ModHandler.class);
             } catch (final Exception e) {
                 LOGGER.error("Caught exception while registering Client-Side event handler:");
                 LOGGER.error(e.getMessage());

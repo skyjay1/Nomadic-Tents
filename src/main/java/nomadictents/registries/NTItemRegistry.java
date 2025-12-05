@@ -1,13 +1,13 @@
 package nomadictents.registries;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import nomadictents.NomadicTents;
 import nomadictents.block.TepeeBlock;
 import nomadictents.item.MalletItem;
@@ -73,7 +73,7 @@ public class NTItemRegistry {
         RegUtils.ITEMS.register(bus);
     }
 
-    public static final RegistryObject<Item> TINY_YURT = RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "tiny_yurt"), ForgeRegistries.ITEMS);
-    public static final RegistryObject<Item> MALLET = RegUtils.ITEMS.register("mallet", () -> new MalletItem(Tiers.IRON, false, new Item.Properties()));
-    public static final RegistryObject<Item> GOLDEN_MALLET = RegUtils.ITEMS.register("golden_mallet", () -> new MalletItem(Tiers.DIAMOND, true, new Item.Properties()));
+    public static final RegistryObject<Item> TINY_YURT = DeferredHolder.create(new ResourceLocation(NomadicTents.MOD_ID, "tiny_yurt"), BuiltInRegistries.ITEM);
+    public static final Supplier<Item> MALLET = RegUtils.ITEMS.register("mallet", () -> new MalletItem(Tiers.IRON, false, new Item.Properties()));
+    public static final Supplier<Item> GOLDEN_MALLET = RegUtils.ITEMS.register("golden_mallet", () -> new MalletItem(Tiers.DIAMOND, true, new Item.Properties()));
 }

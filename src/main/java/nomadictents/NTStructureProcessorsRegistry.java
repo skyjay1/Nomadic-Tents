@@ -4,7 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import nomadictents.dimension.EmptyChunkGenerator;
 import nomadictents.structure.LocStructureProcessor;
 import nomadictents.structure.ShamiyanaStructureProcessor;
@@ -19,7 +19,7 @@ public final class NTStructureProcessorsRegistry {
 
     public static void setupStructureProcessors(FMLCommonSetupEvent event) {
         // register tepee processor
-        TEPEE_PROCESSOR = StructureProcessorType.register(NomadicTents.MOD_ID + ":tepee_processor", TepeeStructureProcessor.CODEC);
+        TEPEE_PROCESSOR = StructureProcessorType.register(NomadicTents.MOD_ID + ":tepee_processor", TepeeStructureProcessor.MAP_CODEC);
         // register shamiyana processor
         SHAMIYANA_PROCESSOR = StructureProcessorType.register(NomadicTents.MOD_ID + ":shamiyana_processor", ShamiyanaStructureProcessor.CODEC);
         // register loc processor

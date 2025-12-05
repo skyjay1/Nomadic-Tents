@@ -8,8 +8,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import nomadictents.dimension.DynamicDimensionHelper;
 
 import java.util.Random;
@@ -29,7 +27,6 @@ public class IndluWallBlock extends TentBlock {
         builder.add(OUTSIDE);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void animateTick(BlockState blockState, Level level, BlockPos blockPos, Random rand) {
         if (level.isRainingAt(blockPos.above()) || (DynamicDimensionHelper.isInsideTent(level) && level.isRaining())) {
             if (rand.nextInt(15) == 1) {

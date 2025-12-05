@@ -1,8 +1,8 @@
 ![banner](https://raw.githubusercontent.com/skyjay1/img/master/nomadictents/banner1.png)
 
 [![](https://img.shields.io/badge/Discord-skyjay_mods-brightgreen.svg?style=flat&logo=discord)](https://discord.tophatcat.dev)
-[![](https://img.shields.io/curseforge/dt/238794?style=flat&label=CurseForge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/nomadic-tents)
-[![](https://img.shields.io/curseforge/game-versions/238794?style=flat&label=CurseForge&logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/nomadic-tents)
+[![](http://cf.way2muchnoise.eu/full_238794_Downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/nomadic-tents)
+[![](http://cf.way2muchnoise.eu/versions/For%20Minecraft_238794_all.svg)](https://www.curseforge.com/minecraft/mc-mods/nomadic-tents/files)
 [![](https://img.shields.io/github/last-commit/skyjay1/Nomadic-Tents.svg?style=flat&logo=github)](https://github.com/skyjay1/Nomadic-Tents)
 
 # Nomadic Tents

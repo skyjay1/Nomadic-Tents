@@ -7,8 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import nomadictents.block.FrameBlock;
 import nomadictents.tileentity.TentDoorBlockEntity;
 
@@ -16,38 +15,38 @@ import java.util.List;
 
 public final class NTConfig {
 
-    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     public static final NTConfig CONFIG = new NTConfig(BUILDER);
 
     private static final String WILDCARD = "*";
 
     // Dimension behavior configs
-    public final ForgeConfigSpec.ConfigValue<String> RESPAWN_DIMENSION;
-    public final ForgeConfigSpec.IntValue PORTAL_COOLDOWN;
-    public final ForgeConfigSpec.BooleanValue RESTRICT_TELEPORT_IN_TENT;
-    public final ForgeConfigSpec.BooleanValue SLEEPING_STRICT;
-    public final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_BLACKLIST;
+    public final ModConfigSpec.ConfigValue<String> RESPAWN_DIMENSION;
+    public final ModConfigSpec.IntValue PORTAL_COOLDOWN;
+    public final ModConfigSpec.BooleanValue RESTRICT_TELEPORT_IN_TENT;
+    public final ModConfigSpec.BooleanValue SLEEPING_STRICT;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> DIMENSION_BLACKLIST;
     // Player permissions
-    public final ForgeConfigSpec.BooleanValue OWNER_ONLY_ENTER;
-    public final ForgeConfigSpec.BooleanValue OWNER_ONLY_PICKUP;
-    public final ForgeConfigSpec.BooleanValue PLAYERS_ENTER_ON_COLLIDE;
-    public final ForgeConfigSpec.BooleanValue NONPLAYERS_ENTER_ON_COLLIDE;
-    public final ForgeConfigSpec.BooleanValue COPY_CREATIVE_ONLY;
-    public final ForgeConfigSpec.BooleanValue ENTER_WHEN_SAFE;
-    public final ForgeConfigSpec.BooleanValue PICKUP_WHEN_SAFE;
+    public final ModConfigSpec.BooleanValue OWNER_ONLY_ENTER;
+    public final ModConfigSpec.BooleanValue OWNER_ONLY_PICKUP;
+    public final ModConfigSpec.BooleanValue PLAYERS_ENTER_ON_COLLIDE;
+    public final ModConfigSpec.BooleanValue NONPLAYERS_ENTER_ON_COLLIDE;
+    public final ModConfigSpec.BooleanValue COPY_CREATIVE_ONLY;
+    public final ModConfigSpec.BooleanValue ENTER_WHEN_SAFE;
+    public final ModConfigSpec.BooleanValue PICKUP_WHEN_SAFE;
 
     // other
-    public final ForgeConfigSpec.BooleanValue TENT_DECOR_BUILD;
-    public final ForgeConfigSpec.BooleanValue TENT_DECOR_UPGRADE;
-    public final ForgeConfigSpec.BooleanValue TENT_FIREPROOF;
-    public final ForgeConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
-    public final ForgeConfigSpec.ConfigValue<String> FLOOR_BLOCK;
-    public final ForgeConfigSpec.BooleanValue USE_ACTUAL_SIZE;
-    public final ForgeConfigSpec.IntValue MALLET_EFFECTIVENESS;
+    public final ModConfigSpec.BooleanValue TENT_DECOR_BUILD;
+    public final ModConfigSpec.BooleanValue TENT_DECOR_UPGRADE;
+    public final ModConfigSpec.BooleanValue TENT_FIREPROOF;
+    public final ModConfigSpec.IntValue TEPEE_DECORATED_CHANCE;
+    public final ModConfigSpec.ConfigValue<String> FLOOR_BLOCK;
+    public final ModConfigSpec.BooleanValue USE_ACTUAL_SIZE;
+    public final ModConfigSpec.IntValue MALLET_EFFECTIVENESS;
 
-    public static final ForgeConfigSpec SPEC = BUILDER.build();
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
-    public NTConfig(final ForgeConfigSpec.Builder builder) {
+    public NTConfig(final ModConfigSpec.Builder builder) {
         builder.push("dimension");
         RESPAWN_DIMENSION = builder
                 .comment("The dimension in which players will respawn from the tent dimension as needed")
@@ -97,7 +96,7 @@ public final class NTConfig {
                 .defineInRange("tepee_design_chance", 35, 0, 100);
         FLOOR_BLOCK = builder
                 .comment("Block used for harvestable layer of all tent floors")
-                .define("tent_floor", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT).toString());
+                .define("tent_floor", Registries.BLOCK.getKey(Blocks.DIRT).toString());
         USE_ACTUAL_SIZE = builder.comment("When true, tents will be the same size on the outside and inside")
                 .define("use_actual_size", false);
         MALLET_EFFECTIVENESS = builder
@@ -110,7 +109,7 @@ public final class NTConfig {
      * @return the Block to use in a tent platform (floor)
      **/
     public Block getFloorBlock() {
-        Block floor = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(FLOOR_BLOCK.get()));
+        Block floor = Registries.BLOCK.getValue(ResourceLocation.tryParse(FLOOR_BLOCK.get()));
         // if floor block is not found, default to dirt
         if (floor == null) {
             floor = Blocks.DIRT;

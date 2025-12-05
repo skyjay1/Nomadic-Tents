@@ -1,13 +1,14 @@
 package nomadictents.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
 
@@ -75,7 +76,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
      * @return a corresponding instance of Tent
      */
     public static Tent from(ItemStack stack) {
-        String itemName = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+        String itemName = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
         int index = itemName.indexOf("_");
         if (index >= 0) {
             String typeName = itemName.substring(0, index);
@@ -101,7 +102,7 @@ public final class Tent implements INBTSerializable<CompoundTag> {
     public ItemStack asItem() {
         String itemName = this.size.getSerializedName() + "_" + this.type.getSerializedName();
         ResourceLocation itemId = new ResourceLocation(NomadicTents.MOD_ID, itemName);
-        Item tentItem = ForgeRegistries.ITEMS.getValue(itemId);
+        Item tentItem = BuiltInRegistries.ITEM.getValue(itemId);
         if (tentItem != null) {
             ItemStack tentStack = new ItemStack(tentItem);
             tentStack.getOrCreateTag().putInt(ID, this.id);

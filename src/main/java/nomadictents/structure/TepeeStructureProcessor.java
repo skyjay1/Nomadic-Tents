@@ -1,6 +1,6 @@
 package nomadictents.structure;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 
 public class TepeeStructureProcessor extends StructureProcessor {
 
-    public static final Codec<TepeeStructureProcessor> CODEC = Codec.unit(TepeeStructureProcessor::new);
+    public static final MapCodec<TepeeStructureProcessor> MAP_CODEC = MapCodec.unit(TepeeStructureProcessor::new);
     public static final TepeeStructureProcessor TEPEE_PROCESSOR = new TepeeStructureProcessor();
 
     @Nullable
