@@ -2,6 +2,8 @@ package nomadictents.tileentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -18,6 +20,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -77,7 +80,8 @@ public class TentDoorBlockEntity extends BlockEntity {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
         // copy tent when player is holding tent copy tool
-        if (heldItem.hasTag() && heldItem.getTag().contains(TENT_COPY_TOOL)
+        CustomData customData = heldItem.get(DataComponents.CUSTOM_DATA);
+        if (customData != null && customData.contains(TENT_COPY_TOOL)
                 && (!NTConfig.CONFIG.COPY_CREATIVE_ONLY.get() || player.isCreative())) {
             // create tent itemstack at player location
             ItemEntity item = player.spawnAtLocation(this.getTent().asItem());
@@ -163,10 +167,10 @@ public class TentDoorBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         // save tent
-        CompoundTag tentTag = tent.serializeNBT();
+        CompoundTag tentTag = tent.serializeNBT(registries);
         tag.put(TENT, tentTag);
         // save direction
         tag.putString(DIRECTION, direction.getSerializedName());
@@ -189,8 +193,8 @@ public class TentDoorBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         // load tent
         CompoundTag tentTag = tag.getCompound(TENT);
         this.tent = new Tent(tentTag);
@@ -243,7 +247,7 @@ public class TentDoorBlockEntity extends BlockEntity {
             }
         }
         // prevent riding/passenger or invalid entities
-        if (entity.isPassenger() || entity.isVehicle() || !entity.canChangeDimensions()) {
+        if (entity.isPassenger() || entity.isVehicle() /* || !entity.canChangeDimensions() */) {
             return TentDoorResult.DENY_OTHER;
         }
         // prevent specific entities

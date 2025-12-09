@@ -1,0 +1,27 @@
+{
+  "type": "nomadictents:tent_layer",
+  "pattern": [
+    "DBD",
+    "DTD",
+    "DSD"
+  ],
+  "key": {
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "B": {
+      "tag": "minecraft:stone_crafting_materials"
+    },
+    "S": {
+      "item": "nomadictents:stone_tent_shovel"
+    },
+    "T": {
+      "item": "nomadictents:small_tepee"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:small_tepee"
+  },
+  "layer": 1
+}

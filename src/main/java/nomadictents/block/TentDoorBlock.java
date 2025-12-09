@@ -78,7 +78,7 @@ public class TentDoorBlock extends TentBlock implements EntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState blockState, Player player) {
         if (!level.isClientSide) {
             // determine block entity position
             BlockPos doorPos = pos;
@@ -94,11 +94,11 @@ public class TentDoorBlock extends TentBlock implements EntityBlock {
             }
         }
 
-        super.playerWillDestroy(level, pos, blockState, player);
+        return super.playerWillDestroy(level, pos, blockState, player);
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult raytraceResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult raytraceResult) {
         // sided success
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
@@ -113,7 +113,7 @@ public class TentDoorBlock extends TentBlock implements EntityBlock {
         if (blockEntity instanceof TentDoorBlockEntity) {
             // delegate to block entity
             TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
-            return tentDoor.use(level.getBlockState(doorPos), level, doorPos, player, hand);
+            return tentDoor.use(level.getBlockState(doorPos), level, doorPos, player, player.getUsedItemHand());
         }
         return InteractionResult.SUCCESS;
     }

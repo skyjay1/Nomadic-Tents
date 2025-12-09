@@ -13,7 +13,10 @@ import nomadictents.tileentity.TentDoorBlockEntity;
 
 import java.util.List;
 
-public final class NTConfig {
+import net.minecraft.core.registries.BuiltInRegistries;
+
+public class NTConfig {
+
 
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     public static final NTConfig CONFIG = new NTConfig(BUILDER);
@@ -96,7 +99,7 @@ public final class NTConfig {
                 .defineInRange("tepee_design_chance", 35, 0, 100);
         FLOOR_BLOCK = builder
                 .comment("Block used for harvestable layer of all tent floors")
-                .define("tent_floor", Registries.BLOCK.getKey(Blocks.DIRT).toString());
+                .define("tent_floor", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT).toString());
         USE_ACTUAL_SIZE = builder.comment("When true, tents will be the same size on the outside and inside")
                 .define("use_actual_size", false);
         MALLET_EFFECTIVENESS = builder
@@ -109,7 +112,7 @@ public final class NTConfig {
      * @return the Block to use in a tent platform (floor)
      **/
     public Block getFloorBlock() {
-        Block floor = Registries.BLOCK.getValue(ResourceLocation.tryParse(FLOOR_BLOCK.get()));
+        Block floor = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(FLOOR_BLOCK.get()));
         // if floor block is not found, default to dirt
         if (floor == null) {
             floor = Blocks.DIRT;

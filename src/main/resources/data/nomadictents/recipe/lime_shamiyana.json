@@ -1,0 +1,21 @@
+{
+  "type": "nomadictents:tent_color",
+  "pattern": [
+    "DDD",
+    "DTD",
+    "DDD"
+  ],
+  "key": {
+    "D": {
+      "tag": "c:dyes/lime"
+    },
+    "T": {
+      "tag": "nomadictents:shamiyana"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:tiny_shamiyana"
+  },
+  "color": "lime"
+}

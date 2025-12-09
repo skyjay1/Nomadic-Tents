@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "nomadictents:white_shamiyana_wall"
+    },
+    {
+      "tag": "c:dyes/orange"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "nomadictents:orange_shamiyana_wall"
+  }
+}

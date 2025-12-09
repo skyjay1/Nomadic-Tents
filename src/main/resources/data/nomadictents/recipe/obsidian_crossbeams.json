@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SBS",
+    "SBS",
+    "SBS"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:obsidian"
+    },
+    "S": {
+      "tag": "c:wooden_rods"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:obsidian_crossbeams"
+  }
+}

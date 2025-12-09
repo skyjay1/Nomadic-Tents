@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -25,9 +26,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import nomadictents.NTConfig;
 import nomadictents.NTSavedData;
+import nomadictents.registries.NTDataComponents;
 import nomadictents.block.FrameBlock;
 import nomadictents.dimension.DynamicDimensionHelper;
 import nomadictents.registries.NTBlockRegistry;
@@ -41,6 +43,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import nomadictents.registries.NTDataComponents;
+import nomadictents.util.TentLayers;
+import net.minecraft.world.entity.LivingEntity;
+
 public class TentItem extends Item {
 
     private static final String DOOR = "door";
@@ -51,20 +57,20 @@ public class TentItem extends Item {
 
     private static final CauldronInteraction WASH_TENT = (state, level, pos, player, hand, itemStack) -> {
         // only interact when item stack has color other than white
-        if (!itemStack.hasTag() || !itemStack.getOrCreateTag().contains(Tent.COLOR)
-                || DyeColor.byName(itemStack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE) == DyeColor.WHITE) {
-            return InteractionResult.PASS;
+        if (!itemStack.has(NTDataComponents.TENT_COLOR)
+                || itemStack.get(NTDataComponents.TENT_COLOR) == DyeColor.WHITE) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (!level.isClientSide) {
             // replace item with white color information
             ItemStack replace = itemStack.copy();
-            replace.getOrCreateTag().putString(Tent.COLOR, DyeColor.WHITE.getSerializedName());
+            replace.set(NTDataComponents.TENT_COLOR, DyeColor.WHITE);
             player.setItemInHand(hand, replace);
             // reduce cauldron fill level
             LayeredCauldronBlock.lowerFillLevel(state, level, pos);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide);
     };
 
     public TentItem(TentType type, TentSize width, Properties properties) {
@@ -72,35 +78,37 @@ public class TentItem extends Item {
         this.type = type;
         this.size = width;
 
-        CauldronInteraction.WATER.put(this, WASH_TENT);
+        CauldronInteraction.WATER.map().put(this, WASH_TENT);
     }
 
+    /*
     @Override
     public boolean isFireResistant() {
         return super.isFireResistant() || NTConfig.CONFIG.TENT_FIREPROOF.get();
     }
+    */
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> list, @NotNull TooltipFlag flag) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, List<Component> list, @NotNull TooltipFlag flag) {
         list.add(Component.translatable("item.nomadictents.tent.tooltip").withStyle(this.size.getColor()));
-        if (this.type == TentType.SHAMIYANA || (stack.hasTag() && stack.getOrCreateTag().contains(Tent.COLOR))) {
-            DyeColor color = DyeColor.byName(stack.getOrCreateTag().getString(Tent.COLOR), DyeColor.WHITE);
+        if (this.type == TentType.SHAMIYANA || stack.has(NTDataComponents.TENT_COLOR.get())) {
+            DyeColor color = stack.getOrDefault(NTDataComponents.TENT_COLOR.get(), DyeColor.WHITE);
             String translationKey = "item.minecraft.firework_star." + color.getSerializedName();
             list.add(Component.translatable(translationKey));
         }
         if (flag.isAdvanced() || net.minecraft.client.gui.screens.Screen.hasShiftDown()) {
             // layer tooltip
-            byte layers = stack.getOrCreateTag().getByte(Tent.LAYERS);
+            byte layers = stack.getOrDefault(NTDataComponents.TENT_LAYERS.get(), (int) TentLayers.MIN).byteValue();
             byte maxLayers = TentLayers.getMaxLayers(this.size);
             list.add(Component.translatable("item.nomadictents.tent.tooltip.layer", layers, maxLayers).withStyle(ChatFormatting.GRAY));
             // ID tooltip
-            int id = stack.getOrCreateTag().getInt(Tent.ID);
+            int id = stack.getOrDefault(NTDataComponents.TENT_ID.get(), 0);
             list.add(Component.translatable("item.nomadictents.tent.tooltip.id", id).withStyle(ChatFormatting.GRAY));
         }
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack stack) {
+    public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
         return 7200;
     }
 
@@ -150,8 +158,8 @@ public class TentItem extends Item {
                 // place door frame
                 context.getLevel().setBlock(placePos, NTBlockRegistry.DOOR_FRAME.get().defaultBlockState(), Block.UPDATE_ALL);
                 // remember the door position and player direction
-                itemStack.getOrCreateTag().put(DOOR, NbtUtils.writeBlockPos(placePos));
-                itemStack.getTag().putString(DIRECTION, context.getHorizontalDirection().getSerializedName());
+                itemStack.set(NTDataComponents.DOOR_POS, placePos);
+                itemStack.set(NTDataComponents.DOOR_DIRECTION, context.getHorizontalDirection());
 
                 return InteractionResult.SUCCESS;
             } else {
@@ -176,9 +184,9 @@ public class TentItem extends Item {
             return;
         }
         // locate door frame
-        if (stack.hasTag() && stack.getTag().contains(DOOR) && stack.getTag().contains(DIRECTION)) {
-            BlockPos pos = NbtUtils.readBlockPos(stack.getTag().getCompound(DOOR));
-            Direction direction = Direction.byName(stack.getTag().getString(DIRECTION));
+        if (stack.has(NTDataComponents.DOOR_POS) && stack.has(NTDataComponents.DOOR_DIRECTION)) {
+            BlockPos pos = stack.get(NTDataComponents.DOOR_POS);
+            Direction direction = stack.get(NTDataComponents.DOOR_DIRECTION);
             if (level.isLoaded(pos)) {
                 // detect door frame
                 BlockState state = level.getBlockState(pos);
@@ -203,7 +211,7 @@ public class TentItem extends Item {
             return;
         }
         // locate selected block
-        BlockHitResult result = clipFrom(entity, entity.getAttribute(ForgeMod.BLOCK_REACH.get()).getValue());
+        BlockHitResult result = clipFrom(entity, entity.getAttribute(Attributes.BLOCK_INTERACTION_RANGE).getValue());
         if (result.getType() != HitResult.Type.BLOCK) {
             entity.releaseUsingItem();
             return;
@@ -217,8 +225,8 @@ public class TentItem extends Item {
         }
         // determine tent direction
         Direction direction = entity.getDirection();
-        if (stack.getOrCreateTag().contains(DIRECTION)) {
-            direction = Direction.byName(stack.getTag().getString(DIRECTION));
+        if (stack.has(NTDataComponents.DOOR_DIRECTION)) {
+            direction = stack.get(NTDataComponents.DOOR_DIRECTION);
         }
         // update door frame progress stages
         int progress = state.getValue(FrameBlock.PROGRESS);
@@ -281,10 +289,10 @@ public class TentItem extends Item {
             return;
         }
         // ensure tent ID exists
-        if (!stack.getOrCreateTag().contains(Tent.ID) || stack.getOrCreateTag().getInt(Tent.ID) == 0) {
+        if (!stack.has(NTDataComponents.TENT_ID) || stack.get(NTDataComponents.TENT_ID) == 0) {
             NTSavedData ntSavedData = NTSavedData.get(level.getServer());
             int tentId = ntSavedData.getNextTentId();
-            stack.getOrCreateTag().putInt(Tent.ID, tentId);
+            stack.set(NTDataComponents.TENT_ID, tentId);
         }
         // create tent wrapper
         Tent tent = Tent.from(stack, this.type, this.size);
@@ -311,8 +319,8 @@ public class TentItem extends Item {
             level.setBlock(clickedPos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
         }
         // remove NBT data
-        stack.getOrCreateTag().remove(DOOR);
-        stack.getOrCreateTag().remove(DIRECTION);
+        stack.remove(NTDataComponents.DOOR_POS);
+        stack.remove(NTDataComponents.DOOR_DIRECTION);
     }
 
     public static BlockHitResult clipFrom(final LivingEntity player, final double range) {

@@ -1,46 +1,62 @@
 package nomadictents.recipe;
 
-import com.google.gson.JsonObject;
-import net.minecraft.core.NonNullList;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.Level;
 import nomadictents.item.TentItem;
+import nomadictents.registries.NTDataComponents;
 import nomadictents.registries.NTRecipeRegistry;
-import nomadictents.util.Tent;
+import nomadictents.util.TentLayers;
 import org.jetbrains.annotations.NotNull;
+
+import net.minecraft.core.HolderLookup;
 
 public class TentLayerRecipe extends ShapedRecipe {
 
     private final byte layer;
+    private final ShapedRecipePattern pattern;
+    private final ItemStack result;
 
-    public TentLayerRecipe(ResourceLocation recipeId, final ItemStack outputItem, final byte layer,
-                           final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
-        super(recipeId, Serializer.CATEGORY, CraftingBookCategory.BUILDING, width, height, recipeItemsIn, outputItemWithLayer(outputItem, layer));
+    public TentLayerRecipe(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result, byte layer) {
+        super(group, category, pattern, outputItemWithLayer(result, layer));
+        this.pattern = pattern;
+        this.result = outputItemWithLayer(result, layer);
         this.layer = layer;
     }
 
     private static ItemStack outputItemWithLayer(final ItemStack itemStack, final byte layer) {
-        itemStack.getOrCreateTag().putByte(Tent.LAYERS, layer);
+        itemStack.set(NTDataComponents.TENT_LAYERS, (int) layer);
         return itemStack;
     }
 
     @Override
-    public boolean matches(@NotNull CraftingContainer craftingInventory, @NotNull Level level) {
-        if (super.matches(craftingInventory, level)) {
+    public boolean matches(@NotNull CraftingInput input, @NotNull Level level) {
+        if (super.matches(input, level)) {
             // locate input tent
-            ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
+            ItemStack tent = ItemStack.EMPTY;
+            for (int i = 0; i < input.size(); i++) {
+                ItemStack stack = input.getItem(i);
+                if (stack.getItem() instanceof TentItem) {
+                    tent = stack;
+                    break;
+                }
+            }
+            
             if (!tent.isEmpty()) {
                 // ensure tent layer is one less than target layer
-                return tent.getOrCreateTag().getByte(Tent.LAYERS) == (this.layer - 1);
+                int currentLayer = tent.getOrDefault(NTDataComponents.TENT_LAYERS.get(), (int) TentLayers.MIN);
+                return currentLayer == (this.layer - 1);
             }
         }
         return false;
@@ -48,16 +64,23 @@ public class TentLayerRecipe extends ShapedRecipe {
 
     @NotNull
     @Override
-    public ItemStack assemble(@NotNull CraftingContainer craftingInventory, @NotNull RegistryAccess access) {
-        ItemStack result = super.assemble(craftingInventory, access);
+    public ItemStack assemble(@NotNull CraftingInput input, @NotNull HolderLookup.Provider access) {
+        ItemStack result = super.assemble(input, access);
 
         // locate input tent
-        ItemStack tent = TentSizeRecipe.getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
-        // copy input NBT to result with layer information
+        ItemStack tent = ItemStack.EMPTY;
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
+            if (stack.getItem() instanceof TentItem) {
+                tent = stack;
+                break;
+            }
+        }
+
+        // copy input components to result with layer information
         if (!tent.isEmpty()) {
-            CompoundTag tag = tent.getOrCreateTag().copy();
-            tag.putByte(Tent.LAYERS, layer);
-            result.setTag(tag);
+            result.applyComponents(tent.getComponents());
+            result.set(NTDataComponents.TENT_LAYERS, (int) layer);
         }
 
         return result;
@@ -73,37 +96,44 @@ public class TentLayerRecipe extends ShapedRecipe {
         return layer;
     }
 
-    public static class Serializer extends ShapedRecipe.Serializer {
+    public ShapedRecipePattern pattern() {
+        return pattern;
+    }
 
+    public ItemStack result() {
+        return result;
+    }
+
+    public static class Serializer implements RecipeSerializer<TentLayerRecipe> {
         public static final String CATEGORY = "tent_layer";
 
-        @NotNull
-        @Override
-        public ShapedRecipe fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
-            // read the recipe from shapeless recipe serializer
-            final ShapedRecipe recipe = super.fromJson(recipeId, json);
-            byte bLayer = 0;
-            if (json.has("layer")) {
-                bLayer = json.get("layer").getAsByte();
-            }
-            return new TentLayerRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY), bLayer,
-                    recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
-        }
+        private static final MapCodec<TentLayerRecipe> CODEC = RecordCodecBuilder.mapCodec(
+                instance -> instance.group(
+                        com.mojang.serialization.Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+                        CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(ShapedRecipe::category),
+                        ShapedRecipePattern.MAP_CODEC.forGetter(TentLayerRecipe::pattern),
+                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(TentLayerRecipe::result),
+                        Codec.BYTE.fieldOf("layer").forGetter(TentLayerRecipe::getLayer)
+                ).apply(instance, TentLayerRecipe::new)
+        );
 
-        @NotNull
-        @Override
-        public ShapedRecipe fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
-            ShapedRecipe recipe = super.fromNetwork(recipeId, buffer);
-            byte layer = buffer.readByte();
-            return new TentLayerRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY), layer,
-                    recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
-        }
+        private static final StreamCodec<RegistryFriendlyByteBuf, TentLayerRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, ShapedRecipe::getGroup,
+                CraftingBookCategory.STREAM_CODEC, ShapedRecipe::category,
+                ShapedRecipePattern.STREAM_CODEC, TentLayerRecipe::pattern,
+                ItemStack.STREAM_CODEC, TentLayerRecipe::result,
+                ByteBufCodecs.BYTE, TentLayerRecipe::getLayer,
+                TentLayerRecipe::new
+        );
 
         @Override
-        public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull ShapedRecipe recipeIn) {
-            super.toNetwork(buffer, recipeIn);
-            TentLayerRecipe recipe = (TentLayerRecipe) recipeIn;
-            buffer.writeByte(recipe.layer);
+        public MapCodec<TentLayerRecipe> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, TentLayerRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

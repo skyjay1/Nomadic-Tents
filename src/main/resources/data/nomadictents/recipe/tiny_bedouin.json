@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " W ",
+    "W W",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "nomadictents:bedouin_section"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:tiny_bedouin"
+  }
+}

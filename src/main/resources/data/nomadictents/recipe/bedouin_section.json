@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FSF",
+    "FSF"
+  ],
+  "key": {
+    "F": {
+      "tag": "minecraft:wool"
+    },
+    "S": {
+      "tag": "c:wooden_rods"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:bedouin_section"
+  }
+}

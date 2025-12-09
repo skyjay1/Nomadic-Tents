@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FSF",
+    "FSF",
+    "FSF"
+  ],
+  "key": {
+    "F": {
+      "item": "minecraft:rabbit_hide"
+    },
+    "S": {
+      "tag": "c:wooden_rods"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:tepee_section"
+  }
+}

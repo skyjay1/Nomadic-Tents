@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "nomadictents:white_shamiyana_wall"
+    },
+    {
+      "tag": "c:dyes/light_blue"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "nomadictents:light_blue_shamiyana_wall"
+  }
+}

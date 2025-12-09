@@ -1,32 +1,25 @@
 package nomadictents.registries;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import nomadictents.NomadicTents;
+import net.neoforged.bus.api.IEventBus;
 import nomadictents.dimension.EmptyChunkGenerator;
 import nomadictents.structure.LocStructureProcessor;
 import nomadictents.structure.ShamiyanaStructureProcessor;
 import nomadictents.structure.TepeeStructureProcessor;
+import com.mojang.serialization.MapCodec;
+import java.util.function.Supplier;
 
 public final class NTStructureProcessorRegistry {
 
-    public static StructureProcessorType<TepeeStructureProcessor> TEPEE_PROCESSOR;
-    public static StructureProcessorType<ShamiyanaStructureProcessor> SHAMIYANA_PROCESSOR;
-    public static StructureProcessorType<LocStructureProcessor> LOC_PROCESSOR;
-
-    public static void setupProcessors(FMLCommonSetupEvent event) {
-        // register tepee processor
-        TEPEE_PROCESSOR = StructureProcessorType.register(NomadicTents.MOD_ID + ":tepee_processor", TepeeStructureProcessor.MAP_CODEC);
-        // register shamiyana processor
-        SHAMIYANA_PROCESSOR = StructureProcessorType.register(NomadicTents.MOD_ID + ":shamiyana_processor", ShamiyanaStructureProcessor.CODEC);
-        // register loc processor
-        LOC_PROCESSOR = StructureProcessorType.register(NomadicTents.MOD_ID + ":loc_processor", LocStructureProcessor.CODEC);
-        // register chunk generator
-        event.enqueueWork(() -> {
-            Registry.register(BuiltInRegistries.CHUNK_GENERATOR, new ResourceLocation(NomadicTents.MOD_ID, "empty"), EmptyChunkGenerator.CODEC);
-        });
+    public static void init(IEventBus bus) {
+        RegUtils.STRUCTURE_PROCESSOR_TYPES.register(bus);
+        RegUtils.CHUNK_GENERATORS.register(bus);
     }
+
+    public static final Supplier<StructureProcessorType<TepeeStructureProcessor>> TEPEE_PROCESSOR = RegUtils.STRUCTURE_PROCESSOR_TYPES.register("tepee_processor", () -> () -> TepeeStructureProcessor.MAP_CODEC);
+    public static final Supplier<StructureProcessorType<ShamiyanaStructureProcessor>> SHAMIYANA_PROCESSOR = RegUtils.STRUCTURE_PROCESSOR_TYPES.register("shamiyana_processor", () -> () -> ShamiyanaStructureProcessor.CODEC);
+    public static final Supplier<StructureProcessorType<LocStructureProcessor>> LOC_PROCESSOR = RegUtils.STRUCTURE_PROCESSOR_TYPES.register("loc_processor", () -> () -> LocStructureProcessor.CODEC);
+
+    public static final Supplier<MapCodec<? extends ChunkGenerator>> EMPTY_CHUNK_GENERATOR = RegUtils.CHUNK_GENERATORS.register("empty", () -> EmptyChunkGenerator.CODEC);
 }

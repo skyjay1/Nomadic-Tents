@@ -10,6 +10,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -37,7 +43,7 @@ public class MalletItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> list, TooltipFlag flag) {
         list.add(Component.translatable(getDescriptionId() + ".tooltip").withStyle(ChatFormatting.GRAY));
     }
 
@@ -63,8 +69,8 @@ public class MalletItem extends Item {
             next = Math.min(next, FrameBlock.MAX_PROGRESS);
             if (next >= FrameBlock.MAX_PROGRESS) {
                 // use durability
-                if (null != context.getPlayer()) {
-                    context.getItemInHand().hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+                if (context.getPlayer() instanceof ServerPlayer serverPlayer) {
+                    context.getItemInHand().hurtAndBreak(1, (ServerLevel) context.getLevel(), serverPlayer, item -> serverPlayer.onEquippedItemBroken(item, context.getHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND));
                 }
                 // determine target block
                 BlockState target = TentPlacer.getFrameTarget(state, context.getLevel(), context.getClickedPos());
@@ -85,14 +91,19 @@ public class MalletItem extends Item {
         return InteractionResult.PASS;
     }
 
+    /*
     @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return enchantment == Enchantments.BLOCK_EFFICIENCY || super.canApplyAtEnchantingTable(stack, enchantment);
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Holder<Enchantment> enchantment) {
+        return enchantment.is(Enchantments.EFFICIENCY) || super.canApplyAtEnchantingTable(stack, enchantment);
     }
+    */
 
     private int getEffectiveness(final ItemStack stack, final Level level, final BlockState state, final BlockPos pos, @Nullable Player player) {
         // In the future we may take into account the tent type and biome, or maybe not
-        int efficiency = stack.getEnchantmentLevel(Enchantments.BLOCK_EFFICIENCY);
+        int efficiency = 0;
+        if (level != null) {
+             efficiency = stack.getEnchantmentLevel(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.EFFICIENCY));
+        }
         return NTConfig.CONFIG.MALLET_EFFECTIVENESS.get() + efficiency * 2;
     }
 
@@ -107,8 +118,8 @@ public class MalletItem extends Item {
         // place target block
         level.setBlock(pos, target, Block.UPDATE_ALL);
         // use durability
-        if (null != context.getPlayer()) {
-            context.getItemInHand().hurtAndBreak(1, context.getPlayer(), p -> p.broadcastBreakEvent(context.getHand()));
+        if (context.getPlayer() instanceof ServerPlayer serverPlayer) {
+            context.getItemInHand().hurtAndBreak(1, (ServerLevel) level, serverPlayer, item -> serverPlayer.onEquippedItemBroken(item, context.getHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND));
         }
         // scan nearby area (including diagonals) and call this method for each frame found
         for (int i = -1; i < 2; i++) {

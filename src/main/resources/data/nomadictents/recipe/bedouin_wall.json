@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "nomadictents:bedouin_section"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "nomadictents:bedouin_wall"
+  }
+}

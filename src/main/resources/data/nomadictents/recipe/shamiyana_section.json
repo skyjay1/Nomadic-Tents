@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "FSF",
+    "TST"
+  ],
+  "key": {
+    "F": {
+      "tag": "minecraft:wool"
+    },
+    "T": {
+      "item": "nomadictents:tent_canvas"
+    },
+    "S": {
+      "tag": "c:wooden_rods"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:shamiyana_section"
+  }
+}

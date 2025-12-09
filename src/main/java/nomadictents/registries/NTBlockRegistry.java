@@ -22,22 +22,29 @@ import nomadictents.block.YurtWallBlock;
 import nomadictents.util.TentSize;
 import nomadictents.util.TentType;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class NTBlockRegistry {
 
+    public static final Map<TepeeBlock.Type, Supplier<Block>> TEPEE_WALL_BLOCKS = new EnumMap<>(TepeeBlock.Type.class);
+    public static final Map<DyeColor, Supplier<Block>> SHAMIYANA_WALL_BLOCKS = new EnumMap<>(DyeColor.class);
+
     public static void init(IEventBus bus) {
         // register tepee blocks
         for (final TepeeBlock.Type type : TepeeBlock.Type.values()) {
-            RegUtils.BLOCKS.register(type.getSerializedName() + "_tepee_wall", () ->
+            Supplier<Block> block = RegUtils.BLOCKS.register(type.getSerializedName() + "_tepee_wall", () ->
                     new TepeeBlock(type, BlockBehaviour.Properties.of().pushReaction(PushReaction.BLOCK).mapColor(MapColor.TERRACOTTA_WHITE)
                             .sound(SoundType.WOOL)));
+            TEPEE_WALL_BLOCKS.put(type, block);
         }
         // register shamiyana blocks
         for (DyeColor color : DyeColor.values()) {
-            RegUtils.BLOCKS.register(color.getSerializedName() + "_shamiyana_wall", () ->
+            Supplier<Block> block = RegUtils.BLOCKS.register(color.getSerializedName() + "_shamiyana_wall", () ->
                     new ShamiyanaWallBlock(color, BlockBehaviour.Properties.of().pushReaction(PushReaction.BLOCK)
                             .mapColor(color.getMapColor()).sound(SoundType.WOOL)));
+            SHAMIYANA_WALL_BLOCKS.put(color, block);
         }
         // register door blocks
         for (TentType type : TentType.values()) {
@@ -81,6 +88,6 @@ public class NTBlockRegistry {
 
 
 
-    public static final Supplier<Block> BLANK_TEPEE_WALL = ObjectHolder.create(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "blank_tepee_wall"));
-    public static final Supplier<Block> WHITE_SHAMIYANA_WALL = DeferredRegister.create(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "white_shamiyana_wall"));
+    public static final Supplier<Block> BLANK_TEPEE_WALL = () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "blank_tepee_wall"));
+    public static final Supplier<Block> WHITE_SHAMIYANA_WALL = () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "white_shamiyana_wall"));
 }

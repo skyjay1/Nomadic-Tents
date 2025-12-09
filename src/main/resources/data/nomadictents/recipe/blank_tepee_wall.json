@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "nomadictents:tepee_section"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "nomadictents:blank_tepee_wall"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "nomadictents:tent_size",
+  "pattern": [
+    "CWC",
+    "WTW",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "nomadictents:indlu_section"
+    },
+    "C": {
+      "item": "nomadictents:golden_crossbeams"
+    },
+    "T": {
+      "item": "nomadictents:medium_indlu"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:large_indlu"
+  }
+}

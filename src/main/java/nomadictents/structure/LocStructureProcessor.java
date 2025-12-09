@@ -1,6 +1,8 @@
 package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
@@ -12,14 +14,16 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import nomadictents.NTStructureProcessorsRegistry;
+import nomadictents.registries.NTStructureProcessorRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
 public class LocStructureProcessor extends StructureProcessor {
 
-    public static final Codec<LocStructureProcessor> CODEC = RuleTest.CODEC.xmap(LocStructureProcessor::new, LocStructureProcessor::getLocPredicate).stable();
+    public static final MapCodec<LocStructureProcessor> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            RuleTest.CODEC.fieldOf("predicate").forGetter(LocStructureProcessor::getLocPredicate)
+    ).apply(instance, LocStructureProcessor::new));
 
     public static final LocStructureProcessor REPLACE_AIR = new LocStructureProcessor(new BlockMatchTest(Blocks.AIR));
 
@@ -48,6 +52,6 @@ public class LocStructureProcessor extends StructureProcessor {
     @NotNull
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTStructureProcessorsRegistry.LOC_PROCESSOR;
+        return NTStructureProcessorRegistry.LOC_PROCESSOR.get();
     }
 }
