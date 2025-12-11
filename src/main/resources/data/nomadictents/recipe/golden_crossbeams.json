@@ -14,7 +14,7 @@
       "item": "minecraft:gold_block"
     },
     "S": {
-      "tag": "c:wooden_rods"
+      "tag": "c:rods/wooden"
     }
   },
   "result": {

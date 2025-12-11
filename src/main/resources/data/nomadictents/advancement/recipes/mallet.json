@@ -33,7 +33,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:wooden_rods"
+            "tag": "c:rods/wooden"
           }
         ]
       }

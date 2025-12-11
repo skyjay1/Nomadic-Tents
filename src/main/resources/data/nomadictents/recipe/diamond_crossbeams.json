@@ -14,7 +14,7 @@
       "item": "minecraft:diamond_block"
     },
     "S": {
-      "tag": "c:wooden_rods"
+      "tag": "c:rods/wooden"
     }
   },
   "result": {
