@@ -1,9 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "rewards": {
-    "recipes": [
-      "nomadictents:indlu_section"
-    ]
+    "recipes": ["nomadictents:indlu_section"]
   },
   "criteria": {
     "has_ingredients": {
@@ -33,11 +31,5 @@
       }
     }
   },
-  "requirements": [
-    [
-      "has_ingredients",
-      "has_stick",
-      "has_the_recipe"
-    ]
-  ]
+  "requirements": [["has_ingredients", "has_stick", "has_the_recipe"]]
 }

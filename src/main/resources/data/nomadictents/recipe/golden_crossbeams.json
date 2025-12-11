@@ -1,11 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "pattern": [
-    "SIS",
-    "SBS",
-    "SIS"
-  ],
+  "pattern": ["SIS", "SBS", "SIS"],
   "key": {
     "I": {
       "item": "minecraft:gold_ingot"

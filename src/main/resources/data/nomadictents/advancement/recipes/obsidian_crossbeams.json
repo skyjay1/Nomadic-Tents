@@ -1,9 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "rewards": {
-    "recipes": [
-      "nomadictents:obsidian_crossbeams"
-    ]
+    "recipes": ["nomadictents:obsidian_crossbeams"]
   },
   "criteria": {
     "has_the_recipe": {
@@ -17,9 +15,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:obsidian"
-            ]
+            "items": ["minecraft:obsidian"]
           }
         ]
       }
@@ -39,18 +35,11 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:obsidian"
-            ]
+            "items": ["minecraft:obsidian"]
           }
         ]
       }
     }
   },
-  "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
-  ]
+  "requirements": [["has_ingredient", "has_the_recipe"]]
 }

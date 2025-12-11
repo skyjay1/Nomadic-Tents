@@ -1,10 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "pattern": [
-    "FSF",
-    "FSF"
-  ],
+  "pattern": ["FSF", "FSF"],
   "key": {
     "F": {
       "item": "nomadictents:tent_canvas"

@@ -1,9 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "rewards": {
-    "recipes": [
-      "nomadictents:diamond_crossbeams"
-    ]
+    "recipes": ["nomadictents:diamond_crossbeams"]
   },
   "criteria": {
     "has_the_recipe": {
@@ -17,9 +15,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:diamond"
-            ]
+            "items": ["minecraft:diamond"]
           }
         ]
       }
@@ -29,9 +25,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:diamond_block"
-            ]
+            "items": ["minecraft:diamond_block"]
           }
         ]
       }
@@ -51,18 +45,11 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:diamond"
-            ]
+            "items": ["minecraft:diamond"]
           }
         ]
       }
     }
   },
-  "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
-  ]
+  "requirements": [["has_ingredient", "has_the_recipe"]]
 }

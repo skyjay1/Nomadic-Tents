@@ -1,9 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "rewards": {
-    "recipes": [
-      "nomadictents:golden_mallet"
-    ]
+    "recipes": ["nomadictents:golden_mallet"]
   },
   "criteria": {
     "has_canvas": {
@@ -11,9 +9,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "nomadictents:tent_canvas"
-            ]
+            "items": ["nomadictents:tent_canvas"]
           }
         ]
       }
@@ -45,12 +41,5 @@
       }
     }
   },
-  "requirements": [
-    [
-      "has_canvas",
-      "has_gold",
-      "has_stick",
-      "has_the_recipe"
-    ]
-  ]
+  "requirements": [["has_canvas", "has_gold", "has_stick", "has_the_recipe"]]
 }

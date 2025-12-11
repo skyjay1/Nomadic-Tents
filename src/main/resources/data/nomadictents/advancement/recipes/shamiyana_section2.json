@@ -1,9 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "rewards": {
-    "recipes": [
-      "nomadictents:shamiyana_section2"
-    ]
+    "recipes": ["nomadictents:shamiyana_section2"]
   },
   "criteria": {
     "has_the_recipe": {
@@ -27,9 +25,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "nomadictents:tent_canvas"
-            ]
+            "items": ["nomadictents:tent_canvas"]
           }
         ]
       }
@@ -55,10 +51,5 @@
       }
     }
   },
-  "requirements": [
-    [
-      "has_ingredient",
-      "has_the_recipe"
-    ]
-  ]
+  "requirements": [["has_ingredient", "has_the_recipe"]]
 }

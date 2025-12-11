@@ -1,9 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
   "rewards": {
-    "recipes": [
-      "nomadictents:tepee_section"
-    ]
+    "recipes": ["nomadictents:tepee_section"]
   },
   "criteria": {
     "has_ingredients": {
@@ -11,9 +9,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:leather"
-            ]
+            "items": ["minecraft:leather"]
           }
         ]
       }
@@ -35,11 +31,5 @@
       }
     }
   },
-  "requirements": [
-    [
-      "has_ingredients",
-      "has_stick",
-      "has_the_recipe"
-    ]
-  ]
+  "requirements": [["has_ingredients", "has_stick", "has_the_recipe"]]
 }

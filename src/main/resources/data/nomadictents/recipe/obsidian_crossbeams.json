@@ -1,11 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "pattern": [
-    "SBS",
-    "SBS",
-    "SBS"
-  ],
+  "pattern": ["SBS", "SBS", "SBS"],
   "key": {
     "B": {
       "item": "minecraft:obsidian"
