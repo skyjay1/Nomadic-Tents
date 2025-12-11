@@ -57,15 +57,15 @@ public class TentItem extends Item {
 
     private static final CauldronInteraction WASH_TENT = (state, level, pos, player, hand, itemStack) -> {
         // only interact when item stack has color other than white
-        if (!itemStack.has(NTDataComponents.TENT_COLOR)
-                || itemStack.get(NTDataComponents.TENT_COLOR) == DyeColor.WHITE) {
+        if (!itemStack.has(NTDataComponents.TENT_COLOR.get())
+                || itemStack.get(NTDataComponents.TENT_COLOR.get()) == DyeColor.WHITE) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (!level.isClientSide) {
             // replace item with white color information
             ItemStack replace = itemStack.copy();
-            replace.set(NTDataComponents.TENT_COLOR, DyeColor.WHITE);
+            replace.set(NTDataComponents.TENT_COLOR.get(), DyeColor.WHITE);
             player.setItemInHand(hand, replace);
             // reduce cauldron fill level
             LayeredCauldronBlock.lowerFillLevel(state, level, pos);
@@ -321,6 +321,10 @@ public class TentItem extends Item {
         // remove NBT data
         stack.remove(NTDataComponents.DOOR_POS);
         stack.remove(NTDataComponents.DOOR_DIRECTION);
+    }
+
+    public TentType getTentType() {
+        return this.type;
     }
 
     public static BlockHitResult clipFrom(final LivingEntity player, final double range) {

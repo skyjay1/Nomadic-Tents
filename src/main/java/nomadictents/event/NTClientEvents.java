@@ -40,20 +40,20 @@ public final class NTClientEvents {
                 // register indlu wall item colors
                 event.register((itemStack, tintIndex) -> {
                             if (tintIndex == 0) {
-                                return 0x666533;
+                                return 0xFF666533;
                             }
                             return -1;
                         },
                         BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "indlu_wall")));
                 // register shamiyana item colors
                 event.register((itemStack, tintIndex) -> {
-                            if (itemStack.has(NTDataComponents.TENT_COLOR)) {
-                                DyeColor color = itemStack.get(NTDataComponents.TENT_COLOR);
+                            if (itemStack.has(NTDataComponents.TENT_COLOR.get())) {
+                                DyeColor color = itemStack.get(NTDataComponents.TENT_COLOR.get());
                                 if (color == DyeColor.BLACK) {
                                     // slightly lighter than pure black
-                                    return 0x303030;
+                                    return 0xFF303030;
                                 }
-                                return color.getTextColor();
+                                return color.getFireworkColor() | 0xFF000000;
                             }
                             return -1;
                         },

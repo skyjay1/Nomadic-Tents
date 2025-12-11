@@ -36,7 +36,7 @@ public class TentColorRecipe extends ShapedRecipe {
     }
 
     private static ItemStack outputItemWithColor(final ItemStack itemStack, final DyeColor color) {
-        itemStack.set(NTDataComponents.TENT_COLOR, color);
+        itemStack.set(NTDataComponents.TENT_COLOR.get(), color);
         return itemStack;
     }
 
@@ -84,7 +84,7 @@ public class TentColorRecipe extends ShapedRecipe {
         // copy input components to result with color information
         if (!tent.isEmpty()) {
             result = tent.copy();
-            result.set(NTDataComponents.TENT_COLOR, this.color);
+            result.set(NTDataComponents.TENT_COLOR.get(), this.color);
         }
 
         return result;

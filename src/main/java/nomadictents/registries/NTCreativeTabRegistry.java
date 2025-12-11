@@ -5,8 +5,12 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.DyeColor;
 import net.neoforged.bus.api.IEventBus;
 import nomadictents.NomadicTents;
+import nomadictents.item.TentItem;
+import nomadictents.util.TentType;
+import nomadictents.registries.NTDataComponents;
 
 import java.util.Comparator;
 
@@ -23,7 +27,17 @@ public class NTCreativeTabRegistry {
                                         -> itemReference.key().location().getNamespace().equals(NomadicTents.MOD_ID))
                                 .sorted(Comparator.comparing(itemReference -> itemReference.key().location().getPath()))
                                 .map(Holder.Reference::value)
-                                .forEachOrdered(entries::accept)).build());
+                                .forEachOrdered(item -> {
+                                    entries.accept(item);
+                                    if (item instanceof TentItem tentItem && tentItem.getTentType() == TentType.SHAMIYANA) {
+                                        for (DyeColor color : DyeColor.values()) {
+                                            if (color == DyeColor.WHITE) continue;
+                                            ItemStack stack = new ItemStack(item);
+                                            stack.set(NTDataComponents.TENT_COLOR.get(), color);
+                                            entries.accept(stack);
+                                        }
+                                    }
+                                })).build());
         RegUtils.CREATIVE_MODE_TABS.register(bus);
     }
 }
