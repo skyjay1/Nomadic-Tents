@@ -1,5 +1,6 @@
 {
   "type": "nomadictents:tent_size",
+  "category": "misc",
   "pattern": [
     "C C",
     "WWW",

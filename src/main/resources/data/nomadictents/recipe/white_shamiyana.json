@@ -1,5 +1,6 @@
 {
   "type": "nomadictents:tent_color",
+  "category": "misc",
   "pattern": [
     "DDD",
     "DTD",

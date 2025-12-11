@@ -1,5 +1,6 @@
 {
   "type": "nomadictents:tent_layer",
+  "category": "misc",
   "pattern": [
     "DBD",
     "DTD",
