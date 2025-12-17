@@ -1,41 +1,60 @@
 package nomadictents.recipe;
 
-import com.google.gson.JsonObject;
-import net.minecraft.core.NonNullList;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import nomadictents.item.TentItem;
 import nomadictents.registries.NTRecipeRegistry;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
+import net.minecraft.core.HolderLookup;
 
 public class TentSizeRecipe extends ShapedRecipe {
 
-    public TentSizeRecipe(ResourceLocation recipeId, final ItemStack outputItem,
-                          final int width, final int height, final NonNullList<Ingredient> recipeItemsIn) {
-        super(recipeId, Serializer.CATEGORY, CraftingBookCategory.BUILDING, width, height, recipeItemsIn, outputItem);
+    private final ShapedRecipePattern pattern;
+    private final ItemStack result;
+
+    public TentSizeRecipe(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result) {
+        super(group, category, pattern, result);
+        this.pattern = pattern;
+        this.result = result;
+    }
+
+    public ShapedRecipePattern pattern() {
+        return pattern;
+    }
+
+    public ItemStack result() {
+        return result;
     }
 
     @NotNull
     @Override
-    public ItemStack assemble(@NotNull CraftingContainer craftingInventory, @NotNull RegistryAccess access) {
-        ItemStack result = super.assemble(craftingInventory, access);
+    public ItemStack assemble(@NotNull CraftingInput input, @NotNull HolderLookup.Provider access) {
+        ItemStack result = super.assemble(input, access);
 
         // locate input tent
-        ItemStack tent = getStackMatching(craftingInventory, i -> i.getItem() instanceof TentItem);
-        // copy input NBT to result
+        ItemStack tent = ItemStack.EMPTY;
+        for (int i = 0; i < input.size(); i++) {
+            ItemStack stack = input.getItem(i);
+            if (stack.getItem() instanceof TentItem) {
+                tent = stack;
+                break;
+            }
+        }
+
+        // copy input components to result
         if (!tent.isEmpty()) {
-            CompoundTag tag = tent.getOrCreateTag().copy();
-            result.setTag(tag);
+            result.applyComponents(tent.getComponents());
         }
 
         return result;
@@ -47,45 +66,34 @@ public class TentSizeRecipe extends ShapedRecipe {
         return NTRecipeRegistry.TENT_SIZE_RECIPE_SERIALIZER.get();
     }
 
-    /**
-     * Searches the given crafting inventory for an item
-     *
-     * @param inv  the inventory
-     * @param pred the predicate to match an item
-     * @return the first item in the inventory that matches the predicate
-     */
-    public static ItemStack getStackMatching(final CraftingContainer inv, final Predicate<ItemStack> pred) {
-        for (int i = 0, l = inv.getContainerSize(); i < l; ++i) {
-            final ItemStack stack = inv.getItem(i);
-            if (!stack.isEmpty() && pred.test(stack)) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
-    public static class Serializer extends ShapedRecipe.Serializer {
-
+    public static class Serializer implements RecipeSerializer<TentSizeRecipe> {
         public static final String CATEGORY = "tent_size";
 
-        @NotNull
+        private static final MapCodec<TentSizeRecipe> CODEC = RecordCodecBuilder.mapCodec(
+                instance -> instance.group(
+                        com.mojang.serialization.Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+                        CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(ShapedRecipe::category),
+                        ShapedRecipePattern.MAP_CODEC.forGetter(TentSizeRecipe::pattern),
+                        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(TentSizeRecipe::result)
+                ).apply(instance, TentSizeRecipe::new)
+        );
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, TentSizeRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, ShapedRecipe::getGroup,
+                CraftingBookCategory.STREAM_CODEC, ShapedRecipe::category,
+                ShapedRecipePattern.STREAM_CODEC, TentSizeRecipe::pattern,
+                ItemStack.STREAM_CODEC, TentSizeRecipe::result,
+                TentSizeRecipe::new
+        );
+
         @Override
-        public ShapedRecipe fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
-            // read the recipe from shapeless recipe serializer
-            final ShapedRecipe recipe = super.fromJson(recipeId, json);
-            return new TentSizeRecipe(recipeId, recipe.getResultItem(RegistryAccess.EMPTY),
-                    recipe.getWidth(), recipe.getHeight(), recipe.getIngredients());
+        public MapCodec<TentSizeRecipe> codec() {
+            return CODEC;
         }
 
-        @NotNull
         @Override
-        public ShapedRecipe fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
-            return super.fromNetwork(recipeId, buffer);
-        }
-
-        @Override
-        public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull ShapedRecipe recipeIn) {
-            super.toNetwork(buffer, recipeIn);
+        public StreamCodec<RegistryFriendlyByteBuf, TentSizeRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

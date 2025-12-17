@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["FSF", "FSF"],
+  "key": {
+    "F": {
+      "item": "minecraft:leather"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:tepee_section"
+  }
+}

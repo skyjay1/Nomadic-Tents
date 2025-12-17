@@ -1,0 +1,28 @@
+{
+  "type": "nomadictents:tent_layer",
+  "category": "misc",
+  "pattern": [
+    "DBD",
+    "DTD",
+    "DSD"
+  ],
+  "key": {
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "B": {
+      "item": "minecraft:obsidian"
+    },
+    "S": {
+      "item": "nomadictents:obsidian_tent_shovel"
+    },
+    "T": {
+      "item": "nomadictents:giant_bedouin"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:giant_bedouin"
+  },
+  "layer": 4
+}

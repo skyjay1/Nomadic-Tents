@@ -2,6 +2,7 @@ package nomadictents.dimension;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -48,13 +49,13 @@ public class EmptyChunkGenerator extends ChunkGenerator {
 
     // We can define the dimension's biome in a json at data/yourmod/worldgen/biome/your_biome
     public static ResourceKey<Biome> TENT_BIOME = ResourceKey.create(Registries.BIOME,
-            new ResourceLocation(NomadicTents.MOD_ID, "tent"));
+            ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "tent"));
 
     // This Codec will need to be registered to the chunk generator registry in Registry
     // during FMLCommonSetupEvent::enqueueWork
     // (unless and until a forge registry wrapper becomes made for chunk generators)
-    public static final Codec<EmptyChunkGenerator> CODEC
-            = RecordCodecBuilder.create(builder -> builder.group(
+    public static final MapCodec<EmptyChunkGenerator> CODEC
+            = RecordCodecBuilder.mapCodec(builder -> builder.group(
             // the registry lookup doesn't actually serialize, so we don't need a field for it
             BiomeSource.CODEC.fieldOf("biome_source").forGetter(EmptyChunkGenerator::getBiomeRegistry)
     ).apply(builder, EmptyChunkGenerator::new));
@@ -79,7 +80,7 @@ public class EmptyChunkGenerator extends ChunkGenerator {
     // get codec
     @NotNull
     @Override
-    protected Codec<? extends ChunkGenerator> codec() {
+    protected MapCodec<? extends ChunkGenerator> codec() {
         return CODEC;
     }
 
@@ -105,7 +106,7 @@ public class EmptyChunkGenerator extends ChunkGenerator {
 
     @NotNull
     @Override
-    public CompletableFuture<ChunkAccess> fillFromNoise(@NotNull Executor executor, @NotNull Blender blender, @NotNull RandomState randomState, @NotNull StructureManager structureFeatureManager, @NotNull ChunkAccess chunkAccess) {
+    public CompletableFuture<ChunkAccess> fillFromNoise(@NotNull Blender blender, @NotNull RandomState randomState, @NotNull StructureManager structureFeatureManager, @NotNull ChunkAccess chunkAccess) {
         return CompletableFuture.completedFuture(chunkAccess);
     }
 

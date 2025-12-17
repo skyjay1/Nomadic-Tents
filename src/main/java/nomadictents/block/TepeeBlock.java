@@ -75,21 +75,21 @@ public class TepeeBlock extends TentBlock {
     }
 
     public enum Type implements StringRepresentable {
-        BLANK("blank", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "blank_tepee_wall"), BuiltInRegistries.BLOCK)),
-        CHANNEL("channel", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "channel_tepee_wall"), BuiltInRegistries.BLOCK)),
-        CREEPER("creeper", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "creeper_tepee_wall"), BuiltInRegistries.BLOCK)),
-        DREAMCATCHER("dreamcatcher", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "dreamcatcher_tepee_wall"), BuiltInRegistries.BLOCK)),
-        EAGLE("eagle", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "eagle_tepee_wall"), BuiltInRegistries.BLOCK)),
-        GOLEM("golem", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "golem_tepee_wall"), BuiltInRegistries.BLOCK)),
-        HOPE("hope", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "hope_tepee_wall"), BuiltInRegistries.BLOCK)),
-        MAGIC("magic", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "magic_tepee_wall"), BuiltInRegistries.BLOCK)),
-        RADIAL("radial", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "radial_tepee_wall"), BuiltInRegistries.BLOCK)),
-        RAIN("rain", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "rain_tepee_wall"), BuiltInRegistries.BLOCK)),
-        SPACE("space", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "space_tepee_wall"), BuiltInRegistries.BLOCK)),
-        SUN("sun", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "sun_tepee_wall"), BuiltInRegistries.BLOCK)),
-        TRIFORCE("triforce", false, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "triforce_tepee_wall"), BuiltInRegistries.BLOCK)),
-        WEDGE("wedge", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "wedge_tepee_wall"), BuiltInRegistries.BLOCK)),
-        ZIGZAG("zigzag", true, RegistryObject.create(new ResourceLocation(NomadicTents.MOD_ID, "zigzag_tepee_wall"), BuiltInRegistries.BLOCK));
+        BLANK("blank", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "blank_tepee_wall"))),
+        CHANNEL("channel", true, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "channel_tepee_wall"))),
+        CREEPER("creeper", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "creeper_tepee_wall"))),
+        DREAMCATCHER("dreamcatcher", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "dreamcatcher_tepee_wall"))),
+        EAGLE("eagle", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "eagle_tepee_wall"))),
+        GOLEM("golem", true, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "golem_tepee_wall"))),
+        HOPE("hope", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "hope_tepee_wall"))),
+        MAGIC("magic", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "magic_tepee_wall"))),
+        RADIAL("radial", true, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "radial_tepee_wall"))),
+        RAIN("rain", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "rain_tepee_wall"))),
+        SPACE("space", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "space_tepee_wall"))),
+        SUN("sun", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "sun_tepee_wall"))),
+        TRIFORCE("triforce", false, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "triforce_tepee_wall"))),
+        WEDGE("wedge", true, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "wedge_tepee_wall"))),
+        ZIGZAG("zigzag", true, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "zigzag_tepee_wall")));
 
         private final String name;
         private final boolean isPattern;

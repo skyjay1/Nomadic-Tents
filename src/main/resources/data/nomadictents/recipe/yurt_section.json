@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["FSF", "FSF"],
+  "key": {
+    "F": {
+      "item": "nomadictents:tent_canvas"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:yurt_section"
+  }
+}

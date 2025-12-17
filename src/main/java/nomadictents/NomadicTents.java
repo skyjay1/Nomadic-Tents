@@ -11,6 +11,7 @@ import nomadictents.event.NTEvents;
 import nomadictents.registries.NTBlockEntityRegistry;
 import nomadictents.registries.NTBlockRegistry;
 import nomadictents.registries.NTCreativeTabRegistry;
+import nomadictents.registries.NTDataComponents;
 import nomadictents.registries.NTItemRegistry;
 import nomadictents.registries.NTRecipeRegistry;
 import nomadictents.registries.NTStructureProcessorRegistry;
@@ -26,13 +27,13 @@ public class NomadicTents {
     public NomadicTents(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, NTConfig.SPEC);
 
-        NTItemRegistry.init(modBus);
         NTBlockRegistry.init(modBus);
+        NTItemRegistry.init(modBus);
         NTBlockEntityRegistry.init(modBus);
+        NTDataComponents.init(modBus);
         NTCreativeTabRegistry.init(modBus);
         NTRecipeRegistry.init(modBus);
-
-        modBus.addListener(NTStructureProcessorRegistry::setupProcessors);
+        NTStructureProcessorRegistry.init(modBus);
 
         // event handlers
         NeoForge.EVENT_BUS.register(NTEvents.ForgeHandler.class);

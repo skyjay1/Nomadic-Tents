@@ -1,0 +1,22 @@
+{
+  "type": "nomadictents:tent_color",
+  "category": "misc",
+  "pattern": [
+    "DDD",
+    "DTD",
+    "DDD"
+  ],
+  "key": {
+    "D": {
+      "tag": "c:dyes/black"
+    },
+    "T": {
+      "tag": "nomadictents:shamiyana"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:tiny_shamiyana"
+  },
+  "color": "black"
+}

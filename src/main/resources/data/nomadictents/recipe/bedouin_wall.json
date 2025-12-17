@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "nomadictents:bedouin_section"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "nomadictents:bedouin_wall"
+  }
+}

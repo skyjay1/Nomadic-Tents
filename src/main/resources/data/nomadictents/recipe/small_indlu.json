@@ -1,0 +1,21 @@
+{
+  "type": "nomadictents:tent_size",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "WTW",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "nomadictents:indlu_section"
+    },
+    "T": {
+      "item": "nomadictents:tiny_indlu"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:small_indlu"
+  }
+}

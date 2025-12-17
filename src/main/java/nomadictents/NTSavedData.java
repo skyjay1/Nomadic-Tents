@@ -1,5 +1,6 @@
 package nomadictents;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -30,10 +31,14 @@ public class NTSavedData extends SavedData {
 
     public static NTSavedData get(MinecraftServer server) {
         return server.getLevel(Level.OVERWORLD).getDataStorage()
-                .computeIfAbsent(NTSavedData::read, NTSavedData::new, NomadicTents.MOD_ID);
+                .computeIfAbsent(new SavedData.Factory<>(
+                        NTSavedData::new,
+                        NTSavedData::read,
+                        null
+                ), NomadicTents.MOD_ID);
     }
 
-    public static NTSavedData read(CompoundTag nbt) {
+    public static NTSavedData read(CompoundTag nbt, HolderLookup.Provider provider) {
         NTSavedData instance = new NTSavedData();
         instance.load(nbt);
         return instance;
@@ -53,7 +58,7 @@ public class NTSavedData extends SavedData {
 
     @NotNull
     @Override
-    public CompoundTag save(@NotNull CompoundTag nbt) {
+    public CompoundTag save(@NotNull CompoundTag nbt, HolderLookup.Provider provider) {
         // write tent map
         final ListTag tagList = new ListTag();
         for (final Entry<Integer, UUID> entry : tentIdMap.entrySet()) {
@@ -77,7 +82,7 @@ public class NTSavedData extends SavedData {
             ResourceKey<Level> worldKey;
             do {
                 uuid = UUID.randomUUID();
-                dimension = new ResourceLocation(NomadicTents.MOD_ID, uuid.toString());
+                dimension = ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, uuid.toString());
                 worldKey = ResourceKey.create(Registries.DIMENSION, dimension);
             } while (server.levelKeys().contains(worldKey));
             // add uuid to the map
@@ -90,7 +95,7 @@ public class NTSavedData extends SavedData {
 
     public ResourceKey<Level> getOrCreateKey(final MinecraftServer server, final int tentId) {
         UUID uuid = getOrCreateUuid(server, tentId);
-        ResourceLocation dimension = new ResourceLocation(NomadicTents.MOD_ID, uuid.toString());
+        ResourceLocation dimension = ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, uuid.toString());
         return ResourceKey.create(Registries.DIMENSION, dimension);
     }
 

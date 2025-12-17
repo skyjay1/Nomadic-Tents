@@ -1,0 +1,20 @@
+{
+  "type": "nomadictents:tent_size",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "WTW"
+  ],
+  "key": {
+    "W": {
+      "item": "nomadictents:shamiyana_section"
+    },
+    "T": {
+      "item": "nomadictents:small_shamiyana"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:medium_shamiyana"
+  }
+}

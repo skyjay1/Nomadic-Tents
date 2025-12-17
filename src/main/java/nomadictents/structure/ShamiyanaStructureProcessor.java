@@ -1,6 +1,8 @@
 package nomadictents.structure;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.LevelReader;
@@ -9,7 +11,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import nomadictents.NTStructureProcessorsRegistry;
+import nomadictents.registries.NTStructureProcessorRegistry;
 import nomadictents.block.ShamiyanaWallBlock;
 import nomadictents.registries.NTBlockRegistry;
 import org.jetbrains.annotations.NotNull;
@@ -18,11 +20,9 @@ import javax.annotation.Nullable;
 
 public class ShamiyanaStructureProcessor extends StructureProcessor {
 
-    public static final Codec<DyeColor> COLOR_CODEC = Codec.STRING.xmap(
-            name -> DyeColor.byName(name, DyeColor.WHITE),
-            DyeColor::getSerializedName).stable();
-
-    public static final Codec<ShamiyanaStructureProcessor> CODEC = COLOR_CODEC.xmap(ShamiyanaStructureProcessor::new, ShamiyanaStructureProcessor::getColor).stable();
+    public static final MapCodec<ShamiyanaStructureProcessor> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            DyeColor.CODEC.fieldOf("color").forGetter(ShamiyanaStructureProcessor::getColor)
+    ).apply(instance, ShamiyanaStructureProcessor::new));
 
     private final DyeColor color;
 
@@ -50,6 +50,6 @@ public class ShamiyanaStructureProcessor extends StructureProcessor {
     @NotNull
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTStructureProcessorsRegistry.TEPEE_PROCESSOR;
+        return NTStructureProcessorRegistry.SHAMIYANA_PROCESSOR.get();
     }
 }

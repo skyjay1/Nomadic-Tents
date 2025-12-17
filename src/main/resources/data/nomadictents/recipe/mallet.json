@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " IS",
+    " CI",
+    "S  "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "C": {
+      "item": "nomadictents:tent_canvas"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:mallet"
+  }
+}

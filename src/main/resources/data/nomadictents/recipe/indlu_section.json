@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": ["FSF", "FSF", "FSF"],
+  "key": {
+    "F": {
+      "tag": "minecraft:leaves"
+    },
+    "S": {
+      "tag": "c:rods/wooden"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:indlu_section"
+  }
+}

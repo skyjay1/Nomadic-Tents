@@ -1,0 +1,20 @@
+{
+  "type": "nomadictents:tent_size",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "WTW"
+  ],
+  "key": {
+    "W": {
+      "item": "nomadictents:yurt_section"
+    },
+    "T": {
+      "item": "nomadictents:small_yurt"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:medium_yurt"
+  }
+}

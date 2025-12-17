@@ -7,7 +7,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import nomadictents.NomadicTents;
 import nomadictents.block.TepeeBlock;
 import nomadictents.item.MalletItem;
@@ -57,23 +56,27 @@ public class NTItemRegistry {
 
         // register tepee wall item blocks
         for (TepeeBlock.Type type : TepeeBlock.Type.values()) {
-            RegUtils.registerItemBlock(type.getSerializedName() + "_tepee_wall", type.getBlockSupplier());
+            RegUtils.registerItemBlock(type.getSerializedName() + "_tepee_wall", NTBlockRegistry.TEPEE_WALL_BLOCKS.get(type));
         }
         // register shamiyana wall item blocks
-        for (Map.Entry<DyeColor, Supplier<Block>> entry : TentPlacer.SHAMIYANA_WALLS.entrySet()) {
+        for (Map.Entry<DyeColor, Supplier<Block>> entry : NTBlockRegistry.SHAMIYANA_WALL_BLOCKS.entrySet()) {
             RegUtils.registerItemBlock(entry.getKey().getSerializedName() + "_shamiyana_wall", entry.getValue());
         }
         // register wall/roof frames
         //TODO Possibly remove these from the creative tab.
         RegUtils.registerItemBlock("door_frame", NTBlockRegistry.DOOR_FRAME);
-        for (RegistryObject<Block> supplier : TentPlacer.BLOCK_TO_FRAME.values()) {
-            RegUtils.registerItemBlock(supplier.getId().getPath(), supplier);
-        }
+        RegUtils.registerItemBlock("yurt_wall_frame", NTBlockRegistry.YURT_WALL_FRAME);
+        RegUtils.registerItemBlock("yurt_roof_frame", NTBlockRegistry.YURT_ROOF_FRAME);
+        RegUtils.registerItemBlock("tepee_wall_frame", NTBlockRegistry.TEPEE_WALL_FRAME);
+        RegUtils.registerItemBlock("bedouin_wall_frame", NTBlockRegistry.BEDOUIN_WALL_FRAME);
+        RegUtils.registerItemBlock("bedouin_roof_frame", NTBlockRegistry.BEDOUIN_ROOF_FRAME);
+        RegUtils.registerItemBlock("indlu_wall_frame", NTBlockRegistry.INDLU_WALL_FRAME);
+        RegUtils.registerItemBlock("shamiyana_wall_frame", NTBlockRegistry.SHAMIYANA_WALL_FRAME);
 
         RegUtils.ITEMS.register(bus);
     }
 
-    public static final RegistryObject<Item> TINY_YURT = DeferredHolder.create(new ResourceLocation(NomadicTents.MOD_ID, "tiny_yurt"), BuiltInRegistries.ITEM);
+    public static final Supplier<Item> TINY_YURT = () -> BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, "tiny_yurt"));
     public static final Supplier<Item> MALLET = RegUtils.ITEMS.register("mallet", () -> new MalletItem(Tiers.IRON, false, new Item.Properties()));
     public static final Supplier<Item> GOLDEN_MALLET = RegUtils.ITEMS.register("golden_mallet", () -> new MalletItem(Tiers.DIAMOND, true, new Item.Properties()));
 }

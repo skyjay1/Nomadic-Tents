@@ -32,8 +32,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import nomadictents.NTConfig;
 import nomadictents.NomadicTents;
 import nomadictents.block.IndluWallBlock;
@@ -57,7 +57,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class TentPlacer {
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+
+public class TentPlacer {
+
 
     /**
      * The direction to place tents inside a tent dimension.
@@ -77,46 +82,46 @@ public final class TentPlacer {
      */
     public static final Map<TentSize, Map<TentType, Supplier<Block>>> DOORS = new ImmutableMap.Builder<TentSize, Map<TentType, Supplier<Block>>>()
             .put(TentSize.TINY, new ImmutableMap.Builder<TentType, Supplier<Block>>()
-                    .put(TentType.TEPEE, RegistryObject.create(new ResourceLocation(MODID, "tiny_tepee_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.YURT, RegistryObject.create(new ResourceLocation(MODID, "tiny_yurt_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.BEDOUIN, RegistryObject.create(new ResourceLocation(MODID, "tiny_bedouin_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.INDLU, RegistryObject.create(new ResourceLocation(MODID, "tiny_indlu_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.SHAMIYANA, RegistryObject.create(new ResourceLocation(MODID, "tiny_shamiyana_door"), ForgeRegistries.BLOCKS))
+                    .put(TentType.TEPEE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "tiny_tepee_door")))
+                    .put(TentType.YURT, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "tiny_yurt_door")))
+                    .put(TentType.BEDOUIN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "tiny_bedouin_door")))
+                    .put(TentType.INDLU, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "tiny_indlu_door")))
+                    .put(TentType.SHAMIYANA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "tiny_shamiyana_door")))
                     .build())
             .put(TentSize.SMALL, new ImmutableMap.Builder<TentType, Supplier<Block>>()
-                    .put(TentType.TEPEE, RegistryObject.create(new ResourceLocation(MODID, "small_tepee_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.YURT, RegistryObject.create(new ResourceLocation(MODID, "small_yurt_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.BEDOUIN, RegistryObject.create(new ResourceLocation(MODID, "small_bedouin_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.INDLU, RegistryObject.create(new ResourceLocation(MODID, "small_indlu_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.SHAMIYANA, RegistryObject.create(new ResourceLocation(MODID, "small_shamiyana_door"), ForgeRegistries.BLOCKS))
+                    .put(TentType.TEPEE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "small_tepee_door")))
+                    .put(TentType.YURT, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "small_yurt_door")))
+                    .put(TentType.BEDOUIN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "small_bedouin_door")))
+                    .put(TentType.INDLU, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "small_indlu_door")))
+                    .put(TentType.SHAMIYANA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "small_shamiyana_door")))
                     .build())
             .put(TentSize.MEDIUM, new ImmutableMap.Builder<TentType, Supplier<Block>>()
-                    .put(TentType.TEPEE, RegistryObject.create(new ResourceLocation(MODID, "medium_tepee_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.YURT, RegistryObject.create(new ResourceLocation(MODID, "medium_yurt_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.BEDOUIN, RegistryObject.create(new ResourceLocation(MODID, "medium_bedouin_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.INDLU, RegistryObject.create(new ResourceLocation(MODID, "medium_indlu_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.SHAMIYANA, RegistryObject.create(new ResourceLocation(MODID, "medium_shamiyana_door"), ForgeRegistries.BLOCKS))
+                    .put(TentType.TEPEE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "medium_tepee_door")))
+                    .put(TentType.YURT, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "medium_yurt_door")))
+                    .put(TentType.BEDOUIN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "medium_bedouin_door")))
+                    .put(TentType.INDLU, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "medium_indlu_door")))
+                    .put(TentType.SHAMIYANA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "medium_shamiyana_door")))
                     .build())
             .put(TentSize.LARGE, new ImmutableMap.Builder<TentType, Supplier<Block>>()
-                    .put(TentType.TEPEE, RegistryObject.create(new ResourceLocation(MODID, "large_tepee_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.YURT, RegistryObject.create(new ResourceLocation(MODID, "large_yurt_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.BEDOUIN, RegistryObject.create(new ResourceLocation(MODID, "large_bedouin_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.INDLU, RegistryObject.create(new ResourceLocation(MODID, "large_indlu_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.SHAMIYANA, RegistryObject.create(new ResourceLocation(MODID, "large_shamiyana_door"), ForgeRegistries.BLOCKS))
+                    .put(TentType.TEPEE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "large_tepee_door")))
+                    .put(TentType.YURT, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "large_yurt_door")))
+                    .put(TentType.BEDOUIN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "large_bedouin_door")))
+                    .put(TentType.INDLU, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "large_indlu_door")))
+                    .put(TentType.SHAMIYANA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "large_shamiyana_door")))
                     .build())
             .put(TentSize.GIANT, new ImmutableMap.Builder<TentType, Supplier<Block>>()
-                    .put(TentType.TEPEE, RegistryObject.create(new ResourceLocation(MODID, "giant_tepee_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.YURT, RegistryObject.create(new ResourceLocation(MODID, "giant_yurt_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.BEDOUIN, RegistryObject.create(new ResourceLocation(MODID, "giant_bedouin_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.INDLU, RegistryObject.create(new ResourceLocation(MODID, "giant_indlu_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.SHAMIYANA, RegistryObject.create(new ResourceLocation(MODID, "giant_shamiyana_door"), ForgeRegistries.BLOCKS))
+                    .put(TentType.TEPEE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "giant_tepee_door")))
+                    .put(TentType.YURT, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "giant_yurt_door")))
+                    .put(TentType.BEDOUIN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "giant_bedouin_door")))
+                    .put(TentType.INDLU, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "giant_indlu_door")))
+                    .put(TentType.SHAMIYANA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "giant_shamiyana_door")))
                     .build())
             .put(TentSize.MEGA, new ImmutableMap.Builder<TentType, Supplier<Block>>()
-                    .put(TentType.TEPEE, RegistryObject.create(new ResourceLocation(MODID, "mega_tepee_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.YURT, RegistryObject.create(new ResourceLocation(MODID, "mega_yurt_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.BEDOUIN, RegistryObject.create(new ResourceLocation(MODID, "mega_bedouin_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.INDLU, RegistryObject.create(new ResourceLocation(MODID, "mega_indlu_door"), ForgeRegistries.BLOCKS))
-                    .put(TentType.SHAMIYANA, RegistryObject.create(new ResourceLocation(MODID, "mega_shamiyana_door"), ForgeRegistries.BLOCKS))
+                    .put(TentType.TEPEE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "mega_tepee_door")))
+                    .put(TentType.YURT, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "mega_yurt_door")))
+                    .put(TentType.BEDOUIN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "mega_bedouin_door")))
+                    .put(TentType.INDLU, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "mega_indlu_door")))
+                    .put(TentType.SHAMIYANA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "mega_shamiyana_door")))
                     .build())
             .build();
 
@@ -124,48 +129,48 @@ public final class TentPlacer {
      * Map where keys = {Frame Block ID} and value = {Function with boolean "outside" that returns Tent Block}
      */
     public static final Map<ResourceLocation, Function<Boolean, BlockState>> FRAME_TO_BLOCK = new ImmutableMap.Builder<ResourceLocation, Function<Boolean, BlockState>>()
-            .put(new ResourceLocation(MODID, "yurt_wall_frame"), outside -> NTBlockRegistry.YURT_WALL.get().defaultBlockState().setValue(YurtWallBlock.OUTSIDE, outside))
-            .put(new ResourceLocation(MODID, "yurt_roof_frame"), outside -> NTBlockRegistry.YURT_ROOF.get().defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, outside))
-            .put(new ResourceLocation(MODID, "tepee_wall_frame"), outside -> NTBlockRegistry.BLANK_TEPEE_WALL.get().defaultBlockState())
-            .put(new ResourceLocation(MODID, "bedouin_wall_frame"), outside -> NTBlockRegistry.BEDOUIN_WALL.get().defaultBlockState())
-            .put(new ResourceLocation(MODID, "bedouin_roof_frame"), outside -> NTBlockRegistry.BEDOUIN_ROOF.get().defaultBlockState())
-            .put(new ResourceLocation(MODID, "indlu_wall_frame"), outside -> NTBlockRegistry.INDLU_WALL.get().defaultBlockState().setValue(IndluWallBlock.OUTSIDE, outside))
-            .put(new ResourceLocation(MODID, "shamiyana_wall_frame"), outside -> NTBlockRegistry.WHITE_SHAMIYANA_WALL.get().defaultBlockState())
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "yurt_wall_frame"), outside -> NTBlockRegistry.YURT_WALL.get().defaultBlockState().setValue(YurtWallBlock.OUTSIDE, outside))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "yurt_roof_frame"), outside -> NTBlockRegistry.YURT_ROOF.get().defaultBlockState().setValue(YurtRoofBlock.OUTSIDE, outside))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "tepee_wall_frame"), outside -> NTBlockRegistry.BLANK_TEPEE_WALL.get().defaultBlockState())
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "bedouin_wall_frame"), outside -> NTBlockRegistry.BEDOUIN_WALL.get().defaultBlockState())
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "bedouin_roof_frame"), outside -> NTBlockRegistry.BEDOUIN_ROOF.get().defaultBlockState())
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "indlu_wall_frame"), outside -> NTBlockRegistry.INDLU_WALL.get().defaultBlockState().setValue(IndluWallBlock.OUTSIDE, outside))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "shamiyana_wall_frame"), outside -> NTBlockRegistry.WHITE_SHAMIYANA_WALL.get().defaultBlockState())
             .build();
 
     /**
      * Map where keys = {Tent Block ID} and value = {Frame Block Supplier}
      */
-    public static final Map<ResourceLocation, RegistryObject<Block>> BLOCK_TO_FRAME = new ImmutableMap.Builder<ResourceLocation, RegistryObject<Block>>()
-            .put(new ResourceLocation(MODID, "yurt_wall"), RegistryObject.create(new ResourceLocation(MODID, "yurt_wall_frame"), ForgeRegistries.BLOCKS))
-            .put(new ResourceLocation(MODID, "yurt_roof"), RegistryObject.create(new ResourceLocation(MODID, "yurt_roof_frame"), ForgeRegistries.BLOCKS))
-            .put(new ResourceLocation(MODID, "blank_tepee_wall"), RegistryObject.create(new ResourceLocation(MODID, "tepee_wall_frame"), ForgeRegistries.BLOCKS))
-            .put(new ResourceLocation(MODID, "bedouin_wall"), RegistryObject.create(new ResourceLocation(MODID, "bedouin_wall_frame"), ForgeRegistries.BLOCKS))
-            .put(new ResourceLocation(MODID, "bedouin_roof"), RegistryObject.create(new ResourceLocation(MODID, "bedouin_roof_frame"), ForgeRegistries.BLOCKS))
-            .put(new ResourceLocation(MODID, "indlu_wall"), RegistryObject.create(new ResourceLocation(MODID, "indlu_wall_frame"), ForgeRegistries.BLOCKS))
-            .put(new ResourceLocation(MODID, "white_shamiyana_wall"), RegistryObject.create(new ResourceLocation(MODID, "shamiyana_wall_frame"), ForgeRegistries.BLOCKS))
+    public static final Map<ResourceLocation, Supplier<Block>> BLOCK_TO_FRAME = new ImmutableMap.Builder<ResourceLocation, Supplier<Block>>()
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "yurt_wall"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "yurt_wall_frame")))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "yurt_roof"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "yurt_roof_frame")))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "blank_tepee_wall"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "tepee_wall_frame")))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "bedouin_wall"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "bedouin_wall_frame")))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "bedouin_roof"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "bedouin_roof_frame")))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "indlu_wall"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "indlu_wall_frame")))
+            .put(ResourceLocation.fromNamespaceAndPath(MODID, "white_shamiyana_wall"), () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "shamiyana_wall_frame")))
             .build();
 
     /**
      * Map where keys = {DyeColor} and value = {Shamiyana Block Supplier}
      */
     public static final Map<DyeColor, Supplier<Block>> SHAMIYANA_WALLS = new ImmutableMap.Builder<DyeColor, Supplier<Block>>()
-            .put(DyeColor.BLACK, RegistryObject.create(new ResourceLocation(MODID, "black_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.BLUE, RegistryObject.create(new ResourceLocation(MODID, "blue_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.BROWN, RegistryObject.create(new ResourceLocation(MODID, "brown_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.CYAN, RegistryObject.create(new ResourceLocation(MODID, "cyan_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.GRAY, RegistryObject.create(new ResourceLocation(MODID, "gray_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.GREEN, RegistryObject.create(new ResourceLocation(MODID, "green_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.LIGHT_BLUE, RegistryObject.create(new ResourceLocation(MODID, "light_blue_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.LIGHT_GRAY, RegistryObject.create(new ResourceLocation(MODID, "light_gray_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.LIME, RegistryObject.create(new ResourceLocation(MODID, "lime_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.MAGENTA, RegistryObject.create(new ResourceLocation(MODID, "magenta_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.ORANGE, RegistryObject.create(new ResourceLocation(MODID, "orange_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.PINK, RegistryObject.create(new ResourceLocation(MODID, "pink_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.PURPLE, RegistryObject.create(new ResourceLocation(MODID, "purple_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.RED, RegistryObject.create(new ResourceLocation(MODID, "red_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.WHITE, RegistryObject.create(new ResourceLocation(MODID, "white_shamiyana_wall"), ForgeRegistries.BLOCKS))
-            .put(DyeColor.YELLOW, RegistryObject.create(new ResourceLocation(MODID, "yellow_shamiyana_wall"), ForgeRegistries.BLOCKS))
+            .put(DyeColor.BLACK, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "black_shamiyana_wall")))
+            .put(DyeColor.BLUE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "blue_shamiyana_wall")))
+            .put(DyeColor.BROWN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "brown_shamiyana_wall")))
+            .put(DyeColor.CYAN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "cyan_shamiyana_wall")))
+            .put(DyeColor.GRAY, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "gray_shamiyana_wall")))
+            .put(DyeColor.GREEN, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "green_shamiyana_wall")))
+            .put(DyeColor.LIGHT_BLUE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "light_blue_shamiyana_wall")))
+            .put(DyeColor.LIGHT_GRAY, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "light_gray_shamiyana_wall")))
+            .put(DyeColor.LIME, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "lime_shamiyana_wall")))
+            .put(DyeColor.MAGENTA, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "magenta_shamiyana_wall")))
+            .put(DyeColor.ORANGE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "orange_shamiyana_wall")))
+            .put(DyeColor.PINK, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "pink_shamiyana_wall")))
+            .put(DyeColor.PURPLE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "purple_shamiyana_wall")))
+            .put(DyeColor.RED, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "red_shamiyana_wall")))
+            .put(DyeColor.WHITE, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "white_shamiyana_wall")))
+            .put(DyeColor.YELLOW, () -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MODID, "yellow_shamiyana_wall")))
             .build();
 
     /**
@@ -204,7 +209,7 @@ public final class TentPlacer {
     private final Map<TentSize, Map<TentType, Set<BlockPos>>> templatePositions = new EnumMap<>(TentSize.class);
 
     public TentPlacer() {
-        TagKey<Block> tentWallTag = BlockTags.create(new ResourceLocation(MODID, "tent/tent_wall"));
+        TagKey<Block> tentWallTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "tent/tent_wall"));
 
         // initialize rule tests
         barrierTest = new BlockMatchTest(Blocks.BARRIER);
@@ -221,8 +226,8 @@ public final class TentPlacer {
         // create rule entry builder for "tent block to frame" processor
         ImmutableList.Builder<ProcessorRule> frameBlocksBuilder = new ImmutableList.Builder<>();
         // iterate over registered "block to frame" values and add each one
-        for (Map.Entry<ResourceLocation, RegistryObject<Block>> entry : BLOCK_TO_FRAME.entrySet()) {
-            Block tentBlock = ForgeRegistries.BLOCKS.getValue(entry.getKey());
+        for (Map.Entry<ResourceLocation, Supplier<Block>> entry : BLOCK_TO_FRAME.entrySet()) {
+            Block tentBlock = BuiltInRegistries.BLOCK.get(entry.getKey());
             if (tentBlock != null) {
                 frameBlocksBuilder.add(new ProcessorRule(new BlockMatchTest(tentBlock), AlwaysTrueTest.INSTANCE, entry.getValue().get().defaultBlockState()));
             }
@@ -553,7 +558,7 @@ public final class TentPlacer {
         BlockPos origin = door.offset(BlockPos.ZERO.offset(0, 0, -template.getSize().getZ() / 2).rotate(rotation));
         Set<BlockPos> tentBlocks = getTentBlockPositions(level, door, type, size);
         // load tent block tag
-        TagKey<Block> tentWallTag = BlockTags.create(new ResourceLocation(MODID, "tent/tent_wall"));
+        TagKey<Block> tentWallTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "tent/tent_wall"));
         // check each block to make sure it is in tent_wall tag (or is tent door)
         BlockPos checkPos;
         BlockState checkState;
@@ -761,7 +766,7 @@ public final class TentPlacer {
     public static StructureTemplate getTemplate(final Level level, final TentType type, final TentSize size) {
         // determine structure to use
         String templateName = "tent/" + size.getSerializedName() + "_" + type.getSerializedName();
-        ResourceLocation templateId = new ResourceLocation(NomadicTents.MOD_ID, templateName);
+        ResourceLocation templateId = ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, templateName);
         return getTemplate(level, templateId);
     }
 
@@ -775,7 +780,7 @@ public final class TentPlacer {
     public static StructureTemplate getDecorTemplate(final Level level, final TentType type, final TentSize size) {
         // determine structure to use
         String templateName = "tent/decor/" + size.getSerializedName() + "_" + type.getSerializedName();
-        ResourceLocation templateId = new ResourceLocation(NomadicTents.MOD_ID, templateName);
+        ResourceLocation templateId = ResourceLocation.fromNamespaceAndPath(NomadicTents.MOD_ID, templateName);
         return getTemplate(level, templateId);
     }
 
@@ -820,9 +825,10 @@ public final class TentPlacer {
 
         Set<BlockPos> tentBlocks = new HashSet<>();
         // load tent block tag
-        TagKey<Block> tentWallTag = BlockTags.create(new ResourceLocation(MODID, "tent/tent_wall"));
+        TagKey<Block> tentWallTag = BlockTags.create(ResourceLocation.fromNamespaceAndPath(MODID, "tent/tent_wall"));
         // filter the template for each block and add to a set
-        for (Block b : ForgeRegistries.BLOCKS.tags().getTag(tentWallTag)) {
+        for (Holder<Block> holder : BuiltInRegistries.BLOCK.getTag(tentWallTag).map(HolderSet::stream).orElse(java.util.stream.Stream.empty()).toList()) {
+            Block b = holder.value();
             List<StructureTemplate.StructureBlockInfo> filtered = template.filterBlocks(origin, placement, b, false);
             for (StructureTemplate.StructureBlockInfo blockInfo : filtered) {
                 tentBlocks.add(blockInfo.pos());
@@ -865,7 +871,7 @@ public final class TentPlacer {
      * @return the block to replace the given frame block
      */
     public static BlockState getFrameTarget(final BlockState frame, final Level level, final BlockPos pos) {
-        ResourceLocation id = ForgeRegistries.BLOCKS.getKey(frame.getBlock());
+        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(frame.getBlock());
         boolean outside = !DynamicDimensionHelper.isInsideTent(level);
         if (FRAME_TO_BLOCK.containsKey(id)) {
             return FRAME_TO_BLOCK.get(id).apply(outside);

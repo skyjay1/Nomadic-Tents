@@ -1,0 +1,28 @@
+{
+  "type": "nomadictents:tent_layer",
+  "category": "misc",
+  "pattern": [
+    "DBD",
+    "DTD",
+    "DSD"
+  ],
+  "key": {
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "B": {
+      "tag": "c:storage_blocks/gold"
+    },
+    "S": {
+      "item": "nomadictents:golden_tent_shovel"
+    },
+    "T": {
+      "item": "nomadictents:mega_indlu"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:mega_indlu"
+  },
+  "layer": 3
+}

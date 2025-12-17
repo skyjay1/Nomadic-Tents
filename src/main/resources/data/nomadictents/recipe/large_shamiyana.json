@@ -1,0 +1,24 @@
+{
+  "type": "nomadictents:tent_size",
+  "category": "misc",
+  "pattern": [
+    "C C",
+    "WWW",
+    "WTW"
+  ],
+  "key": {
+    "W": {
+      "item": "nomadictents:shamiyana_section"
+    },
+    "C": {
+      "item": "nomadictents:golden_crossbeams"
+    },
+    "T": {
+      "item": "nomadictents:medium_shamiyana"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "nomadictents:large_shamiyana"
+  }
+}

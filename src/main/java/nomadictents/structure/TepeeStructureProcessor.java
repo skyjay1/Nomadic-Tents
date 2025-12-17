@@ -9,7 +9,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import nomadictents.NTConfig;
-import nomadictents.NTStructureProcessorsRegistry;
+import nomadictents.registries.NTStructureProcessorRegistry;
 import nomadictents.block.TepeeBlock;
 import nomadictents.registries.NTBlockRegistry;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +47,6 @@ public class TepeeStructureProcessor extends StructureProcessor {
 
     @Override
     protected StructureProcessorType<?> getType() {
-        return NTStructureProcessorsRegistry.TEPEE_PROCESSOR;
+        return NTStructureProcessorRegistry.TEPEE_PROCESSOR.get();
     }
 }

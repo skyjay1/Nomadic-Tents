@@ -1,7 +1,8 @@
 package nomadictents.dimension;
 
-import commoble.infiniverse.api.InfiniverseAPI;
+import net.commoble.infiniverse.api.InfiniverseAPI;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -10,8 +11,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.ITeleporter;
 import nomadictents.NTConfig;
 import nomadictents.NomadicTents;
 import nomadictents.structure.TentPlacer;
@@ -80,11 +81,24 @@ public class DynamicDimensionHelper {
     private static void sendToDimension(Entity entity, ServerLevel targetWorld, Vec3 targetVec, float targetRot) {
         // ensure destination chunk is loaded before we put the player in it
         targetWorld.getChunk(new BlockPos((int) targetVec.x, (int) targetVec.y, (int) targetVec.z));
+        
+        // Calculate motion
+        Vec3i normal = TentPlacer.TENT_DIRECTION.getNormal();
+        Vec3 targetMotion = entity.getDeltaMovement();
+        targetMotion = targetMotion.multiply(normal.getX(), normal.getY(), normal.getZ());
+
         // teleport the entity
-        ITeleporter teleporter = DirectTeleporter.create(entity, targetVec, targetRot, TentPlacer.TENT_DIRECTION);
-        entity.changeDimension(targetWorld, teleporter);
+        DimensionTransition transition = new DimensionTransition(
+            targetWorld,
+            targetVec,
+            targetMotion,
+            targetRot,
+            entity.getXRot(),
+            DimensionTransition.DO_NOTHING
+        );
+        entity.changeDimension(transition);
         // portal cooldown
-        entity.portalCooldown = NTConfig.CONFIG.PORTAL_COOLDOWN.get();
+        entity.setPortalCooldown(NTConfig.CONFIG.PORTAL_COOLDOWN.get());
     }
 
     /**
