@@ -1,0 +1,8 @@
+{
+  "values": [
+    "#nomadictents:tent/tent_door",
+    "#nomadictents:tent/tent_wall",
+    "minecraft:barrier",
+    "minecraft:bedrock"
+  ]
+}
