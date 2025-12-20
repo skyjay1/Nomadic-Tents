@@ -12,12 +12,14 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
@@ -30,10 +32,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
-import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import nomadictents.NTConfig;
 import nomadictents.NomadicTents;
 import nomadictents.block.IndluWallBlock;
@@ -57,7 +57,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 
@@ -325,8 +324,7 @@ public class TentPlacer {
         Tent prevTent = tent;
         if (tentExists) {
             BlockEntity blockEntity = level.getBlockEntity(door);
-            if (blockEntity instanceof TentDoorBlockEntity) {
-                TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
+            if (blockEntity instanceof TentDoorBlockEntity tentDoor) {
                 // set up tile entity fields
                 prevTent = tentDoor.getTent();
             }
@@ -358,8 +356,7 @@ public class TentPlacer {
         }
         // update door
         BlockEntity blockEntity = level.getBlockEntity(door);
-        if (blockEntity instanceof TentDoorBlockEntity) {
-            TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
+        if (blockEntity instanceof TentDoorBlockEntity tentDoor) {
             // set up tile entity fields
             tentDoor.setSpawnpoint(sourceLevel, sourceVec);
             tentDoor.setSpawnRot(sourceRot);
@@ -383,8 +380,7 @@ public class TentPlacer {
         // update door
         if (success) {
             BlockEntity blockEntity = level.getBlockEntity(door);
-            if (blockEntity instanceof TentDoorBlockEntity) {
-                TentDoorBlockEntity tentDoor = (TentDoorBlockEntity) blockEntity;
+            if (blockEntity instanceof TentDoorBlockEntity tentDoor) {
                 // set up tile entity fields
                 tentDoor.setTent(tent);
                 tentDoor.setDirection(direction);
@@ -644,7 +640,8 @@ public class TentPlacer {
                 // determine block location
                 p = origin.offset(x, 0, z);
                 // determine which block state to place
-                rigid = level.getBlockState(p.above()).getPistonPushReaction() == PushReaction.BLOCK;
+                BlockPos aboveP = p.above();
+                rigid = this.shouldHaveRigidDirtBeneath(level.getBlockState(aboveP), level, aboveP);
                 state = rigid ? rigidDirt : dirt;
                 // place in a column at this location
                 if (rigid || fill) {
@@ -656,6 +653,17 @@ public class TentPlacer {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns true if the given state is a tent boundary and should have rigid dirt beneath it when the tent is upgraded.
+     * @param state     the state to check
+     * @param level     the level the state is in
+     * @param pos     the position of the state
+     * @return true if the state should have rigid dirt beneath it
+     */
+    protected boolean shouldHaveRigidDirtBeneath(final BlockState state, final BlockGetter level, final BlockPos pos) {
+        return state.is(NomadicTents.TENT_BOUNDARIES);
     }
 
     /**
@@ -714,7 +722,8 @@ public class TentPlacer {
                         continue;
                     }
                     // determine which block state to place
-                    rigid = level.getBlockState(p.above()).getPistonPushReaction() == PushReaction.BLOCK;
+                    BlockPos aboveP = p.above();
+                    rigid = this.shouldHaveRigidDirtBeneath(level.getBlockState(aboveP), level, aboveP);
                     state = rigid ? rigidDirt : dirt;
                     // place in a column at this location
                     for (int y = 0, l = layersOld + 1; y < l; y++) {
@@ -738,12 +747,9 @@ public class TentPlacer {
                     // determine block location
                     p = origin.offset(x, 0, z);
                     // determine which block state to place
-                    rigid = level.getBlockState(p.above()).getPistonPushReaction() == PushReaction.BLOCK;
-                    if (rigid) {
-                        state = rigidDirt;
-                    } else {
-                        state = dirt;
-                    }
+                    BlockPos aboveP = p.above();
+                    rigid = this.shouldHaveRigidDirtBeneath(level.getBlockState(aboveP), level, aboveP);
+                    state = rigid ? rigidDirt : dirt;
                     // place in a column at this location
                     for (int y = layersOld + 1, l = layersNew + 1; y < l; y++) {
                         level.setBlock(p.below(y), state, Block.UPDATE_ALL);
@@ -849,13 +855,13 @@ public class TentPlacer {
     public static BlockState getDoor(final TentType type, final TentSize size, Direction direction) {
         // ensure valid tent type
         if (!DOORS.containsKey(size)) {
-            NomadicTents.LOGGER.warn("No tent door is registered for tent size " + size.getSerializedName());
+            NomadicTents.LOGGER.warn("No tent door is registered for tent size %s", size.getSerializedName());
             return null;
         }
         // ensure valid tent size
         Map<TentType, Supplier<Block>> doors = DOORS.get(size);
         if (!doors.containsKey(type)) {
-            NomadicTents.LOGGER.warn("No tent door is registered for tent type " + size.getSerializedName()
+            NomadicTents.LOGGER.warn("No tent door is registered for tent type %s", size.getSerializedName()
                     + " " + type.getSerializedName());
             return null;
         }
@@ -876,23 +882,16 @@ public class TentPlacer {
         if (FRAME_TO_BLOCK.containsKey(id)) {
             return FRAME_TO_BLOCK.get(id).apply(outside);
         }
-        NomadicTents.LOGGER.warn("Failed to locate frame block target for " + id);
+        NomadicTents.LOGGER.warn("Failed to locate frame block target for %s", id);
         return frame;
     }
 
     public static Rotation toRotation(Direction dir) {
-        switch (dir) {
-            case DOWN:
-            case UP:
-            case EAST:
-            default:
-                return Rotation.NONE;
-            case WEST:
-                return Rotation.CLOCKWISE_180;
-            case NORTH:
-                return Rotation.COUNTERCLOCKWISE_90;
-            case SOUTH:
-                return Rotation.CLOCKWISE_90;
-        }
+        return switch (dir) {
+            case WEST -> Rotation.CLOCKWISE_180;
+            case NORTH -> Rotation.COUNTERCLOCKWISE_90;
+            case SOUTH -> Rotation.CLOCKWISE_90;
+            default -> Rotation.NONE;
+        };
     }
 }

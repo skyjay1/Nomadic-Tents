@@ -1,5 +1,9 @@
 package nomadictents;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -23,6 +27,10 @@ public class NomadicTents {
 
     public static final String MOD_ID = "nomadictents";
     public static final Logger LOGGER = LogManager.getFormatterLogger(MOD_ID);
+
+    // Note: move to a different class when/if you have other tags or start moving to use data generation.
+    // No sense in having a separate class now, but it'll make things neater later.
+    public static final TagKey<Block> TENT_BOUNDARIES = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "tent_boundaries"));
 
     public NomadicTents(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, NTConfig.SPEC);
