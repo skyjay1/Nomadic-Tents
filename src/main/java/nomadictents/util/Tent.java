@@ -9,7 +9,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import nomadictents.NomadicTents;
 import nomadictents.registries.NTDataComponents;
 import nomadictents.structure.TentPlacer;

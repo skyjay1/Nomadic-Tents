@@ -1,6 +1,5 @@
 package nomadictents.structure;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -11,16 +10,17 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import nomadictents.registries.NTStructureProcessorRegistry;
 import nomadictents.block.ShamiyanaWallBlock;
 import nomadictents.registries.NTBlockRegistry;
+import nomadictents.registries.NTStructureProcessorRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
 public class ShamiyanaStructureProcessor extends StructureProcessor {
 
-    public static final MapCodec<ShamiyanaStructureProcessor> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final MapCodec<ShamiyanaStructureProcessor> CODEC
+            = RecordCodecBuilder.mapCodec(instance -> instance.group(
             DyeColor.CODEC.fieldOf("color").forGetter(ShamiyanaStructureProcessor::getColor)
     ).apply(instance, ShamiyanaStructureProcessor::new));
 
@@ -36,12 +36,18 @@ public class ShamiyanaStructureProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(@NotNull LevelReader level, @NotNull BlockPos rawPos, @NotNull BlockPos pos, @NotNull StructureTemplate.StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, @NotNull StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
+    public StructureTemplate.StructureBlockInfo process(@NotNull LevelReader level, @NotNull BlockPos rawPos,
+                                                        @NotNull BlockPos pos,
+                                                        @NotNull StructureTemplate.StructureBlockInfo rawBlockInfo,
+                                                        StructureTemplate.StructureBlockInfo blockInfo,
+                                                        @NotNull StructurePlaceSettings placementSettings,
+                                                        @Nullable StructureTemplate template) {
         // process blank tepee wall
         BlockPos p = blockInfo.pos();
         if (blockInfo.state().getBlock() == NTBlockRegistry.WHITE_SHAMIYANA_WALL.get()) {
             boolean pattern = /*p.getY() % 3 == 1 || */ blockInfo.state().getValue(ShamiyanaWallBlock.PATTERN);
-            BlockState state = TentPlacer.SHAMIYANA_WALLS.get(this.color).get().defaultBlockState().setValue(ShamiyanaWallBlock.PATTERN, pattern);
+            BlockState state = TentPlacer.SHAMIYANA_WALLS.get(this.color).get()
+                    .defaultBlockState().setValue(ShamiyanaWallBlock.PATTERN, pattern);
             return new StructureTemplate.StructureBlockInfo(p, state, null);
         }
         return blockInfo;

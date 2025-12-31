@@ -1,6 +1,0 @@
-- Add support for REI (Possibly update JEI support or remove, need to consult sky)
-- Fix infiniverse dependency.
-- Fix some registry, dimension and portal code.
-- Recipe code is broken still.
-- Structure stuff?
-- General port work... This was a VERY rough first attempt because I'm exhausted...

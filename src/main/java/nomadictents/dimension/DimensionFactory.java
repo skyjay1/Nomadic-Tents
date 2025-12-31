@@ -15,7 +15,7 @@ import nomadictents.NomadicTents;
  */
 // a Dimension is just a DimensionType + a ChunkGenerator
 // we can define the dimension type in a json at data/yourmod/worldgen/dimension_type/your_dimension_type.json
-// but we'll need to create instances of the chunk generator at runtime since there's no json folder for them
+// but, we'll need to create instances of the chunk generator at runtime since there's no json folder for them
 public class DimensionFactory {
 
     public static final ResourceKey<DimensionType> TYPE_KEY = ResourceKey.create(Registries.DIMENSION_TYPE,

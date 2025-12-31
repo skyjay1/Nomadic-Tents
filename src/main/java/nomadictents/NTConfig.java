@@ -1,6 +1,7 @@
 package nomadictents;
 
 import com.google.common.collect.Lists;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -13,10 +14,7 @@ import nomadictents.tileentity.TentDoorBlockEntity;
 
 import java.util.List;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-
 public class NTConfig {
-
 
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     public static final NTConfig CONFIG = new NTConfig(BUILDER);

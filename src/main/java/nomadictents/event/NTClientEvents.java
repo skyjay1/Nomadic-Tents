@@ -11,7 +11,6 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import nomadictents.NomadicTents;
 import nomadictents.registries.NTBlockRegistry;
 import nomadictents.registries.NTDataComponents;
-import nomadictents.util.Tent;
 
 public final class NTClientEvents {
 

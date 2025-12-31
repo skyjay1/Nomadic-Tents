@@ -1,6 +1,5 @@
 package nomadictents.structure;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -21,7 +20,8 @@ import javax.annotation.Nullable;
 
 public class LocStructureProcessor extends StructureProcessor {
 
-    public static final MapCodec<LocStructureProcessor> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final MapCodec<LocStructureProcessor> CODEC
+            = RecordCodecBuilder.mapCodec(instance -> instance.group(
             RuleTest.CODEC.fieldOf("predicate").forGetter(LocStructureProcessor::getLocPredicate)
     ).apply(instance, LocStructureProcessor::new));
 
@@ -39,7 +39,12 @@ public class LocStructureProcessor extends StructureProcessor {
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(LevelReader level, @NotNull BlockPos rawPos, @NotNull BlockPos pos, StructureTemplate.@NotNull StructureBlockInfo rawBlockInfo, StructureTemplate.StructureBlockInfo blockInfo, StructurePlaceSettings placementSettings, @Nullable StructureTemplate template) {
+    public StructureTemplate.StructureBlockInfo process(LevelReader level, @NotNull BlockPos rawPos,
+                                                        @NotNull BlockPos pos,
+                                                        @NotNull StructureTemplate.StructureBlockInfo rawBlockInfo,
+                                                        StructureTemplate.StructureBlockInfo blockInfo,
+                                                        StructurePlaceSettings placementSettings,
+                                                        @Nullable StructureTemplate template) {
         RandomSource random = placementSettings.getRandom(blockInfo.pos());
         BlockState blockState = level.getBlockState(blockInfo.pos());
         // only process the block if the existing block at this location passes the rule test
